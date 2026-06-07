@@ -11,6 +11,19 @@ export const encountersByFloor = {
   20: 8
 };
 
+export const baseDcByFloor = {
+  11: 15,
+  12: 15,
+  13: 20,
+  14: 20,
+  15: 20,
+  16: 25,
+  17: 25,
+  18: 25,
+  19: 30,
+  20: 30
+};
+
 export const roomTypes = [
   { type: "normal", label: "Encontro normal", short: "N", weight: 62 },
   { type: "elite", label: "Encontro elite", short: "E", weight: 11 },
@@ -29,6 +42,12 @@ export const treasureRoom = {
   type: "treasure",
   label: "Tesouro",
   short: "T"
+};
+
+export const campRoom = {
+  type: "camp",
+  label: "Acampamento",
+  short: "C"
 };
 
 export const skillOptionsByRoomType = {

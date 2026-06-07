@@ -121,25 +121,26 @@ aside h2 {
   font-weight: bold;
 }
 
+.legend-node img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
 .link {
-  stroke: #9c7656;
-  stroke-width: 2;
+  stroke-width: 3;
+  stroke-linecap: round;
   fill: none;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .node circle {
-  stroke: #f1d6a8;
-  stroke-width: 2;
+  stroke: var(--column-color, #f1d6a8);
+  stroke-width: 3;
 }
 
-.node text {
-  fill: #fff7e8;
-  font-size: 12px;
-  text-anchor: middle;
-  dominant-baseline: middle;
+.node-icon {
   pointer-events: none;
-  font-weight: bold;
 }
 
 .node .check-text {
@@ -161,28 +162,30 @@ aside h2 {
 .legend-elite {
   background: #4b1111;
   fill: #4b1111;
-  border-color: #ff9f43;
-  stroke: #ff9f43;
 }
 
 .trap circle,
 .legend-trap {
-  background: #5f5f5f;
-  fill: #5f5f5f;
+  background: #4f6b45;
+  fill: #4f6b45;
 }
 
 .unknown circle,
 .legend-unknown {
-  background: #6b4aa0;
-  fill: #6b4aa0;
+  background: #1f3f66;
+  fill: #1f3f66;
 }
 
 .treasure circle,
 .legend-treasure {
   background: #b88a28;
   fill: #b88a28;
-  border-color: #fff0a8;
-  stroke: #fff0a8;
+}
+
+.camp circle,
+.legend-camp {
+  background: #2f5d63;
+  fill: #2f5d63;
 }
 
 @media (max-width: 800px) {

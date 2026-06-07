@@ -34,8 +34,8 @@
         </label>
 
         <label>
-          Convergência %:
-          <input id="convergenceInput" type="number" min="0" max="100" value="65" />
+          CD base:
+          <input id="baseDcInput" type="number" min="5" max="40" value="15" />
         </label>
 
         <button id="generateButton" type="button">Gerar mapa</button>
@@ -53,28 +53,33 @@
         <h2>Legenda</h2>
 
         <div class="legend-item">
-          <span class="legend-node legend-normal">N</span>
+          <span class="legend-node legend-normal"><img src="/assets/icons/normal.svg" alt="" /></span>
           <span>Encontro normal</span>
         </div>
 
         <div class="legend-item">
-          <span class="legend-node legend-elite">E</span>
+          <span class="legend-node legend-elite"><img src="/assets/icons/elite.svg" alt="" /></span>
           <span>Encontro elite</span>
         </div>
 
         <div class="legend-item">
-          <span class="legend-node legend-trap">A</span>
+          <span class="legend-node legend-trap"><img src="/assets/icons/trap.svg" alt="" /></span>
           <span>Armadilha</span>
         </div>
 
         <div class="legend-item">
-          <span class="legend-node legend-unknown">?</span>
+          <span class="legend-node legend-unknown"><img src="/assets/icons/unknown.svg" alt="" /></span>
           <span>Desconhecido</span>
         </div>
 
         <div class="legend-item">
-          <span class="legend-node legend-treasure">T</span>
+          <span class="legend-node legend-treasure"><img src="/assets/icons/treasure.svg" alt="" /></span>
           <span>Tesouro</span>
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-node legend-camp"><img src="/assets/icons/camp.svg" alt="" /></span>
+          <span>Acampamento</span>
         </div>
       </aside>
     </main>
