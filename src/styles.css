@@ -1,0 +1,203 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #1f1b18;
+  color: #f2e6d8;
+}
+
+header {
+  padding: 16px;
+  background: #2d241f;
+  border-bottom: 2px solid #6b4b35;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+input,
+select,
+button {
+  font-size: 16px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #8b6b4f;
+}
+
+input,
+select {
+  background: #f7efe6;
+}
+
+input {
+  width: 80px;
+}
+
+button {
+  background: #8b4a2b;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #a85a35;
+}
+
+#info {
+  padding: 10px 16px;
+  background: #2a211d;
+  border-bottom: 1px solid #4d392c;
+  font-size: 14px;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 230px;
+  height: calc(100vh - 132px);
+}
+
+#container {
+  overflow: auto;
+  background:
+    radial-gradient(circle at center, rgba(120, 80, 40, 0.15), transparent 60%),
+    #1f1b18;
+}
+
+svg {
+  display: block;
+  margin: 0 auto;
+}
+
+aside {
+  background: #181311;
+  border-left: 2px solid #4d392c;
+  padding: 16px;
+}
+
+aside h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.legend-node {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #f1d6a8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff7e8;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.link {
+  stroke: #9c7656;
+  stroke-width: 2;
+  fill: none;
+  opacity: 0.85;
+}
+
+.node circle {
+  stroke: #f1d6a8;
+  stroke-width: 2;
+}
+
+.node text {
+  fill: #fff7e8;
+  font-size: 12px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+  font-weight: bold;
+}
+
+.node .check-text {
+  fill: #f2e6d8;
+  font-size: 11px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+  font-weight: normal;
+}
+
+.normal circle,
+.legend-normal {
+  background: #8b2f2f;
+  fill: #8b2f2f;
+}
+
+.elite circle,
+.legend-elite {
+  background: #4b1111;
+  fill: #4b1111;
+  border-color: #ff9f43;
+  stroke: #ff9f43;
+}
+
+.trap circle,
+.legend-trap {
+  background: #5f5f5f;
+  fill: #5f5f5f;
+}
+
+.unknown circle,
+.legend-unknown {
+  background: #6b4aa0;
+  fill: #6b4aa0;
+}
+
+.treasure circle,
+.legend-treasure {
+  background: #b88a28;
+  fill: #b88a28;
+  border-color: #fff0a8;
+  stroke: #fff0a8;
+}
+
+@media (max-width: 800px) {
+  main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  aside {
+    border-left: none;
+    border-top: 2px solid #4d392c;
+  }
+
+  .legend-item {
+    display: inline-flex;
+    margin-right: 12px;
+  }
+}

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2d241f" />
+    <title>Mega Dungeon - Tormenta20</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+  </head>
+  <body>
+    <header>
+      <h1>Mapa Aleatório de Encontros - Andares 11 a 20</h1>
+
+      <div class="controls">
+        <label>
+          Andar:
+          <select id="floorInput">
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="17">17</option>
+            <option value="18">18</option>
+            <option value="19">19</option>
+            <option value="20">20</option>
+          </select>
+        </label>
+
+        <label>
+          Encontros:
+          <input id="depthInput" type="number" min="3" max="20" value="3" />
+        </label>
+
+        <label>
+          Convergência %:
+          <input id="convergenceInput" type="number" min="0" max="100" value="65" />
+        </label>
+
+        <button id="generateButton" type="button">Gerar mapa</button>
+      </div>
+    </header>
+
+    <div id="info"></div>
+
+    <main>
+      <div id="container">
+        <svg id="map"></svg>
+      </div>
+
+      <aside>
+        <h2>Legenda</h2>
+
+        <div class="legend-item">
+          <span class="legend-node legend-normal">N</span>
+          <span>Encontro normal</span>
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-node legend-elite">E</span>
+          <span>Encontro elite</span>
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-node legend-trap">A</span>
+          <span>Armadilha</span>
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-node legend-unknown">?</span>
+          <span>Desconhecido</span>
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-node legend-treasure">T</span>
+          <span>Tesouro</span>
+        </div>
+      </aside>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

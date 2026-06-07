@@ -1,0 +1,10 @@
+{
+  "name": "Mega Dungeon",
+  "short_name": "Mega Dungeon",
+  "description": "Gerador de andares e encontros para Tormenta20.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f1b18",
+  "theme_color": "#2d241f",
+  "icons": []
+}
