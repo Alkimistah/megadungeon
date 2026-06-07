@@ -5,19 +5,15 @@ import {
   unknownRoom
 } from "./tables.js";
 
-const MIN_NODES_PER_LEVEL = 1;
-const MAX_NODES_PER_LEVEL = 4;
-const MIN_CONNECTIONS = 1;
-const MAX_CONNECTIONS = 3;
+const MIN_INITIAL_NODES = 2;
+const MAX_INITIAL_NODES = 4;
+const MIN_CHILDREN_PER_NODE = 1;
+const MAX_CHILDREN_PER_NODE = 4;
 
 let nodeId = 0;
 
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function chance(value) {
-  return Math.random() < value;
 }
 
 function pick(array) {
@@ -84,7 +80,7 @@ function assignDiscoveryCheck(node, floor) {
   const options = skillOptionsByRoomType[node.type] || skillOptionsByRoomType.normal;
   const baseDC = getBaseDCByFloor(floor);
   const modifier = getRoomTypeDCModifier(node.type);
-  const variation = getRandomDCVariation();
+  const variation = node.type === "elite" ? 0 : getRandomDCVariation();
 
   node.skill = pickWeightedSkill(options);
   node.dc = Math.min(Math.max(baseDC + modifier + variation, 5), 40);
@@ -130,88 +126,40 @@ function guaranteeAtLeastOneTreasure(levels) {
   applyRoomType(target, treasureRoom);
 }
 
-function getNearbyTargets(index, currentLevelSize, nextLevel) {
-  if (nextLevel.length <= 2) return nextLevel;
+function createInitialLevel() {
+  const nodeCount = randomInt(MIN_INITIAL_NODES, MAX_INITIAL_NODES);
 
-  const relativePosition = currentLevelSize === 1 ? 0.5 : index / (currentLevelSize - 1);
-  const idealIndex = Math.round(relativePosition * (nextLevel.length - 1));
-  const targets = [];
-
-  for (let offset = -1; offset <= 1; offset++) {
-    const targetIndex = idealIndex + offset;
-
-    if (targetIndex >= 0 && targetIndex < nextLevel.length) {
-      targets.push(nextLevel[targetIndex]);
-    }
-  }
-
-  return targets;
+  return Array.from({ length: nodeCount }, () => createNode(1));
 }
 
-function findSharedNeighborTarget(currentLevel, node, alreadyChosen) {
-  const neighborLinks = [];
+function createNextLevel(currentLevel, nextLevelNumber, convergenceChance) {
+  const nextLevel = [];
+  const ownChildrenBySource = new Map();
 
-  currentLevel.forEach((otherNode) => {
-    if (otherNode === node) return;
+  currentLevel.forEach((source) => {
+    const childCount = randomInt(MIN_CHILDREN_PER_NODE, MAX_CHILDREN_PER_NODE);
+    const children = Array.from({ length: childCount }, () => createNode(nextLevelNumber));
 
-    otherNode.links.forEach((target) => {
-      if (!alreadyChosen.includes(target)) {
-        neighborLinks.push(target);
+    source.links = [...children];
+    ownChildrenBySource.set(source, children);
+    nextLevel.push(...children);
+  });
+
+  currentLevel.forEach((source) => {
+    const ownChildren = ownChildrenBySource.get(source);
+
+    nextLevel.forEach((target) => {
+      if (ownChildren.includes(target)) {
+        return;
+      }
+
+      if (Math.random() < convergenceChance) {
+        source.links.push(target);
       }
     });
   });
 
-  if (neighborLinks.length === 0) return null;
-
-  return pick(neighborLinks);
-}
-
-function ensureEveryNextNodeIsReachable(currentLevel, nextLevel) {
-  nextLevel.forEach((target) => {
-    const hasIncomingLink = currentLevel.some((node) => node.links.includes(target));
-
-    if (!hasIncomingLink) {
-      const source = pick(currentLevel);
-      source.links.push(target);
-    }
-  });
-}
-
-function connectLevels(levels, convergenceChance) {
-  for (let level = 0; level < levels.length - 1; level++) {
-    const currentLevel = levels[level];
-    const nextLevel = levels[level + 1];
-
-    currentLevel.forEach((node, index) => {
-      const possibleTargets = getNearbyTargets(index, currentLevel.length, nextLevel);
-      const connectionCount = Math.min(
-        randomInt(MIN_CONNECTIONS, MAX_CONNECTIONS),
-        possibleTargets.length
-      );
-
-      const chosenTargets = [];
-
-      for (let i = 0; i < connectionCount; i++) {
-        let target = null;
-
-        if (chance(convergenceChance)) {
-          target = findSharedNeighborTarget(currentLevel, node, chosenTargets);
-        }
-
-        if (!target) {
-          target = pick(possibleTargets);
-        }
-
-        if (!chosenTargets.includes(target)) {
-          chosenTargets.push(target);
-        }
-      }
-
-      node.links = chosenTargets;
-    });
-
-    ensureEveryNextNodeIsReachable(currentLevel, nextLevel);
-  }
+  return nextLevel;
 }
 
 function convertTotalConvergencesToUnknown(levels) {
@@ -236,26 +184,12 @@ function convertTotalConvergencesToUnknown(levels) {
 
 export function generateMapData(depth, convergenceChance, floor) {
   nodeId = 0;
-  const levels = [];
+  const levels = [createInitialLevel()];
 
-  for (let level = 0; level < depth; level++) {
-    levels[level] = [];
-    let nodeCount;
-
-    if (level === 0) {
-      nodeCount = randomInt(2, 4);
-    } else if (level === depth - 1) {
-      nodeCount = randomInt(1, 3);
-    } else {
-      nodeCount = randomInt(MIN_NODES_PER_LEVEL, MAX_NODES_PER_LEVEL);
-    }
-
-    for (let i = 0; i < nodeCount; i++) {
-      levels[level].push(createNode(level + 1));
-    }
+  for (let level = 1; level < depth; level++) {
+    levels[level] = createNextLevel(levels[level - 1], level + 1, convergenceChance);
   }
 
-  connectLevels(levels, convergenceChance);
   convertTotalConvergencesToUnknown(levels);
   guaranteeAtLeastOneTreasure(levels);
   assignDiscoveryChecks(levels, floor);
