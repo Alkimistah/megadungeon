@@ -44,11 +44,18 @@
             CD base:
             <input id="baseDcInput" type="number" min="5" max="40" value="15" />
           </label>
+
+          <label class="checkbox-field">
+            <input id="unknownPathsInput" type="checkbox" />
+            Caminhos desconhecidos
+          </label>
         </div>
 
         <div id="info"></div>
       </div>
     </header>
+    <button id="reloadAppButton" class="reload-button floating-reload" type="button" aria-label="Recarregar aplicativo"><img src="/assets/icons/return-arrow.svg" alt="" /></button>
+
     <div id="timeTracker" class="time-tracker" aria-live="polite">
       <span>Tempo de exploração</span>
       <strong id="timeTrackerValue">0min</strong>
@@ -68,7 +75,7 @@
         <aside id="legendPanel" class="legend-panel" hidden>
           <div class="legend-header">
             <h2>Legenda</h2>
-            <button id="legendClose" class="legend-close" type="button" aria-label="Fechar legenda">×</button>
+            <button id="legendClose" class="legend-close" type="button" aria-label="Fechar legenda"><img src="/assets/icons/close-modal.svg" alt="" /></button>
           </div>
 
           <div class="legend-item">
@@ -79,6 +86,11 @@
           <div class="legend-item">
             <span class="legend-node legend-elite"><img src="/assets/icons/elite.svg" alt="" /></span>
             <span>Encontro elite</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-node legend-boss"><img src="/assets/icons/boss.svg" alt="" /></span>
+            <span>Chefão</span>
           </div>
 
           <div class="legend-item">
@@ -120,6 +132,11 @@
           <select id="floorRangeInput"></select>
         </label>
 
+        <label class="checkbox-field">
+          <input id="initialUnknownPathsInput" type="checkbox" />
+          Caminhos desconhecidos
+        </label>
+
         <button id="rangeConfirm" type="submit">Iniciar exploração</button>
       </form>
     </dialog>
@@ -132,7 +149,7 @@
             <h2 id="nodeDialogTitle"></h2>
             <p id="nodeDialogMeta" class="node-dialog-meta"></p>
           </div>
-          <button id="nodeDialogClose" class="icon-button" type="submit" aria-label="Fechar">×</button>
+          <button id="nodeDialogClose" class="icon-button" type="submit" aria-label="Fechar"><img src="/assets/icons/close-modal.svg" alt="" /></button>
         </div>
 
         <div id="nodeDialogContent"></div>

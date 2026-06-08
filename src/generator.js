@@ -1,7 +1,8 @@
+import { assignChallengeRating } from "./challenge.js";
 import { generateEnvironmentContext } from "./environment.js";
 import {
+  bossRoom,
   campRoom,
-  roomTypes,
   skillOptionsByRoomType,
   treasureRoom,
   unknownRoom
@@ -14,11 +15,13 @@ const MIN_MIDDLE_NODES = 5;
 const MAX_MIDDLE_NODES = 7;
 const EXTRA_LINK_CHANCE = 0.18;
 const UNKNOWN_INCOMING_THRESHOLD = 3;
-
-const INVESTIGATION_TIME_RULES = [
-  { floorRange: [11, 20], incrementMinutes: 15, maxMinutes: 60, noCheckMinutes: 30 }
+const UNKNOWN_REVEAL_OPTIONS = [
+  "Encontro normal",
+  "Encontro elite",
+  "Armadilha",
+  "Tesouro",
+  "Acampamento"
 ];
-// TODO: Add investigation time increments and encounter limits for floors above 20.
 
 const COLUMN_TEMPLATES = {
   3: [[1, 3, 5], [0, 3, 6], [1, 2, 4]],
@@ -77,18 +80,34 @@ function pickWeightedSkill(options) {
   return pickWeighted(options).skill;
 }
 
-function pickWeightedRoomType() {
-  return pickWeighted(roomTypes);
+function pickWeightedRoomType(profile) {
+  return pickWeighted(profile.encounterRules.roomTypes);
 }
 
-function assignEnvironments(levels) {
+function assignEnvironments(levels, profile) {
   levels.flat().forEach((node) => {
-    node.environment = generateEnvironmentContext();
+    node.environment = generateEnvironmentContext({
+      avoidDamagingClimate: node.type === "camp",
+      environmentRules: profile.environmentRules
+    });
+  });
+}
+
+function assignUnknownReveals(levels) {
+  levels.flat().forEach((node) => {
+    node.revealedLabel = node.type === "unknown" ? pick(UNKNOWN_REVEAL_OPTIONS) : null;
+  });
+}
+
+
+function assignChallengeRatings(levels, profile, floor) {
+  levels.flat().forEach((node) => {
+    assignChallengeRating(node, floor, profile);
   });
 }
 
 function assignDiscoveryCheck(node, baseDC) {
-  if (node.type === "unknown" || node.type === "camp") {
+  if (node.type === "unknown" || node.type === "camp" || node.type === "boss") {
     node.skill = null;
     node.dc = null;
     return;
@@ -108,16 +127,12 @@ function assignDiscoveryChecks(levels, baseDC) {
   });
 }
 
-function getInvestigationTimeRule() {
-  return INVESTIGATION_TIME_RULES[0];
-}
-
 function getClimateEventCount(node) {
   return node.environment.climate.filter((climate) => climate.name !== "Clima normal").length;
 }
 
-function assignInvestigationTime(node) {
-  const rule = getInvestigationTimeRule();
+function assignInvestigationTime(node, profile) {
+  const rule = profile.encounterRules.timeRule;
 
   if (!node.skill || !node.dc) {
     node.investigationMinutes = rule.noCheckMinutes;
@@ -130,9 +145,9 @@ function assignInvestigationTime(node) {
   node.investigationMinutes = Math.min(minutes, rule.maxMinutes);
 }
 
-function assignInvestigationTimes(levels) {
+function assignInvestigationTimes(levels, profile) {
   levels.flat().forEach((node) => {
-    assignInvestigationTime(node);
+    assignInvestigationTime(node, profile);
   });
 }
 
@@ -143,10 +158,12 @@ function applyRoomType(node, roomData) {
   node.skill = null;
   node.dc = null;
   node.investigationMinutes = null;
+  node.revealedLabel = null;
+  node.challenge = null;
 }
 
-function createNode(level, column) {
-  const data = pickWeightedRoomType();
+function createNode(level, column, profile) {
+  const data = pickWeightedRoomType(profile);
 
   return {
     id: nodeId++,
@@ -161,7 +178,9 @@ function createNode(level, column) {
     skill: null,
     dc: null,
     investigationMinutes: null,
-    environment: null
+    revealedLabel: null,
+    environment: null,
+    challenge: null
   };
 }
 
@@ -170,7 +189,8 @@ function guaranteeAtLeastOneTreasure(levels) {
 
   if (treasureExists) return;
 
-  const target = pick(levels.flat());
+  const candidates = levels.flat().filter((node) => node.type !== "boss");
+  const target = pick(candidates);
   applyRoomType(target, treasureRoom);
 }
 
@@ -184,7 +204,7 @@ function pickCampNode(levelNodes) {
     (node) => node.type === "normal" || node.type === "trap"
   );
   const fallbackCandidates = levelNodes.filter(
-    (node) => node.type !== "treasure" && node.type !== "camp"
+    (node) => node.type !== "treasure" && node.type !== "camp" && node.type !== "boss"
   );
   const candidates = preferredCandidates.length > 0 ? preferredCandidates : fallbackCandidates;
 
@@ -193,7 +213,11 @@ function pickCampNode(levelNodes) {
 
 function addCampsIfEligible(levels) {
   getCampLevelIndexes(levels).forEach((levelIndex) => {
-    applyRoomType(pickCampNode(levels[levelIndex]), campRoom);
+    const levelNodes = levels[levelIndex].filter((node) => node.type !== "boss");
+
+    if (levelNodes.length > 0) {
+      applyRoomType(pickCampNode(levelNodes), campRoom);
+    }
   });
 }
 
@@ -214,13 +238,13 @@ function pickColumnsForNodeCount(nodeCount) {
   return [...pick(templates)];
 }
 
-function createLevel(levelIndex, nodeCount) {
+function createLevel(levelIndex, nodeCount, profile) {
   return pickColumnsForNodeCount(nodeCount).map((column) =>
-    createNode(levelIndex + 1, column)
+    createNode(levelIndex + 1, column, profile)
   );
 }
 
-function createCupLevels(depth) {
+function createCupLevels(depth, profile) {
   const edgeNodeCount = randomInt(MIN_EDGE_NODES, MAX_EDGE_NODES);
   const middleNodeCount = randomInt(
     Math.max(MIN_MIDDLE_NODES, edgeNodeCount + 2),
@@ -235,7 +259,7 @@ function createCupLevels(depth) {
       middleNodeCount
     );
 
-    return createLevel(levelIndex, nodeCount);
+    return createLevel(levelIndex, nodeCount, profile);
   });
 }
 
@@ -304,11 +328,51 @@ function connectCupLevels(levels) {
   }
 }
 
-function createSlayLikeMap(depth) {
-  const levels = createCupLevels(depth);
+function createSlayLikeMap(depth, profile) {
+  const levels = createCupLevels(depth, profile);
   connectCupLevels(levels);
 
   return levels;
+}
+
+
+function shouldAddBoss(profile, floor) {
+  const bossRules = profile.encounterRules.boss;
+
+  if (!bossRules?.enabled) return false;
+  if (!bossRules.finalFloorOnly) return true;
+
+  return floor === Math.max(...profile.floors);
+}
+
+function addFinalBoss(levels, profile, floor) {
+  if (!shouldAddBoss(profile, floor)) return;
+
+  const boss = {
+    id: nodeId++,
+    level: levels.length,
+    column: Math.floor(GRID_WIDTH / 2),
+    type: bossRoom.type,
+    label: bossRoom.label,
+    short: bossRoom.short,
+    x: 0,
+    y: 0,
+    links: [],
+    skill: null,
+    dc: null,
+    investigationMinutes: null,
+    revealedLabel: null,
+    environment: null,
+    challenge: null
+  };
+
+  levels[levels.length - 1] = [boss];
+
+  if (levels.length > 1) {
+    levels[levels.length - 2].forEach((node) => {
+      node.links = [boss];
+    });
+  }
 }
 
 function convertMergedPathsToUnknown(levels) {
@@ -321,23 +385,26 @@ function convertMergedPathsToUnknown(levels) {
         previousNode.links.includes(node)
       ).length;
 
-      if (incomingCount >= UNKNOWN_INCOMING_THRESHOLD) {
+      if (node.type !== "boss" && incomingCount >= UNKNOWN_INCOMING_THRESHOLD) {
         applyRoomType(node, unknownRoom);
       }
     });
   }
 }
 
-export function generateMapData(depth, baseDC) {
+export function generateMapData(depth, baseDC, profile, floor) {
   nodeId = 0;
-  const levels = createSlayLikeMap(depth);
+  const levels = createSlayLikeMap(depth, profile);
 
+  addFinalBoss(levels, profile, floor);
   guaranteeAtLeastOneTreasure(levels);
   convertMergedPathsToUnknown(levels);
   addCampsIfEligible(levels);
-  assignEnvironments(levels);
+  assignUnknownReveals(levels);
+  assignEnvironments(levels, profile);
+  assignChallengeRatings(levels, profile, floor);
   assignDiscoveryChecks(levels, baseDC);
-  assignInvestigationTimes(levels);
+  assignInvestigationTimes(levels, profile);
 
   return levels;
 }

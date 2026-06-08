@@ -142,6 +142,19 @@ const fog = {
   effect: "Fornece camuflagem. Neblina espessa fornece camuflagem leve a criaturas a 1,5 m e camuflagem total a criaturas a mais de 1,5 m."
 };
 
+const heatClimateNames = ["Calor", "Calor extremo"];
+const coldPrecipitationNames = ["Granizo", "Neve"];
+const damagingClimateNames = [
+  "Calor",
+  "Calor extremo",
+  "Frio",
+  "Frio extremo",
+  "Granizo",
+  "Tempestade",
+  "Furacão",
+  "Tornado"
+];
+
 const forestFeatures = [
   { weight: 26, value: { name: "Árvores", effect: "Árvores estreitas têm menos de 1,5 m de largura; árvores largas têm mais de 1,5 m. Árvore estreita concede cobertura leve; árvore larga tem RD 5 e 500 PV. Subir exige Atletismo CD 15; permanecer no topo exige Equilíbrio CD 15, exceto em árvore larga, que concede cobertura leve contra criaturas no solo." } },
   { weight: 24, value: { name: "Folhagens", effect: "Mato e arbustos contam como terreno difícil e fornecem camuflagem leve para criaturas dentro deles." } },
@@ -218,34 +231,121 @@ function hasFog(climate) {
   return climate.some((item) => item.name === "Neblina");
 }
 
-function getClimateVariation(kind) {
-  if (kind === "temperature") return pickWeighted(temperatureOptions);
-  if (kind === "precipitation") return pickWeighted(precipitationOptions);
-  if (kind === "wind") return pickWeighted(windOptions);
-  return fog;
+function hasHeat(climate, rules) {
+  return climate.some((item) => rules.heatClimateNames.includes(item.name));
 }
 
-function getAvailableClimateKinds(climate, usedKinds) {
-  return climateVariationOptions.filter((option) => {
+function hasColdPrecipitation(climate, rules) {
+  return climate.some((item) => rules.coldPrecipitationNames.includes(item.name));
+}
+
+function hasStorm(climate) {
+  return climate.some((item) => item.name === "Tempestade");
+}
+
+function getClimateRules(options) {
+  return options.environmentRules?.climate || {
+    variationCountOptions: climateVariationCountOptions,
+    variationKindOptions: climateVariationOptions,
+    temperatureOptions,
+    precipitationOptions,
+    windOptions,
+    fog,
+    heatClimateNames,
+    coldPrecipitationNames,
+    damagingClimateNames
+  };
+}
+
+function getTerrainRules(options) {
+  return options.environmentRules?.terrain || {
+    terrainOptions,
+    forestAquaticFeatureChance: 12,
+    wetSoilChance: 8,
+    wetSoilFeature: {
+      name: "Solo encharcado",
+      effect: "Trechos baixos e encharcados contam como terreno difícil."
+    }
+  };
+}
+
+function isDamagingClimate(climate, rules) {
+  return rules.damagingClimateNames.includes(climate.name);
+}
+
+function isClimateCompatible(candidate, climate, options, rules) {
+  if (options.avoidDamagingClimate && isDamagingClimate(candidate, rules)) return false;
+  if (candidate.name === "Neblina" && hasWind(climate)) return false;
+  if (["Vento forte", "Vendaval", "Furacão", "Tornado"].includes(candidate.name) && hasFog(climate)) return false;
+  if (candidate.name === "Tempestade" && hasWind(climate)) return false;
+  if (["Vento forte", "Vendaval", "Furacão", "Tornado"].includes(candidate.name) && hasStorm(climate)) return false;
+  if (rules.coldPrecipitationNames.includes(candidate.name) && hasHeat(climate, rules)) return false;
+  if (rules.heatClimateNames.includes(candidate.name) && hasColdPrecipitation(climate, rules)) return false;
+
+  return true;
+}
+
+function filterCompatibleWeightedOptions(weightedOptions, climate, options, rules) {
+  return weightedOptions.filter((option) =>
+    isClimateCompatible(option.value, climate, options, rules)
+  );
+}
+
+function getClimateVariation(kind, climate, options, rules) {
+  if (kind === "fog") return isClimateCompatible(rules.fog, climate, options, rules) ? rules.fog : null;
+
+  const optionSourceByKind = {
+    temperature: rules.temperatureOptions,
+    precipitation: rules.precipitationOptions,
+    wind: rules.windOptions
+  };
+  const compatibleOptions = filterCompatibleWeightedOptions(
+    optionSourceByKind[kind],
+    climate,
+    options,
+    rules
+  );
+
+  return compatibleOptions.length > 0 ? pickWeighted(compatibleOptions) : null;
+}
+
+function hasCompatibleClimateVariation(kind, climate, options, rules) {
+  if (kind === "fog") return isClimateCompatible(rules.fog, climate, options, rules);
+
+  const optionSourceByKind = {
+    temperature: rules.temperatureOptions,
+    precipitation: rules.precipitationOptions,
+    wind: rules.windOptions
+  };
+
+  return filterCompatibleWeightedOptions(optionSourceByKind[kind], climate, options, rules).length > 0;
+}
+
+function getAvailableClimateKinds(climate, usedKinds, options, rules) {
+  return rules.variationKindOptions.filter((option) => {
     if (usedKinds.has(option.value)) return false;
-    if (option.value === "fog" && hasWind(climate)) return false;
-    if (option.value === "wind" && hasFog(climate)) return false;
-    return true;
+    return hasCompatibleClimateVariation(option.value, climate, options, rules);
   });
 }
 
-function generateClimate() {
+function generateClimate(options = {}) {
+  const rules = getClimateRules(options);
   const climate = [];
   const usedKinds = new Set();
-  const variationCount = pickWeighted(climateVariationCountOptions);
+  const variationCount = pickWeighted(rules.variationCountOptions);
 
   for (let index = 0; index < variationCount; index++) {
-    const availableKinds = getAvailableClimateKinds(climate, usedKinds);
+    const availableKinds = getAvailableClimateKinds(climate, usedKinds, options, rules);
 
     if (availableKinds.length === 0) break;
 
     const kind = pickWeighted(availableKinds);
-    const variation = getClimateVariation(kind);
+    const variation = getClimateVariation(kind, climate, options, rules);
+
+    if (!variation) {
+      usedKinds.add(kind);
+      continue;
+    }
 
     climate.push(variation);
     usedKinds.add(kind);
@@ -260,8 +360,9 @@ function addUniqueFeature(features, feature) {
   }
 }
 
-function generateTerrain() {
-  const terrain = pickWeighted(terrainOptions);
+function generateTerrain(options = {}) {
+  const rules = getTerrainRules(options);
+  const terrain = pickWeighted(rules.terrainOptions);
   const desiredFeatureCount = terrain.name === "Floresta" ? randomInt(1, 3) : randomInt(1, 2);
   const uniqueFeatureCount = new Set(terrain.featureOptions.map((option) => option.value.name)).size;
   const featureCount = Math.min(desiredFeatureCount, uniqueFeatureCount);
@@ -271,20 +372,24 @@ function generateTerrain() {
     addUniqueFeature(features, pickWeighted(terrain.featureOptions));
   }
 
-  if (terrain.name === "Floresta" && chance(12)) {
-    addUniqueFeature(features, pickWeighted(terrainOptions.find((option) => option.value.name === "Aquático").value.featureOptions));
+  if (terrain.name === "Floresta" && chance(rules.forestAquaticFeatureChance)) {
+    const aquaticTerrain = rules.terrainOptions.find((option) => option.value.name === "Aquático");
+
+    if (aquaticTerrain) {
+      addUniqueFeature(features, pickWeighted(aquaticTerrain.value.featureOptions));
+    }
   }
 
-  if (terrain.name !== "Pântano" && chance(8)) {
-    addUniqueFeature(features, { name: "Solo encharcado", effect: "Trechos baixos e encharcados contam como terreno difícil." });
+  if (terrain.name !== "Pântano" && chance(rules.wetSoilChance)) {
+    addUniqueFeature(features, rules.wetSoilFeature);
   }
 
   return { name: terrain.name, effect: terrain.effect, features };
 }
 
-export function generateEnvironmentContext() {
+export function generateEnvironmentContext(options = {}) {
   return {
-    climate: generateClimate(),
-    terrain: generateTerrain()
+    climate: generateClimate(options),
+    terrain: generateTerrain(options)
   };
 }

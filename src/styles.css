@@ -17,6 +17,10 @@
   box-sizing: border-box;
 }
 
+html {
+  overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -76,6 +80,12 @@ label {
   gap: 6px;
 }
 
+.checkbox-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: #d6b85a;
+}
+
 input,
 select,
 button {
@@ -118,8 +128,6 @@ button:hover {
   width: 38px;
   height: 38px;
   padding: 0;
-  font-size: 22px;
-  line-height: 1;
 }
 
 #info {
@@ -128,6 +136,27 @@ button:hover {
   border-radius: 6px;
   background: var(--surface-alt);
   font-size: 13px;
+}
+
+.floating-reload {
+  position: fixed;
+  left: 14px;
+  bottom: 14px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid var(--header-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
+}
+
+.floating-reload:hover {
+  background: color-mix(in srgb, var(--header) 92%, white 8%);
 }
 
 .time-tracker {
@@ -216,7 +245,10 @@ svg {
 }
 
 .legend-toggle img,
-.settings-toggle img {
+.settings-toggle img,
+.reload-button img,
+.legend-close img,
+.icon-button img {
   width: 22px;
   height: 22px;
   display: block;
@@ -266,8 +298,9 @@ svg {
   border-color: var(--border);
   background: var(--header);
   color: #fff7e8;
-  font-size: 20px;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .environment-group {
@@ -363,6 +396,17 @@ svg {
   pointer-events: none;
 }
 
+.node.is-hidden-path,
+.link.is-hidden-path {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.node.is-concealed circle {
+  fill: #355c3c;
+  stroke: #9fc88e;
+}
+
 .node.is-chosen circle {
   stroke-width: 5;
   filter: drop-shadow(0 0 7px rgba(241, 214, 168, 0.65));
@@ -414,6 +458,12 @@ svg {
   fill: #4b1111;
 }
 
+.boss circle,
+.legend-boss {
+  background: #4b1111;
+  fill: #4b1111;
+}
+
 .trap circle,
 .legend-trap {
   background: #4f6b45;
@@ -439,7 +489,7 @@ svg {
 }
 
 #nodeDialog {
-  width: min(660px, calc(100vw - 28px));
+  width: min(820px, calc(100vw - 28px));
   max-height: min(760px, calc(100vh - 28px));
   padding: 0;
   border: 1px solid var(--border);
@@ -502,8 +552,9 @@ svg {
   border-color: var(--border);
   background: var(--header);
   color: #fff7e8;
-  font-size: 22px;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .detail-line {
@@ -518,13 +569,22 @@ svg {
   color: #fff7e8;
 }
 
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .modal-choice {
   display: flex;
   align-items: center;
   gap: 8px;
   width: fit-content;
-  margin: 2px 0 4px;
-  padding: 8px 10px;
+  min-width: 178px;
+  margin: 0;
+  padding: 9px 12px;
   border: 1px solid var(--border-soft);
   border-radius: 6px;
   background: #172419;
@@ -532,10 +592,66 @@ svg {
   font-size: 14px;
 }
 
+.attempt-choice {
+  border-color: #8b7b55;
+  background: rgba(139, 123, 85, 0.3);
+}
+
+.explored-choice {
+  border-color: #7fa66a;
+  background: rgba(127, 166, 106, 0.32);
+}
+
+.rest-choice {
+  border-color: #4f8f8a;
+  background: rgba(79, 143, 138, 0.3);
+}
+
+.route-choice {
+  border-color: #5f8a66;
+  background: rgba(47, 107, 68, 0.42);
+}
+
 .modal-choice input {
   width: 18px;
   height: 18px;
   accent-color: #d6b85a;
+}
+
+.environment-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  margin-top: 10px;
+}
+
+.modal-divider {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--border-soft);
+}
+
+.modal-footer {
+  padding-top: 6px;
+  color: #aebda8;
+  font-size: 12px;
+}
+
+.hidden-environment-notice {
+  margin: 10px 0 0;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background: rgba(16, 24, 16, 0.48);
+  color: #d8c8b7;
+  text-align: center;
+}
+
+.modal-footer .detail-line {
+  margin: 0;
+  font-size: 12px;
 }
 
 .range-dialog {
@@ -571,6 +687,10 @@ svg {
 }
 
 @media (max-width: 800px) {
+  .environment-columns {
+    grid-template-columns: 1fr;
+  }
+
   main {
     height: calc(100vh - 112px);
   }

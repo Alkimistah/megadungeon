@@ -1,37 +1,3 @@
-export const encountersByFloor = {
-  11: 3,
-  12: 4,
-  13: 4,
-  14: 5,
-  15: 5,
-  16: 6,
-  17: 6,
-  18: 7,
-  19: 8,
-  20: 8
-};
-
-export const baseDcByFloor = {
-  11: 15,
-  12: 15,
-  13: 20,
-  14: 20,
-  15: 20,
-  16: 25,
-  17: 25,
-  18: 25,
-  19: 30,
-  20: 30
-};
-
-export const roomTypes = [
-  { type: "normal", label: "Encontro normal", short: "N", weight: 62 },
-  { type: "elite", label: "Encontro elite", short: "E", weight: 11 },
-  { type: "trap", label: "Armadilha", short: "A", weight: 16 },
-  { type: "unknown", label: "Desconhecido", short: "?", weight: 5 },
-  { type: "treasure", label: "Tesouro", short: "T", weight: 6 }
-];
-
 export const unknownRoom = {
   type: "unknown",
   label: "Desconhecido",
@@ -48,6 +14,12 @@ export const campRoom = {
   type: "camp",
   label: "Acampamento",
   short: "C"
+};
+
+export const bossRoom = {
+  type: "boss",
+  label: "Chefão",
+  short: "B"
 };
 
 export const skillOptionsByRoomType = {
