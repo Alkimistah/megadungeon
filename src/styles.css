@@ -7,6 +7,7 @@ body {
   font-family: Arial, sans-serif;
   background: #1f1b18;
   color: #f2e6d8;
+  overscroll-behavior: none;
 }
 
 header {
@@ -99,6 +100,40 @@ aside h2 {
   letter-spacing: 0;
 }
 
+.environment-group {
+  margin-bottom: 16px;
+}
+
+.environment-group h3 {
+  margin: 0 0 8px;
+  color: #f1d6a8;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.environment-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.environment-list li {
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.environment-list strong {
+  color: #fff7e8;
+}
+
+.environment-list span {
+  color: #d8c8b7;
+}
+
 .legend-item {
   display: flex;
   align-items: center;
@@ -132,11 +167,45 @@ aside h2 {
   stroke-linecap: round;
   fill: none;
   opacity: 0.9;
+  transition: opacity 120ms ease, stroke-width 120ms ease;
+}
+
+.link.is-dimmed {
+  opacity: 0.22;
+}
+
+.link.is-route {
+  opacity: 1;
+  stroke-width: 4;
+}
+
+.node {
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 120ms ease;
+}
+
+.node.is-locked {
+  cursor: default;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.node.is-chosen circle {
+  stroke-width: 5;
+  filter: drop-shadow(0 0 7px rgba(241, 214, 168, 0.65));
 }
 
 .node circle {
   stroke: var(--column-color, #f1d6a8);
   stroke-width: 3;
+  transition: stroke-width 120ms ease, filter 120ms ease;
+}
+
+.node:hover circle,
+.node:focus circle {
+  filter: brightness(1.18);
+  stroke-width: 4;
 }
 
 .node-icon {
@@ -186,6 +255,95 @@ aside h2 {
 .legend-camp {
   background: #2f5d63;
   fill: #2f5d63;
+}
+
+#nodeDialog {
+  width: min(520px, calc(100vw - 28px));
+  max-height: min(760px, calc(100vh - 28px));
+  padding: 0;
+  border: 1px solid #7b5a42;
+  border-radius: 8px;
+  background: #1f1b18;
+  color: #f2e6d8;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.65);
+}
+
+#nodeDialog::backdrop {
+  background: rgba(10, 7, 5, 0.72);
+}
+
+.node-dialog {
+  display: grid;
+  gap: 14px;
+  max-height: inherit;
+  padding: 18px;
+  overflow: auto;
+}
+
+.node-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #4d392c;
+  padding-bottom: 12px;
+}
+
+.node-dialog-header h2 {
+  margin: 2px 0 0;
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.node-dialog-type {
+  margin: 0;
+  color: #f1d6a8;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.icon-button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  border-color: #7b5a42;
+  background: #2d241f;
+  color: #fff7e8;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.detail-line {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 8px;
+  color: #d8c8b7;
+  font-size: 14px;
+}
+
+.detail-line strong {
+  color: #fff7e8;
+}
+
+.route-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin: 2px 0 4px;
+  padding: 8px 10px;
+  border: 1px solid #5f4635;
+  border-radius: 6px;
+  background: #2a211d;
+  color: #fff7e8;
+  font-size: 14px;
+}
+
+.route-choice input {
+  width: 18px;
+  height: 18px;
+  accent-color: #d6b85a;
 }
 
 @media (max-width: 800px) {

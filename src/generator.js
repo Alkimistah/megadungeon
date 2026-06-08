@@ -1,3 +1,4 @@
+import { generateEnvironmentContext } from "./environment.js";
 import {
   campRoom,
   roomTypes,
@@ -75,6 +76,12 @@ function pickWeightedRoomType() {
   return pickWeighted(roomTypes);
 }
 
+function assignEnvironments(levels) {
+  levels.flat().forEach((node) => {
+    node.environment = generateEnvironmentContext();
+  });
+}
+
 function assignDiscoveryCheck(node, baseDC) {
   if (node.type === "unknown" || node.type === "camp") {
     node.skill = null;
@@ -118,7 +125,8 @@ function createNode(level, column) {
     y: 0,
     links: [],
     skill: null,
-    dc: null
+    dc: null,
+    environment: null
   };
 }
 
@@ -286,6 +294,7 @@ export function generateMapData(depth, baseDC) {
   guaranteeAtLeastOneTreasure(levels);
   convertMergedPathsToUnknown(levels);
   addCampIfEligible(levels);
+  assignEnvironments(levels);
   assignDiscoveryChecks(levels, baseDC);
 
   return levels;

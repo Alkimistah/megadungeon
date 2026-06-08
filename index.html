@@ -81,8 +81,23 @@
           <span class="legend-node legend-camp"><img src="/assets/icons/camp.svg" alt="" /></span>
           <span>Acampamento</span>
         </div>
+
       </aside>
     </main>
+
+    <dialog id="nodeDialog" aria-labelledby="nodeDialogTitle">
+      <form method="dialog" class="node-dialog">
+        <div class="node-dialog-header">
+          <div>
+            <p id="nodeDialogType" class="node-dialog-type"></p>
+            <h2 id="nodeDialogTitle"></h2>
+          </div>
+          <button id="nodeDialogClose" class="icon-button" type="submit" aria-label="Fechar">×</button>
+        </div>
+
+        <div id="nodeDialogContent"></div>
+      </form>
+    </dialog>
 
     <script type="module" src="/src/main.js"></script>
   </body>
