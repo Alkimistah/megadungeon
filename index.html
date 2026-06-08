@@ -3,87 +3,126 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#2d241f" />
+    <meta name="theme-color" content="#1d3424" />
     <title>Mega Dungeon - Tormenta20</title>
     <link rel="manifest" href="/manifest.webmanifest" />
   </head>
   <body>
     <header>
-      <h1>Mapa Aleatório de Encontros - Andares 11 a 20</h1>
+      <div class="header-main">
+        <h1>Mapa Aleatório de Encontros - <span id="floorRangeTitle">Andares de 11 a 20</span></h1>
+        <div class="header-actions">
+          <button id="settingsToggle" class="settings-toggle" type="button" aria-controls="settingsPanel" aria-expanded="false" aria-label="Expandir configurações"><img id="settingsToggleIcon" src="/assets/icons/expand-down.svg" alt="" /></button>
+          <button id="generateButton" class="generate-button" type="button">Gerar mapa</button>
+        </div>
+      </div>
 
-      <div class="controls">
-        <label>
-          Andar:
-          <select id="floorInput">
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <option value="13">13</option>
-            <option value="14">14</option>
-            <option value="15">15</option>
-            <option value="16">16</option>
-            <option value="17">17</option>
-            <option value="18">18</option>
-            <option value="19">19</option>
-            <option value="20">20</option>
-          </select>
-        </label>
+      <div id="settingsPanel" class="settings-panel" hidden>
+        <div class="controls">
+          <label>
+            Andar:
+            <select id="floorInput">
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+            </select>
+          </label>
 
-        <label>
-          Encontros:
-          <input id="depthInput" type="number" min="3" max="20" value="3" />
-        </label>
+          <label>
+            Encontros:
+            <input id="depthInput" type="number" min="3" max="20" value="3" />
+          </label>
 
-        <label>
-          CD base:
-          <input id="baseDcInput" type="number" min="5" max="40" value="15" />
-        </label>
+          <label>
+            CD base:
+            <input id="baseDcInput" type="number" min="5" max="40" value="15" />
+          </label>
+        </div>
 
-        <button id="generateButton" type="button">Gerar mapa</button>
+        <div id="info"></div>
       </div>
     </header>
-
-    <div id="info"></div>
+    <div id="timeTracker" class="time-tracker" aria-live="polite">
+      <span>Tempo de exploração</span>
+      <strong id="timeTrackerValue">0min</strong>
+    </div>
 
     <main>
       <div id="container">
+        <button
+          id="legendToggle"
+          class="legend-toggle"
+          type="button"
+          aria-controls="legendPanel"
+          aria-expanded="false"
+          aria-label="Abrir legenda"
+        ><img src="/assets/icons/info.svg" alt="" /></button>
+
+        <aside id="legendPanel" class="legend-panel" hidden>
+          <div class="legend-header">
+            <h2>Legenda</h2>
+            <button id="legendClose" class="legend-close" type="button" aria-label="Fechar legenda">×</button>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-node legend-normal"><img src="/assets/icons/normal.svg" alt="" /></span>
+            <span>Encontro normal</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-node legend-elite"><img src="/assets/icons/elite.svg" alt="" /></span>
+            <span>Encontro elite</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-node legend-trap"><img src="/assets/icons/trap.svg" alt="" /></span>
+            <span>Armadilha</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-node legend-unknown"><img src="/assets/icons/unknown.svg" alt="" /></span>
+            <span>Desconhecido</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-node legend-treasure"><img src="/assets/icons/treasure.svg" alt="" /></span>
+            <span>Tesouro</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-node legend-camp"><img src="/assets/icons/camp.svg" alt="" /></span>
+            <span>Acampamento</span>
+          </div>
+        </aside>
+
         <svg id="map"></svg>
       </div>
-
-      <aside>
-        <h2>Legenda</h2>
-
-        <div class="legend-item">
-          <span class="legend-node legend-normal"><img src="/assets/icons/normal.svg" alt="" /></span>
-          <span>Encontro normal</span>
-        </div>
-
-        <div class="legend-item">
-          <span class="legend-node legend-elite"><img src="/assets/icons/elite.svg" alt="" /></span>
-          <span>Encontro elite</span>
-        </div>
-
-        <div class="legend-item">
-          <span class="legend-node legend-trap"><img src="/assets/icons/trap.svg" alt="" /></span>
-          <span>Armadilha</span>
-        </div>
-
-        <div class="legend-item">
-          <span class="legend-node legend-unknown"><img src="/assets/icons/unknown.svg" alt="" /></span>
-          <span>Desconhecido</span>
-        </div>
-
-        <div class="legend-item">
-          <span class="legend-node legend-treasure"><img src="/assets/icons/treasure.svg" alt="" /></span>
-          <span>Tesouro</span>
-        </div>
-
-        <div class="legend-item">
-          <span class="legend-node legend-camp"><img src="/assets/icons/camp.svg" alt="" /></span>
-          <span>Acampamento</span>
-        </div>
-
-      </aside>
     </main>
+
+    <dialog id="rangeDialog" aria-labelledby="rangeDialogTitle">
+      <form method="dialog" class="range-dialog">
+        <div class="node-dialog-header">
+          <div>
+            <p class="node-dialog-type">Configuração inicial</p>
+            <h2 id="rangeDialogTitle">Escolha a faixa de andares</h2>
+          </div>
+        </div>
+
+        <label class="range-field">
+          Grupo de andares
+          <select id="floorRangeInput"></select>
+        </label>
+
+        <button id="rangeConfirm" type="submit">Iniciar exploração</button>
+      </form>
+    </dialog>
 
     <dialog id="nodeDialog" aria-labelledby="nodeDialogTitle">
       <form method="dialog" class="node-dialog">
@@ -91,6 +130,7 @@
           <div>
             <p id="nodeDialogType" class="node-dialog-type"></p>
             <h2 id="nodeDialogTitle"></h2>
+            <p id="nodeDialogMeta" class="node-dialog-meta"></p>
           </div>
           <button id="nodeDialogClose" class="icon-button" type="submit" aria-label="Fechar">×</button>
         </div>

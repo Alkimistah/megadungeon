@@ -15,6 +15,11 @@ const MAX_MIDDLE_NODES = 7;
 const EXTRA_LINK_CHANCE = 0.18;
 const UNKNOWN_INCOMING_THRESHOLD = 3;
 
+const INVESTIGATION_TIME_RULES = [
+  { floorRange: [11, 20], incrementMinutes: 15, maxMinutes: 60, noCheckMinutes: 30 }
+];
+// TODO: Add investigation time increments and encounter limits for floors above 20.
+
 const COLUMN_TEMPLATES = {
   3: [[1, 3, 5], [0, 3, 6], [1, 2, 4]],
   4: [[1, 2, 4, 5], [0, 2, 4, 6], [1, 3, 4, 6]],
@@ -103,12 +108,41 @@ function assignDiscoveryChecks(levels, baseDC) {
   });
 }
 
+function getInvestigationTimeRule() {
+  return INVESTIGATION_TIME_RULES[0];
+}
+
+function getClimateEventCount(node) {
+  return node.environment.climate.filter((climate) => climate.name !== "Clima normal").length;
+}
+
+function assignInvestigationTime(node) {
+  const rule = getInvestigationTimeRule();
+
+  if (!node.skill || !node.dc) {
+    node.investigationMinutes = rule.noCheckMinutes;
+    return;
+  }
+
+  const climateEventCount = getClimateEventCount(node);
+  const minutes = rule.incrementMinutes * (1 + climateEventCount);
+
+  node.investigationMinutes = Math.min(minutes, rule.maxMinutes);
+}
+
+function assignInvestigationTimes(levels) {
+  levels.flat().forEach((node) => {
+    assignInvestigationTime(node);
+  });
+}
+
 function applyRoomType(node, roomData) {
   node.type = roomData.type;
   node.label = roomData.label;
   node.short = roomData.short;
   node.skill = null;
   node.dc = null;
+  node.investigationMinutes = null;
 }
 
 function createNode(level, column) {
@@ -126,6 +160,7 @@ function createNode(level, column) {
     links: [],
     skill: null,
     dc: null,
+    investigationMinutes: null,
     environment: null
   };
 }
@@ -139,21 +174,27 @@ function guaranteeAtLeastOneTreasure(levels) {
   applyRoomType(target, treasureRoom);
 }
 
-function addCampIfEligible(levels) {
-  if (levels.length < 5) return;
-
-  const middleLevels = levels.slice(1, -1);
-  const preferredCandidates = middleLevels
-    .flat()
-    .filter((node) => node.type === "normal" || node.type === "trap");
-  const fallbackCandidates = middleLevels
-    .flat()
-    .filter((node) => node.type !== "unknown" && node.type !== "treasure");
+function getCampLevelIndexes(levels) {
+  return levels
+    .map((_, levelIndex) => levelIndex)
+    .filter((levelIndex) => (levelIndex + 1) % 4 === 0);
+}
+function pickCampNode(levelNodes) {
+  const preferredCandidates = levelNodes.filter(
+    (node) => node.type === "normal" || node.type === "trap"
+  );
+  const fallbackCandidates = levelNodes.filter(
+    (node) => node.type !== "treasure" && node.type !== "camp"
+  );
   const candidates = preferredCandidates.length > 0 ? preferredCandidates : fallbackCandidates;
 
-  if (candidates.length === 0) return;
+  return candidates.length > 0 ? pick(candidates) : pick(levelNodes);
+}
 
-  applyRoomType(pick(candidates), campRoom);
+function addCampsIfEligible(levels) {
+  getCampLevelIndexes(levels).forEach((levelIndex) => {
+    applyRoomType(pickCampNode(levels[levelIndex]), campRoom);
+  });
 }
 
 function getCupLevelNodeCount(levelIndex, depth, edgeNodeCount, middleNodeCount) {
@@ -293,9 +334,10 @@ export function generateMapData(depth, baseDC) {
 
   guaranteeAtLeastOneTreasure(levels);
   convertMergedPathsToUnknown(levels);
-  addCampIfEligible(levels);
+  addCampsIfEligible(levels);
   assignEnvironments(levels);
   assignDiscoveryChecks(levels, baseDC);
+  assignInvestigationTimes(levels);
 
   return levels;
 }
