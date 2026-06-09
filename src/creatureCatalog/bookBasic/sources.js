@@ -1,0 +1,392 @@
+export const livroBasicoSourceByCreatureId = {
+  "glop": {
+    "book": "Livro Básico",
+    "pdfPage": 1,
+    "bookPage": null
+  },
+  "rato-gigante": {
+    "book": "Livro Básico",
+    "pdfPage": 1,
+    "bookPage": null
+  },
+  "orc-combatente": {
+    "book": "Livro Básico",
+    "pdfPage": 1,
+    "bookPage": null
+  },
+  "orc-chefe": {
+    "book": "Livro Básico",
+    "pdfPage": 1,
+    "bookPage": null
+  },
+  "orc-mutante": {
+    "book": "Livro Básico",
+    "pdfPage": 1,
+    "bookPage": null
+  },
+  "aranha-gigante": {
+    "book": "Livro Básico",
+    "pdfPage": 2,
+    "bookPage": null
+  },
+  "gargula": {
+    "book": "Livro Básico",
+    "pdfPage": 2,
+    "bookPage": null
+  },
+  "guerreiro-de-chifres": {
+    "book": "Livro Básico",
+    "pdfPage": 2,
+    "bookPage": null
+  },
+  "manticora": {
+    "book": "Livro Básico",
+    "pdfPage": 2,
+    "bookPage": null
+  },
+  "centopeia-dragao": {
+    "book": "Livro Básico",
+    "pdfPage": 2,
+    "bookPage": null
+  },
+  "golem-de-ferro": {
+    "book": "Livro Básico",
+    "pdfPage": 3,
+    "bookPage": null
+  },
+  "bandido": {
+    "book": "Livro Básico",
+    "pdfPage": 4,
+    "bookPage": null
+  },
+  "chefe-bandido": {
+    "book": "Livro Básico",
+    "pdfPage": 4,
+    "bookPage": null
+  },
+  "guarda-de-cidade": {
+    "book": "Livro Básico",
+    "pdfPage": 4,
+    "bookPage": null
+  },
+  "sargento-da-guarda": {
+    "book": "Livro Básico",
+    "pdfPage": 4,
+    "bookPage": null
+  },
+  "lobo": {
+    "book": "Livro Básico",
+    "pdfPage": 5,
+    "bookPage": null
+  },
+  "centauro-combatente": {
+    "book": "Livro Básico",
+    "pdfPage": 5,
+    "bookPage": null
+  },
+  "centauro-xama": {
+    "book": "Livro Básico",
+    "pdfPage": 5,
+    "bookPage": null
+  },
+  "gnoll-saqueador": {
+    "book": "Livro Básico",
+    "pdfPage": 5,
+    "bookPage": null
+  },
+  "gnoll-filibusteiro": {
+    "book": "Livro Básico",
+    "pdfPage": 6,
+    "bookPage": null
+  },
+  "gorlogg": {
+    "book": "Livro Básico",
+    "pdfPage": 6,
+    "bookPage": null
+  },
+  "trog": {
+    "book": "Livro Básico",
+    "pdfPage": 6,
+    "bookPage": null
+  },
+  "lobo-das-cavernas": {
+    "book": "Livro Básico",
+    "pdfPage": 7,
+    "bookPage": null
+  },
+  "cao-do-inferno": {
+    "book": "Livro Básico",
+    "pdfPage": 7,
+    "bookPage": null
+  },
+  "grifo": {
+    "book": "Livro Básico",
+    "pdfPage": 7,
+    "bookPage": null
+  },
+  "basilisco": {
+    "book": "Livro Básico",
+    "pdfPage": 8,
+    "bookPage": null
+  },
+  "ogro": {
+    "book": "Livro Básico",
+    "pdfPage": 8,
+    "bookPage": null
+  },
+  "urso-coruja": {
+    "book": "Livro Básico",
+    "pdfPage": 8,
+    "bookPage": null
+  },
+  "serpe": {
+    "book": "Livro Básico",
+    "pdfPage": 8,
+    "bookPage": null
+  },
+  "recruta-purista": {
+    "book": "Livro Básico",
+    "pdfPage": 9,
+    "bookPage": null
+  },
+  "soldado-purista": {
+    "book": "Livro Básico",
+    "pdfPage": 9,
+    "bookPage": null
+  },
+  "sargento-mor": {
+    "book": "Livro Básico",
+    "pdfPage": 9,
+    "bookPage": null
+  },
+  "capelao-de-guerra": {
+    "book": "Livro Básico",
+    "pdfPage": 10,
+    "bookPage": null
+  },
+  "capitao-baluarte": {
+    "book": "Livro Básico",
+    "pdfPage": 10,
+    "bookPage": null
+  },
+  "cavaleiro-do-leopardo-sangrento": {
+    "book": "Livro Básico",
+    "pdfPage": 10,
+    "bookPage": null
+  },
+  "colosso-supremo": {
+    "book": "Livro Básico",
+    "pdfPage": 11,
+    "bookPage": null
+  },
+  "zumbi": {
+    "book": "Livro Básico",
+    "pdfPage": 12,
+    "bookPage": null
+  },
+  "turba-zumbi": {
+    "book": "Livro Básico",
+    "pdfPage": 12,
+    "bookPage": null
+  },
+  "esqueleto": {
+    "book": "Livro Básico",
+    "pdfPage": 12,
+    "bookPage": null
+  },
+  "esqueleto-de-elite": {
+    "book": "Livro Básico",
+    "pdfPage": 12,
+    "bookPage": null
+  },
+  "falange": {
+    "book": "Livro Básico",
+    "pdfPage": 13,
+    "bookPage": null
+  },
+  "aparicao": {
+    "book": "Livro Básico",
+    "pdfPage": 13,
+    "bookPage": null
+  },
+  "necromante": {
+    "book": "Livro Básico",
+    "pdfPage": 13,
+    "bookPage": null
+  },
+  "vampiro": {
+    "book": "Livro Básico",
+    "pdfPage": 14,
+    "bookPage": null
+  },
+  "goblin-salteador": {
+    "book": "Livro Básico",
+    "pdfPage": 15,
+    "bookPage": null
+  },
+  "hobgoblin-soldado": {
+    "book": "Livro Básico",
+    "pdfPage": 15,
+    "bookPage": null
+  },
+  "goblin-engenhoqueiro": {
+    "book": "Livro Básico",
+    "pdfPage": 15,
+    "bookPage": null
+  },
+  "arauto-de-thwor": {
+    "book": "Livro Básico",
+    "pdfPage": 16,
+    "bookPage": null
+  },
+  "hobgoblin-mago-de-batalha": {
+    "book": "Livro Básico",
+    "pdfPage": 16,
+    "bookPage": null
+  },
+  "engenho-de-guerra-goblin": {
+    "book": "Livro Básico",
+    "pdfPage": 16,
+    "bookPage": null
+  },
+  "devorador-de-medos": {
+    "book": "Livro Básico",
+    "pdfPage": 18,
+    "bookPage": null
+  },
+  "sombra-de-thwor": {
+    "book": "Livro Básico",
+    "pdfPage": 18,
+    "bookPage": null
+  },
+  "cascavel": {
+    "book": "Livro Básico",
+    "pdfPage": 19,
+    "bookPage": null
+  },
+  "jiboia": {
+    "book": "Livro Básico",
+    "pdfPage": 19,
+    "bookPage": null
+  },
+  "naja": {
+    "book": "Livro Básico",
+    "pdfPage": 19,
+    "bookPage": null
+  },
+  "sucuri": {
+    "book": "Livro Básico",
+    "pdfPage": 19,
+    "bookPage": null
+  },
+  "nagah-guardiao": {
+    "book": "Livro Básico",
+    "pdfPage": 20,
+    "bookPage": null
+  },
+  "nagah-mistica": {
+    "book": "Livro Básico",
+    "pdfPage": 20,
+    "bookPage": null
+  },
+  "cultista-de-sszzaas": {
+    "book": "Livro Básico",
+    "pdfPage": 21,
+    "bookPage": null
+  },
+  "hidra": {
+    "book": "Livro Básico",
+    "pdfPage": 21,
+    "bookPage": null
+  },
+  "lagash": {
+    "book": "Livro Básico",
+    "pdfPage": 21,
+    "bookPage": null
+  },
+  "finntroll-cacador": {
+    "book": "Livro Básico",
+    "pdfPage": 22,
+    "bookPage": null
+  },
+  "finntroll-feitor": {
+    "book": "Livro Básico",
+    "pdfPage": 22,
+    "bookPage": null
+  },
+  "ganchador": {
+    "book": "Livro Básico",
+    "pdfPage": 23,
+    "bookPage": null
+  },
+  "troll": {
+    "book": "Livro Básico",
+    "pdfPage": 23,
+    "bookPage": null
+  },
+  "troll-das-cavernas": {
+    "book": "Livro Básico",
+    "pdfPage": 24,
+    "bookPage": null
+  },
+  "dragao-filhote": {
+    "book": "Livro Básico",
+    "pdfPage": 25,
+    "bookPage": null
+  },
+  "dragao-jovem": {
+    "book": "Livro Básico",
+    "pdfPage": 25,
+    "bookPage": null
+  },
+  "dragao-adulto": {
+    "book": "Livro Básico",
+    "pdfPage": 26,
+    "bookPage": null
+  },
+  "dragao-veneravel": {
+    "book": "Livro Básico",
+    "pdfPage": 26,
+    "bookPage": null
+  },
+  "dragao-rei": {
+    "book": "Livro Básico",
+    "pdfPage": 27,
+    "bookPage": null
+  },
+  "tirano-do-terceiro": {
+    "book": "Livro Básico",
+    "pdfPage": 28,
+    "bookPage": null
+  },
+  "maniaco-lefou": {
+    "book": "Livro Básico",
+    "pdfPage": 29,
+    "bookPage": null
+  },
+  "uktril": {
+    "book": "Livro Básico",
+    "pdfPage": 29,
+    "bookPage": null
+  },
+  "geraktril": {
+    "book": "Livro Básico",
+    "pdfPage": 29,
+    "bookPage": null
+  },
+  "reishid": {
+    "book": "Livro Básico",
+    "pdfPage": 29,
+    "bookPage": null
+  },
+  "otyugh": {
+    "book": "Livro Básico",
+    "pdfPage": 30,
+    "bookPage": null
+  },
+  "sacerdote-de-aharadak": {
+    "book": "Livro Básico",
+    "pdfPage": 31,
+    "bookPage": null
+  }
+};

@@ -1,4 +1,5 @@
 import { assignChallengeRating } from "./challenge.js";
+import { assignCreatureProfile } from "./creatures.js";
 import { generateEnvironmentContext } from "./environment.js";
 import { pick, pickWeighted, randomInt } from "./random.js";
 import {
@@ -85,6 +86,12 @@ function assignChallengeRatings(levels, profile, floor) {
   });
 }
 
+function assignCreatureProfiles(levels, profile, rng) {
+  levels.flat().forEach((node) => {
+    assignCreatureProfile(node, profile, rng);
+  });
+}
+
 function assignDiscoveryCheck(node, baseDC, rng) {
   if (node.type === "unknown" || node.type === "camp" || node.type === "boss") {
     node.skill = null;
@@ -139,6 +146,7 @@ function applyRoomType(node, roomData) {
   node.investigationMinutes = null;
   node.revealedLabel = null;
   node.challenge = null;
+  node.creature = null;
 }
 
 function createNode(level, column, profile, rng) {
@@ -159,7 +167,8 @@ function createNode(level, column, profile, rng) {
     investigationMinutes: null,
     revealedLabel: null,
     environment: null,
-    challenge: null
+    challenge: null,
+    creature: null
   };
 }
 
@@ -343,7 +352,8 @@ function addFinalBoss(levels, profile, floor) {
     investigationMinutes: null,
     revealedLabel: null,
     environment: null,
-    challenge: null
+    challenge: null,
+    creature: null
   };
 
   levels[levels.length - 1] = [boss];
@@ -383,6 +393,7 @@ export function generateMapData(depth, baseDC, profile, floor, rng = Math.random
   assignUnknownReveals(levels, rng);
   assignEnvironments(levels, profile, rng);
   assignChallengeRatings(levels, profile, floor);
+  assignCreatureProfiles(levels, profile, rng);
   assignDiscoveryChecks(levels, baseDC, rng);
   assignInvestigationTimes(levels, profile);
 

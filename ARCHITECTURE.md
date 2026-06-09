@@ -184,6 +184,7 @@ Renderiza:
 - Tipo e nome da sala.
 - Perícia e DC do teste.
 - ND do encontro (com breakdown: base + clima + terreno).
+- Perfil de criatura quando aplicável (tipo predominante, ND da criatura e orientação de ajuste).
 - Clima gerado (temperatura, precipitação, vento, névoa).
 - Terreno (tipo + características).
 - Botões de ação: explorar, tentar, descansar (acampamento), escolher rota.
@@ -204,7 +205,47 @@ ND total = ND base do encontro + modificador de clima + modificador de terreno
 
 ---
 
-### 6. Ambiente (`environment.js`)
+### 6. Criaturas (`creatures.js`)
+
+Define os tipos gerais de criatura de Tormenta20 e atribui um perfil de criatura a nós que representam encontro.
+
+Tipos cadastrados:
+- Animais
+- Construtos
+- Espíritos
+- Humanoides
+- Monstros
+- Mortos-vivos
+
+A seleção usa pesos por terreno definidos em `creatureRules.typeWeightsByTerrain` no perfil de andar. Assim, um perfil florestal pode favorecer Animais e Monstros em Floresta/Pântano, enquanto Colinas e Planície aberta podem aumentar Humanoides.
+
+O ND da criatura inicial vem de `creatureRules.challengeSource`:
+- `total`: usa o ND total do encontro, incluindo clima e terreno.
+- `encounter`: usa apenas o ND base do tipo de sala.
+
+Nesta etapa, o app não inventa orçamento quantitativo para múltiplas criaturas. Ele registra a orientação de Tormenta20: ND considera um grupo padrão de quatro personagens, e o mestre deve ajustar 1 ou 2 pontos conforme experiência dos jogadores, composição do grupo, ambiente/circunstâncias e quantidade de combates.
+
+O diretório `creatureCatalog/` armazena fichas de criaturas específicas por tipo (`animals.js`, `constructs.js`, `humanoids.js`, `monsters.js`, `spirits.js`, `undead.js`). Cada ficha é um objeto exportado com identidade, ND, sentidos, estatísticas, ações, habilidades, perícias, equipamento e tesouro. O índice `creatureCatalog/index.js` agrega tudo e expõe buscas por id, tipo, ND e papel de ameaça.
+
+Além do tipo da criatura, o catálogo enriquece cada ficha com papel de ameaça (`role`): `solo`, `minion`/`lacaio` ou `special`/`especial`. Esse campo representa o ícone mecânico da ficha, não a espécie ou origem da criatura. Quando o papel não está explícito no cadastro, `inferThreatRole` compara PV, Defesa, ataque e quantidade de habilidades com as tabelas de criação de ameaças e marca o resultado com `roleSource: "inferred"` e `roleConfidence`; registros futuros podem sobrescrever isso com `roleSource: "explicit"`.
+
+A subpasta `creatureCatalog/bookBasic/` contém cadastros importados do PDF textual do Livro Básico. Esses registros ficam separados por tipo, têm `source: { book: "Livro Básico", pdfPage, bookPage }` e enriquecem criaturas manuais já existentes com a mesma fonte sem duplicar ids.
+
+### 7. Criação e Modificação de Ameaças (`threatCreationRules.js`)
+
+Modela as regras do PDF de criação e modificação de ameaças como dados e helpers puros. O módulo contém:
+- Funções narrativas sugeridas (`combatant`, `caster`, `trickster`, `henchman`, `boss`) e seus papéis prováveis.
+- Papéis mecânicos (`solo`, `minion`/`lacaio`, `special`/`especial`) com metadados de ícone, descrição e uso em encontro.
+- Patamares de ND e recomendação de quantidade de habilidades por patamar.
+- Tabela de deslocamentos por forma corporal/tipo de movimento.
+- Parâmetros de combate por papel e ND: ataque, dano médio, Defesa, resistências forte/média/fraca, PV e CD de habilidade.
+- Helpers para criar uma ficha-base, aplicar ajustes de estatística por ND, planejar modificação de uma criatura existente e criar um template de bando.
+
+O módulo não altera o mapa nem escolhe monstros automaticamente; ele prepara a camada de regras para a futura geração de encontros e variantes.
+
+---
+
+### 8. Ambiente (`environment.js`)
 
 Gera clima e terreno proceduralmente para cada nó.
 
@@ -222,7 +263,7 @@ Pesos de seleção são definidos por `environmentRules` no perfil do andar.
 
 ---
 
-### 7. Perfis de andar (`floorProfiles/`)
+### 9. Perfis de andar (`floorProfiles/`)
 
 Cada arquivo de perfil define o comportamento completo de uma faixa de andares. É o principal ponto de extensão do projeto.
 
@@ -270,7 +311,7 @@ Para adicionar um novo perfil:
 
 ---
 
-### 8. RNG com seed (`random.js`)
+### 10. RNG com seed (`random.js`)
 
 Usa os algoritmos **cyrb128** (hash de string para 4 inteiros de 32 bits) e **sfc32** (gerador de números pseudoaleatórios).
 

@@ -40,6 +40,65 @@ export const forest11to20Profile = {
     ],
     timeRule: { incrementMinutes: 15, maxMinutes: 60, noCheckMinutes: 30 }
   },
+  creatureRules: {
+    defaultPartySize: 4,
+    challengeSource: "encounter",
+    defaultTypeWeights: [
+      { type: "animal", weight: 30 },
+      { type: "construct", weight: 4 },
+      { type: "spirit", weight: 8 },
+      { type: "humanoid", weight: 18 },
+      { type: "monster", weight: 32 },
+      { type: "undead", weight: 8 }
+    ],
+    typeWeightsByTerrain: {
+      "Floresta": [
+        { type: "animal", weight: 38 },
+        { type: "construct", weight: 2 },
+        { type: "spirit", weight: 9 },
+        { type: "humanoid", weight: 15 },
+        { type: "monster", weight: 31 },
+        { type: "undead", weight: 5 }
+      ],
+      "Pântano": [
+        { type: "animal", weight: 26 },
+        { type: "construct", weight: 2 },
+        { type: "spirit", weight: 10 },
+        { type: "humanoid", weight: 8 },
+        { type: "monster", weight: 39 },
+        { type: "undead", weight: 15 }
+      ],
+      "Aquático": [
+        { type: "animal", weight: 34 },
+        { type: "construct", weight: 1 },
+        { type: "spirit", weight: 14 },
+        { type: "humanoid", weight: 6 },
+        { type: "monster", weight: 40 },
+        { type: "undead", weight: 5 }
+      ],
+      "Colinas": [
+        { type: "animal", weight: 28 },
+        { type: "construct", weight: 5 },
+        { type: "spirit", weight: 8 },
+        { type: "humanoid", weight: 28 },
+        { type: "monster", weight: 26 },
+        { type: "undead", weight: 5 }
+      ],
+      "Planície aberta": [
+        { type: "animal", weight: 22 },
+        { type: "construct", weight: 6 },
+        { type: "spirit", weight: 6 },
+        { type: "humanoid", weight: 40 },
+        { type: "monster", weight: 20 },
+        { type: "undead", weight: 6 }
+      ]
+    },
+    groupGuidance: [
+      "O ND-alvo considera uma criatura ou encontro justo para quatro personagens.",
+      "Use este ND como alvo da criatura principal; clima e terreno continuam ajustando o ND total do encontro.",
+      "Ajuste o ND em 1 ou 2 pontos para grupos maiores, menores, veteranos, desgastados ou em circunstâncias muito favoráveis."
+    ]
+  },
   challengeRules: {
     minimum: 0.25,
     maximum: 8,

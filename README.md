@@ -5,7 +5,7 @@ Gerador procedural de andares e encontros para Tormenta20. Cria mapas em grafo c
 ## O que o app faz
 
 - Gera um mapa de nós com múltiplos níveis e caminhos ramificados.
-- Cada nó tem tipo de sala (normal, elite, armadilha, tesouro, boss, acampamento), perícia de descoberta, DC, ND calculado e ambiente (clima + terreno).
+- Cada nó tem tipo de sala (normal, elite, armadilha, tesouro, boss, acampamento), perícia de descoberta, DC, ND calculado, ambiente (clima + terreno) e perfil de criatura quando aplicável.
 - O jogador navega pelo mapa escolhendo rotas, marcando encontros como explorados ou tentados, e descansando em acampamentos.
 - O estado completo (mapa + progresso) é exportado como um código de sessão que pode ser copiado e restaurado a qualquer momento — sem conta, sem backend.
 - Funciona offline e pode ser instalado como PWA.
@@ -42,6 +42,9 @@ src/
 ├── mapRenderer.js    # Renderização SVG
 ├── nodeDialog.js     # Modal de detalhes do nó
 ├── challenge.js      # Cálculo de ND
+├── creatures.js      # Tipos de criatura e perfil de encontro
+├── creatureCatalog/  # Fichas por tipo, fonte e papel de ameaça inferido/explícito
+├── threatCreationRules.js # Criação, modificação, papéis e bandos de ameaças
 ├── environment.js    # Geração de clima e terreno
 ├── tables.js         # Tabelas de perícias por tipo de sala
 ├── floorRanges.js    # Gerenciamento de perfis de andar
@@ -58,7 +61,7 @@ Toda a documentação técnica detalhada — arquitetura, sistemas, estrutura de
 2. Exportar o novo perfil em `src/floorProfiles/index.js`.
 3. Ele aparece automaticamente no seletor da interface.
 
-O perfil define pesos de tipos de sala, NDs por faixa de nível, tema visual (cores CSS), e regras de geração de clima e terreno.
+O perfil define pesos de tipos de sala, NDs por faixa de nível, pesos de tipos de criatura por terreno, tema visual (cores CSS), e regras de geração de clima e terreno.
 
 ## Próximos passos sugeridos
 

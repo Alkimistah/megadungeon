@@ -28,6 +28,29 @@ function createEnvironmentGroup(title, items) {
   return section;
 }
 
+function createCreatureSection(node) {
+  const section = document.createElement("section");
+  const heading = document.createElement("h3");
+  const guidance = document.createElement("ul");
+
+  section.className = "creature-section";
+  heading.textContent = "Criatura";
+  guidance.className = "creature-guidance";
+
+  node.creature.groupGuidance.forEach((text) => {
+    const item = document.createElement("li");
+    item.textContent = text;
+    guidance.appendChild(item);
+  });
+
+  section.appendChild(heading);
+  section.appendChild(createDetailLine("Tipo", node.creature.typeLabel + " - " + node.creature.typeDescription));
+  section.appendChild(createDetailLine("ND da criatura", "ND " + node.creature.targetChallengeLabel));
+  section.appendChild(guidance);
+
+  return section;
+}
+
 function createDetailLine(label, value) {
   const item = document.createElement("p");
   const name = document.createElement("strong");
@@ -234,6 +257,10 @@ export function createNodeDialogController({
     contentElement.appendChild(createModalActions(node));
 
     if (canShowEnvironmentDetails(node, state)) {
+      if (node.creature) {
+        contentElement.appendChild(createCreatureSection(node));
+      }
+
       contentElement.appendChild(createEnvironmentColumns(node));
     } else {
       contentElement.appendChild(createHiddenEnvironmentNotice());
