@@ -1,5 +1,6 @@
 import { assignChallengeRating } from "./challenge.js";
 import { generateEnvironmentContext } from "./environment.js";
+import { pick, pickWeighted, randomInt } from "./random.js";
 import {
   bossRoom,
   campRoom,
@@ -33,39 +34,16 @@ const COLUMN_TEMPLATES = {
 
 let nodeId = 0;
 
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function pick(array) {
-  return array[randomInt(0, array.length - 1)];
-}
-
-function pickWeighted(options) {
-  const totalWeight = options.reduce((sum, option) => sum + option.weight, 0);
-  let roll = randomInt(1, totalWeight);
-
-  for (const option of options) {
-    roll -= option.weight;
-
-    if (roll <= 0) {
-      return option;
-    }
-  }
-
-  return options[0];
-}
-
-function getRoomTypeDCModifier(type) {
+function getRoomTypeDCModifier(rng, type) {
   if (type === "elite") {
-    return randomInt(2, 5);
+    return randomInt(rng, 2, 5);
   }
 
   return 0;
 }
 
-function getRandomDCVariation() {
-  return pickWeighted([
+function getRandomDCVariation(rng) {
+  return pickWeighted(rng, [
     { modifier: 0, weight: 40 },
     { modifier: -3, weight: 10 },
     { modifier: -2, weight: 10 },
@@ -76,26 +54,27 @@ function getRandomDCVariation() {
   ]).modifier;
 }
 
-function pickWeightedSkill(options) {
-  return pickWeighted(options).skill;
+function pickWeightedSkill(rng, options) {
+  return pickWeighted(rng, options).skill;
 }
 
-function pickWeightedRoomType(profile) {
-  return pickWeighted(profile.encounterRules.roomTypes);
+function pickWeightedRoomType(rng, profile) {
+  return pickWeighted(rng, profile.encounterRules.roomTypes);
 }
 
-function assignEnvironments(levels, profile) {
+function assignEnvironments(levels, profile, rng) {
   levels.flat().forEach((node) => {
     node.environment = generateEnvironmentContext({
       avoidDamagingClimate: node.type === "camp",
-      environmentRules: profile.environmentRules
+      environmentRules: profile.environmentRules,
+      rng
     });
   });
 }
 
-function assignUnknownReveals(levels) {
+function assignUnknownReveals(levels, rng) {
   levels.flat().forEach((node) => {
-    node.revealedLabel = node.type === "unknown" ? pick(UNKNOWN_REVEAL_OPTIONS) : null;
+    node.revealedLabel = node.type === "unknown" ? pick(rng, UNKNOWN_REVEAL_OPTIONS) : null;
   });
 }
 
@@ -106,7 +85,7 @@ function assignChallengeRatings(levels, profile, floor) {
   });
 }
 
-function assignDiscoveryCheck(node, baseDC) {
+function assignDiscoveryCheck(node, baseDC, rng) {
   if (node.type === "unknown" || node.type === "camp" || node.type === "boss") {
     node.skill = null;
     node.dc = null;
@@ -114,16 +93,16 @@ function assignDiscoveryCheck(node, baseDC) {
   }
 
   const options = skillOptionsByRoomType[node.type] || skillOptionsByRoomType.normal;
-  const modifier = getRoomTypeDCModifier(node.type);
-  const variation = node.type === "elite" ? 0 : getRandomDCVariation();
+  const modifier = getRoomTypeDCModifier(rng, node.type);
+  const variation = node.type === "elite" ? 0 : getRandomDCVariation(rng);
 
-  node.skill = pickWeightedSkill(options);
+  node.skill = pickWeightedSkill(rng, options);
   node.dc = Math.max(baseDC + modifier + variation, 5);
 }
 
-function assignDiscoveryChecks(levels, baseDC) {
+function assignDiscoveryChecks(levels, baseDC, rng) {
   levels.flat().forEach((node) => {
-    assignDiscoveryCheck(node, baseDC);
+    assignDiscoveryCheck(node, baseDC, rng);
   });
 }
 
@@ -162,8 +141,8 @@ function applyRoomType(node, roomData) {
   node.challenge = null;
 }
 
-function createNode(level, column, profile) {
-  const data = pickWeightedRoomType(profile);
+function createNode(level, column, profile, rng) {
+  const data = pickWeightedRoomType(rng, profile);
 
   return {
     id: nodeId++,
@@ -184,13 +163,13 @@ function createNode(level, column, profile) {
   };
 }
 
-function guaranteeAtLeastOneTreasure(levels) {
+function guaranteeAtLeastOneTreasure(levels, rng) {
   const treasureExists = levels.flat().some((node) => node.type === "treasure");
 
   if (treasureExists) return;
 
   const candidates = levels.flat().filter((node) => node.type !== "boss");
-  const target = pick(candidates);
+  const target = pick(rng, candidates);
   applyRoomType(target, treasureRoom);
 }
 
@@ -199,7 +178,7 @@ function getCampLevelIndexes(levels) {
     .map((_, levelIndex) => levelIndex)
     .filter((levelIndex) => (levelIndex + 1) % 4 === 0);
 }
-function pickCampNode(levelNodes) {
+function pickCampNode(levelNodes, rng) {
   const preferredCandidates = levelNodes.filter(
     (node) => node.type === "normal" || node.type === "trap"
   );
@@ -208,15 +187,15 @@ function pickCampNode(levelNodes) {
   );
   const candidates = preferredCandidates.length > 0 ? preferredCandidates : fallbackCandidates;
 
-  return candidates.length > 0 ? pick(candidates) : pick(levelNodes);
+  return candidates.length > 0 ? pick(rng, candidates) : pick(rng, levelNodes);
 }
 
-function addCampsIfEligible(levels) {
+function addCampsIfEligible(levels, rng) {
   getCampLevelIndexes(levels).forEach((levelIndex) => {
     const levelNodes = levels[levelIndex].filter((node) => node.type !== "boss");
 
     if (levelNodes.length > 0) {
-      applyRoomType(pickCampNode(levelNodes), campRoom);
+      applyRoomType(pickCampNode(levelNodes, rng), campRoom);
     }
   });
 }
@@ -233,20 +212,21 @@ function getCupLevelNodeCount(levelIndex, depth, edgeNodeCount, middleNodeCount)
   return Math.min(Math.max(nodeCount, MIN_EDGE_NODES), GRID_WIDTH);
 }
 
-function pickColumnsForNodeCount(nodeCount) {
+function pickColumnsForNodeCount(nodeCount, rng) {
   const templates = COLUMN_TEMPLATES[nodeCount] || COLUMN_TEMPLATES[GRID_WIDTH];
-  return [...pick(templates)];
+  return [...pick(rng, templates)];
 }
 
-function createLevel(levelIndex, nodeCount, profile) {
-  return pickColumnsForNodeCount(nodeCount).map((column) =>
-    createNode(levelIndex + 1, column, profile)
+function createLevel(levelIndex, nodeCount, profile, rng) {
+  return pickColumnsForNodeCount(nodeCount, rng).map((column) =>
+    createNode(levelIndex + 1, column, profile, rng)
   );
 }
 
-function createCupLevels(depth, profile) {
-  const edgeNodeCount = randomInt(MIN_EDGE_NODES, MAX_EDGE_NODES);
+function createCupLevels(depth, profile, rng) {
+  const edgeNodeCount = randomInt(rng, MIN_EDGE_NODES, MAX_EDGE_NODES);
   const middleNodeCount = randomInt(
+    rng,
     Math.max(MIN_MIDDLE_NODES, edgeNodeCount + 2),
     MAX_MIDDLE_NODES
   );
@@ -259,7 +239,7 @@ function createCupLevels(depth, profile) {
       middleNodeCount
     );
 
-    return createLevel(levelIndex, nodeCount, profile);
+    return createLevel(levelIndex, nodeCount, profile, rng);
   });
 }
 
@@ -267,7 +247,7 @@ function getIncomingCount(previousLevel, target) {
   return previousLevel.filter((node) => node.links.includes(target)).length;
 }
 
-function sortByDistanceFromColumn(nodes, column) {
+function sortByDistanceFromColumn(nodes, column, rng) {
   return [...nodes].sort((first, second) => {
     const firstDistance = Math.abs(first.column - column);
     const secondDistance = Math.abs(second.column - column);
@@ -276,61 +256,61 @@ function sortByDistanceFromColumn(nodes, column) {
       return firstDistance - secondDistance;
     }
 
-    return Math.random() < 0.5 ? -1 : 1;
+    return rng() < 0.5 ? -1 : 1;
   });
 }
 
-function connectPrimaryPaths(currentLevel, nextLevel) {
+function connectPrimaryPaths(currentLevel, nextLevel, rng) {
   currentLevel.forEach((source) => {
-    const sortedTargets = sortByDistanceFromColumn(nextLevel, source.column);
+    const sortedTargets = sortByDistanceFromColumn(nextLevel, source.column, rng);
     const underusedTargets = sortedTargets.filter(
       (target) => getIncomingCount(currentLevel, target) === 0
     );
-    const target = pick(underusedTargets.slice(0, 2)) || sortedTargets[0];
+    const target = pick(rng, underusedTargets.slice(0, 2)) || sortedTargets[0];
 
     source.links.push(target);
   });
 }
 
-function ensureEveryNextNodeIsReachable(currentLevel, nextLevel) {
+function ensureEveryNextNodeIsReachable(currentLevel, nextLevel, rng) {
   nextLevel.forEach((target) => {
     if (getIncomingCount(currentLevel, target) > 0) {
       return;
     }
 
-    const source = sortByDistanceFromColumn(currentLevel, target.column)[0];
+    const source = sortByDistanceFromColumn(currentLevel, target.column, rng)[0];
     source.links.push(target);
   });
 }
 
-function addOptionalLinks(currentLevel, nextLevel) {
+function addOptionalLinks(currentLevel, nextLevel, rng) {
   currentLevel.forEach((source) => {
-    const nearbyTargets = sortByDistanceFromColumn(nextLevel, source.column)
+    const nearbyTargets = sortByDistanceFromColumn(nextLevel, source.column, rng)
       .filter((target) => !source.links.includes(target))
       .slice(0, 2);
 
     nearbyTargets.forEach((target) => {
-      if (Math.random() < EXTRA_LINK_CHANCE) {
+      if (rng() < EXTRA_LINK_CHANCE) {
         source.links.push(target);
       }
     });
   });
 }
 
-function connectCupLevels(levels) {
+function connectCupLevels(levels, rng) {
   for (let levelIndex = 0; levelIndex < levels.length - 1; levelIndex++) {
     const currentLevel = levels[levelIndex];
     const nextLevel = levels[levelIndex + 1];
 
-    connectPrimaryPaths(currentLevel, nextLevel);
-    ensureEveryNextNodeIsReachable(currentLevel, nextLevel);
-    addOptionalLinks(currentLevel, nextLevel);
+    connectPrimaryPaths(currentLevel, nextLevel, rng);
+    ensureEveryNextNodeIsReachable(currentLevel, nextLevel, rng);
+    addOptionalLinks(currentLevel, nextLevel, rng);
   }
 }
 
-function createSlayLikeMap(depth, profile) {
-  const levels = createCupLevels(depth, profile);
-  connectCupLevels(levels);
+function createSlayLikeMap(depth, profile, rng) {
+  const levels = createCupLevels(depth, profile, rng);
+  connectCupLevels(levels, rng);
 
   return levels;
 }
@@ -392,18 +372,18 @@ function convertMergedPathsToUnknown(levels) {
   }
 }
 
-export function generateMapData(depth, baseDC, profile, floor) {
+export function generateMapData(depth, baseDC, profile, floor, rng = Math.random) {
   nodeId = 0;
-  const levels = createSlayLikeMap(depth, profile);
+  const levels = createSlayLikeMap(depth, profile, rng);
 
   addFinalBoss(levels, profile, floor);
-  guaranteeAtLeastOneTreasure(levels);
+  guaranteeAtLeastOneTreasure(levels, rng);
   convertMergedPathsToUnknown(levels);
-  addCampsIfEligible(levels);
-  assignUnknownReveals(levels);
-  assignEnvironments(levels, profile);
+  addCampsIfEligible(levels, rng);
+  assignUnknownReveals(levels, rng);
+  assignEnvironments(levels, profile, rng);
   assignChallengeRatings(levels, profile, floor);
-  assignDiscoveryChecks(levels, baseDC);
+  assignDiscoveryChecks(levels, baseDC, rng);
   assignInvestigationTimes(levels, profile);
 
   return levels;

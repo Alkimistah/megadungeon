@@ -45,13 +45,14 @@
             <input id="baseDcInput" type="number" min="5" max="40" value="15" />
           </label>
 
+
           <label class="checkbox-field">
             <input id="unknownPathsInput" type="checkbox" />
             Caminhos desconhecidos
           </label>
         </div>
 
-        <div id="info"></div>
+        <button id="info" type="button" title="Copiar seed da sessão atual"></button>
       </div>
     </header>
     <button id="reloadAppButton" class="reload-button floating-reload" type="button" aria-label="Recarregar aplicativo"><img src="/assets/icons/return-arrow.svg" alt="" /></button>
@@ -130,6 +131,11 @@
         <label class="range-field">
           Grupo de andares
           <select id="floorRangeInput"></select>
+        </label>
+
+        <label class="range-field seed-field">
+          Seed de sessão
+          <input id="seedInput" type="text" placeholder="Cole uma sessão MD1 ou deixe vazio" />
         </label>
 
         <label class="checkbox-field">

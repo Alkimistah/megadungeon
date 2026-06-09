@@ -1,18 +1,18 @@
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+function getRng(options) {
+  return options.rng || Math.random;
 }
 
-function chance(percent) {
-  return Math.random() < percent / 100;
+function randomInt(rng, min, max) {
+  return Math.floor(rng() * (max - min + 1)) + min;
 }
 
-function pick(array) {
-  return array[randomInt(0, array.length - 1)];
+function chance(rng, percent) {
+  return rng() < percent / 100;
 }
 
-function pickWeighted(options) {
+function pickWeighted(rng, options) {
   const totalWeight = options.reduce((sum, option) => sum + option.weight, 0);
-  let roll = randomInt(1, totalWeight);
+  let roll = randomInt(rng, 1, totalWeight);
 
   for (const option of options) {
     roll -= option.weight;
@@ -306,7 +306,7 @@ function getClimateVariation(kind, climate, options, rules) {
     rules
   );
 
-  return compatibleOptions.length > 0 ? pickWeighted(compatibleOptions) : null;
+  return compatibleOptions.length > 0 ? pickWeighted(getRng(options), compatibleOptions) : null;
 }
 
 function hasCompatibleClimateVariation(kind, climate, options, rules) {
@@ -332,14 +332,15 @@ function generateClimate(options = {}) {
   const rules = getClimateRules(options);
   const climate = [];
   const usedKinds = new Set();
-  const variationCount = pickWeighted(rules.variationCountOptions);
+  const rng = getRng(options);
+  const variationCount = pickWeighted(rng, rules.variationCountOptions);
 
   for (let index = 0; index < variationCount; index++) {
     const availableKinds = getAvailableClimateKinds(climate, usedKinds, options, rules);
 
     if (availableKinds.length === 0) break;
 
-    const kind = pickWeighted(availableKinds);
+    const kind = pickWeighted(rng, availableKinds);
     const variation = getClimateVariation(kind, climate, options, rules);
 
     if (!variation) {
@@ -362,25 +363,26 @@ function addUniqueFeature(features, feature) {
 
 function generateTerrain(options = {}) {
   const rules = getTerrainRules(options);
-  const terrain = pickWeighted(rules.terrainOptions);
-  const desiredFeatureCount = terrain.name === "Floresta" ? randomInt(1, 3) : randomInt(1, 2);
+  const rng = getRng(options);
+  const terrain = pickWeighted(rng, rules.terrainOptions);
+  const desiredFeatureCount = terrain.name === "Floresta" ? randomInt(rng, 1, 3) : randomInt(rng, 1, 2);
   const uniqueFeatureCount = new Set(terrain.featureOptions.map((option) => option.value.name)).size;
   const featureCount = Math.min(desiredFeatureCount, uniqueFeatureCount);
   const features = [];
 
   while (features.length < featureCount) {
-    addUniqueFeature(features, pickWeighted(terrain.featureOptions));
+    addUniqueFeature(features, pickWeighted(rng, terrain.featureOptions));
   }
 
-  if (terrain.name === "Floresta" && chance(rules.forestAquaticFeatureChance)) {
+  if (terrain.name === "Floresta" && chance(rng, rules.forestAquaticFeatureChance)) {
     const aquaticTerrain = rules.terrainOptions.find((option) => option.value.name === "Aquático");
 
     if (aquaticTerrain) {
-      addUniqueFeature(features, pickWeighted(aquaticTerrain.value.featureOptions));
+      addUniqueFeature(features, pickWeighted(rng, aquaticTerrain.value.featureOptions));
     }
   }
 
-  if (terrain.name !== "Pântano" && chance(rules.wetSoilChance)) {
+  if (terrain.name !== "Pântano" && chance(rng, rules.wetSoilChance)) {
     addUniqueFeature(features, rules.wetSoilFeature);
   }
 

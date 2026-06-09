@@ -3,8 +3,10 @@ import { createExplorationState } from "./appState.js";
 import { FLOOR_RANGES, applyTheme, getFloorRange } from "./floorRanges.js";
 import { formatElapsedTime } from "./format.js";
 import { generateMapData } from "./generator.js";
+import { createRandomSeed, createRng } from "./random.js";
 import { createMapRenderer } from "./mapRenderer.js";
 import { createNodeDialogController } from "./nodeDialog.js";
+import { decodeSessionCode, encodeSessionCode, isSessionCode } from "./sessionCode.js";
 
 const elements = {
   svg: document.getElementById("map"),
@@ -14,6 +16,7 @@ const elements = {
   floorInput: document.getElementById("floorInput"),
   depthInput: document.getElementById("depthInput"),
   baseDcInput: document.getElementById("baseDcInput"),
+  seedInput: document.getElementById("seedInput"),
   unknownPathsInput: document.getElementById("unknownPathsInput"),
   generateButton: document.getElementById("generateButton"),
   reloadAppButton: document.getElementById("reloadAppButton"),
@@ -36,6 +39,8 @@ const elements = {
 
 const state = createExplorationState();
 let activeFloorRange = FLOOR_RANGES[0];
+let currentMapSeed = createRandomSeed();
+let infoMessageTimeout = null;
 
 const nodeDialogController = createNodeDialogController({
   contentElement: elements.nodeDialogContent,
@@ -76,39 +81,90 @@ function updateTimeTracker() {
   elements.timeTrackerValue.textContent = formatElapsedTime(state.getElapsedMinutes());
 }
 
-function updateInfo(levels) {
-  const allNodes = levels.flat();
-  const counts = {
-    normal: 0,
-    elite: 0,
-    trap: 0,
-    unknown: 0,
-    treasure: 0,
-    camp: 0,
-    boss: 0
+function getCurrentSession() {
+  return {
+    v: 1,
+    profile: activeFloorRange.id,
+    floor: Number(elements.floorInput.value),
+    depth: Number(elements.depthInput.value),
+    baseDc: Number(elements.baseDcInput.value),
+    unknownPaths: state.isUnknownPathsEnabled(),
+    mapSeed: currentMapSeed,
+    state: state.exportSessionState()
   };
+}
 
-  allNodes.forEach((node) => {
-    counts[node.type]++;
-  });
+function getCurrentSessionCode() {
+  return encodeSessionCode(getCurrentSession());
+}
 
-  const totalNodes = allNodes.length;
-  const totalLinks = allNodes.reduce((sum, node) => sum + node.links.length, 0);
-  const floor = elements.floorInput.value;
-  const bossText = floor === "20" ? " | Boss após o mapa" : "";
+function updateInfo() {
+  elements.info.textContent = `Seed: ${currentMapSeed} | Clique para copiar sessão`;
+}
 
-  elements.info.textContent =
-    `Andar ${floor} | ` +
-    `Encontros: ${levels.length}${bossText} | ` +
-    `Nós: ${totalNodes} | ` +
-    `Conexões: ${totalLinks} | ` +
-    `Normais: ${counts.normal} | ` +
-    `Elites: ${counts.elite} | ` +
-    `Armadilhas: ${counts.trap} | ` +
-    `Desconhecidos: ${counts.unknown} | ` +
-    `Tesouros: ${counts.treasure} | ` +
-    `Acampamentos: ${counts.camp} | ` +
-    `Chefões: ${counts.boss}`;
+function showInfoMessage(message) {
+  if (infoMessageTimeout) {
+    clearTimeout(infoMessageTimeout);
+  }
+
+  elements.info.textContent = message;
+  infoMessageTimeout = setTimeout(() => {
+    updateInfo(state.getLevels());
+  }, 1800);
+}
+
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
+async function copyCurrentSessionCode() {
+  const sessionCode = getCurrentSessionCode();
+
+  await copyTextToClipboard(sessionCode);
+  showInfoMessage("Mapa atual e todas as informações foram salvos no clipboard.");
+}
+
+function drawGeneratedLevels(levels) {
+  state.setLevels(levels);
+  mapRenderer.drawMap(levels, activeFloorRange.theme.columnColors);
+  refreshExplorationDisplay();
+  updateInfo(levels);
+}
+
+function restoreSession(session) {
+  applyFloorRange(session.profile);
+  elements.floorInput.value = String(session.floor);
+  elements.depthInput.value = session.depth;
+  elements.baseDcInput.value = session.baseDc;
+  currentMapSeed = session.mapSeed;
+  setUnknownPathsMode(Boolean(session.unknownPaths));
+
+  const levels = generateMapData(
+    session.depth,
+    session.baseDc,
+    activeFloorRange,
+    session.floor,
+    createRng(currentMapSeed)
+  );
+
+  state.setLevels(levels);
+  state.importSessionState(session.state);
+  mapRenderer.drawMap(levels, activeFloorRange.theme.columnColors);
+  refreshExplorationDisplay();
+  updateInfo(levels);
 }
 
 function refreshExplorationDisplay() {
@@ -195,13 +251,17 @@ function generateMap() {
 
   elements.depthInput.value = depth;
   elements.baseDcInput.value = baseDC;
+  currentMapSeed = createRandomSeed();
 
-  const levels = generateMapData(depth, baseDC, activeFloorRange, Number(elements.floorInput.value));
+  const levels = generateMapData(
+    depth,
+    baseDC,
+    activeFloorRange,
+    Number(elements.floorInput.value),
+    createRng(currentMapSeed)
+  );
 
-  state.setLevels(levels);
-  mapRenderer.drawMap(levels, activeFloorRange.theme.columnColors);
-  refreshExplorationDisplay();
-  updateInfo(levels);
+  drawGeneratedLevels(levels);
 }
 
 function registerServiceWorker() {
@@ -230,6 +290,12 @@ function bindEvents() {
 
   elements.generateButton.addEventListener("click", () => {
     generateMap();
+  });
+
+  elements.info.addEventListener("click", () => {
+    copyCurrentSessionCode().catch(() => {
+      showInfoMessage("Não foi possível copiar a sessão atual.");
+    });
   });
 
   elements.reloadAppButton.addEventListener("click", () => {
@@ -266,7 +332,34 @@ function bindEvents() {
     setUnknownPathsMode(elements.initialUnknownPathsInput.checked);
   });
 
-  elements.rangeConfirm.addEventListener("click", () => {
+  elements.seedInput.addEventListener("input", () => {
+    elements.seedInput.setCustomValidity("");
+  });
+
+  elements.rangeConfirm.addEventListener("click", (event) => {
+    const seedValue = elements.seedInput.value.trim();
+
+    elements.seedInput.setCustomValidity("");
+
+    if (seedValue) {
+      if (!isSessionCode(seedValue)) {
+        event.preventDefault();
+        elements.seedInput.setCustomValidity("Cole uma sessão válida iniciada por MD1 ou deixe o campo vazio.");
+        elements.seedInput.reportValidity();
+        return;
+      }
+
+      try {
+        restoreSession(decodeSessionCode(seedValue));
+      } catch {
+        event.preventDefault();
+        elements.seedInput.setCustomValidity("Seed de sessão inválida. Verifique o código informado.");
+        elements.seedInput.reportValidity();
+      }
+
+      return;
+    }
+
     applyFloorRange(elements.floorRangeInput.value);
     setUnknownPathsMode(elements.initialUnknownPathsInput.checked);
     generateMap();

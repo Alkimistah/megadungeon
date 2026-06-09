@@ -104,6 +104,15 @@ input {
   width: 80px;
 }
 
+.seed-field {
+  flex: 1 1 260px;
+}
+
+.seed-field input {
+  min-width: 220px;
+  width: 100%;
+}
+
 button {
   background: var(--action);
   color: white;
@@ -131,11 +140,19 @@ button:hover {
 }
 
 #info {
+  width: 100%;
   padding: 8px 10px;
   border: 1px solid var(--border-soft);
   border-radius: 6px;
   background: var(--surface-alt);
+  color: #fff7e8;
   font-size: 13px;
+  line-height: 1.3;
+  text-align: left;
+}
+
+#info:hover {
+  background: color-mix(in srgb, var(--surface-alt) 85%, white 15%);
 }
 
 .floating-reload {

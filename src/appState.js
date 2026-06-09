@@ -16,8 +16,48 @@ export function createExplorationState() {
     exploredNodeIds = new Set();
     attemptedNodeIds = new Set();
     restedNodeIds = new Set();
-    elapsedMinutes = 0;
     activeNodeIds = new Set(levels[0].map((node) => node.id));
+  }
+
+
+  function findNodeById(nodeId) {
+    return levels.flat().find((node) => node.id === nodeId);
+  }
+
+  function rebuildActiveNodesFromChosenRoutes() {
+    activeNodeIds = new Set();
+
+    if (chosenNodeByLevel.size === 0) {
+      activeNodeIds = new Set(levels[0].map((node) => node.id));
+      return;
+    }
+
+    const highestChosenLevel = Math.max(...chosenNodeByLevel.keys());
+    const chosenNode = findNodeById(chosenNodeByLevel.get(highestChosenLevel));
+
+    if (chosenNode && chosenNode.level < levels.length) {
+      activeNodeIds = new Set(chosenNode.links.map((node) => node.id));
+    }
+  }
+
+  function exportSessionState() {
+    return {
+      attempted: [...attemptedNodeIds],
+      chosenByLevel: [...chosenNodeByLevel.entries()],
+      elapsedMinutes,
+      explored: [...exploredNodeIds],
+      rested: [...restedNodeIds]
+    };
+  }
+
+  function importSessionState(sessionState = {}) {
+    chosenNodeByLevel = new Map(sessionState.chosenByLevel || []);
+    chosenNodeIds = new Set([...chosenNodeByLevel.values()]);
+    exploredNodeIds = new Set(sessionState.explored || []);
+    attemptedNodeIds = new Set(sessionState.attempted || []);
+    restedNodeIds = new Set(sessionState.rested || []);
+    elapsedMinutes = sessionState.elapsedMinutes || 0;
+    rebuildActiveNodesFromChosenRoutes();
   }
 
   function getLevels() {
@@ -174,10 +214,12 @@ export function createExplorationState() {
     canOpenNode,
     canRestAtNode,
     chooseRoute,
+    exportSessionState,
     getElapsedMinutes,
     getLevels,
     getLinkViewState,
     getNodeViewState,
+    importSessionState,
     isNodeAttempted,
     isNodeChosen,
     isNodeExplored,
