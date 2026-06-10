@@ -220,16 +220,25 @@ Tipos cadastrados:
 A seleção usa pesos por terreno definidos em `creatureRules.typeWeightsByTerrain` no perfil de andar. Assim, um perfil florestal pode favorecer Animais e Monstros em Floresta/Pântano, enquanto Colinas e Planície aberta podem aumentar Humanoides.
 
 O ND da criatura inicial vem de `creatureRules.challengeSource`:
-- `total`: usa o ND total do encontro, incluindo clima e terreno.
+- `creatures`: usa o orçamento restante para criaturas depois de reservar ND para armadilhas.
 - `encounter`: usa apenas o ND base do tipo de sala.
+- `total`: usa o ND total do encontro, incluindo clima e terreno.
 
-Nesta etapa, o app não inventa orçamento quantitativo para múltiplas criaturas. Ele registra a orientação de Tormenta20: ND considera um grupo padrão de quatro personagens, e o mestre deve ajustar 1 ou 2 pontos conforme experiência dos jogadores, composição do grupo, ambiente/circunstâncias e quantidade de combates.
+O app separa o ND em camadas: `challenge.encounter` é o orçamento base do encontro; `challenge.trap` consome parte desse orçamento; `challenge.creatures` é o orçamento restante para criatura ou grupo; `challenge.climate` e `challenge.terrain` são modificadores externos. Assim, o total segue a regra `total = encounter + climate + terrain`, enquanto a composição interna segue `encounter = creatures + trap` quando uma armadilha incidental existe.
 
 O diretório `creatureCatalog/` armazena fichas de criaturas específicas por tipo (`animals.js`, `constructs.js`, `humanoids.js`, `monsters.js`, `spirits.js`, `undead.js`). Cada ficha é um objeto exportado com identidade, ND, sentidos, estatísticas, ações, habilidades, perícias, equipamento e tesouro. O índice `creatureCatalog/index.js` agrega tudo e expõe buscas por id, tipo, ND e papel de ameaça.
 
 Além do tipo da criatura, o catálogo enriquece cada ficha com papel de ameaça (`role`): `solo`, `minion`/`lacaio` ou `special`/`especial`. Esse campo representa o ícone mecânico da ficha, não a espécie ou origem da criatura. Quando o papel não está explícito no cadastro, `inferThreatRole` compara PV, Defesa, ataque e quantidade de habilidades com as tabelas de criação de ameaças e marca o resultado com `roleSource: "inferred"` e `roleConfidence`; registros futuros podem sobrescrever isso com `roleSource: "explicit"`.
 
 A subpasta `creatureCatalog/bookBasic/` contém cadastros importados do PDF textual do Livro Básico. Esses registros ficam separados por tipo, têm `source: { book: "Livro Básico", pdfPage, bookPage }` e enriquecem criaturas manuais já existentes com a mesma fonte sem duplicar ids.
+
+A subpasta `creatureCatalog/ameacasArton/` contém cadastros importados dos PDFs textuais de Ameaças de Arton. Duplicatas já presentes no catálogo principal não são recadastradas; em vez disso, entram como fonte adicional em `sources`. O perfil atual usa `creatureRules.bossCreatureId: "quimera"`, fazendo a Quimera de Ameaças de Arton ser a criatura específica do boss do andar 20.
+
+`damageTypes.js` centraliza os tipos de dano (`acid`, `slashing`, `electricity`, `essence`, `fire`, `cold`, `bludgeoning`, `light`, `piercing`, `psychic`, `darkness`) com rótulos em português, aliases e categorias. Esse catálogo deve ser usado por ameaças, armadilhas, perigos ambientais e futuras habilidades geradas automaticamente.
+
+`generalCreatureAbilities.js` centraliza habilidades gerais de ameaças vindas do PDF textual de habilidades gerais, como Agarrar Aprimorado, Bando, Enxame, Evasão, Magias, Redução de Dano, Vulnerabilidade e sentidos especiais. Cada registro é um resumo estruturado com categoria, parâmetros esperados e fonte por página, para servir como base de seleção e composição em variantes de criaturas.
+
+`traps.js` centraliza o catálogo de armadilhas do Livro Básico e de Ameaças de Arton e as regras de atribuição aos nodos. Nodos do tipo `trap` ou desconhecidos revelados como Armadilha recebem armadilha principal; encontros normais, elites e boss podem receber armadilha incidental conforme `trapRules.incidentalChanceByRoomType`. Armadilhas não aumentam `challenge.total`; elas consomem parte de `challenge.encounter` e reduzem `challenge.creatures`.
 
 ### 7. Criação e Modificação de Ameaças (`threatCreationRules.js`)
 

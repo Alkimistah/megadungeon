@@ -40,9 +40,20 @@ export const forest11to20Profile = {
     ],
     timeRule: { incrementMinutes: 15, maxMinutes: 60, noCheckMinutes: 30 }
   },
+  trapRules: {
+    sources: ["livroBasico", "ameacasArton"],
+    minimumChallenge: 0.25,
+    incidentalChallengeOffset: 1,
+    incidentalChanceByRoomType: {
+      normal: 0.06,
+      elite: 0.1,
+      boss: 0.08
+    }
+  },
   creatureRules: {
     defaultPartySize: 4,
-    challengeSource: "encounter",
+    challengeSource: "creatures",
+    bossCreatureId: "quimera",
     defaultTypeWeights: [
       { type: "animal", weight: 30 },
       { type: "construct", weight: 4 },

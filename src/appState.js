@@ -41,11 +41,17 @@ export function createExplorationState() {
   }
 
   function exportSessionState() {
+    const resolvedEncounters = levels
+      .flat()
+      .filter((node) => node.resolvedEncounter)
+      .map((node) => [node.id, node.resolvedEncounter]);
+
     return {
       attempted: [...attemptedNodeIds],
       chosenByLevel: [...chosenNodeByLevel.entries()],
       elapsedMinutes,
       explored: [...exploredNodeIds],
+      resolvedEncounters,
       rested: [...restedNodeIds]
     };
   }
@@ -57,6 +63,12 @@ export function createExplorationState() {
     attemptedNodeIds = new Set(sessionState.attempted || []);
     restedNodeIds = new Set(sessionState.rested || []);
     elapsedMinutes = sessionState.elapsedMinutes || 0;
+
+    const resolvedEncounterByNode = new Map(sessionState.resolvedEncounters || []);
+    levels.flat().forEach((node) => {
+      node.resolvedEncounter = resolvedEncounterByNode.get(node.id) || null;
+    });
+
     rebuildActiveNodesFromChosenRoutes();
   }
 

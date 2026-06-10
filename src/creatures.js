@@ -1,4 +1,5 @@
 import { formatChallengeRating } from "./challenge.js";
+import { getCreatureById } from "./creatureCatalog/index.js";
 import { pickWeighted } from "./random.js";
 
 export const CREATURE_TYPES = {
@@ -49,6 +50,7 @@ const NON_CREATURE_UNKNOWN_LABELS = new Set(["Acampamento", "Armadilha", "Tesour
 function hasCreatureProfile(node) {
   if (NON_CREATURE_ROOM_TYPES.has(node.type)) return false;
   if (node.type === "unknown" && NON_CREATURE_UNKNOWN_LABELS.has(node.revealedLabel)) return false;
+  if (node.challenge?.creatures === 0) return false;
 
   return true;
 }
@@ -65,12 +67,21 @@ function getWeightedCreatureTypes(node, rules) {
     DEFAULT_CREATURE_TYPE_WEIGHTS;
 }
 
-function getChallengeSource(node, rules) {
-  const source = rules.challengeSource || "total";
+function getSpecificCreature(node, rules) {
+  if (node.type === "boss" && rules.bossCreatureId) {
+    return getCreatureById(rules.bossCreatureId);
+  }
 
+  return null;
+}
+
+function getChallengeSource(node, rules) {
+  const source = rules.challengeSource || "creatures";
+
+  if (source === "total") return node.challenge.total;
   if (source === "encounter") return node.challenge.encounter;
 
-  return node.challenge.total;
+  return node.challenge.creatures ?? node.challenge.encounter;
 }
 
 function getGroupGuidance(node, rules) {
@@ -90,17 +101,22 @@ export function assignCreatureProfile(node, profile, rng) {
   }
 
   const rules = getCreatureRules(profile);
-  const typeOption = pickWeighted(rng, getWeightedCreatureTypes(node, rules));
+  const specificCreature = getSpecificCreature(node, rules);
+  const typeOption = specificCreature ? { type: specificCreature.type } : pickWeighted(rng, getWeightedCreatureTypes(node, rules));
   const type = CREATURE_TYPES[typeOption.type] || CREATURE_TYPES.monster;
-  const targetChallenge = getChallengeSource(node, rules);
+  const targetChallenge = specificCreature?.challengeRating ?? getChallengeSource(node, rules);
 
   node.creature = {
     type: type.id,
     typeLabel: type.label,
     typeDescription: type.description,
+    creatureId: specificCreature?.id || null,
+    creatureName: specificCreature?.name || null,
+    creatureRole: specificCreature?.role || null,
+    creatureRoleLabel: specificCreature?.roleMetadata?.label || null,
     targetChallenge,
     targetChallengeLabel: formatChallengeRating(targetChallenge),
-    challengeSource: rules.challengeSource || "total",
+    challengeSource: specificCreature ? "specific" : rules.challengeSource || "creatures",
     defaultPartySize: rules.defaultPartySize || 4,
     groupGuidance: getGroupGuidance(node, rules)
   };

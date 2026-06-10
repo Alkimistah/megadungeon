@@ -5,6 +5,7 @@ import { formatElapsedTime } from "./format.js";
 import { generateMapData } from "./generator.js";
 import { createRandomSeed, createRng } from "./random.js";
 import { createMapRenderer } from "./mapRenderer.js";
+import { resolveNodeEncounter } from "./encounterResolver.js";
 import { createNodeDialogController } from "./nodeDialog.js";
 import { decodeSessionCode, encodeSessionCode, isSessionCode } from "./sessionCode.js";
 
@@ -52,7 +53,12 @@ const nodeDialogController = createNodeDialogController({
     nodeDialogController.open(node);
   },
   onChooseRoute: (node) => {
-    state.chooseRoute(node);
+    const changed = state.chooseRoute(node);
+
+    if (changed) {
+      resolveNodeEncounter(node, { mapSeed: currentMapSeed });
+    }
+
     refreshExplorationDisplay();
     nodeDialogController.open(node);
   },
@@ -144,6 +150,16 @@ function drawGeneratedLevels(levels) {
   updateInfo(levels);
 }
 
+function resolveChosenRouteEncounters(levels, sessionState = {}) {
+  const chosenNodeIds = new Set((sessionState.chosenByLevel || []).map(([, nodeId]) => nodeId));
+
+  levels.flat().forEach((node) => {
+    if (chosenNodeIds.has(node.id)) {
+      resolveNodeEncounter(node, { mapSeed: currentMapSeed });
+    }
+  });
+}
+
 function restoreSession(session) {
   applyFloorRange(session.profile);
   elements.floorInput.value = String(session.floor);
@@ -162,6 +178,7 @@ function restoreSession(session) {
 
   state.setLevels(levels);
   state.importSessionState(session.state);
+  resolveChosenRouteEncounters(levels, session.state);
   mapRenderer.drawMap(levels, activeFloorRange.theme.columnColors);
   refreshExplorationDisplay();
   updateInfo(levels);

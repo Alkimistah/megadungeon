@@ -1,5 +1,6 @@
 import { assignChallengeRating } from "./challenge.js";
 import { assignCreatureProfile } from "./creatures.js";
+import { assignTrapProfile } from "./traps.js";
 import { generateEnvironmentContext } from "./environment.js";
 import { pick, pickWeighted, randomInt } from "./random.js";
 import {
@@ -86,6 +87,12 @@ function assignChallengeRatings(levels, profile, floor) {
   });
 }
 
+function assignTrapProfiles(levels, profile, rng) {
+  levels.flat().forEach((node) => {
+    assignTrapProfile(node, profile, rng);
+  });
+}
+
 function assignCreatureProfiles(levels, profile, rng) {
   levels.flat().forEach((node) => {
     assignCreatureProfile(node, profile, rng);
@@ -147,13 +154,17 @@ function applyRoomType(node, roomData) {
   node.revealedLabel = null;
   node.challenge = null;
   node.creature = null;
+  node.trap = null;
+  node.resolvedEncounter = null;
 }
 
 function createNode(level, column, profile, rng) {
   const data = pickWeightedRoomType(rng, profile);
+  const id = nodeId++;
 
   return {
-    id: nodeId++,
+    id,
+    encounterSeed: `N${id}`,
     level,
     column,
     type: data.type,
@@ -168,7 +179,9 @@ function createNode(level, column, profile, rng) {
     revealedLabel: null,
     environment: null,
     challenge: null,
-    creature: null
+    creature: null,
+    trap: null,
+    resolvedEncounter: null
   };
 }
 
@@ -337,8 +350,10 @@ function shouldAddBoss(profile, floor) {
 function addFinalBoss(levels, profile, floor) {
   if (!shouldAddBoss(profile, floor)) return;
 
+  const id = nodeId++;
   const boss = {
-    id: nodeId++,
+    id,
+    encounterSeed: `N${id}`,
     level: levels.length,
     column: Math.floor(GRID_WIDTH / 2),
     type: bossRoom.type,
@@ -353,7 +368,9 @@ function addFinalBoss(levels, profile, floor) {
     revealedLabel: null,
     environment: null,
     challenge: null,
-    creature: null
+    creature: null,
+    trap: null,
+    resolvedEncounter: null
   };
 
   levels[levels.length - 1] = [boss];
@@ -393,6 +410,7 @@ export function generateMapData(depth, baseDC, profile, floor, rng = Math.random
   assignUnknownReveals(levels, rng);
   assignEnvironments(levels, profile, rng);
   assignChallengeRatings(levels, profile, floor);
+  assignTrapProfiles(levels, profile, rng);
   assignCreatureProfiles(levels, profile, rng);
   assignDiscoveryChecks(levels, baseDC, rng);
   assignInvestigationTimes(levels, profile);

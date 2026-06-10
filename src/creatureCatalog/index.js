@@ -6,6 +6,11 @@ import { spiritCreatures } from "./spirits.js";
 import { undeadCreatures } from "./undead.js";
 import { inferThreatRole, getThreatRole } from "../threatCreationRules.js";
 import { bookBasicCreaturesByType, livroBasicoSourceByCreatureId } from "./bookBasic/index.js";
+import { ameacasArtonCreaturesByType, ameacasArtonSourceByCreatureId } from "./ameacasArton/index.js";
+import {
+  ameacasArtonSupplementalCreatureCatalog,
+  ameacasArtonSupplementalCreaturesByType
+} from "./ameacasArton/supplemental.js";
 
 export { animalCreatures } from "./animals.js";
 export { constructCreatures } from "./constructs.js";
@@ -14,6 +19,8 @@ export { monsterCreatures } from "./monsters.js";
 export { spiritCreatures } from "./spirits.js";
 export { undeadCreatures } from "./undead.js";
 export { bookBasicCreatureCatalog, bookBasicCreaturesByType, livroBasicoSourceByCreatureId } from "./bookBasic/index.js";
+export { ameacasArtonCreatureCatalog, ameacasArtonCreaturesByType, ameacasArtonSourceByCreatureId } from "./ameacasArton/index.js";
+export { ameacasArtonSupplementalCreatureCatalog, ameacasArtonSupplementalCreaturesByType } from "./ameacasArton/supplemental.js";
 
 const manualCreaturesByType = {
   animal: animalCreatures,
@@ -24,12 +31,45 @@ const manualCreaturesByType = {
   undead: undeadCreatures
 };
 
-function withLivroBasicoSource(creature) {
-  const source = livroBasicoSourceByCreatureId[creature.id];
+function uniqueSources(sources) {
+  const seen = new Set();
 
-  if (!source || creature.source) return creature;
+  return sources.filter((source) => {
+    if (!source) return false;
 
-  return { ...creature, source };
+    const key = `${source.book}|${source.pdfFile || ""}|${source.pdfPage || ""}|${source.bookPage || ""}`;
+    if (seen.has(key)) return false;
+
+    seen.add(key);
+    return true;
+  });
+}
+
+function withCreatureSources(creature) {
+  const sources = uniqueSources([
+    creature.source,
+    livroBasicoSourceByCreatureId[creature.id],
+    ameacasArtonSourceByCreatureId[creature.id]
+  ]);
+
+  if (sources.length === 0) return creature;
+
+  return {
+    ...creature,
+    source: creature.source || sources[0],
+    sources
+  };
+}
+
+function dedupeById(creatures) {
+  const seen = new Set();
+
+  return creatures.filter((creature) => {
+    if (seen.has(creature.id)) return false;
+
+    seen.add(creature.id);
+    return true;
+  });
 }
 
 function withThreatRoleMetadata(creature) {
@@ -49,10 +89,12 @@ function withThreatRoleMetadata(creature) {
 export const creaturesByType = Object.fromEntries(
   Object.entries(manualCreaturesByType).map(([type, creatures]) => [
     type,
-    [
+    dedupeById([
       ...creatures,
-      ...(bookBasicCreaturesByType[type] || [])
-    ].map(withLivroBasicoSource).map(withThreatRoleMetadata)
+      ...(bookBasicCreaturesByType[type] || []),
+      ...(ameacasArtonCreaturesByType[type] || []),
+      ...(ameacasArtonSupplementalCreaturesByType[type] || [])
+    ]).map(withCreatureSources).map(withThreatRoleMetadata)
   ])
 );
 

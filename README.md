@@ -43,7 +43,10 @@ src/
 ├── nodeDialog.js     # Modal de detalhes do nó
 ├── challenge.js      # Cálculo de ND
 ├── creatures.js      # Tipos de criatura e perfil de encontro
-├── creatureCatalog/  # Fichas por tipo, fonte e papel de ameaça inferido/explícito
+├── creatureCatalog/  # Fichas por tipo, fonte e papel; inclui Livro Básico e Ameaças de Arton
+├── damageTypes.js    # Tipos de dano para ameaças, perigos e armadilhas
+├── generalCreatureAbilities.js # Habilidades gerais reutilizáveis de criaturas
+├── traps.js          # Catálogo e orçamento de armadilhas
 ├── threatCreationRules.js # Criação, modificação, papéis e bandos de ameaças
 ├── environment.js    # Geração de clima e terreno
 ├── tables.js         # Tabelas de perícias por tipo de sala
@@ -61,7 +64,7 @@ Toda a documentação técnica detalhada — arquitetura, sistemas, estrutura de
 2. Exportar o novo perfil em `src/floorProfiles/index.js`.
 3. Ele aparece automaticamente no seletor da interface.
 
-O perfil define pesos de tipos de sala, NDs por faixa de nível, pesos de tipos de criatura por terreno, tema visual (cores CSS), e regras de geração de clima e terreno.
+O perfil define pesos de tipos de sala, NDs por faixa de nível, pesos de tipos de criatura por terreno, regras de armadilhas, tema visual (cores CSS), e regras de geração de clima e terreno.
 
 ## Próximos passos sugeridos
 
