@@ -2,9 +2,23 @@
   "name": "Mega Dungeon",
   "short_name": "Mega Dungeon",
   "description": "Gerador de andares e encontros para Tormenta20.",
-  "start_url": "/",
+  "start_url": "/megadungeon/",
+  "scope": "/megadungeon/",
   "display": "standalone",
   "background_color": "#1f1b18",
   "theme_color": "#2d241f",
-  "icons": []
+  "icons": [
+    {
+      "src": "/megadungeon/assets/icons/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/megadungeon/assets/icons/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
 }

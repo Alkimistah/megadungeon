@@ -1,4 +1,5 @@
 import "./styles.css";
+import { assetUrl } from "./assetUrl.js";
 import { createExplorationState } from "./appState.js";
 import { FLOOR_RANGES, applyTheme, getFloorRange } from "./floorRanges.js";
 import { formatElapsedTime } from "./format.js";
@@ -256,7 +257,7 @@ function setSettingsOpen(isOpen) {
   elements.settingsPanel.hidden = !isOpen;
   elements.settingsToggleIcon.setAttribute(
     "src",
-    isOpen ? "/assets/icons/expand-up.svg" : "/assets/icons/expand-down.svg"
+    isOpen ? assetUrl("/assets/icons/expand-up.svg") : assetUrl("/assets/icons/expand-down.svg")
   );
   elements.settingsToggle.setAttribute("aria-expanded", String(isOpen));
   elements.settingsToggle.setAttribute(
@@ -310,7 +311,7 @@ function registerServiceWorker() {
 
   window.addEventListener("load", () => {
     if (import.meta.env.PROD) {
-      navigator.serviceWorker.register("/sw.js");
+      navigator.serviceWorker.register(import.meta.env.BASE_URL + "sw.js");
       return;
     }
 

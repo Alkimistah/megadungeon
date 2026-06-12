@@ -1,8 +1,10 @@
+import { assetUrl } from "../assetUrl.js";
+
 export const forest11to20Profile = {
   id: "forest-11-20",
   label: "Andares de 11 a 20",
   floors: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-  hiddenNodeIcon: "/assets/icons/hidden-forest.svg",
+  hiddenNodeIcon: assetUrl("/assets/icons/hidden-forest.svg"),
   recommendations: {
     encountersByFloor: {
       11: 3,

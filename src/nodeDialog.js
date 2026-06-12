@@ -2,9 +2,10 @@ import { formatChallengeRating } from "./challenge.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getDamageType } from "./damageTypes.js";
 import { getTrapById } from "./traps.js";
+import { assetUrl } from "./assetUrl.js";
 
-const COMBAT_ICON = "/assets/icons/winged-sword.svg";
-const ENVIRONMENT_ICON = "/assets/icons/earth-arrow-left.svg";
+const COMBAT_ICON = assetUrl("/assets/icons/winged-sword.svg");
+const ENVIRONMENT_ICON = assetUrl("/assets/icons/earth-arrow-left.svg");
 
 function createEnvironmentGroup(title, items) {
   const section = document.createElement("section");

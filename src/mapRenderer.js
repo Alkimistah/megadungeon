@@ -1,16 +1,18 @@
+import { assetUrl } from "./assetUrl.js";
+
 const NODE_RADIUS = 22;
 const LEVEL_HEIGHT = 120;
 const NODE_SPACING = 110;
 const MARGIN = 90;
 const GRID_WIDTH = 7;
 const ICONS_BY_ROOM_TYPE = {
-  normal: "/assets/icons/normal.svg",
-  elite: "/assets/icons/elite.svg",
-  boss: "/assets/icons/boss.svg",
-  trap: "/assets/icons/trap.svg",
-  unknown: "/assets/icons/unknown.svg",
-  treasure: "/assets/icons/treasure.svg",
-  camp: "/assets/icons/camp.svg"
+  normal: assetUrl("/assets/icons/normal.svg"),
+  elite: assetUrl("/assets/icons/elite.svg"),
+  boss: assetUrl("/assets/icons/boss.svg"),
+  trap: assetUrl("/assets/icons/trap.svg"),
+  unknown: assetUrl("/assets/icons/unknown.svg"),
+  treasure: assetUrl("/assets/icons/treasure.svg"),
+  camp: assetUrl("/assets/icons/camp.svg"),
 };
 
 function createSvgElement(tagName) {
@@ -58,7 +60,7 @@ function createCheckLabel(node) {
   return checkGroup;
 }
 
-export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = "/assets/icons/hidden-forest.svg" }) {
+export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("/assets/icons/hidden-forest.svg") }) {
   let activeHiddenNodeIcon = hiddenNodeIcon;
   let nodeElements = new Map();
   let linkElements = [];
