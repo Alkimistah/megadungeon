@@ -22,6 +22,7 @@ const elements = {
   seedInput: document.getElementById("seedInput"),
   unknownPathsInput: document.getElementById("unknownPathsInput"),
   generateButton: document.getElementById("generateButton"),
+  installButton: document.getElementById("installButton"),
   reloadAppButton: document.getElementById("reloadAppButton"),
   manualEncounterButton: document.getElementById("manualEncounterButton"),
   manualEncounterChallengeInput: document.getElementById("manualEncounterChallengeInput"),
@@ -306,6 +307,31 @@ function generateMap() {
   drawGeneratedLevels(levels);
 }
 
+function setupInstallButton() {
+  let deferredPrompt = null;
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    elements.installButton.hidden = false;
+  });
+
+  elements.installButton.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      elements.installButton.hidden = true;
+    }
+    deferredPrompt = null;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    elements.installButton.hidden = true;
+    deferredPrompt = null;
+  });
+}
+
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
 
@@ -428,6 +454,7 @@ function bindEvents() {
 
 function boot() {
   bindEvents();
+  setupInstallButton();
   registerServiceWorker();
   populateFloorRangeSelect();
   applyFloorRange(activeFloorRange.id);

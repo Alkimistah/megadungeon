@@ -573,6 +573,22 @@ svg {
   color: #fff7e8;
 }
 
+.install-button {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: #f1d6a8;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.install-button:hover {
+  background: var(--surface-alt);
+}
+
 .icon-button {
   width: 34px;
   height: 34px;
