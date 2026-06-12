@@ -4,25 +4,17 @@ import { humanoidCreatures } from "./humanoids.js";
 import { monsterCreatures } from "./monsters.js";
 import { spiritCreatures } from "./spirits.js";
 import { undeadCreatures } from "./undead.js";
+import { sourceByCreatureId } from "./sources.js";
 import { inferThreatRole, getThreatRole } from "../threatCreationRules.js";
-import { bookBasicCreaturesByType, livroBasicoSourceByCreatureId } from "./bookBasic/index.js";
-import { ameacasArtonCreaturesByType, ameacasArtonSourceByCreatureId } from "./ameacasArton/index.js";
-import {
-  ameacasArtonSupplementalCreatureCatalog,
-  ameacasArtonSupplementalCreaturesByType
-} from "./ameacasArton/supplemental.js";
-
 export { animalCreatures } from "./animals.js";
 export { constructCreatures } from "./constructs.js";
 export { humanoidCreatures } from "./humanoids.js";
 export { monsterCreatures } from "./monsters.js";
 export { spiritCreatures } from "./spirits.js";
 export { undeadCreatures } from "./undead.js";
-export { bookBasicCreatureCatalog, bookBasicCreaturesByType, livroBasicoSourceByCreatureId } from "./bookBasic/index.js";
-export { ameacasArtonCreatureCatalog, ameacasArtonCreaturesByType, ameacasArtonSourceByCreatureId } from "./ameacasArton/index.js";
-export { ameacasArtonSupplementalCreatureCatalog, ameacasArtonSupplementalCreaturesByType } from "./ameacasArton/supplemental.js";
+export { sourceByCreatureId } from "./sources.js";
 
-const manualCreaturesByType = {
+const creaturesByTypeRaw = {
   animal: animalCreatures,
   construct: constructCreatures,
   spirit: spiritCreatures,
@@ -48,8 +40,7 @@ function uniqueSources(sources) {
 function withCreatureSources(creature) {
   const sources = uniqueSources([
     creature.source,
-    livroBasicoSourceByCreatureId[creature.id],
-    ameacasArtonSourceByCreatureId[creature.id]
+    sourceByCreatureId[creature.id]
   ]);
 
   if (sources.length === 0) return creature;
@@ -87,14 +78,9 @@ function withThreatRoleMetadata(creature) {
 }
 
 export const creaturesByType = Object.fromEntries(
-  Object.entries(manualCreaturesByType).map(([type, creatures]) => [
+  Object.entries(creaturesByTypeRaw).map(([type, creatures]) => [
     type,
-    dedupeById([
-      ...creatures,
-      ...(bookBasicCreaturesByType[type] || []),
-      ...(ameacasArtonCreaturesByType[type] || []),
-      ...(ameacasArtonSupplementalCreaturesByType[type] || [])
-    ]).map(withCreatureSources).map(withThreatRoleMetadata)
+    dedupeById(creatures).map(withCreatureSources).map(withThreatRoleMetadata)
   ])
 );
 

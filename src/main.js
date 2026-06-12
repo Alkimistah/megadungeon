@@ -5,6 +5,7 @@ import { formatElapsedTime } from "./format.js";
 import { generateMapData } from "./generator.js";
 import { createRandomSeed, createRng } from "./random.js";
 import { createMapRenderer } from "./mapRenderer.js";
+import { createManualEncounterDialogController } from "./manualEncounterDialog.js";
 import { resolveNodeEncounter } from "./encounterResolver.js";
 import { createNodeDialogController } from "./nodeDialog.js";
 import { decodeSessionCode, encodeSessionCode, isSessionCode } from "./sessionCode.js";
@@ -21,6 +22,15 @@ const elements = {
   unknownPathsInput: document.getElementById("unknownPathsInput"),
   generateButton: document.getElementById("generateButton"),
   reloadAppButton: document.getElementById("reloadAppButton"),
+  manualEncounterButton: document.getElementById("manualEncounterButton"),
+  manualEncounterChallengeInput: document.getElementById("manualEncounterChallengeInput"),
+  manualEncounterClose: document.getElementById("manualEncounterClose"),
+  manualEncounterCreatureTypeInput: document.getElementById("manualEncounterCreatureTypeInput"),
+  manualEncounterDialog: document.getElementById("manualEncounterDialog"),
+  manualEncounterForm: document.getElementById("manualEncounterForm"),
+  manualEncounterResult: document.getElementById("manualEncounterResult"),
+  manualEncounterTerrainInput: document.getElementById("manualEncounterTerrainInput"),
+  manualEncounterTrapModeInput: document.getElementById("manualEncounterTrapModeInput"),
   settingsToggle: document.getElementById("settingsToggle"),
   settingsToggleIcon: document.getElementById("settingsToggleIcon"),
   settingsPanel: document.getElementById("settingsPanel"),
@@ -81,6 +91,19 @@ const mapRenderer = createMapRenderer({
   svg: elements.svg,
   hiddenNodeIcon: activeFloorRange.hiddenNodeIcon,
   onNodeOpen: (node) => nodeDialogController.open(node)
+});
+
+const manualEncounterDialogController = createManualEncounterDialogController({
+  challengeInput: elements.manualEncounterChallengeInput,
+  closeButton: elements.manualEncounterClose,
+  creatureTypeInput: elements.manualEncounterCreatureTypeInput,
+  dialogElement: elements.manualEncounterDialog,
+  formElement: elements.manualEncounterForm,
+  getProfile: () => activeFloorRange,
+  openButton: elements.manualEncounterButton,
+  resultElement: elements.manualEncounterResult,
+  terrainInput: elements.manualEncounterTerrainInput,
+  trapModeInput: elements.manualEncounterTrapModeInput
 });
 
 function updateTimeTracker() {
@@ -226,6 +249,7 @@ function applyFloorRange(floorRangeId) {
   applyTheme(activeFloorRange.theme);
   mapRenderer.setHiddenNodeIcon(activeFloorRange.hiddenNodeIcon);
   syncRecommendationsWithFloor();
+  manualEncounterDialogController.syncProfileOptions();
 }
 
 function setSettingsOpen(isOpen) {
@@ -326,6 +350,12 @@ function bindEvents() {
   elements.nodeDialog.addEventListener("click", (event) => {
     if (event.target === elements.nodeDialog) {
       elements.nodeDialog.close();
+    }
+  });
+
+  elements.manualEncounterDialog.addEventListener("click", (event) => {
+    if (event.target === elements.manualEncounterDialog) {
+      elements.manualEncounterDialog.close();
     }
   });
 

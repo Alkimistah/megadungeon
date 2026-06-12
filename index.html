@@ -56,6 +56,7 @@
       </div>
     </header>
     <button id="reloadAppButton" class="reload-button floating-reload" type="button" aria-label="Recarregar aplicativo"><img src="/assets/icons/return-arrow.svg" alt="" /></button>
+    <button id="manualEncounterButton" class="reload-button floating-encounter" type="button" aria-label="Gerar encontro manual"><img src="/assets/icons/sword-spin.svg" alt="" /></button>
 
     <div id="timeTracker" class="time-tracker" aria-live="polite">
       <span>Tempo de exploração</span>
@@ -144,6 +145,49 @@
         </label>
 
         <button id="rangeConfirm" type="submit">Iniciar exploração</button>
+      </form>
+    </dialog>
+
+    <dialog id="manualEncounterDialog" aria-labelledby="manualEncounterDialogTitle">
+      <form id="manualEncounterForm" class="node-dialog manual-encounter-dialog">
+        <div class="node-dialog-header">
+          <div>
+            <p class="node-dialog-type">Gerador manual</p>
+            <h2 id="manualEncounterDialogTitle">Encontro</h2>
+            <p class="node-dialog-meta">Configure o orçamento de combate e gere uma composição.</p>
+          </div>
+          <button id="manualEncounterClose" class="icon-button" type="button" aria-label="Fechar"><img src="/assets/icons/close-modal.svg" alt="" /></button>
+        </div>
+
+        <div class="manual-encounter-controls">
+          <label>
+            Orçamento de combate
+            <select id="manualEncounterChallengeInput"></select>
+          </label>
+
+          <label>
+            Terreno
+            <select id="manualEncounterTerrainInput"></select>
+          </label>
+
+          <label>
+            Tipo de criatura
+            <select id="manualEncounterCreatureTypeInput"></select>
+          </label>
+
+          <label>
+            Armadilha
+            <select id="manualEncounterTrapModeInput">
+              <option value="none">Nenhuma</option>
+              <option value="incidental">Incidental</option>
+              <option value="primary">Principal</option>
+            </select>
+          </label>
+
+          <button class="generate-button" type="submit">Gerar encontro</button>
+        </div>
+
+        <div id="manualEncounterResult" class="manual-encounter-result"></div>
       </form>
     </dialog>
 

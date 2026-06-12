@@ -87,17 +87,37 @@ function formatModifier(value) {
   return value > 0 ? `+${value}` : String(value);
 }
 
-function createSheetLine(label, value) {
+function createSheetLine(label, value, label2=null, value2=null) {
   const item = document.createElement("p");
   const name = document.createElement("strong");
   const text = document.createElement("span");
+  let name2 = null;
+  let text2 = null;
+  if(label2 !== null){
+    name2 = document.createElement("strong");
+  }
+  if(value2 !== null){
+    text2 = document.createElement("span");
+  }
 
   item.className = "sheet-line";
   name.textContent = `${label} `;
   text.textContent = value;
+  if(label2 !== null){
+    name2.textContent = `${label2} `;
+  }
+  if(value2 !== null){
+    text2.textContent = value2;
+  }
 
   item.appendChild(name);
   item.appendChild(text);
+  if(label2 !== null){
+    item.appendChild(name2);
+  }
+  if(value2 !== null){
+    item.appendChild(text2);
+  }
 
   return item;
 }
@@ -285,6 +305,28 @@ function createEncounterList(node, selectedKey, onSelect) {
   return panel;
 }
 
+function formatTiming(timing) {
+  if (!timing) return null;
+
+  return timing.charAt(0).toUpperCase() + timing.slice(1);
+}
+
+function formatEntryLabel(entry) {
+  if (!entry?.name) return null;
+
+  const timing = formatTiming(entry.timing);
+
+  if (!timing || entry.name.includes("(")) return entry.name;
+
+  return `${entry.name} (${timing})`;
+}
+
+function removeRepeatedLabel(text, label) {
+  if (!label || !text.startsWith(label)) return text.trim();
+
+  return text.slice(label.length).trim();
+}
+
 function splitSheetAbility(text, fallbackLabel = null) {
   const knownLabels = [
     "Corpo a Corpo",
@@ -313,8 +355,16 @@ function splitSheetAbility(text, fallbackLabel = null) {
   return { label: fallbackLabel || "Habilidade", text };
 }
 
-function appendCreatureSheetAbilities(section, entries) {
+function appendCreatureSheetAbilities(section, entries, { preferEntryName = false } = {}) {
   entries.filter(Boolean).forEach((entry) => {
+    if (preferEntryName && typeof entry === "object" && entry.name) {
+      const label = formatEntryLabel(entry);
+      const text = removeRepeatedLabel(entry.text || "", entry.name);
+
+      section.appendChild(createSheetAbilityLine(label, text));
+      return;
+    }
+
     const rawText = entry.text || entry.name || entry;
     const { label, text } = splitSheetAbility(rawText, entry.name);
 
@@ -359,7 +409,7 @@ function createCreatureDetail(item) {
   section.appendChild(createDivider());
 
   const perceptionText = [formatModifier(stats.perception), stats.senses].filter(Boolean).join(", ");
-  section.appendChild(createSheetLine("INICIATIVA", `${formatModifier(stats.initiative)}, PERCEPÇÃO ${perceptionText}`));
+  section.appendChild(createSheetLine("INICIATIVA", `${formatModifier(stats.initiative)},`, " PERCEPÇÃO", `${perceptionText}`));
   section.appendChild(createSheetLine("DEFESA", `${stats.defense ?? "?"}, FORT ${formatModifier(stats.fortitude)}, REF ${formatModifier(stats.reflex)}, VON ${formatModifier(stats.will)}${stats.defensesText ? `, ${stats.defensesText}` : ""}`));
   section.appendChild(createSheetLine("PONTOS DE VIDA", String(stats.hitPoints ?? "?")));
 
@@ -374,7 +424,7 @@ function createCreatureDetail(item) {
   }
 
   if (creature.abilities?.length) {
-    appendCreatureSheetAbilities(section, creature.abilities);
+    appendCreatureSheetAbilities(section, creature.abilities, { preferEntryName: true });
   }
 
   if (stats.attributes) {
@@ -459,14 +509,29 @@ function createEncounterDetail(node, selectedKey) {
   return panel;
 }
 
+function getFirstEncounterItemKey(node) {
+  return node.resolvedEncounter?.items?.[0]
+    ? getEncounterItemKey(node.resolvedEncounter.items[0], 0)
+    : null;
+}
+
 function createCombatPage(node, selectedKey, onSelect) {
   const page = document.createElement("div");
+  const currentSelectedKey = selectedKey || getFirstEncounterItemKey(node);
 
   page.className = "combat-page";
-  page.appendChild(createEncounterList(node, selectedKey, onSelect));
-  page.appendChild(createEncounterDetail(node, selectedKey));
+  page.appendChild(createEncounterList(node, currentSelectedKey, onSelect));
+  page.appendChild(createEncounterDetail(node, currentSelectedKey));
 
   return page;
+}
+
+export function createEncounterCombatPage(node, selectedKey, onSelect = () => {}) {
+  return createCombatPage(node, selectedKey, onSelect);
+}
+
+export function getDefaultEncounterItemKey(node) {
+  return getFirstEncounterItemKey(node);
 }
 
 function createCombatUnavailableNotice() {

@@ -155,7 +155,8 @@ button:hover {
   background: color-mix(in srgb, var(--surface-alt) 85%, white 15%);
 }
 
-.floating-reload {
+.floating-reload,
+.floating-encounter {
   position: fixed;
   left: 14px;
   bottom: 14px;
@@ -172,8 +173,17 @@ button:hover {
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
 }
 
-.floating-reload:hover {
+.floating-reload:hover,
+.floating-encounter:hover {
   background: color-mix(in srgb, var(--header) 92%, white 8%);
+}
+
+.floating-encounter {
+  left: 72px;
+}
+
+.floating-encounter img {
+  filter: brightness(0) invert(1);
 }
 
 .time-tracker {
@@ -505,7 +515,8 @@ svg {
   fill: #2f5d63;
 }
 
-#nodeDialog {
+#nodeDialog,
+#manualEncounterDialog {
   width: min(820px, calc(100vw - 28px));
   max-height: min(760px, calc(100vh - 28px));
   padding: 0;
@@ -516,7 +527,8 @@ svg {
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.65);
 }
 
-#nodeDialog::backdrop {
+#nodeDialog::backdrop,
+#manualEncounterDialog::backdrop {
   background: rgba(10, 7, 5, 0.72);
 }
 
@@ -903,6 +915,33 @@ svg {
   text-align: center;
 }
 
+
+.manual-encounter-dialog {
+  width: 100%;
+}
+
+.manual-encounter-controls {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.manual-encounter-controls label {
+  display: grid;
+  gap: 5px;
+  color: #d8c8b7;
+  font-size: 12px;
+}
+
+.manual-encounter-controls select {
+  width: 100%;
+}
+
+.manual-encounter-result:empty {
+  display: none;
+}
+
 .range-dialog {
   display: grid;
   gap: 16px;
@@ -937,7 +976,8 @@ svg {
 
 @media (max-width: 800px) {
   .environment-columns,
-  .combat-page {
+  .combat-page,
+  .manual-encounter-controls {
     grid-template-columns: 1fr;
   }
 
