@@ -2,7 +2,7 @@ import { calculateCombatND, formatChallengeRating, roundToQuarter } from "./chal
 import { creatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
 import { createRng, pickWeighted } from "./random.js";
 
-const ENCOUNTER_RESOLUTION_VERSION = 5;
+const ENCOUNTER_RESOLUTION_VERSION = 6;
 
 const CREATURE_TYPE_LABELS = {
   animal: "Animal",
@@ -257,7 +257,10 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
       }
 
       const neededCR = getRequiredAdditionCR(current, targetChallenge);
-      if (neededCR !== null) {
+      // Refuse to add a creature whose CR alone would already constitute the full
+      // encounter (CR ≥ targetChallenge). That produces encounters where one creature
+      // dominates while companions are just filler — remove the weakest instead.
+      if (neededCR !== null && neededCR < targetChallenge) {
         // Allow picking creatures already in the group so quantity++ is possible —
         // sometimes the right fix is more of the lead creature, not a new species.
         const leadCreature = getCreatureById(current[0].creatureId);
@@ -280,8 +283,8 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
         }
       }
 
-      // Addition impossible or yielded no candidate: remove the weakest creature
-      // (it is diluting the average) and retry with the stronger remainder.
+      // Addition impossible, would require a solo-worthy creature, or yielded no
+      // candidate: remove the weakest creature and retry with the stronger remainder.
       if (current.length <= 1) break;
       removeLeastCR(current);
     } else {
