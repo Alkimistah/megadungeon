@@ -68,38 +68,35 @@ function getChallengeWeight(creature, targetChallenge) {
   return 1;
 }
 
-function getCandidateWeight(creature, targetChallenge, terrainName, preferredIds = []) {
+function getCandidateWeight(creature, targetChallenge, terrainName, preferredIds = [], preferredSubtype = null) {
   let weight = getChallengeWeight(creature, targetChallenge);
 
   if (hasTerrainAffinity(creature, terrainName)) weight += 30;
   if (preferredIds.includes(creature.id)) weight += 18;
   if (creature.role === "minion" && targetChallenge <= 2) weight += 3;
+  if (preferredSubtype !== null && creature.subtype === preferredSubtype) weight += 25;
 
   return weight;
 }
 
 function getCandidates(type, maximumChallenge, excludedIds = new Set()) {
-  const typedCandidates = creatureCatalog.filter((creature) =>
-    creature.type === type &&
+  const baseCandidates = creatureCatalog.filter((creature) =>
     typeof creature.challengeRating === "number" &&
     creature.challengeRating <= maximumChallenge &&
     !excludedIds.has(creature.id)
   );
 
-  if (typedCandidates.length > 0) return typedCandidates;
+  if (type === null) return baseCandidates;
 
-  return creatureCatalog.filter((creature) =>
-    typeof creature.challengeRating === "number" &&
-    creature.challengeRating <= maximumChallenge &&
-    !excludedIds.has(creature.id)
-  );
+  const typedCandidates = baseCandidates.filter((creature) => creature.type === type);
+  return typedCandidates.length > 0 ? typedCandidates : baseCandidates;
 }
 
-function pickCreatureForChallenge({ type, targetChallenge, terrainName, rng, excludedIds, preferredIds = [] }) {
+function pickCreatureForChallenge({ type, targetChallenge, terrainName, rng, excludedIds, preferredIds = [], preferredSubtype = null }) {
   const candidates = getCandidates(type, targetChallenge, excludedIds);
   const options = candidates.map((creature) => ({
     creature,
-    weight: getCandidateWeight(creature, targetChallenge, terrainName, preferredIds)
+    weight: getCandidateWeight(creature, targetChallenge, terrainName, preferredIds, preferredSubtype)
   }));
 
   return options.length > 0 ? pickWeighted(rng, options).creature : null;
@@ -183,31 +180,40 @@ function resolveCreatureGroup(node, rng) {
   if (!lead) return [];
   if (totalCount === 1) return [getCreatureSummary(lead, 1)];
 
-  const excludedIds = new Set([lead.id]);
-  const itemsByCreatureId = new Map([[lead.id, { creature: lead, quantity: 1 }]]);
+  // 75% homogeneous (all same creature), 25% mixed (lead + one support type)
+  const { mixed } = pickWeighted(rng, [
+    { mixed: false, weight: 15 },
+    { mixed: true,  weight: 5  },
+  ]);
 
-  for (let slot = 1; slot < totalCount; slot++) {
-    const support = pickCreatureForChallenge({
-      excludedIds,
-      preferredIds: SUPPORT_CREATURE_IDS_BY_TYPE[type] || [],
-      rng,
-      targetChallenge: requiredCR,
-      terrainName,
-      type,
-    });
-
-    if (support) {
-      excludedIds.add(support.id);
-      itemsByCreatureId.set(support.id, { creature: support, quantity: 1 });
-    } else {
-      // No distinct creature available — add another of the lead
-      itemsByCreatureId.get(lead.id).quantity++;
-    }
+  if (!mixed) {
+    return [getCreatureSummary(lead, totalCount)];
   }
 
-  return [...itemsByCreatureId.values()].map(({ creature, quantity }) =>
-    getCreatureSummary(creature, quantity)
-  );
+  // Mixed: support gets ~1/3 of slots, lead gets the rest
+  const supportCount = Math.max(1, Math.floor(totalCount / 3));
+  const leadCount = totalCount - supportCount;
+  const { crossType } = pickWeighted(rng, [
+    { crossType: false, weight: 8 },
+    { crossType: true,  weight: 2 },
+  ]);
+
+  const support = pickCreatureForChallenge({
+    excludedIds: new Set([lead.id]),
+    preferredIds: SUPPORT_CREATURE_IDS_BY_TYPE[type] || [],
+    preferredSubtype: crossType ? null : lead.subtype,
+    rng,
+    targetChallenge: requiredCR,
+    terrainName,
+    type: crossType ? null : type,
+  });
+
+  if (!support) return [getCreatureSummary(lead, totalCount)];
+
+  return [
+    getCreatureSummary(lead, leadCount),
+    getCreatureSummary(support, supportCount),
+  ];
 }
 
 function getEncounterSeed(node, mapSeed) {

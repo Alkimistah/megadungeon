@@ -164,9 +164,12 @@ export const orcMutante = {
         attributes: { str: 6, dex: 2, con: 4, int: -2, wis: -2, cha: -2 }
     },
     actions: [
-        { name: "Corpo a Corpo", text: "Machado de guerra +11 (1d12+18, x3) e." }
+        { name: "Corpo a Corpo", text: "Machado de guerra +11 (1d12+18, x3) e mordida +20 (1d6+18)." }
     ],
-    abilities: [],
+    abilities: [
+        { name: "Terceiro Braço", timing: "Livre", text: " Se o orc mutante acerta o ataque de machado de guerra e o ataque de mordida em uma mesma criatura na mesma rodada, ele rasga a vítima com seu terceiro braço degenerado, causando mais 1d6+9 pontos de dano de corte." },
+        { name: "Sensibilidade a Luz", timing: "passiva", text: "Quando exposto a luz do sol ou similar, o orc fica ofuscado." }
+    ],
     equipment: "Machado de guerra.",
     treasure: "Padrão.",
     skillsText: null
