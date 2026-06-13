@@ -289,7 +289,9 @@ function createEncounterList(node, selectedKey, onSelect) {
     const name = document.createElement("strong");
 
     button.type = "button";
-    button.className = `encounter-list-item ${item.kind === "trap" ? "is-trap" : "is-creature"}`;
+    const kindClass = item.kind === "trap" ? "is-trap" : "is-creature";
+    const generatedClass = item.generated ? " is-generated" : "";
+    button.className = `encounter-list-item ${kindClass}${generatedClass}`;
     button.classList.toggle("is-selected", key === selectedKey);
     name.textContent = item.kind === "trap"
       ? `${item.quantity} x ${item.name}`
@@ -374,7 +376,7 @@ function appendCreatureSheetAbilities(section, entries, { preferEntryName = fals
 }
 
 function createCreatureDetail(item) {
-  const creature = getCreatureById(item.creatureId);
+  const creature = item.generated ? item.creatureData : getCreatureById(item.creatureId);
   const section = document.createElement("section");
 
   section.className = "encounter-detail-card creature-detail-card tormenta-creature-sheet";
@@ -404,6 +406,12 @@ function createCreatureDetail(item) {
   subtitle.textContent = `${typeText} ${creature.size || ""} · ${item.roleLabel} · ${item.quantity} no encontro`;
 
   header.appendChild(title);
+  if (item.generated) {
+    const badge = document.createElement("span");
+    badge.className = "creature-generated-badge";
+    badge.textContent = "Gerada";
+    header.appendChild(badge);
+  }
   header.appendChild(challenge);
   section.appendChild(header);
   section.appendChild(subtitle);
@@ -445,7 +453,9 @@ function createCreatureDetail(item) {
     section.appendChild(createSheetLine("TESOURO", creature.treasure));
   }
 
-  if (source) {
+  if (item.generated) {
+    section.appendChild(createSheetLine("ORIGEM", `Variante gerada de ${creature.baseCreatureName || item.name}`));
+  } else if (source) {
     const page = source.bookPage ? `, p. ${source.bookPage}` : "";
     section.appendChild(createSheetLine("FONTE", `${source.book}${page}`));
   }

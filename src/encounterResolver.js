@@ -1,8 +1,9 @@
 import { calculateCombatND, formatChallengeRating, roundToQuarter } from "./challenge.js";
 import { creatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
 import { createRng, pickWeighted } from "./random.js";
+import { createModificationPlan, getThreatParameters, THREAT_CHALLENGE_ORDER } from "./threatCreationRules.js";
 
-const ENCOUNTER_RESOLUTION_VERSION = 6;
+const ENCOUNTER_RESOLUTION_VERSION = 7;
 
 const CREATURE_TYPE_LABELS = {
   animal: "Animal",
@@ -34,6 +35,15 @@ const TERRAIN_AFFINITIES = {
     ids: ["orc-combatente", "gnoll-saqueador", "gnoll-filibusteiro"],
     subtypes: ["orc", "gnoll"]
   }
+};
+
+const ELITE_ADJECTIVES_BY_TYPE = {
+  animal:    ["Enfurecido",  "Raivoso",   "Feroz"],
+  construct: ["Reforçado",   "Blindado",  "Avançado"],
+  spirit:    ["Perturbado",  "Furioso",   "Primordial"],
+  humanoid:  ["Elite",       "Veterano",  "Campeão"],
+  monster:   ["Mutante",     "Colossal",  "Ancestral"],
+  undead:    ["Corrompido",  "Sombrio",   "Amaldiçoado"]
 };
 
 const SUPPORT_CREATURE_IDS_BY_TYPE = {
@@ -129,6 +139,127 @@ function pickCreatureForChallenge({ type, targetChallenge, terrainName, rng, exc
   }));
 
   return options.length > 0 ? pickWeighted(rng, options).creature : null;
+}
+
+// Returns the smallest CR in THREAT_CHALLENGE_ORDER that is >= cr.
+function snapToValidCRAtOrAbove(cr) {
+  return THREAT_CHALLENGE_ORDER.find(v => v >= cr) ?? THREAT_CHALLENGE_ORDER[THREAT_CHALLENGE_ORDER.length - 1];
+}
+
+function getEliteAdjective(type, crDelta) {
+  const adjectives = ELITE_ADJECTIVES_BY_TYPE[type] || ["Elite", "Avançado", "Ancestral"];
+  if (crDelta <= 1) return adjectives[0];
+  if (crDelta <= 3) return adjectives[1];
+  return adjectives[2];
+}
+
+// Maps each creature save (fortitude/reflex/will) to its table slot (strong/medium/weak)
+// and returns the corresponding target CR table value for each save.
+function assignScaledSaves(baseStats, baseParams, targetParams) {
+  const paramKeys = ["strong", "medium", "weak"];
+  const result = {};
+  for (const saveKey of ["fortitude", "reflex", "will"]) {
+    const base = baseStats[saveKey];
+    if (typeof base !== "number") { result[saveKey] = null; continue; }
+    let bestParam = "medium";
+    let bestDist = Infinity;
+    for (const param of paramKeys) {
+      const dist = Math.abs(base - baseParams.saves[param]);
+      if (dist < bestDist) { bestDist = dist; bestParam = param; }
+    }
+    result[saveKey] = targetParams.saves[bestParam];
+  }
+  return result;
+}
+
+function extractAttackName(actionText) {
+  if (!actionText) return null;
+  const match = actionText.match(/^([A-Za-zÀ-ÿ\s]+?)(?=\s*[+-]\d)/);
+  return match ? match[1].trim() : null;
+}
+
+// Generates a scaled "elite" variant of baseCreature at targetCR using T20 table parameters.
+// Returns null if the required table entries are unavailable.
+function createEliteVariant(baseCreature, targetCR) {
+  const snappedTargetCR = snapToValidCRAtOrAbove(targetCR);
+  const role = baseCreature.role || "solo";
+  let plan, baseParams, targetParams;
+  try {
+    plan = createModificationPlan(baseCreature, {
+      baseRole: role,
+      targetChallengeRating: snappedTargetCR,
+      targetRole: role
+    });
+    baseParams = getThreatParameters(role, snapToValidCRAtOrAbove(baseCreature.challengeRating));
+    targetParams = getThreatParameters(role, snappedTargetCR);
+  } catch {
+    return null;
+  }
+
+  const baseStats = baseCreature.stats || {};
+  const crDelta = snappedTargetCR - baseCreature.challengeRating;
+  const adjective = getEliteAdjective(baseCreature.type, crDelta);
+  const scaledSaves = assignScaledSaves(baseStats, baseParams, targetParams);
+
+  const scaledActions = (baseCreature.actions ?? []).map(action => {
+    const attackName = extractAttackName(action.text ?? "") ?? action.name ?? "Ataque";
+    return {
+      name: action.name ?? "Corpo a Corpo",
+      text: `${attackName} +${targetParams.attack} (dano médio ${targetParams.averageDamage})`
+    };
+  });
+
+  return {
+    id: `${baseCreature.id}-elite-cr${snappedTargetCR}`,
+    name: `${baseCreature.name} ${adjective}`,
+    challengeRating: snappedTargetCR,
+    type: baseCreature.type,
+    subtype: baseCreature.subtype ?? null,
+    role,
+    roleMetadata: baseCreature.roleMetadata ?? null,
+    roleSource: "generated",
+    size: baseCreature.size ?? null,
+    generated: true,
+    baseCreatureId: baseCreature.id,
+    baseCreatureName: baseCreature.name,
+    stats: {
+      defense: plan.target.stats.defense,
+      hitPoints: plan.target.stats.hitPoints,
+      ...scaledSaves,
+      initiative: baseStats.initiative ?? null,
+      perception: baseStats.perception ?? null,
+      senses: baseStats.senses ?? null,
+      speedText: baseStats.speedText ?? null,
+      attributes: baseStats.attributes ?? null,
+      defensesText: null,
+    },
+    actions: scaledActions,
+    abilities: baseCreature.abilities ?? [],
+    skillsText: baseCreature.skillsText ?? null,
+    equipment: baseCreature.equipment ?? null,
+    treasure: baseCreature.treasure ?? null,
+    sourceRules: null,
+  };
+}
+
+function getEliteCreatureSummary(generatedCreature, quantity) {
+  const roleLabel = generatedCreature.roleMetadata?.label || generatedCreature.role || "Papel não definido";
+  const typeLabel = CREATURE_TYPE_LABELS[generatedCreature.type] || generatedCreature.type;
+
+  return {
+    challengeLabel: formatChallengeRating(generatedCreature.challengeRating),
+    challengeRating: generatedCreature.challengeRating,
+    creatureId: generatedCreature.id,
+    creatureData: generatedCreature,
+    generated: true,
+    kind: "creature",
+    name: generatedCreature.name,
+    quantity,
+    role: generatedCreature.role || null,
+    roleLabel,
+    type: generatedCreature.type,
+    typeLabel
+  };
 }
 
 function getCreatureSummary(creature, quantity) {
@@ -261,9 +392,9 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
       // encounter (CR ≥ targetChallenge). That produces encounters where one creature
       // dominates while companions are just filler — remove the weakest instead.
       if (neededCR !== null && neededCR < targetChallenge) {
+        const leadCreature = getCreatureById(current[0].creatureId) ?? current[0].creatureData ?? null;
         // Allow picking creatures already in the group so quantity++ is possible —
         // sometimes the right fix is more of the lead creature, not a new species.
-        const leadCreature = getCreatureById(current[0].creatureId);
         const added = pickCreatureForChallenge({
           type,
           targetChallenge: neededCR,
@@ -272,7 +403,11 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
           excludedIds: new Set(),
           preferredSubtype: leadCreature?.subtype ?? null,
         });
-        if (added) {
+
+        // Use the catalog creature only if it's reasonably close to the needed CR;
+        // a large gap (> 0.5) means a catalog gap — fall through to elite generation.
+        const catalogFits = added && (neededCR - added.challengeRating) <= 0.5;
+        if (catalogFits) {
           const existing = current.find(i => i.creatureId === added.id);
           if (existing) {
             existing.quantity++;
@@ -281,11 +416,34 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
           }
           continue;
         }
+
+        // Catalog gap: generate a scaled elite variant of the lead creature.
+        // Only for CR ≥ 1 targets where the base creature is genuinely weaker.
+        if (leadCreature && neededCR >= 1 && neededCR > leadCreature.challengeRating + 0.5) {
+          const elite = createEliteVariant(leadCreature, neededCR);
+          if (elite) {
+            current.push(getEliteCreatureSummary(elite, 1));
+            continue;
+          }
+        }
+      }
+
+      // Single-creature group that needs to reach a higher ND: upgrade the creature
+      // itself to targetChallenge rather than trying (and failing) to add a companion.
+      if (current.length === 1) {
+        const solo = getCreatureById(current[0].creatureId) ?? current[0].creatureData ?? null;
+        if (solo && targetChallenge > solo.challengeRating + 0.5) {
+          const elite = createEliteVariant(solo, targetChallenge);
+          if (elite) {
+            current[0] = getEliteCreatureSummary(elite, 1);
+            continue;
+          }
+        }
+        break;
       }
 
       // Addition impossible, would require a solo-worthy creature, or yielded no
       // candidate: remove the weakest creature and retry with the stronger remainder.
-      if (current.length <= 1) break;
       removeLeastCR(current);
     } else {
       removeLeastCR(current);
