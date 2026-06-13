@@ -1,8 +1,8 @@
-import { formatChallengeRating } from "./challenge.js";
+import { formatChallengeRating, roundToQuarter } from "./challenge.js";
 import { creatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
 import { createRng, pickWeighted } from "./random.js";
 
-const ENCOUNTER_RESOLUTION_VERSION = 1;
+const ENCOUNTER_RESOLUTION_VERSION = 2;
 
 const CREATURE_TYPE_LABELS = {
   animal: "Animal",
@@ -142,59 +142,72 @@ function resolveSpecificCreature(node) {
   return creature ? [getCreatureSummary(creature, 1)] : [];
 }
 
-function getSupportQuantity(supportCreature, remainingChallenge) {
-  if (!supportCreature?.challengeRating) return 1;
+// Per T20 rules: to hit a target ND with `totalCount` creatures of equal CR,
+// the required CR = target - 2×floor(log2(count)) for CR≥1,
+// or target/count for sub-1 targets.
+function getRequiredCreatureCR(targetChallenge, totalCount) {
+  if (totalCount <= 1) return targetChallenge;
 
-  const quantity = Math.floor((remainingChallenge + 0.001) / supportCreature.challengeRating);
+  if (targetChallenge < 1) {
+    return roundToQuarter(targetChallenge / totalCount);
+  }
 
-  return Math.max(1, Math.min(quantity, 3));
+  const doublings = Math.floor(Math.log2(totalCount));
+  return Math.max(0.25, roundToQuarter(targetChallenge - 2 * doublings));
 }
 
 function resolveCreatureGroup(node, rng) {
   if (!node.creature || !node.challenge || node.challenge.creatures <= 0) return [];
 
   const specificCreatureItems = resolveSpecificCreature(node);
-
   if (specificCreatureItems.length > 0) return specificCreatureItems;
 
   const targetChallenge = node.creature.targetChallenge ?? node.challenge.creatures;
   const terrainName = getTerrainName(node);
   const type = node.creature.type;
-  const excludedIds = new Set();
-  const lead = pickCreatureForChallenge({
-    excludedIds,
-    rng,
-    targetChallenge,
-    terrainName,
-    type
-  });
 
+  // Each size option produces a group whose actual combat ND equals targetChallenge
+  // (per T20 doubling rule) when all creatures have CR = requiredCR.
+  const sizeOptions = [
+    { totalCount: 1, weight: 10 },
+    { totalCount: 2, weight: 8 },
+    { totalCount: 3, weight: 6 },
+    { totalCount: 4, weight: 5 },
+    { totalCount: 6, weight: 3 },
+  ].filter(opt => getRequiredCreatureCR(targetChallenge, opt.totalCount) >= 0.25);
+
+  const { totalCount } = pickWeighted(rng, sizeOptions);
+  const requiredCR = getRequiredCreatureCR(targetChallenge, totalCount);
+
+  const lead = pickCreatureForChallenge({ type, targetChallenge: requiredCR, terrainName, rng, excludedIds: new Set() });
   if (!lead) return [];
+  if (totalCount === 1) return [getCreatureSummary(lead, 1)];
 
-  excludedIds.add(lead.id);
+  const excludedIds = new Set([lead.id]);
+  const itemsByCreatureId = new Map([[lead.id, { creature: lead, quantity: 1 }]]);
 
-  const items = [getCreatureSummary(lead, 1)];
-  let remainingChallenge = Math.round((targetChallenge - lead.challengeRating) * 4) / 4;
-
-  while (remainingChallenge >= 0.25 && items.length < 3) {
+  for (let slot = 1; slot < totalCount; slot++) {
     const support = pickCreatureForChallenge({
       excludedIds,
       preferredIds: SUPPORT_CREATURE_IDS_BY_TYPE[type] || [],
       rng,
-      targetChallenge: remainingChallenge,
+      targetChallenge: requiredCR,
       terrainName,
-      type
+      type,
     });
 
-    if (!support) break;
-
-    const quantity = getSupportQuantity(support, remainingChallenge);
-    items.push(getCreatureSummary(support, quantity));
-    excludedIds.add(support.id);
-    remainingChallenge = Math.round((remainingChallenge - support.challengeRating * quantity) * 4) / 4;
+    if (support) {
+      excludedIds.add(support.id);
+      itemsByCreatureId.set(support.id, { creature: support, quantity: 1 });
+    } else {
+      // No distinct creature available — add another of the lead
+      itemsByCreatureId.get(lead.id).quantity++;
+    }
   }
 
-  return items;
+  return [...itemsByCreatureId.values()].map(({ creature, quantity }) =>
+    getCreatureSummary(creature, quantity)
+  );
 }
 
 function getEncounterSeed(node, mapSeed) {

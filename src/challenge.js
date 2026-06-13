@@ -5,7 +5,7 @@ const CHALLENGE_LABELS = new Map([
   [0.75, "3/4"]
 ]);
 
-function roundToQuarter(value) {
+export function roundToQuarter(value) {
   return Math.round(value * 4) / 4;
 }
 
@@ -56,6 +56,27 @@ function getTerrainChallenge(node, rules) {
   }, 0);
 
   return terrainBase + featureTotal;
+}
+
+// Calculates actual combat ND from a list of encounter items per T20 rules:
+// - All CR < 1: sum linearly (4×CR¼ = ND 1)
+// - Any CR ≥ 1: average CR + 2 per doubling of count (floor(log2(count)) doublings)
+export function calculateCombatND(items) {
+  if (!items || items.length === 0) return 0;
+
+  const allCRs = items.flatMap(({ challengeRating, quantity }) =>
+    Array(quantity).fill(challengeRating)
+  );
+  const count = allCRs.length;
+  const total = allCRs.reduce((s, cr) => s + cr, 0);
+
+  if (!allCRs.some(cr => cr >= 1)) {
+    return roundToQuarter(total);
+  }
+
+  const avgCR = total / count;
+  const doublings = Math.floor(Math.log2(count));
+  return roundToQuarter(avgCR + 2 * doublings);
 }
 
 export function assignChallengeRating(node, floor, profile) {
