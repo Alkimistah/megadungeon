@@ -1,8 +1,8 @@
-import { formatChallengeRating, roundToQuarter } from "./challenge.js";
+import { calculateCombatND, formatChallengeRating, roundToQuarter } from "./challenge.js";
 import { creatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
 import { createRng, pickWeighted } from "./random.js";
 
-const ENCOUNTER_RESOLUTION_VERSION = 2;
+const ENCOUNTER_RESOLUTION_VERSION = 3;
 
 const CREATURE_TYPE_LABELS = {
   animal: "Animal",
@@ -79,21 +79,50 @@ function getCandidateWeight(creature, targetChallenge, terrainName, preferredIds
   return weight;
 }
 
-function getCandidates(type, maximumChallenge, excludedIds = new Set()) {
-  const baseCandidates = creatureCatalog.filter((creature) =>
+function getCandidates(type, maximumChallenge, excludedIds = new Set(), minimumChallenge = 0) {
+  const matchesCR = (creature) =>
     typeof creature.challengeRating === "number" &&
+    creature.challengeRating >= minimumChallenge &&
     creature.challengeRating <= maximumChallenge &&
-    !excludedIds.has(creature.id)
+    !excludedIds.has(creature.id);
+
+  if (type === null) {
+    const res = creatureCatalog.filter(matchesCR);
+    if (res.length > 0) return res;
+    return creatureCatalog.filter(c =>
+      typeof c.challengeRating === "number" &&
+      c.challengeRating <= maximumChallenge &&
+      !excludedIds.has(c.id)
+    );
+  }
+
+  const typed = creatureCatalog.filter(c => c.type === type && matchesCR(c));
+  if (typed.length > 0) return typed;
+
+  // Fallback 1: same type, ignore minimum CR
+  const typedAnyCR = creatureCatalog.filter(c =>
+    c.type === type &&
+    typeof c.challengeRating === "number" &&
+    c.challengeRating <= maximumChallenge &&
+    !excludedIds.has(c.id)
   );
+  if (typedAnyCR.length > 0) return typedAnyCR;
 
-  if (type === null) return baseCandidates;
+  // Fallback 2: any type, with CR range
+  const anyTypeInRange = creatureCatalog.filter(matchesCR);
+  if (anyTypeInRange.length > 0) return anyTypeInRange;
 
-  const typedCandidates = baseCandidates.filter((creature) => creature.type === type);
-  return typedCandidates.length > 0 ? typedCandidates : baseCandidates;
+  // Fallback 3: any type, any CR
+  return creatureCatalog.filter(c =>
+    typeof c.challengeRating === "number" &&
+    c.challengeRating <= maximumChallenge &&
+    !excludedIds.has(c.id)
+  );
 }
 
 function pickCreatureForChallenge({ type, targetChallenge, terrainName, rng, excludedIds, preferredIds = [], preferredSubtype = null }) {
-  const candidates = getCandidates(type, targetChallenge, excludedIds);
+  const minimumChallenge = Math.max(0.25, targetChallenge - 2);
+  const candidates = getCandidates(type, targetChallenge, excludedIds, minimumChallenge);
   const options = candidates.map((creature) => ({
     creature,
     weight: getCandidateWeight(creature, targetChallenge, terrainName, preferredIds, preferredSubtype)
@@ -141,16 +170,99 @@ function resolveSpecificCreature(node) {
 
 // Per T20 rules: to hit a target ND with `totalCount` creatures of equal CR,
 // the required CR = target - 2×floor(log2(count)) for CR≥1,
-// or target/count for sub-1 targets.
+// or target/count for sub-1 targets (linear rule).
 function getRequiredCreatureCR(targetChallenge, totalCount) {
   if (totalCount <= 1) return targetChallenge;
-
-  if (targetChallenge < 1) {
-    return roundToQuarter(targetChallenge / totalCount);
-  }
+  if (targetChallenge < 1) return roundToQuarter(targetChallenge / totalCount);
 
   const doublings = Math.floor(Math.log2(totalCount));
-  return Math.max(0.25, roundToQuarter(targetChallenge - 2 * doublings));
+  const doublingCR = roundToQuarter(targetChallenge - 2 * doublings);
+  if (doublingCR >= 1) return doublingCR;
+
+  // Doubling formula would require CR < 1; fall back to linear rule
+  return Math.max(0.25, roundToQuarter(targetChallenge / totalCount));
+}
+
+// Returns what CR a single added creature must have to bring the group's T20 ND
+// to exactly targetChallenge. Returns null if the math yields no valid CR.
+function getRequiredAdditionCR(items, targetChallenge) {
+  const allCRs = items.flatMap(i => Array(i.quantity).fill(i.challengeRating));
+  const N = allCRs.length;
+  const S = allCRs.reduce((a, b) => a + b, 0);
+  const allSubOne = allCRs.every(cr => cr < 1);
+  const newN = N + 1;
+  const newDoublings = Math.floor(Math.log2(newN));
+
+  if (allSubOne) {
+    // Try staying sub-1: linear ND = S + x = target
+    const xLinear = roundToQuarter(targetChallenge - S);
+    if (xLinear >= 0.25 && xLinear < 1) return xLinear;
+
+    // Try adding CR ≥ 1: switches to averaging formula
+    const newAvgNeeded = targetChallenge - 2 * newDoublings;
+    if (newAvgNeeded <= 0) return null;
+    const xAvg = roundToQuarter(newAvgNeeded * newN - S);
+    return xAvg >= 1 ? xAvg : null;
+  }
+
+  // Already has CR ≥ 1: averaging formula
+  // (S + x) / newN + 2*newDoublings = target → x = (target - 2*newDoublings)*newN - S
+  const newAvgNeeded = targetChallenge - 2 * newDoublings;
+  if (newAvgNeeded <= 0) return null;
+  const x = roundToQuarter(newAvgNeeded * newN - S);
+  return x >= 0.25 ? x : null;
+}
+
+// Post-generation validation: adjust the group iteratively until its actual T20 ND
+// matches targetChallenge. Adds creatures to fill a deficit; removes the lowest-CR
+// creature to fix an excess.
+function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
+  if (items.length === 0) return items;
+  const MAX_ITER = 8;
+  const current = items.map(i => ({ ...i }));
+
+  for (let iter = 0; iter < MAX_ITER; iter++) {
+    const actualND = calculateCombatND(current);
+    const diff = roundToQuarter(targetChallenge) - roundToQuarter(actualND);
+    if (diff === 0) break;
+
+    if (diff > 0) {
+      const neededCR = getRequiredAdditionCR(current, targetChallenge);
+      if (neededCR === null) break;
+
+      const leadCreature = getCreatureById(current[0].creatureId);
+      const excludedIds = new Set(current.map(i => i.creatureId));
+      const added = pickCreatureForChallenge({
+        type,
+        targetChallenge: neededCR,
+        terrainName,
+        rng,
+        excludedIds,
+        preferredSubtype: leadCreature?.subtype ?? null,
+      });
+      if (!added) break;
+
+      const existing = current.find(i => i.creatureId === added.id);
+      if (existing) {
+        existing.quantity++;
+      } else {
+        current.push(getCreatureSummary(added, 1));
+      }
+    } else {
+      // Over target: remove one instance of the lowest-CR creature
+      const lowest = current.reduce((min, i) =>
+        i.challengeRating < min.challengeRating ? i : min
+      );
+      if (lowest.quantity > 1) {
+        lowest.quantity--;
+      } else {
+        current.splice(current.indexOf(lowest), 1);
+      }
+      if (current.length === 0) break;
+    }
+  }
+
+  return current;
 }
 
 function resolveCreatureGroup(node, rng) {
@@ -178,42 +290,46 @@ function resolveCreatureGroup(node, rng) {
 
   const lead = pickCreatureForChallenge({ type, targetChallenge: requiredCR, terrainName, rng, excludedIds: new Set() });
   if (!lead) return [];
-  if (totalCount === 1) return [getCreatureSummary(lead, 1)];
 
-  // 75% homogeneous (all same creature), 25% mixed (lead + one support type)
-  const { mixed } = pickWeighted(rng, [
-    { mixed: false, weight: 15 },
-    { mixed: true,  weight: 5  },
-  ]);
+  let rawItems;
 
-  if (!mixed) {
-    return [getCreatureSummary(lead, totalCount)];
+  if (totalCount === 1) {
+    rawItems = [getCreatureSummary(lead, 1)];
+  } else {
+    // 75% homogeneous (all same creature), 25% mixed (lead + one support type)
+    const { mixed } = pickWeighted(rng, [
+      { mixed: false, weight: 15 },
+      { mixed: true,  weight: 5  },
+    ]);
+
+    if (!mixed) {
+      rawItems = [getCreatureSummary(lead, totalCount)];
+    } else {
+      // Mixed: support gets ~1/3 of slots, lead gets the rest
+      const supportCount = Math.max(1, Math.floor(totalCount / 3));
+      const leadCount = totalCount - supportCount;
+      const { crossType } = pickWeighted(rng, [
+        { crossType: false, weight: 8 },
+        { crossType: true,  weight: 2 },
+      ]);
+
+      const support = pickCreatureForChallenge({
+        excludedIds: new Set([lead.id]),
+        preferredIds: SUPPORT_CREATURE_IDS_BY_TYPE[type] || [],
+        preferredSubtype: crossType ? null : lead.subtype,
+        rng,
+        targetChallenge: requiredCR,
+        terrainName,
+        type: crossType ? null : type,
+      });
+
+      rawItems = support
+        ? [getCreatureSummary(lead, leadCount), getCreatureSummary(support, supportCount)]
+        : [getCreatureSummary(lead, totalCount)];
+    }
   }
 
-  // Mixed: support gets ~1/3 of slots, lead gets the rest
-  const supportCount = Math.max(1, Math.floor(totalCount / 3));
-  const leadCount = totalCount - supportCount;
-  const { crossType } = pickWeighted(rng, [
-    { crossType: false, weight: 8 },
-    { crossType: true,  weight: 2 },
-  ]);
-
-  const support = pickCreatureForChallenge({
-    excludedIds: new Set([lead.id]),
-    preferredIds: SUPPORT_CREATURE_IDS_BY_TYPE[type] || [],
-    preferredSubtype: crossType ? null : lead.subtype,
-    rng,
-    targetChallenge: requiredCR,
-    terrainName,
-    type: crossType ? null : type,
-  });
-
-  if (!support) return [getCreatureSummary(lead, totalCount)];
-
-  return [
-    getCreatureSummary(lead, leadCount),
-    getCreatureSummary(support, supportCount),
-  ];
+  return refineEncounterGroup(rawItems, targetChallenge, type, terrainName, rng);
 }
 
 function getEncounterSeed(node, mapSeed) {
