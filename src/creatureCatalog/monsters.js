@@ -233,7 +233,7 @@ export const centopeiasDragao = {
     id: "centopeia-dragao", name: "Centopeia-dragão", type: "monster", subtype: null, size: "Enorme", challengeRating: 7,
     description: [], source: { book: "Livro Básico", pdfPage: 2, bookPage: null },
     stats: { initiative: 10, perception: 8, defense: 27, fortitude: 20, reflex: 14, will: 9, hitPoints: 275, speedText: "15m (10q), escavar 6m (4q)", senses: null, defensesText: null, attributes: { str: 11, dex: 3, con: 9, int: -4, wis: 1, cha: 0 } },
-    actions: [{ name: null, text: "Corpo a Corpo Mordida +24 (2d8+18 mais 2d6 de fogo)." }],
+    actions: [{ name: "Corpo a Corpo", text: "Mordida +24 (2d8+18 mais 2d6 de fogo)." }],
     abilities: [], equipment: null, treasure: "2d4 doses de essência abissal (CD 22 para extrair).", skillsText: null
 };
 
@@ -241,7 +241,7 @@ export const grifo = {
     id: "grifo", name: "Grifo", type: "monster", subtype: null, size: "Grande", challengeRating: 3,
     description: [], source: { book: "Livro Básico", pdfPage: 7, bookPage: null },
     stats: { initiative: 9, perception: 7, defense: 19, fortitude: 9, reflex: 15, will: 4, hitPoints: 110, speedText: "12m, voo 24m", senses: null, defensesText: null, attributes: { str: 5, dex: 4, con: 3, int: -4, wis: 2, cha: -1 } },
-    actions: [{ name: null, text: "Corpo a Corpo Mordida +14 (2d6+5) e duas garras +14." }],
+    actions: [{ name: "Corpo a Corpo", text: "Mordida +14 (2d6+5) e duas garras +14." }],
     abilities: [], equipment: null, treasure: "Um ninho de grifo tem 25% de chance de conter 1d4 ovos no valor de T$ 2.500 cada.", skillsText: null
 };
 
@@ -249,7 +249,7 @@ export const ursoCoruja = {
     id: "urso-coruja", name: "Urso-Coruja", type: "monster", subtype: null, size: "Grande", challengeRating: 4,
     description: [], source: { book: "Livro Básico", pdfPage: 8, bookPage: null },
     stats: { initiative: 7, perception: 5, defense: 23, fortitude: 16, reflex: 10, will: 5, hitPoints: 145, speedText: "12m (8q)", senses: null, defensesText: null, attributes: { str: 7, dex: 3, con: 5, int: -4, wis: 1, cha: -2 } },
-    actions: [{ name: null, text: "Corpo a Corpo Mordida +16 (1d8+5) e duas garras +15." }],
+    actions: [{ name: "Corpo a Corpo", text: "Mordida +16 (1d8+5) e duas garras +15." }],
     abilities: [], equipment: null, treasure: "Nenhum.", skillsText: null
 };
 
@@ -257,7 +257,7 @@ export const serpe = {
     id: "serpe", name: "Serpe", type: "monster", subtype: null, size: "Grande", challengeRating: 5,
     description: [], source: { book: "Livro Básico", pdfPage: 8, bookPage: null },
     stats: { initiative: 5, perception: 7, defense: 24, fortitude: 10, reflex: 16, will: 5, hitPoints: 200, speedText: "9m (6q), voo 18m (12q)", senses: null, defensesText: null, attributes: { str: 6, dex: 1, con: 6, int: -2, wis: 1, cha: -1 } },
-    actions: [{ name: null, text: "Corpo a Corpo Mordida +17 (2d6+12) e ferrão +17 (1d8+12)." }],
+    actions: [{ name: "Corpo a Corpo", text: "Mordida +17 (2d6+12) e ferrão +17 (1d8+12)." }],
     abilities: [], equipment: null, treasure: "1d4 doses de peçonha concentrada (CD 20 para extrair).", skillsText: null
 };
 
@@ -265,7 +265,7 @@ export const hidra = {
     id: "hidra", name: "Hidra", type: "monster", subtype: null, size: "Enorme", challengeRating: 11,
     description: [], source: { book: "Livro Básico", pdfPage: 21, bookPage: null },
     stats: { initiative: 9, perception: 9, defense: 35, fortitude: 24, reflex: 18, will: 9, hitPoints: 550, speedText: "9m (6q), natação 9m (6q)", senses: null, defensesText: null, attributes: { str: 10, dex: 0, con: 10, int: -4, wis: 0, cha: -1 } },
-    actions: [{ name: null, text: "Corpo a Corpo Cinco mordidas +34 (3d6+16)." }],
+    actions: [{ name: "Corpo a Corpo", text: "Cinco mordidas +34 (3d6+16)." }],
     abilities: [], equipment: null, treasure: "Padrão.", skillsText: null
 };
 
