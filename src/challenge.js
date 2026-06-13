@@ -71,7 +71,11 @@ export function calculateCombatND(items) {
   const total = allCRs.reduce((s, cr) => s + cr, 0);
 
   if (!allCRs.some(cr => cr >= 1)) {
-    return roundToQuarter(total);
+    if (total < 1) return roundToQuarter(total);
+    // T20 two-phase rule: sum sub-1 CRs → ND1-equivalents, then apply doubling
+    // 4×CR¼=ND1 (base), 8×CR¼=ND3, 16×CR¼=ND5; 2×CR½=ND1, 4×CR½=ND3, 8×CR½=ND5
+    const doublings = Math.floor(Math.log2(total));
+    return roundToQuarter(1 + 2 * doublings);
   }
 
   const avgCR = total / count;

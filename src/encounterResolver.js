@@ -2,7 +2,7 @@ import { calculateCombatND, formatChallengeRating, roundToQuarter } from "./chal
 import { creatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
 import { createRng, pickWeighted } from "./random.js";
 
-const ENCOUNTER_RESOLUTION_VERSION = 3;
+const ENCOUNTER_RESOLUTION_VERSION = 4;
 
 const CREATURE_TYPE_LABELS = {
   animal: "Animal",
@@ -185,6 +185,7 @@ function getRequiredCreatureCR(targetChallenge, totalCount) {
 
 // Returns what CR a single added creature must have to bring the group's T20 ND
 // to exactly targetChallenge. Returns null if the math yields no valid CR.
+// Note: all-sub-1 groups with targetChallenge >= 1 use bulk-add in refineEncounterGroup instead.
 function getRequiredAdditionCR(items, targetChallenge) {
   const allCRs = items.flatMap(i => Array(i.quantity).fill(i.challengeRating));
   const N = allCRs.length;
@@ -194,18 +195,19 @@ function getRequiredAdditionCR(items, targetChallenge) {
   const newDoublings = Math.floor(Math.log2(newN));
 
   if (allSubOne) {
-    // Try staying sub-1: linear ND = S + x = target
-    const xLinear = roundToQuarter(targetChallenge - S);
-    if (xLinear >= 0.25 && xLinear < 1) return xLinear;
-
-    // Try adding CR ≥ 1: switches to averaging formula
+    if (targetChallenge < 1) {
+      // Linear sub-1: S + x = target, x must keep total < 1
+      const x = roundToQuarter(targetChallenge - S);
+      return (x >= 0.25 && S + x < 1) ? x : null;
+    }
+    // target >= 1 with all-sub-1 group: try adding CR ≥ 1 (switches to averaging formula)
     const newAvgNeeded = targetChallenge - 2 * newDoublings;
     if (newAvgNeeded <= 0) return null;
     const xAvg = roundToQuarter(newAvgNeeded * newN - S);
     return xAvg >= 1 ? xAvg : null;
   }
 
-  // Already has CR ≥ 1: averaging formula
+  // Has CR ≥ 1: averaging formula
   // (S + x) / newN + 2*newDoublings = target → x = (target - 2*newDoublings)*newN - S
   const newAvgNeeded = targetChallenge - 2 * newDoublings;
   if (newAvgNeeded <= 0) return null;
@@ -227,6 +229,22 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
     if (diff === 0) break;
 
     if (diff > 0) {
+      const allCRs = current.flatMap(i => Array(i.quantity).fill(i.challengeRating));
+      const allSubOne = allCRs.every(cr => cr < 1);
+      const S = allCRs.reduce((a, b) => a + b, 0);
+
+      if (allSubOne && targetChallenge >= 1) {
+        // T20 two-phase rule: ND = 1+2k requires total ∈ [2^k, 2^(k+1)).
+        // Add enough of the lead creature to reach the floor of the required tier.
+        const k = Math.floor((targetChallenge - 1) / 2);
+        const minTotal = Math.pow(2, k);
+        const deficit = minTotal - S;
+        if (deficit <= 0) break; // already at this tier; can't improve (even target unreachable)
+        const leadItem = current[0];
+        leadItem.quantity += Math.ceil(deficit / leadItem.challengeRating);
+        continue;
+      }
+
       const neededCR = getRequiredAdditionCR(current, targetChallenge);
       if (neededCR === null) break;
 
