@@ -358,6 +358,13 @@ function splitSheetAbility(text, fallbackLabel = null) {
   return { label: fallbackLabel || "Habilidade", text };
 }
 
+function createSheetAbilityOriginalLine(originalText) {
+  const item = document.createElement("p");
+  item.className = "sheet-ability-original";
+  item.textContent = originalText;
+  return item;
+}
+
 function appendCreatureSheetAbilities(section, entries, { preferEntryName = false } = {}) {
   entries.filter(Boolean).forEach((entry) => {
     if (preferEntryName && typeof entry === "object" && entry.name) {
@@ -372,6 +379,10 @@ function appendCreatureSheetAbilities(section, entries, { preferEntryName = fals
     const { label, text } = splitSheetAbility(rawText, entry.name);
 
     section.appendChild(createSheetAbilityLine(label, text));
+
+    if (entry.originalText) {
+      section.appendChild(createSheetAbilityOriginalLine(entry.originalText));
+    }
   });
 }
 
@@ -433,6 +444,12 @@ function createCreatureDetail(item) {
   }
 
   if (creature.abilities?.length) {
+    if (item.generated) {
+      const note = document.createElement("p");
+      note.className = "creature-generated-note";
+      note.textContent = "Habilidades exibem valores da criatura base.";
+      section.appendChild(note);
+    }
     appendCreatureSheetAbilities(section, creature.abilities, { preferEntryName: true });
   }
 

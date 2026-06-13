@@ -205,7 +205,8 @@ function createEliteVariant(baseCreature, targetCR) {
     const attackName = extractAttackName(action.text ?? "") ?? action.name ?? "Ataque";
     return {
       name: action.name ?? "Corpo a Corpo",
-      text: `${attackName} +${targetParams.attack} (dano médio ${targetParams.averageDamage})`
+      text: `${attackName} +${targetParams.attack} (dano médio ${targetParams.averageDamage})`,
+      originalText: action.text ?? null
     };
   });
 
