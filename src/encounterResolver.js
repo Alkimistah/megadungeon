@@ -2,7 +2,7 @@ import { calculateCombatND, formatChallengeRating, roundToQuarter } from "./chal
 import { creatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
 import { createRng, pickWeighted } from "./random.js";
 
-const ENCOUNTER_RESOLUTION_VERSION = 4;
+const ENCOUNTER_RESOLUTION_VERSION = 5;
 
 const CREATURE_TYPE_LABELS = {
   animal: "Animal",
@@ -215,12 +215,23 @@ function getRequiredAdditionCR(items, targetChallenge) {
   return x >= 0.25 ? x : null;
 }
 
+function removeLeastCR(current) {
+  const lowest = current.reduce((min, i) =>
+    i.challengeRating < min.challengeRating ? i : min
+  );
+  if (lowest.quantity > 1) {
+    lowest.quantity--;
+  } else {
+    current.splice(current.indexOf(lowest), 1);
+  }
+}
+
 // Post-generation validation: adjust the group iteratively until its actual T20 ND
 // matches targetChallenge. Adds creatures to fill a deficit; removes the lowest-CR
-// creature to fix an excess.
+// creature to fix an excess or when addition is mathematically impossible.
 function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
   if (items.length === 0) return items;
-  const MAX_ITER = 8;
+  const MAX_ITER = 10;
   const current = items.map(i => ({ ...i }));
 
   for (let iter = 0; iter < MAX_ITER; iter++) {
@@ -246,36 +257,35 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
       }
 
       const neededCR = getRequiredAdditionCR(current, targetChallenge);
-      if (neededCR === null) break;
-
-      const leadCreature = getCreatureById(current[0].creatureId);
-      const excludedIds = new Set(current.map(i => i.creatureId));
-      const added = pickCreatureForChallenge({
-        type,
-        targetChallenge: neededCR,
-        terrainName,
-        rng,
-        excludedIds,
-        preferredSubtype: leadCreature?.subtype ?? null,
-      });
-      if (!added) break;
-
-      const existing = current.find(i => i.creatureId === added.id);
-      if (existing) {
-        existing.quantity++;
-      } else {
-        current.push(getCreatureSummary(added, 1));
+      if (neededCR !== null) {
+        // Allow picking creatures already in the group so quantity++ is possible —
+        // sometimes the right fix is more of the lead creature, not a new species.
+        const leadCreature = getCreatureById(current[0].creatureId);
+        const added = pickCreatureForChallenge({
+          type,
+          targetChallenge: neededCR,
+          terrainName,
+          rng,
+          excludedIds: new Set(),
+          preferredSubtype: leadCreature?.subtype ?? null,
+        });
+        if (added) {
+          const existing = current.find(i => i.creatureId === added.id);
+          if (existing) {
+            existing.quantity++;
+          } else {
+            current.push(getCreatureSummary(added, 1));
+          }
+          continue;
+        }
       }
+
+      // Addition impossible or yielded no candidate: remove the weakest creature
+      // (it is diluting the average) and retry with the stronger remainder.
+      if (current.length <= 1) break;
+      removeLeastCR(current);
     } else {
-      // Over target: remove one instance of the lowest-CR creature
-      const lowest = current.reduce((min, i) =>
-        i.challengeRating < min.challengeRating ? i : min
-      );
-      if (lowest.quantity > 1) {
-        lowest.quantity--;
-      } else {
-        current.splice(current.indexOf(lowest), 1);
-      }
+      removeLeastCR(current);
       if (current.length === 0) break;
     }
   }
