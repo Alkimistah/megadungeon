@@ -66,9 +66,13 @@ Toda a documentação técnica detalhada — arquitetura, sistemas, estrutura de
 
 O perfil define pesos de tipos de sala, NDs por faixa de nível, pesos de tipos de criatura por terreno, regras de armadilhas, tema visual (cores CSS), e regras de geração de clima e terreno.
 
-## Próximos passos sugeridos
+## Próximos objetivos (não necessariamente ordem de prioridade)
 
-- Adicionar mais faixas de andares (atualmente apenas Floresta 11-20).
-- Salvar histórico de andares gerados no navegador (localStorage).
+- Adicionar gerador de quests automático para dinheiro em paralelo com as runs (objetivos criados fora da dungeon que podem ser checksdos e são únicos por run na dungeon)
+- Adicionar botão de próximo andar no mapa, quando chegar no final dos encontros determinados.
+- Melhorar as descrições de monstros, armadilhas e visualização das telas de combate.
+- Fazer um cálculo de XP por encontro/combate, que condiza com o XP total do evento/combate e tenha os cálculos corretos.
+- Melhorar a visualização de ND por evento, dar mais ou menos peso em momentos específicos para desafios específicos.
+- Adaptar armadilhas para diferentes tipos de terreno e conjunto de andares (talvez gerar uma descrição específica para como a armadilha é ativada ou como ela se localiza no evento).
+- Adicionar mais faixas de andares (atualmente apenas Floresta 11-20) e regras para essas faixas.
 - Adicionar tabelas de encontros, tesouros e eventos específicos por perfil.
-- Completar ícones PWA em `manifest.webmanifest`.
