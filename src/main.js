@@ -331,6 +331,10 @@ function applyFloorRange(floorRangeId) {
   mapRenderer.setHiddenNodeIcon(activeFloorRange.hiddenNodeIcon);
   syncRecommendationsWithFloor();
   document.body.classList.toggle("extended-exploration-mode", isExtendedExplorationMode());
+  elements.legendToggle.hidden = isExtendedExplorationMode();
+  if (isExtendedExplorationMode()) {
+    setLegendOpen(false);
+  }
   elements.generateButton.textContent = isExtendedExplorationMode() ? "Iniciar andar" : "Gerar mapa";
   manualEncounterDialogController.syncProfileOptions();
 }

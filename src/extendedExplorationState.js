@@ -33,11 +33,73 @@ function getApproach(profile, approachId) {
     || profile.extendedExploration.approaches[0];
 }
 
+function getFloorApproaches(profile, floor) {
+  const approachIds = profile.extendedExploration.approachIdsByFloor?.[floor];
+
+  if (!approachIds?.length) return profile.extendedExploration.approaches;
+
+  const approachesById = new Map(profile.extendedExploration.approaches.map((approach) => [approach.id, approach]));
+
+  return approachIds
+    .map((approachId) => approachesById.get(approachId))
+    .filter(Boolean);
+}
+
 function getExplorationMinutes(profile, floor, approach) {
   const baseMinutes = profile.extendedExploration.baseMinutesByFloor?.[floor] || 10;
   const multiplier = approach.timeMultiplier || 1;
 
   return Math.max(Math.round(baseMinutes * multiplier), 1);
+}
+
+function getUsedApproachLabels(profile, floor, usedApproachIds) {
+  const approachesById = new Map(getFloorApproaches(profile, floor).map((approach) => [approach.id, approach]));
+
+  return [...usedApproachIds]
+    .map((approachId) => approachesById.get(approachId)?.label)
+    .filter(Boolean);
+}
+
+function getApproachAction(approach) {
+  return approach.label.includes(":")
+    ? approach.label.split(":").slice(1).join(":").trim()
+    : approach.label;
+}
+
+function getApproachNarrative(approach, outcome) {
+  const action = getApproachAction(approach);
+  const actionLower = action.toLocaleLowerCase("pt-BR");
+  const isSuccess = outcome === "success" || outcome === "criticalSuccess";
+  const prefix = {
+    Acrobacia: `Um personagem assume a dianteira e tenta ${actionLower} para vencer a geometria irregular do labirinto.`,
+    Adestramento: `Um personagem tenta ${actionLower} para lidar com uma criatura ou sinal animal no caminho.`,
+    Atletismo: `Um personagem usa força e impulso para ${actionLower} e abrir passagem pelo obstáculo.`,
+    Conhecimento: `Um personagem recorre ao estudo para usar ${actionLower} como chave de leitura do labirinto.`,
+    Cura: `Um personagem examina vestígios físicos e usa ${actionLower} para entender o que aconteceu ali.`,
+    Diplomacia: `Um personagem tenta ${actionLower} para transformar um encontro social em rota segura.`,
+    Enganação: `Um personagem usa ${actionLower} para atravessar a situação sem revelar a intenção do grupo.`,
+    Fortitude: `Um personagem se coloca à prova para ${actionLower} e manter o grupo em movimento.`,
+    Furtividade: `Um personagem reduz o ritmo do grupo para ${actionLower} sem chamar atenção.`,
+    Guerra: `Um personagem lê o espaço como campo de batalha e tenta ${actionLower}.`,
+    Intimidação: `Um personagem usa presença e ameaça para ${actionLower} e abrir caminho.`,
+    Intuição: `Um personagem segue um pressentimento e tenta ${actionLower}.`,
+    Investigação: `Um personagem assume a busca ativa e tenta ${actionLower} pistas úteis no labirinto.`,
+    Ladinagem: `Um personagem trabalha com cuidado para ${actionLower} sem acionar riscos ocultos.`,
+    Misticismo: `Um personagem interpreta sinais arcanos e tenta ${actionLower}.`,
+    Nobreza: "Com sua educação de nobre, um personagem interpreta símbolos, etiqueta e arquitetura para indicar uma rota segura pelo labirinto.",
+    Ofício: `Um personagem usa conhecimento técnico para ${actionLower} e transformar o obstáculo em passagem.`,
+    Percepção: action === "Observar"
+      ? "Um personagem decidiu tomar a liderança e observar possíveis caminhos."
+      : `Um personagem se concentra nos seus sentidos e tenta ${actionLower} sinais do caminho.`,
+    Reflexos: `Um personagem se move no instante certo para ${actionLower} ao perigo do labirinto.`,
+    Religião: `Um personagem usa tradição sagrada para ${actionLower} os sinais do caminho.`,
+    Sobrevivência: `Um personagem usa experiência de jornada para ${actionLower} dentro do labirinto.`,
+    Vontade: `Um personagem se centra e tenta ${actionLower} diante da pressão mental da masmorra.`
+  }[approach.skill] || `Um personagem tenta ${actionLower} para avançar pelo labirinto.`;
+
+  return isSuccess
+    ? `${prefix} A leitura estava correta.`
+    : `${prefix} A tentativa não encontra uma rota segura.`;
 }
 
 function clampRoll(value) {
@@ -776,8 +838,9 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
   let phase = "exploring";
   let successes = 0;
   let failures = 0;
-  let usedSuccessfulSkills = new Set();
+  let usedApproachIds = new Set();
   let currentResult = null;
+  let currentResults = [];
   let finalEncounter = null;
   let log = [];
   let elapsedMinutes = 0;
@@ -790,8 +853,9 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
   function resetFloorProgress(message = "O grupo retornou ao início do andar.") {
     successes = 0;
     failures = 0;
-    usedSuccessfulSkills = new Set();
+    usedApproachIds = new Set();
     currentResult = null;
+    currentResults = [];
     finalEncounter = null;
     pendingSceneEffects = [];
     phase = floor === 10 ? "boss" : "exploring";
@@ -831,8 +895,9 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     floor = nextFloor;
     successes = 0;
     failures = 0;
-    usedSuccessfulSkills = new Set();
+    usedApproachIds = new Set();
     currentResult = null;
+    currentResults = [];
     finalEncounter = null;
     pendingSceneEffects = [];
     phase = floor === 10 ? "boss" : "exploring";
@@ -853,8 +918,9 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       phase = sessionState.phase || (floor === 10 ? "boss" : "exploring");
       successes = sessionState.successes || 0;
       failures = sessionState.failures || 0;
-      usedSuccessfulSkills = new Set(sessionState.usedSuccessfulSkills || []);
+      usedApproachIds = new Set(sessionState.usedApproachIds || sessionState.usedSuccessfulSkills || []);
       currentResult = sessionState.currentResult || null;
+      currentResults = sessionState.currentResults || (currentResult ? [currentResult] : []);
       finalEncounter = sessionState.finalEncounter || null;
       log = sessionState.log || [];
       elapsedMinutes = sessionState.elapsedMinutes || 0;
@@ -866,8 +932,9 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     phase = floor === 10 ? "boss" : "exploring";
     successes = 0;
     failures = 0;
-    usedSuccessfulSkills = new Set();
+    usedApproachIds = new Set();
     currentResult = null;
+    currentResults = [];
     finalEncounter = null;
     log = [];
     elapsedMinutes = 0;
@@ -924,6 +991,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       challenge,
       detail,
       encounterNode,
+      id: seedSuffix,
       roll,
       rollSource,
       sceneEffects,
@@ -940,13 +1008,14 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
   }
 
   function completeSuccess(approach) {
-    if (usedSuccessfulSkills.has(approach.skill)) {
-      addLog(`${approach.skill} já gerou sucesso neste andar. Escolha outra abordagem.`, "warning");
+    if (usedApproachIds.has(approach.id)) {
+      addLog(`${approach.label} já foi usada neste andar. Escolha outra ação.`, "warning");
       return false;
     }
 
     successes += 1;
-    usedSuccessfulSkills.add(approach.skill);
+    usedApproachIds.add(approach.id);
+    addLog(getApproachNarrative(approach, "success"), "info");
     addLog(`${approach.label}: sucesso (${successes}/${getFloorRules(activeProfile, floor).successesRequired}).`, "success");
 
     const rules = getFloorRules(activeProfile, floor);
@@ -964,16 +1033,23 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     if (phase !== "exploring") return;
 
     const rules = getFloorRules(activeProfile, floor);
-    const approach = getApproach(activeProfile, approachId);
+    const approach = getFloorApproaches(activeProfile, floor).find((candidate) => candidate.id === approachId)
+      || getApproach(activeProfile, approachId);
 
-    const explorationMinutes = getExplorationMinutes(activeProfile, floor, approach);
-    elapsedMinutes += explorationMinutes;
-    addLog(`${approach.label}: ${explorationMinutes}min de exploração.`, "time");
+    if (usedApproachIds.has(approach.id)) {
+      addLog(`${approach.label} já foi usada neste andar. Escolha outra ação.`, "warning");
+      return;
+    }
 
     if (outcome === "success" || outcome === "criticalSuccess") {
       const changed = completeSuccess(approach);
+      if (!changed) return;
 
-      if (changed && outcome === "criticalSuccess" && failures > 0) {
+      const explorationMinutes = getExplorationMinutes(activeProfile, floor, approach);
+      elapsedMinutes += explorationMinutes;
+      addLog(`${approach.label}: ${explorationMinutes}min de exploração.`, "time");
+
+      if (outcome === "criticalSuccess" && failures > 0) {
         failures -= 1;
         addLog("Sucesso superior: removeu 1 falha acumulada.", "success");
       }
@@ -981,13 +1057,22 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       return;
     }
 
+    const explorationMinutes = getExplorationMinutes(activeProfile, floor, approach);
+    elapsedMinutes += explorationMinutes;
+    addLog(`${approach.label}: ${explorationMinutes}min de exploração.`, "time");
+
+    usedApproachIds.add(approach.id);
+    addLog(getApproachNarrative(approach, outcome), "info");
     failures += 1;
     addLog(`${approach.label}: falha (${failures}/${rules.failureLimit}).`, "failure");
 
     const rollCount = outcome === "criticalFailure" ? 2 : 1;
+    currentResults = [];
     for (let index = 0; index < rollCount; index += 1) {
-      resolveD100(manualRolls[index]);
+      const result = resolveD100(manualRolls[index]);
+      currentResults.push(result);
     }
+    currentResult = currentResults[currentResults.length - 1] || null;
 
     if (failures >= rules.failureLimit) {
       resetFloorProgress("Falhas demais: o grupo retornou ao início do andar e zerou o progresso.");
@@ -1008,7 +1093,9 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
   }
 
   function rerollTacticalMap(target = "current") {
-    const scene = target === "final" ? finalEncounter : currentResult;
+    const scene = target === "final"
+      ? finalEncounter
+      : currentResults.find((result) => result.id === target) || currentResult;
 
     if (!scene?.encounterNode?.resolvedEncounter?.items?.length) return;
 
@@ -1036,6 +1123,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
   function exportSessionState() {
     return {
       currentResult,
+      currentResults,
       elapsedMinutes,
       failures,
       finalEncounter,
@@ -1044,7 +1132,8 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       pendingSceneEffects,
       phase,
       successes,
-      usedSuccessfulSkills: [...usedSuccessfulSkills]
+      usedApproachIds: [...usedApproachIds],
+      usedSuccessfulSkills: [...usedApproachIds]
     };
   }
 
@@ -1059,9 +1148,10 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       : null;
 
     return {
-      approaches: activeProfile.extendedExploration.approaches,
+      approaches: getFloorApproaches(activeProfile, floor),
       bossEncounter: phase === "boss" ? getBossEncounter() : null,
       currentResult,
+      currentResults,
       elapsedMinutes,
       failures,
       finalEncounter,
@@ -1072,7 +1162,9 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       rules: rulesWithTime,
       successes,
       tier,
-      usedSuccessfulSkills: [...usedSuccessfulSkills]
+      usedApproachIds: [...usedApproachIds],
+      usedApproachLabels: getUsedApproachLabels(activeProfile, floor, usedApproachIds),
+      usedSuccessfulSkills: getUsedApproachLabels(activeProfile, floor, usedApproachIds)
     };
   }
 

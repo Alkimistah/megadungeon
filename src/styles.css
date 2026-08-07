@@ -123,6 +123,15 @@ button:hover {
   background: var(--action-hover);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+button:disabled:hover {
+  background: var(--action);
+}
+
 .generate-button {
   min-height: 38px;
   padding: 8px 14px;
@@ -412,6 +421,7 @@ svg {
 }
 
 .extended-dc,
+.extended-approach-prompt,
 .pending-effects,
 .used-skills,
 .result-detail,
@@ -420,6 +430,11 @@ svg {
   color: #d8c8b7;
   font-size: 14px;
   line-height: 1.35;
+}
+
+.extended-approach-prompt {
+  color: #c9b99f;
+  font-style: italic;
 }
 
 .result-title,
@@ -432,6 +447,18 @@ svg {
 .used-skills {
   display: grid;
   gap: 4px;
+}
+
+.current-scene-card {
+  display: grid;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-soft);
+}
+
+.current-scene-card:first-of-type {
+  padding-top: 0;
+  border-top: 0;
 }
 
 .pending-effects span {
@@ -499,12 +526,19 @@ svg {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
 .tactical-map-header strong {
   color: #fff7e8;
   font-size: 13px;
+}
+
+.tactical-map-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .tactical-grid {
@@ -586,6 +620,34 @@ svg {
   width: 12px;
   height: 12px;
   border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.tactical-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.78);
+}
+
+.tactical-fullscreen-panel {
+  display: grid;
+  gap: 12px;
+  width: min(96vw, 980px);
+  max-height: calc(100vh - 40px);
+  padding: 16px;
+  overflow: auto;
+  border: 1px solid var(--header-border);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.62);
+}
+
+.tactical-fullscreen-panel .tactical-grid {
+  width: min(100%, calc((100vh - 180px) * 1.4), 920px);
+  justify-self: center;
 }
 
 .exploration-log {
@@ -681,6 +743,10 @@ svg {
 
 .legend-toggle:hover {
   background: color-mix(in srgb, var(--header) 92%, white 8%);
+}
+
+.extended-exploration-mode .legend-panel {
+  display: none;
 }
 
 .legend-panel {

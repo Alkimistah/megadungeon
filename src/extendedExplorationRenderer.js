@@ -30,6 +30,22 @@ function getDcText(rules, approach) {
   return `${approach.skill} CD ${dc} (${modifier}) | ${minutes}min`;
 }
 
+function getApproachPrompt(approach) {
+  const action = approach.label.includes(":")
+    ? approach.label.split(":").slice(1).join(":").trim()
+    : approach.label;
+  const actionLower = action.toLocaleLowerCase("pt-BR");
+
+  return {
+    Nobreza: "Com sua educação de nobre, um personagem indica uma rota segura pelo labirinto.",
+    Percepção: action === "Observar"
+      ? "Um personagem decidiu tomar a liderança e observar possíveis caminhos."
+      : `Um personagem tenta ${actionLower} sinais discretos no labirinto.`,
+    Reflexos: "Um personagem se prepara para reagir ao perigo e manter o avanço.",
+    Vontade: "Um personagem se concentra para resistir à pressão mental da masmorra."
+  }[approach.skill] || `Um personagem tenta ${actionLower} para conduzir o grupo pelo labirinto.`;
+}
+
 function parseManualRolls(value) {
   if (value.trim() === "") return [];
 
@@ -110,7 +126,9 @@ function createApproachControls(snapshot, selectedApproachId, setSelectedApproac
   const approachSelect = document.createElement("select");
   const selectedApproach = snapshot.approaches.find((approach) => approach.id === selectedApproachId)
     || snapshot.approaches[0];
+  const selectedApproachAlreadyUsed = snapshot.usedApproachIds.includes(selectedApproach.id);
   const dc = createElement("p", "extended-dc", getDcText(snapshot.rules, selectedApproach));
+  const prompt = createElement("p", "extended-approach-prompt", getApproachPrompt(selectedApproach));
   const rollLabel = createElement("label");
   const rollText = document.createTextNode("d100 manual");
   const rollInput = document.createElement("input");
@@ -118,8 +136,9 @@ function createApproachControls(snapshot, selectedApproachId, setSelectedApproac
 
   snapshot.approaches.forEach((approach) => {
     const option = document.createElement("option");
+    const alreadyUsed = snapshot.usedApproachIds.includes(approach.id);
     option.value = approach.id;
-    option.textContent = `${approach.label} (${approach.skill})`;
+    option.textContent = `${approach.label}${alreadyUsed ? " — usada" : ""}`;
     approachSelect.appendChild(option);
   });
 
@@ -140,10 +159,10 @@ function createApproachControls(snapshot, selectedApproachId, setSelectedApproac
   rollLabel.appendChild(rollText);
   rollLabel.appendChild(rollInput);
 
-  buttons.appendChild(createButton("Sucesso", "extended-action", () => onOutcome("success", parseManualRolls(rollInput.value))));
-  buttons.appendChild(createButton("Sucesso +5", "extended-action", () => onOutcome("criticalSuccess", parseManualRolls(rollInput.value))));
-  buttons.appendChild(createButton("Falha", "extended-action is-danger", () => onOutcome("failure", parseManualRolls(rollInput.value))));
-  buttons.appendChild(createButton("Falha +5", "extended-action is-danger", () => onOutcome("criticalFailure", parseManualRolls(rollInput.value))));
+  buttons.appendChild(createButton("Sucesso", "extended-action", () => onOutcome("success", parseManualRolls(rollInput.value)), selectedApproachAlreadyUsed));
+  buttons.appendChild(createButton("Sucesso +5", "extended-action", () => onOutcome("criticalSuccess", parseManualRolls(rollInput.value)), selectedApproachAlreadyUsed));
+  buttons.appendChild(createButton("Falha", "extended-action is-danger", () => onOutcome("failure", parseManualRolls(rollInput.value)), selectedApproachAlreadyUsed));
+  buttons.appendChild(createButton("Falha +5", "extended-action is-danger", () => onOutcome("criticalFailure", parseManualRolls(rollInput.value)), selectedApproachAlreadyUsed));
 
   controls.appendChild(approachLabel);
   controls.appendChild(rollLabel);
@@ -151,6 +170,7 @@ function createApproachControls(snapshot, selectedApproachId, setSelectedApproac
   section.appendChild(heading);
   section.appendChild(controls);
   section.appendChild(dc);
+  section.appendChild(prompt);
   section.appendChild(createUsedSkills(snapshot));
   const pendingEffects = createPendingEffects(snapshot);
   if (pendingEffects) section.appendChild(pendingEffects);
@@ -161,11 +181,11 @@ function createApproachControls(snapshot, selectedApproachId, setSelectedApproac
 
 function createUsedSkills(snapshot) {
   const container = createElement("div", "used-skills");
-  const label = createElement("strong", null, "Perícias com sucesso neste andar:");
+  const label = createElement("strong", null, "Ações usadas neste andar:");
   const value = createElement(
     "span",
     null,
-    snapshot.usedSuccessfulSkills.length ? snapshot.usedSuccessfulSkills.join(", ") : "nenhuma"
+    snapshot.usedApproachLabels.length ? snapshot.usedApproachLabels.join(", ") : "nenhuma"
   );
 
   container.appendChild(label);
@@ -191,26 +211,45 @@ function createPendingEffects(snapshot) {
   return container;
 }
 
-function createCurrentResult(snapshot) {
+function getSceneKey(scene) {
+  return scene?.id || scene?.encounterNode?.id || `${scene?.roll}-${scene?.categoryId}`;
+}
+
+function createCurrentResult(snapshot, selectedEncounterItemByScene, onSelectItem, onRerollMap) {
   const section = createElement("section", "extended-panel");
   const heading = createElement("h3", null, "Cena atual");
+  const results = snapshot.currentResults?.length
+    ? snapshot.currentResults
+    : snapshot.currentResult ? [snapshot.currentResult] : [];
 
   section.appendChild(heading);
 
-  if (!snapshot.currentResult) {
+  if (!results.length) {
     const empty = createElement("p", "hidden-environment-notice", "Nenhuma cena d100 resolvida ainda. Registre uma falha para gerar a próxima cena.");
     section.appendChild(empty);
     return section;
   }
 
-  const result = snapshot.currentResult;
-  const challengeText = result.challenge > 0 ? ` | ND ${formatChallengeRating(result.challenge)}` : "";
-  const sourceText = result.rollSource === "manual" ? "manual" : "automático";
-  const title = createElement("p", "result-title", `d100 ${result.roll} (${sourceText}): ${result.categoryLabel}${challengeText}`);
-  const detail = createElement("p", "result-detail", result.detail);
+  results.forEach((result, index) => {
+    const scene = createElement("div", "current-scene-card");
+    const challengeText = result.challenge > 0 ? ` | ND ${formatChallengeRating(result.challenge)}` : "";
+    const sourceText = result.rollSource === "manual" ? "manual" : "automático";
+    const titlePrefix = results.length > 1 ? `Rolagem ${index + 1}: ` : "";
+    const title = createElement("p", "result-title", `${titlePrefix}d100 ${result.roll} (${sourceText}): ${result.categoryLabel}${challengeText}`);
+    const detail = createElement("p", "result-detail", result.detail);
+    const sceneKey = getSceneKey(result);
+    const encounter = createResolvedEncounter(
+      result,
+      selectedEncounterItemByScene.get(sceneKey),
+      (nextKey) => onSelectItem(sceneKey, nextKey),
+      () => onRerollMap(result.id || "current")
+    );
 
-  section.appendChild(title);
-  section.appendChild(detail);
+    scene.appendChild(title);
+    scene.appendChild(detail);
+    if (encounter) scene.appendChild(encounter);
+    section.appendChild(scene);
+  });
 
   return section;
 }
@@ -228,27 +267,23 @@ function getTacticalCellLabel(cell) {
   }[cell] || cell;
 }
 
-function createTacticalMap(scene, onRerollMap) {
-  if (!scene?.tacticalMap) return null;
-
-  const section = createElement("div", "tactical-map-panel");
-  const header = createElement("div", "tactical-map-header");
-  const title = createElement(
-    "strong",
-    null,
-    `Mapa 14x10 | ${scene.tacticalMap.enemyCount} inimigo(s) | ${scene.tacticalMap.trapCount} armadilha(s)`
-  );
+function createTacticalGrid(tacticalMap) {
   const grid = createElement("div", "tactical-grid");
-  const legend = createElement("div", "tactical-legend");
 
-  grid.style.setProperty("--tactical-width", String(scene.tacticalMap.width));
-  grid.style.setProperty("--tactical-height", String(scene.tacticalMap.height));
+  grid.style.setProperty("--tactical-width", String(tacticalMap.width));
+  grid.style.setProperty("--tactical-height", String(tacticalMap.height));
 
-  scene.tacticalMap.cells.forEach((cell) => {
+  tacticalMap.cells.forEach((cell) => {
     const tile = createElement("span", `tactical-cell is-${cell}`);
     tile.title = getTacticalCellLabel(cell);
     grid.appendChild(tile);
   });
+
+  return grid;
+}
+
+function createTacticalLegend() {
+  const legend = createElement("div", "tactical-legend");
 
   [
     ["wall", "Parede"],
@@ -265,11 +300,61 @@ function createTacticalMap(scene, onRerollMap) {
     legend.appendChild(item);
   });
 
+  return legend;
+}
+
+function openTacticalMapFullscreen(tacticalMap) {
+  const overlay = createElement("div", "tactical-fullscreen");
+  const panel = createElement("div", "tactical-fullscreen-panel");
+  const header = createElement("div", "tactical-map-header");
+  const title = createElement(
+    "strong",
+    null,
+    `Mapa 14x10 | ${tacticalMap.enemyCount} inimigo(s) | ${tacticalMap.trapCount} armadilha(s)`
+  );
+
+  function close() {
+    document.removeEventListener("keydown", onKeyDown);
+    overlay.remove();
+  }
+
+  function onKeyDown(event) {
+    if (event.key === "Escape") close();
+  }
+
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) close();
+  });
+  document.addEventListener("keydown", onKeyDown);
+
   header.appendChild(title);
-  header.appendChild(createButton("Gerar outro mapa", "extended-action is-compact", onRerollMap));
+  header.appendChild(createButton("Fechar", "extended-action is-compact", close));
+  panel.appendChild(header);
+  panel.appendChild(createTacticalGrid(tacticalMap));
+  panel.appendChild(createTacticalLegend());
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+}
+
+function createTacticalMap(scene, onRerollMap) {
+  if (!scene?.tacticalMap) return null;
+
+  const section = createElement("div", "tactical-map-panel");
+  const header = createElement("div", "tactical-map-header");
+  const title = createElement(
+    "strong",
+    null,
+    `Mapa 14x10 | ${scene.tacticalMap.enemyCount} inimigo(s) | ${scene.tacticalMap.trapCount} armadilha(s)`
+  );
+  const actions = createElement("div", "tactical-map-actions");
+
+  actions.appendChild(createButton("Expandir", "extended-action is-compact", () => openTacticalMapFullscreen(scene.tacticalMap)));
+  actions.appendChild(createButton("Gerar outro mapa", "extended-action is-compact", onRerollMap));
+  header.appendChild(title);
+  header.appendChild(actions);
   section.appendChild(header);
-  section.appendChild(grid);
-  section.appendChild(legend);
+  section.appendChild(createTacticalGrid(scene.tacticalMap));
+  section.appendChild(createTacticalLegend());
 
   return section;
 }
@@ -408,22 +493,19 @@ export function createExtendedExplorationRenderer({
           manualRollInput.value = "";
         }
       ));
-      const currentSceneId = snapshot.currentResult?.encounterNode?.id;
-      const currentEncounter = createCurrentResult(snapshot);
-      const currentResolved = createResolvedEncounter(
-        snapshot.currentResult,
-        currentSceneId ? selectedEncounterItemByScene.get(currentSceneId) : null,
-        (nextKey) => {
-          selectedEncounterItemByScene.set(currentSceneId, nextKey);
+      const currentEncounter = createCurrentResult(
+        snapshot,
+        selectedEncounterItemByScene,
+        (sceneKey, nextKey) => {
+          selectedEncounterItemByScene.set(sceneKey, nextKey);
           render();
         },
-        () => {
-          onRerollTacticalMap("current");
+        (target) => {
+          onRerollTacticalMap(target);
           render();
         }
       );
       left.appendChild(currentEncounter);
-      if (currentResolved) currentEncounter.appendChild(currentResolved);
 
       const finalSceneId = snapshot.finalEncounter?.encounterNode?.id;
       left.appendChild(createFinalEncounter(

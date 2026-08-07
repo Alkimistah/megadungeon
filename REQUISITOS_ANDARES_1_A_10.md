@@ -331,14 +331,14 @@ Quando os sucessos são completados, a porta final deve ganhar destaque e a tela
 Exibe:
 
 - abordagem selecionada;
-- perícia sugerida;
+- ação de exploração selecionada, no formato `Perícia: Ação`;
 - modificador da abordagem;
 - CD final;
-- perícias que já geraram sucesso neste andar;
+- ações que já foram usadas neste andar;
 - botões de resultado do teste;
 - campo para valor manual de d100;
 - botão para rolar d100 automaticamente;
-- último resultado gerado;
+- resultado ou resultados d100 gerados pela última falha;
 - log curto da exploração.
 
 ## Tema Visual
@@ -367,9 +367,10 @@ O visual deve ser funcional e de mesa: rápido de ler, com poucos elementos deco
   phase: "exploring",
   successes: 2,
   failures: 1,
-  usedSuccessfulSkills: ["Sobrevivência", "Percepção"],
+  usedApproachIds: ["survival-orient", "perception-observe"],
   pendingRolls: [],
   currentResult: null,
+  currentResults: [],
   finalEncounter: null,
   pendingSceneEffects: [],
   log: [],
@@ -476,6 +477,14 @@ Criar ou separar:
 - Controle de sucessos, falhas, reset de andar e avanço apenas para frente.
 - Consumo de tempo por teste com base no andar e multiplicador da abordagem.
 - Rolagem d100 automática e manual, com indicação da origem da rolagem.
+- Falha crítica ou margem 5+ gera duas rolagens d100 e exibe ambas na cena atual.
+- Ações de exploração específicas no formato `Perícia: Ação`, com 10 opções por andar.
+- Repetição de perícia permitida quando a ação é diferente; uma mesma ação não se repete no andar.
+- Qualquer resultado de teste bloqueia a ação usada no andar, seja sucesso ou falha.
+- Textos temáticos por ação aparecem abaixo da CD e no log de resolução.
+- Tempo base ajustado para 1 a 9 minutos nos andares 1 a 9, mantendo multiplicadores por ação.
+- Mapa tático com visualização expandida em tela cheia.
+- Legenda global dos nodos escondida no modo labirinto dos andares 1 a 10.
 - Falhas que geram encontro, obstáculo ou armadilha já produzem cena concreta, em vez de apenas orientar consulta manual.
 - Encontro final obrigatório antes de liberar o próximo andar.
 - Mapa tático 14x10 gerado para cenas relevantes.
@@ -490,8 +499,8 @@ Criar ou separar:
 - Presságios e vantagens já podem ser tratados como estados, mas ainda precisam de cobertura completa por tabela e comunicação visual refinada de criação, aplicação e consumo.
 - O mapa tático já tem validações importantes, mas ainda precisa de ajuste fino por tipo de encontro, tipo de armadilha e gimmick de andar.
 - Encontros finais existem como etapa obrigatória, mas ainda precisam de tabelas próprias por andar ou variações mais marcantes.
-- O log existe no fluxo, mas ainda deve ser revisado quanto ao quanto precisa persistir no código de sessão.
 - As tabelas d100 estão estruturadas, mas precisam ser conferidas contra a versão definitiva do material.
+- A seleção de ações por andar existe, mas ainda deve ser revisada contra a versão definitiva do documento de perícias e ações.
 
 ### Pendente
 
@@ -502,7 +511,7 @@ Criar ou separar:
 - Estruturar loot e XP dos encontros finais e achados úteis.
 - Associar cada tipo de armadilha a padrões táticos diferentes no mapa, em vez de usar apenas uma zona genérica.
 - Ajustar balanceamento para personagens de nível 1 a 4, especialmente quantidade de inimigos, ND agregado, dano de armadilhas e frequência de falhas.
-- Revisar persistência de sessão para garantir que estado mecânico, encontro atual, mapa atual e efeitos pendentes carreguem sem fragilidade.
+- Revisar persistência de sessão para garantir que estado mecânico, encontro atual, mapas atuais e efeitos pendentes carreguem sem fragilidade.
 
 ### Melhorias Futuras
 
@@ -537,12 +546,12 @@ tempo do teste = tempo base do andar x multiplicador da abordagem
 
 Exemplo:
 
-- andar 1 tem tempo base de 5 minutos;
+- andar 1 tem tempo base de 1 minuto;
 - Sobrevivência tem multiplicador 1;
 - investigar/mapear pode ter multiplicador 1.5;
 - uma abordagem mais lenta pode chegar a multiplicador 2.
 
-O multiplicador normalmente deve ficar entre 1 e 2. Cada andar pode ter tempo base próprio, possivelmente usando a dificuldade padrão do andar como referência para desgaste e complexidade.
+Decisão atual: os andares 1 a 9 usam tempo base de 1 a 9 minutos, respectivamente. O multiplicador normalmente deve ficar entre 1 e 2. Cada ação pode ajustar esse multiplicador conforme risco, cuidado ou complexidade.
 
 ### Presságios e Vantagens
 
@@ -564,8 +573,8 @@ Exemplo:
 
 ```text
 Exploração iniciada no andar 1.
-Sobrevivência: sucesso (1/3).
-Percepção: falha (1/5).
+Sobrevivência: Orientar-se: sucesso (1/3).
+Percepção: Observar: falha (1/5).
 d100 74: Encontro médio, ND 1/2.
 ```
 
@@ -587,6 +596,6 @@ Decisão: na primeira versão, basta gerar novamente o mapa tático. Edição c�
 
 Implementar os andares 1 a 10 como um segundo modo de exploração, não como uma variação do gerador de nodos atual.
 
-O mapa de nodos continua sendo a melhor representação para andares 11 a 20, onde existem rotas e escolhas pré-geradas. Para os andares 1 a 10, o labirinto abstrato representa progresso acumulado dentro de um andar, enquanto as cenas surgem dinamicamente por falhas, anomalias, encontros e achados.
+O mapa de nodos continua sendo a melhor representação para andares 11 a 20, onde existem rotas e escolhas pré-geradas. Para os andares 1 a 10, o labirinto abstrato representa progresso acumulado num andar, enquanto as cenas surgem dinamicamente por falhas, anomalias, encontros e achados.
 
 Essa separação preserva a clareza da experiência e reduz acoplamento técnico: o app passa a ter dois modos de geração/apresentação que compartilham sistemas comuns de regras, mas respeitam estruturas de jogo diferentes.
