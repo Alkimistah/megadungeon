@@ -288,9 +288,9 @@ export const dungeon1to10Profile = {
       4: ["orc-combatente", "orc-enfraquecido", "orc-chefe", "lobo", "gorlogg", "goblin-salteador"],
       5: ["orc-combatente", "orc-chefe", "hobgoblin-soldado", "goblin-engenhoqueiro", "gnoll-saqueador", "glop", "glooop"],
       6: ["glop", "glooop", "mamae-glop", "orc-enfraquecido", "orc-combatente", "goblin-engenhoqueiro"],
-      7: ["aranhas-filhotes", "rato-gigante", "goblin-salteador", "orc-enfraquecido", "glop", "hobgoblin-soldado"],
-      8: ["aranhas-filhotes", "aranha-gigante", "orc-combatente", "orc-chefe", "hobgoblin-soldado", "glooop"],
-      9: ["aranhas-filhotes", "aranha-gigante", "orc-chefe", "hobgoblin-soldado", "goblin-engenhoqueiro", "glooop", "mamae-glop"]
+      7: ["aranhas-filhotes", "rato-gigante", "goblin-salteador", "orc-enfraquecido", "glop", "hobgoblin-soldado", "mimico-menor"],
+      8: ["aranhas-filhotes", "aranha-gigante", "orc-combatente", "orc-chefe", "hobgoblin-soldado", "glooop", "mimico-menor"],
+      9: ["aranhas-filhotes", "aranha-gigante", "orc-chefe", "hobgoblin-soldado", "goblin-engenhoqueiro", "glooop", "mamae-glop", "mimico-menor"]
     },
     defaultTypeWeights: [
       { type: "animal", weight: 22 },

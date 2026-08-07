@@ -1307,17 +1307,59 @@ export const mimico = {
         initiative: 9, perception: 8, defense: 26, fortitude: 18, reflex: 12, will: 6,
         hitPoints: 220,
         speedText: "6m (4q)",
-        senses: null,
-        defensesText: null,
+        senses: "visão no escuro",
+        defensesText: "imunidade a ácido, redução de dano 5/frio",
         attributes: { str: 2, dex: 4, con: 3, int: -2, wis: 3, cha: 0 }
     },
     actions: [
-        { name: "Corpo a Corpo", text: "Dois tentáculos +20 (2d8+15)." }
+        { name: "Corpo a Corpo", text: "Dois tentáculos +20 (2d8+15)." },
+        { name: "Cuspe Material", text: "Cone de 6m; criaturas na área sofrem 6d4+6 pontos de perfuração (Ref CD 22 reduz à metade; uma criatura abocanhada falha automaticamente)." }
     ],
-    abilities: [],
+    abilities: [
+        { name: "Abocanhar", timing: "livre", text: "Se começar seu turno agarrando uma criatura Média ou menor, pode fazer um teste de agarrar contra ela. Se vencer, abocanha a criatura. Uma criatura abocanhada continua agarrada e sofre 4d8+25 pontos de dano de corte no início de cada turno do mímico. O mímico pode manter uma criatura abocanhada por vez e pode atacar com seus tentáculos normalmente enquanto faz isso. Uma criatura abocanhada pode escapar vencendo uma manobra agarrar contra o mímico." },
+        { name: "Agarrar Aprimorado", timing: "livre", text: "Tentáculo (teste +20)." },
+        { name: "Ataque Furtivo", timing: "passiva", text: "+3d6." },
+        { name: "Imobilidade", timing: "passiva", text: "Um mímico pode permanecer completamente imóvel. Se ele estiver assim, um personagem deve passar num teste de Percepção (CD 40) para perceber que ele é uma criatura e não um objeto." }
+    ],
     equipment: null,
     treasure: "Padrão.",
     skillsText: "Enganação +15, Furtividade +2"
+};
+
+export const mimicoMenor = {
+    id: "mimico-menor",
+    name: "Mímico Menor",
+    type: "monster",
+    subtype: null,
+    size: "Médio",
+    challengeRating: 2,
+    description: [
+        "Uma cria ou exemplar subnutrido de mímico, adaptado à escassez dos primeiros andares da masmorra. Imita baús, portas e móveis simples para atrair exploradores isolados."
+    ],
+    role: "special",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    stats: {
+        initiative: 5, perception: 5, defense: 18, fortitude: 10, reflex: 7, will: 3,
+        hitPoints: 80,
+        speedText: "6m (4q)",
+        senses: "visão no escuro",
+        defensesText: "imunidade a ácido, redução de dano 2/frio",
+        attributes: { str: 1, dex: 3, con: 2, int: -3, wis: 2, cha: -1 }
+    },
+    actions: [
+        { name: "Corpo a Corpo", text: "Dois tentáculos +12 (1d8+7)." },
+        { name: "Cuspe Material", text: "Cone de 6m; criaturas na área sofrem 3d4+3 pontos de perfuração (Ref CD 16 reduz à metade; uma criatura abocanhada falha automaticamente)." }
+    ],
+    abilities: [
+        { name: "Abocanhar", timing: "livre", text: "Se começar seu turno agarrando uma criatura Média ou menor, pode fazer um teste de agarrar contra ela. Se vencer, abocanha a criatura. Uma criatura abocanhada continua agarrada e sofre 2d8+10 pontos de dano de corte no início de cada turno do mímico menor. O mímico menor pode manter uma criatura abocanhada por vez e pode atacar com seus tentáculos normalmente enquanto faz isso. Uma criatura abocanhada pode escapar vencendo uma manobra agarrar contra o mímico menor." },
+        { name: "Agarrar Aprimorado", timing: "livre", text: "Tentáculo (teste +12)." },
+        { name: "Ataque Furtivo", timing: "passiva", text: "+1d6." },
+        { name: "Imobilidade", timing: "passiva", text: "Um mímico menor pode permanecer completamente imóvel. Se ele estiver assim, um personagem deve passar num teste de Percepção (CD 30) para perceber que ele é uma criatura e não um objeto." }
+    ],
+    equipment: null,
+    treasure: "Padrão.",
+    skillsText: "Enganação +10, Furtividade +2"
 };
 
 export const monsterCreatures = [
@@ -1332,5 +1374,5 @@ export const monsterCreatures = [
     carrascoDeLeena, ente, estirge, enxameEstirge, nuvemDeEstirges,
     feraVassalo, feraLider, feraMae,
     enxameLarval, koboldPatrulheiro, koboldVeterano, patrulhaKobold, koboldExplosivo, koboldXama,
-    cocatrizReal, harpiaSaqueadora, mantor, quimera, mimico
+    cocatrizReal, harpiaSaqueadora, mantor, quimera, mimico, mimicoMenor
 ];

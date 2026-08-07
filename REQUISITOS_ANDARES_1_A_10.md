@@ -496,6 +496,7 @@ Criar ou separar:
 - Armadilhas representadas como zonas de múltiplas células que podem bloquear ou pressionar o caminho.
 - Aranha Matriarca e filhotes adicionados ao catálogo de criaturas.
 - Encontros podem sortear armas compatíveis para criaturas armadas Pequenas ou Médias, preservando bônus de ataque e modificadores de dano da ficha base.
+- Mímico Menor ND 2 adicionado como adaptação do Mímico para aparecer nos andares avançados de 1 a 10.
 
 ### Parcialmente Implementado
 
