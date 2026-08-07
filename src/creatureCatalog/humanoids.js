@@ -810,7 +810,7 @@ export const cultistaDeSSzzaas = {
 
 export const finntrollCacador = {
     id: "finntroll-cacador",
-    name: "Finntroll Caçador",
+    name: "Finntroll Caçadot",
     type: "humanoid",
     subtype: "finntroll",
     size: "Médio",
