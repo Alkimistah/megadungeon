@@ -61,10 +61,33 @@ function getCreatureRules(profile) {
 
 function getWeightedCreatureTypes(node, rules) {
   const terrainName = node.environment?.terrain?.name;
-
-  return rules.typeWeightsByTerrain?.[terrainName] ||
+  const allowedCreatureIds = getAllowedCreatureIds(node, rules);
+  const allowedTypes = getAllowedCreatureTypes(allowedCreatureIds);
+  const weights = rules.typeWeightsByTerrain?.[terrainName] ||
     rules.defaultTypeWeights ||
     DEFAULT_CREATURE_TYPE_WEIGHTS;
+
+  if (!allowedTypes) return weights;
+
+  const filteredWeights = weights.filter((option) => allowedTypes.has(option.type));
+
+  return filteredWeights.length ? filteredWeights : weights;
+}
+
+function getAllowedCreatureIds(node, rules) {
+  return rules.allowedCreatureIdsByFloor?.[node.level] || rules.allowedCreatureIds || null;
+}
+
+function getAllowedCreatureTypes(allowedCreatureIds) {
+  if (!allowedCreatureIds?.length) return null;
+
+  const allowedTypes = new Set(
+    allowedCreatureIds
+      .map((creatureId) => getCreatureById(creatureId)?.type)
+      .filter(Boolean)
+  );
+
+  return allowedTypes.size ? allowedTypes : null;
 }
 
 function getSpecificCreature(node, rules) {
@@ -105,8 +128,10 @@ export function assignCreatureProfile(node, profile, rng) {
   const typeOption = specificCreature ? { type: specificCreature.type } : pickWeighted(rng, getWeightedCreatureTypes(node, rules));
   const type = CREATURE_TYPES[typeOption.type] || CREATURE_TYPES.monster;
   const targetChallenge = specificCreature?.challengeRating ?? getChallengeSource(node, rules);
+  const allowedCreatureIds = getAllowedCreatureIds(node, rules);
 
   node.creature = {
+    allowedCreatureIds,
     type: type.id,
     typeLabel: type.label,
     typeDescription: type.description,
@@ -121,4 +146,3 @@ export function assignCreatureProfile(node, profile, rng) {
     groupGuidance: getGroupGuidance(node, rules)
   };
 }
-

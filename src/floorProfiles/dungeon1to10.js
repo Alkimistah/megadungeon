@@ -281,13 +281,23 @@ export const dungeon1to10Profile = {
   creatureRules: {
     defaultPartySize: 4,
     challengeSource: "encounter",
+    allowedCreatureIdsByFloor: {
+      1: ["rato-gigante", "glop", "goblin-salteador", "orc-enfraquecido", "cascavel"],
+      2: ["goblin-salteador", "bandido", "rato-gigante", "glop", "orc-enfraquecido", "lobo"],
+      3: ["goblin-salteador", "hobgoblin-soldado", "goblin-engenhoqueiro", "orc-combatente", "glop"],
+      4: ["orc-combatente", "orc-enfraquecido", "orc-chefe", "lobo", "gorlogg", "goblin-salteador"],
+      5: ["orc-combatente", "orc-chefe", "hobgoblin-soldado", "goblin-engenhoqueiro", "gnoll-saqueador", "glop", "glooop"],
+      6: ["glop", "glooop", "mamae-glop", "orc-enfraquecido", "orc-combatente", "goblin-engenhoqueiro"],
+      7: ["aranhas-filhotes", "rato-gigante", "goblin-salteador", "orc-enfraquecido", "glop", "hobgoblin-soldado"],
+      8: ["aranhas-filhotes", "aranha-gigante", "orc-combatente", "orc-chefe", "hobgoblin-soldado", "glooop"],
+      9: ["aranhas-filhotes", "aranha-gigante", "orc-chefe", "hobgoblin-soldado", "goblin-engenhoqueiro", "glooop", "mamae-glop"]
+    },
     defaultTypeWeights: [
       { type: "animal", weight: 22 },
       { type: "construct", weight: 6 },
       { type: "spirit", weight: 6 },
       { type: "humanoid", weight: 32 },
-      { type: "monster", weight: 24 },
-      { type: "undead", weight: 10 }
+      { type: "monster", weight: 24 }
     ],
     typeWeightsByTerrain: {
       "Labirinto": [
@@ -295,16 +305,14 @@ export const dungeon1to10Profile = {
         { type: "construct", weight: 8 },
         { type: "spirit", weight: 6 },
         { type: "humanoid", weight: 34 },
-        { type: "monster", weight: 24 },
-        { type: "undead", weight: 10 }
+        { type: "monster", weight: 24 }
       ],
       "Covil aracnídeo": [
         { type: "animal", weight: 38 },
         { type: "construct", weight: 2 },
         { type: "spirit", weight: 4 },
         { type: "humanoid", weight: 12 },
-        { type: "monster", weight: 38 },
-        { type: "undead", weight: 6 }
+        { type: "monster", weight: 38 }
       ]
     },
     groupGuidance: [

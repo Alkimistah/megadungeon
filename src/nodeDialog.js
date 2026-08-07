@@ -1,6 +1,7 @@
 import { formatChallengeRating } from "./challenge.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getDamageType } from "./damageTypes.js";
+import { getWeaponVariationLabel } from "./equipment/weaponVariation.js";
 import { getTrapById } from "./traps.js";
 import { assetUrl } from "./assetUrl.js";
 
@@ -42,7 +43,19 @@ function formatSkillCheck(check) {
 
 function formatTrapSave(save) {
   if (!save) return "Sem teste de resistência";
+  if (Array.isArray(save)) {
+    return save.map((entry) => `${entry.ability} CD ${entry.dc} (${entry.effect})`).join("; ");
+  }
   return `${save.ability} CD ${save.dc} (${save.effect})`;
+}
+
+function formatAdditionalTrapTests(tests = []) {
+  if (!tests.length) return null;
+
+  return tests.map((test) => {
+    const action = test.action ? `, ${test.action}` : "";
+    return `${test.test} CD ${test.dc}${action}: ${test.purpose}`;
+  }).join("; ");
 }
 
 function formatTrapDamageTypes(trap) {
@@ -387,7 +400,7 @@ function appendCreatureSheetAbilities(section, entries, { preferEntryName = fals
 }
 
 function createCreatureDetail(item) {
-  const creature = item.generated ? item.creatureData : getCreatureById(item.creatureId);
+    const creature = item.creatureData ?? getCreatureById(item.creatureId);
   const section = document.createElement("section");
 
   section.className = "encounter-detail-card creature-detail-card tormenta-creature-sheet";
@@ -441,6 +454,11 @@ function createCreatureDetail(item) {
 
   if (creature.actions?.length) {
     appendCreatureSheetAbilities(section, creature.actions);
+  }
+
+  const weaponVariationLabel = getWeaponVariationLabel(creature);
+  if (weaponVariationLabel) {
+    section.appendChild(createSheetLine("ARMA SORTEADA", weaponVariationLabel));
   }
 
   if (creature.abilities?.length) {
@@ -502,6 +520,7 @@ function createTrapDetail(node, item) {
 
   const source = trap.source;
   const damageTypes = formatTrapDamageTypes(trap);
+  const additionalTests = formatAdditionalTrapTests(trap.additionalTests);
 
   section.appendChild(createDetailLine("ND", `ND ${item.challengeLabel}`));
   section.appendChild(createDetailLine("Papel", `${trap.roleLabel || item.roleLabel} - ${trap.roleDescription || "Armadilha do encontro"}`));
@@ -512,6 +531,8 @@ function createTrapDetail(node, item) {
 
   if (damageTypes) section.appendChild(createDetailLine("Tipo de dano", damageTypes));
   if (trap.area) section.appendChild(createDetailLine("Área", trap.area));
+  if (additionalTests) section.appendChild(createDetailLine("Testes adicionais", additionalTests));
+  if (trap.notes?.length) section.appendChild(createDetailLine("Observações", trap.notes.join(" ")));
 
   if (source) {
     const page = source.bookPage ? `, p. ${source.bookPage}` : "";

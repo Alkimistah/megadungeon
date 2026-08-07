@@ -26,6 +26,36 @@ export const orcCombatant = {
     skillsText: null
 };
 
+export const orcEnfraquecido = {
+    id: "orc-enfraquecido",
+    name: "Orc Enfraquecido",
+    type: "humanoid",
+    subtype: "orc",
+    size: "Médio",
+    challengeRating: 0.25,
+    description: [
+        "Um orc faminto, doente ou drenado pela masmorra, ainda perigoso em combate direto, mas sem a disciplina ou vigor de um combatente pleno."
+    ],
+    source: { book: "Masmorra de Práxis", pdfFile: "reskin-zumbi", pdfPage: null, bookPage: null },
+    stats: {
+        initiative: -1, perception: -1, defense: 11, fortitude: 3, reflex: -1, will: -1,
+        hitPoints: 20,
+        speedText: "6m (4q)",
+        senses: "visão no escuro",
+        defensesText: null,
+        attributes: { str: 3, dex: -1, con: 2, int: -5, wis: -1, cha: 0 }
+    },
+    actions: [
+        { name: "Corpo a Corpo", text: "Pancada +7 (1d6+6)." }
+    ],
+    abilities: [
+        { name: "Debilitado", timing: "passiva", text: "O orc enfraquecido sofre o dobro de dano de acertos críticos ou de ataques precisos contra pontos vitais." }
+    ],
+    equipment: null,
+    treasure: "Nenhum.",
+    skillsText: null
+};
+
 export const orcChief = {
     id: "orc-chefe",
     name: "Orc Chefe",
@@ -1025,7 +1055,7 @@ export const nezumiBrutamontes = {
 
 export const humanoidCreatures = [
     // Manuais
-    orcCombatant, orcChief, ogre, gnollMarauder, gnollFilibuster,
+    orcCombatant, orcEnfraquecido, orcChief, ogre, gnollMarauder, gnollFilibuster,
     // Livro Básico
     orcMutante, bandido, chefeBandido, guardaDeCidade, sargentoDaGuarda,
     centauroCombatente, centauroXama, trog, recrutaPurista, soldadoPurista,

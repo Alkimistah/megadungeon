@@ -1,9 +1,10 @@
 import { calculateCombatND, formatChallengeRating, roundToQuarter } from "./challenge.js";
 import { creatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
+import { applyWeaponVariation } from "./equipment/weaponVariation.js";
 import { createRng, pickWeighted } from "./random.js";
 import { createModificationPlan, getThreatParameters, THREAT_CHALLENGE_ORDER } from "./threatCreationRules.js";
 
-const ENCOUNTER_RESOLUTION_VERSION = 7;
+const ENCOUNTER_RESOLUTION_VERSION = 8;
 
 const CREATURE_TYPE_LABELS = {
   animal: "Animal",
@@ -89,7 +90,15 @@ function getCandidateWeight(creature, targetChallenge, terrainName, preferredIds
   return weight;
 }
 
-function getCandidates(type, maximumChallenge, excludedIds = new Set(), minimumChallenge = 0) {
+function getAllowedCatalog(allowedIds = null) {
+  if (!allowedIds?.length) return creatureCatalog;
+
+  const allowedSet = new Set(allowedIds);
+  return creatureCatalog.filter((creature) => allowedSet.has(creature.id));
+}
+
+function getCandidates(type, maximumChallenge, excludedIds = new Set(), minimumChallenge = 0, allowedIds = null) {
+  const catalog = getAllowedCatalog(allowedIds);
   const matchesCR = (creature) =>
     typeof creature.challengeRating === "number" &&
     creature.challengeRating >= minimumChallenge &&
@@ -97,20 +106,20 @@ function getCandidates(type, maximumChallenge, excludedIds = new Set(), minimumC
     !excludedIds.has(creature.id);
 
   if (type === null) {
-    const res = creatureCatalog.filter(matchesCR);
+    const res = catalog.filter(matchesCR);
     if (res.length > 0) return res;
-    return creatureCatalog.filter(c =>
+    return catalog.filter(c =>
       typeof c.challengeRating === "number" &&
       c.challengeRating <= maximumChallenge &&
       !excludedIds.has(c.id)
     );
   }
 
-  const typed = creatureCatalog.filter(c => c.type === type && matchesCR(c));
+  const typed = catalog.filter(c => c.type === type && matchesCR(c));
   if (typed.length > 0) return typed;
 
   // Fallback 1: same type, ignore minimum CR
-  const typedAnyCR = creatureCatalog.filter(c =>
+  const typedAnyCR = catalog.filter(c =>
     c.type === type &&
     typeof c.challengeRating === "number" &&
     c.challengeRating <= maximumChallenge &&
@@ -119,20 +128,20 @@ function getCandidates(type, maximumChallenge, excludedIds = new Set(), minimumC
   if (typedAnyCR.length > 0) return typedAnyCR;
 
   // Fallback 2: any type, with CR range
-  const anyTypeInRange = creatureCatalog.filter(matchesCR);
+  const anyTypeInRange = catalog.filter(matchesCR);
   if (anyTypeInRange.length > 0) return anyTypeInRange;
 
   // Fallback 3: any type, any CR
-  return creatureCatalog.filter(c =>
+  return catalog.filter(c =>
     typeof c.challengeRating === "number" &&
     c.challengeRating <= maximumChallenge &&
     !excludedIds.has(c.id)
   );
 }
 
-function pickCreatureForChallenge({ type, targetChallenge, terrainName, rng, excludedIds, preferredIds = [], preferredSubtype = null }) {
+function pickCreatureForChallenge({ type, targetChallenge, terrainName, rng, excludedIds, preferredIds = [], preferredSubtype = null, allowedIds = null }) {
   const minimumChallenge = Math.max(0.25, targetChallenge - 2);
-  const candidates = getCandidates(type, targetChallenge, excludedIds, minimumChallenge);
+  const candidates = getCandidates(type, targetChallenge, excludedIds, minimumChallenge, allowedIds);
   const options = candidates.map((creature) => ({
     creature,
     weight: getCandidateWeight(creature, targetChallenge, terrainName, preferredIds, preferredSubtype)
@@ -243,40 +252,43 @@ function createEliteVariant(baseCreature, targetCR) {
   };
 }
 
-function getEliteCreatureSummary(generatedCreature, quantity) {
-  const roleLabel = generatedCreature.roleMetadata?.label || generatedCreature.role || "Papel não definido";
-  const typeLabel = CREATURE_TYPE_LABELS[generatedCreature.type] || generatedCreature.type;
+function getEliteCreatureSummary(generatedCreature, quantity, rng = null) {
+  const encounterCreature = rng ? applyWeaponVariation(generatedCreature, rng) : generatedCreature;
+  const roleLabel = encounterCreature.roleMetadata?.label || encounterCreature.role || "Papel não definido";
+  const typeLabel = CREATURE_TYPE_LABELS[encounterCreature.type] || encounterCreature.type;
 
   return {
-    challengeLabel: formatChallengeRating(generatedCreature.challengeRating),
-    challengeRating: generatedCreature.challengeRating,
-    creatureId: generatedCreature.id,
-    creatureData: generatedCreature,
+    challengeLabel: formatChallengeRating(encounterCreature.challengeRating),
+    challengeRating: encounterCreature.challengeRating,
+    creatureId: encounterCreature.id,
+    creatureData: encounterCreature,
     generated: true,
     kind: "creature",
-    name: generatedCreature.name,
+    name: encounterCreature.name,
     quantity,
-    role: generatedCreature.role || null,
+    role: encounterCreature.role || null,
     roleLabel,
-    type: generatedCreature.type,
+    type: encounterCreature.type,
     typeLabel
   };
 }
 
-function getCreatureSummary(creature, quantity) {
-  const roleLabel = creature.roleMetadata?.label || creature.role || "Papel não definido";
-  const typeLabel = CREATURE_TYPE_LABELS[creature.type] || creature.type;
+function getCreatureSummary(creature, quantity, rng = null) {
+  const encounterCreature = rng ? applyWeaponVariation(creature, rng) : creature;
+  const roleLabel = encounterCreature.roleMetadata?.label || encounterCreature.role || "Papel não definido";
+  const typeLabel = CREATURE_TYPE_LABELS[encounterCreature.type] || encounterCreature.type;
 
   return {
-    challengeLabel: formatChallengeRating(creature.challengeRating),
-    challengeRating: creature.challengeRating,
+    challengeLabel: formatChallengeRating(encounterCreature.challengeRating),
+    challengeRating: encounterCreature.challengeRating,
+    creatureData: encounterCreature.weaponVariation ? encounterCreature : undefined,
     creatureId: creature.id,
     kind: "creature",
-    name: creature.name,
+    name: encounterCreature.name,
     quantity,
-    role: creature.role || null,
+    role: encounterCreature.role || null,
     roleLabel,
-    type: creature.type,
+    type: encounterCreature.type,
     typeLabel
   };
 }
@@ -294,10 +306,10 @@ function getTrapSummary(trap) {
   };
 }
 
-function resolveSpecificCreature(node) {
+function resolveSpecificCreature(node, rng) {
   const creature = node.creature?.creatureId ? getCreatureById(node.creature.creatureId) : null;
 
-  return creature ? [getCreatureSummary(creature, 1)] : [];
+  return creature ? [getCreatureSummary(creature, 1, rng)] : [];
 }
 
 // Per T20 rules: to hit a target ND with `totalCount` creatures of equal CR,
@@ -361,7 +373,7 @@ function removeLeastCR(current) {
 // Post-generation validation: adjust the group iteratively until its actual T20 ND
 // matches targetChallenge. Adds creatures to fill a deficit; removes the lowest-CR
 // creature to fix an excess or when addition is mathematically impossible.
-function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
+function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, allowedIds = null) {
   if (items.length === 0) return items;
   const MAX_ITER = 10;
   const current = items.map(i => ({ ...i }));
@@ -403,6 +415,7 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
           rng,
           excludedIds: new Set(),
           preferredSubtype: leadCreature?.subtype ?? null,
+          allowedIds,
         });
 
         // Use the catalog creature only if it's reasonably close to the needed CR;
@@ -413,7 +426,7 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
           if (existing) {
             existing.quantity++;
           } else {
-            current.push(getCreatureSummary(added, 1));
+            current.push(getCreatureSummary(added, 1, rng));
           }
           continue;
         }
@@ -423,7 +436,7 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
         if (leadCreature && neededCR >= 1 && neededCR > leadCreature.challengeRating + 0.5) {
           const elite = createEliteVariant(leadCreature, neededCR);
           if (elite) {
-            current.push(getEliteCreatureSummary(elite, 1));
+            current.push(getEliteCreatureSummary(elite, 1, rng));
             continue;
           }
         }
@@ -436,7 +449,7 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
         if (solo && targetChallenge > solo.challengeRating + 0.5) {
           const elite = createEliteVariant(solo, targetChallenge);
           if (elite) {
-            current[0] = getEliteCreatureSummary(elite, 1);
+            current[0] = getEliteCreatureSummary(elite, 1, rng);
             continue;
           }
         }
@@ -458,12 +471,13 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng) {
 function resolveCreatureGroup(node, rng) {
   if (!node.creature || !node.challenge || node.challenge.creatures <= 0) return [];
 
-  const specificCreatureItems = resolveSpecificCreature(node);
+  const specificCreatureItems = resolveSpecificCreature(node, rng);
   if (specificCreatureItems.length > 0) return specificCreatureItems;
 
   const targetChallenge = node.creature.targetChallenge ?? node.challenge.creatures;
   const terrainName = getTerrainName(node);
   const type = node.creature.type;
+  const allowedIds = node.creature.allowedCreatureIds || null;
 
   // Each size option produces a group whose actual combat ND equals targetChallenge
   // (per T20 doubling rule) when all creatures have CR = requiredCR.
@@ -478,13 +492,13 @@ function resolveCreatureGroup(node, rng) {
   const { totalCount } = pickWeighted(rng, sizeOptions);
   const requiredCR = getRequiredCreatureCR(targetChallenge, totalCount);
 
-  const lead = pickCreatureForChallenge({ type, targetChallenge: requiredCR, terrainName, rng, excludedIds: new Set() });
+  const lead = pickCreatureForChallenge({ type, targetChallenge: requiredCR, terrainName, rng, excludedIds: new Set(), allowedIds });
   if (!lead) return [];
 
   let rawItems;
 
   if (totalCount === 1) {
-    rawItems = [getCreatureSummary(lead, 1)];
+    rawItems = [getCreatureSummary(lead, 1, rng)];
   } else {
     // 75% homogeneous (all same creature), 25% mixed (lead + one support type)
     const { mixed } = pickWeighted(rng, [
@@ -493,7 +507,7 @@ function resolveCreatureGroup(node, rng) {
     ]);
 
     if (!mixed) {
-      rawItems = [getCreatureSummary(lead, totalCount)];
+      rawItems = [getCreatureSummary(lead, totalCount, rng)];
     } else {
       // Mixed: support gets ~1/3 of slots, lead gets the rest
       const supportCount = Math.max(1, Math.floor(totalCount / 3));
@@ -511,15 +525,16 @@ function resolveCreatureGroup(node, rng) {
         targetChallenge: requiredCR,
         terrainName,
         type: crossType ? null : type,
+        allowedIds,
       });
 
       rawItems = support
-        ? [getCreatureSummary(lead, leadCount), getCreatureSummary(support, supportCount)]
-        : [getCreatureSummary(lead, totalCount)];
+        ? [getCreatureSummary(lead, leadCount, rng), getCreatureSummary(support, supportCount, rng)]
+        : [getCreatureSummary(lead, totalCount, rng)];
     }
   }
 
-  return refineEncounterGroup(rawItems, targetChallenge, type, terrainName, rng);
+  return refineEncounterGroup(rawItems, targetChallenge, type, terrainName, rng, allowedIds);
 }
 
 function getEncounterSeed(node, mapSeed) {
@@ -527,7 +542,9 @@ function getEncounterSeed(node, mapSeed) {
 }
 
 export function resolveNodeEncounter(node, { mapSeed } = {}) {
-  if (!node || node.resolvedEncounter) return node?.resolvedEncounter || null;
+  if (!node) return null;
+  if (node.resolvedEncounter?.version === ENCOUNTER_RESOLUTION_VERSION) return node.resolvedEncounter;
+  if (node.resolvedEncounter) node.resolvedEncounter = null;
   if (!node.creature && !node.trap) return null;
 
   const seed = getEncounterSeed(node, mapSeed);
@@ -554,4 +571,3 @@ export function resolveNodeEncounter(node, { mapSeed } = {}) {
 
   return node.resolvedEncounter;
 }
-

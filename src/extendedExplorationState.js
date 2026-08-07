@@ -845,6 +845,8 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
   let log = [];
   let elapsedMinutes = 0;
   let pendingSceneEffects = [];
+  let resetPending = false;
+  let descentPending = false;
 
   function addLog(message, kind) {
     log = [createLogEntry(message, kind), ...log].slice(0, INITIAL_LOG_LIMIT);
@@ -858,6 +860,8 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     currentResults = [];
     finalEncounter = null;
     pendingSceneEffects = [];
+    resetPending = false;
+    descentPending = false;
     phase = floor === 10 ? "boss" : "exploring";
     addLog(message, "reset");
   }
@@ -900,6 +904,8 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     currentResults = [];
     finalEncounter = null;
     pendingSceneEffects = [];
+    resetPending = false;
+    descentPending = false;
     phase = floor === 10 ? "boss" : "exploring";
     addLog(
       floor === 10
@@ -907,6 +913,21 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
         : `O grupo entrou no andar ${floor}.`,
       "floor"
     );
+  }
+
+  function sceneHasPitTrap(scene) {
+    return Boolean(scene?.encounterNode?.trap?.tags?.includes("fosso"));
+  }
+
+  function hasPitTrapResult(results) {
+    return results.some(sceneHasPitTrap);
+  }
+
+  function refreshSceneEncounter(scene) {
+    if (!scene?.encounterNode) return scene;
+
+    resolveNodeEncounter(scene.encounterNode, { mapSeed: `extended-floor-${floor}` });
+    return scene;
   }
 
   function initialize(nextProfile, nextFloor, nextRng, sessionState = null) {
@@ -919,12 +940,15 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       successes = sessionState.successes || 0;
       failures = sessionState.failures || 0;
       usedApproachIds = new Set(sessionState.usedApproachIds || sessionState.usedSuccessfulSkills || []);
-      currentResult = sessionState.currentResult || null;
-      currentResults = sessionState.currentResults || (currentResult ? [currentResult] : []);
-      finalEncounter = sessionState.finalEncounter || null;
+      currentResult = refreshSceneEncounter(sessionState.currentResult || null);
+      currentResults = (sessionState.currentResults || (currentResult ? [currentResult] : []))
+        .map(refreshSceneEncounter);
+      finalEncounter = refreshSceneEncounter(sessionState.finalEncounter || null);
       log = sessionState.log || [];
       elapsedMinutes = sessionState.elapsedMinutes || 0;
       pendingSceneEffects = sessionState.pendingSceneEffects || [];
+      resetPending = Boolean(sessionState.resetPending);
+      descentPending = Boolean(sessionState.descentPending ?? hasPitTrapResult(currentResults));
       return;
     }
 
@@ -939,6 +963,8 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     log = [];
     elapsedMinutes = 0;
     pendingSceneEffects = [];
+    resetPending = false;
+    descentPending = false;
     addLog(
       phase === "boss"
         ? "A exploração começa na sala da Matriarca Aracnídea."
@@ -1031,10 +1057,26 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
 
   function applyOutcome(outcome, approachId, manualRolls = []) {
     if (phase !== "exploring") return;
+    if (resetPending) {
+      addLog("Resolva a cena atual antes de retornar ao início do andar.", "warning");
+      return;
+    }
 
     const rules = getFloorRules(activeProfile, floor);
     const approach = getFloorApproaches(activeProfile, floor).find((candidate) => candidate.id === approachId)
       || getApproach(activeProfile, approachId);
+
+    if (descentPending) {
+      if (failures >= rules.failureLimit) {
+        descentPending = false;
+        resetPending = true;
+        addLog("O grupo deixou o fosso para trás, mas o limite de falhas foi atingido. Resolva a cena atual; depois retorne ao início do andar.", "warning");
+        return;
+      }
+
+      descentPending = false;
+      addLog("O grupo deixou o fosso para trás e continuou explorando o andar atual.", "state");
+    }
 
     if (usedApproachIds.has(approach.id)) {
       addLog(`${approach.label} já foi usada neste andar. Escolha outra ação.`, "warning");
@@ -1074,9 +1116,46 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     }
     currentResult = currentResults[currentResults.length - 1] || null;
 
-    if (failures >= rules.failureLimit) {
-      resetFloorProgress("Falhas demais: o grupo retornou ao início do andar e zerou o progresso.");
+    if (hasPitTrapResult(currentResults) && floor < 10) {
+      descentPending = true;
+      addLog("Fosso encontrado. Resolva a cena atual; depois o grupo pode descer para o próximo andar.", "warning");
     }
+
+    if (failures >= rules.failureLimit && !descentPending) {
+      failures = rules.failureLimit;
+      resetPending = true;
+      addLog("Limite de falhas atingido. Resolva a cena atual; depois retorne ao início do andar.", "warning");
+    }
+  }
+
+  function confirmFloorReset() {
+    if (!resetPending) return;
+
+    resetFloorProgress("Falhas demais: depois de resolver a cena, o grupo retornou ao início do andar e zerou o progresso.");
+  }
+
+  function confirmPitDescent() {
+    if (!descentPending) return;
+
+    const nextFloor = Math.min(floor + 1, 10);
+    enterFloor(nextFloor);
+    addLog(`O grupo desceu pelo fosso até o andar ${nextFloor}.`, "floor");
+  }
+
+  function dismissPitDescent() {
+    if (!descentPending) return;
+
+    descentPending = false;
+    const rules = getFloorRules(activeProfile, floor);
+
+    if (rules && failures >= rules.failureLimit) {
+      failures = rules.failureLimit;
+      resetPending = true;
+      addLog("O grupo contornou o fosso, mas o limite de falhas foi atingido. Resolva a cena atual; depois retorne ao início do andar.", "warning");
+      return;
+    }
+
+    addLog("O grupo contornou o fosso e continuou explorando o andar atual.", "state");
   }
 
   function resolveFinalEncounter() {
@@ -1124,6 +1203,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     return {
       currentResult,
       currentResults,
+      descentPending,
       elapsedMinutes,
       failures,
       finalEncounter,
@@ -1131,6 +1211,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       log,
       pendingSceneEffects,
       phase,
+      resetPending,
       successes,
       usedApproachIds: [...usedApproachIds],
       usedSuccessfulSkills: [...usedApproachIds]
@@ -1152,6 +1233,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       bossEncounter: phase === "boss" ? getBossEncounter() : null,
       currentResult,
       currentResults,
+      descentPending,
       elapsedMinutes,
       failures,
       finalEncounter,
@@ -1159,6 +1241,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       log,
       pendingSceneEffects,
       phase,
+      resetPending,
       rules: rulesWithTime,
       successes,
       tier,
@@ -1171,6 +1254,9 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
   return {
     advanceFloor,
     applyOutcome,
+    confirmFloorReset,
+    confirmPitDescent,
+    dismissPitDescent,
     exportSessionState,
     getElapsedMinutes: () => elapsedMinutes,
     getSnapshot,

@@ -121,6 +121,22 @@ const extendedExplorationRenderer = createExtendedExplorationRenderer({
     refreshExplorationDisplay();
     updateInfo();
   },
+  onConfirmFloorReset: () => {
+    extendedState.confirmFloorReset();
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onConfirmPitDescent: () => {
+    extendedState.confirmPitDescent();
+    elements.floorInput.value = String(extendedState.getSnapshot().floor);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onDismissPitDescent: () => {
+    extendedState.dismissPitDescent();
+    refreshExplorationDisplay();
+    updateInfo();
+  },
   onOutcome: (outcome, approachId, manualRolls) => {
     extendedState.applyOutcome(outcome, approachId, manualRolls);
     refreshExplorationDisplay();

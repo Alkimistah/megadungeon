@@ -1,0 +1,868 @@
+[
+  {
+    "nome": "Adaga",
+    "categoria": "simples",
+    "tipo": [
+      "corpo a corpo",
+      "arremesso"
+    ],
+    "empunhadura": [
+      "leve"
+    ],
+    "dano": "1d4",
+    "critico": "19",
+    "alcance": "curto",
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Faca pequena e fácil de esconder, comum entre habitantes do Reinado e especialmente útil para quem precisa portar uma arma discreta.",
+    "observacoes": "Fornece +5 em testes de Ladinagem para ocultá-la. Nos ataques, pode usar Destreza em vez de Força. Pode ser arremessada.",
+    "tags": [
+      "ocultável",
+      "destreza no ataque",
+      "arremesso"
+    ]
+  },
+  {
+    "nome": "Espada curta",
+    "categoria": "simples",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "leve"
+    ],
+    "dano": "1d6",
+    "critico": "19",
+    "alcance": null,
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Espada curta e comum, usada por guardas e como arma secundária por guerreiros.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Foice",
+    "categoria": "simples",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "leve"
+    ],
+    "dano": "1d6",
+    "critico": "x3",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Ferramenta agrícola de lâmina curva também usada como arma, tradicional entre druidas.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Clava",
+    "categoria": "simples",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d6",
+    "critico": "x2",
+    "alcance": null,
+    "tipoDano": [
+      "impacto"
+    ],
+    "descricao": "Pedaço de madeira usado como arma; pode representar galhos, pedaços de mobília e objetos semelhantes.",
+    "observacoes": "Seu preço é zero.",
+    "tags": [
+      "preço zero"
+    ]
+  },
+  {
+    "nome": "Lança",
+    "categoria": "simples",
+    "tipo": [
+      "corpo a corpo",
+      "arremesso"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d6",
+    "critico": "x2",
+    "alcance": "curto",
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Haste de madeira com ponta afiada, simples de fabricar e muito comum.",
+    "observacoes": "Pode ser arremessada.",
+    "tags": [
+      "arremesso"
+    ]
+  },
+  {
+    "nome": "Maça",
+    "categoria": "simples",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d8",
+    "critico": "x2",
+    "alcance": null,
+    "tipoDano": [
+      "impacto"
+    ],
+    "descricao": "Bastão com uma cabeça pesada e protuberante, usado para esmagar o alvo.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Bordão",
+    "categoria": "simples",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "1d6/1d6",
+    "critico": "x2",
+    "alcance": null,
+    "tipoDano": [
+      "impacto"
+    ],
+    "descricao": "Cajado simples, comum entre viajantes e camponeses.",
+    "observacoes": "É uma arma dupla. Seu preço é zero.",
+    "tags": [
+      "dupla",
+      "preço zero"
+    ]
+  },
+  {
+    "nome": "Pique",
+    "categoria": "simples",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "1d8",
+    "critico": "x2",
+    "alcance": null,
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Uma lança muito longa, feita para manter o inimigo afastado.",
+    "observacoes": "É uma arma alongada.",
+    "tags": [
+      "alongada"
+    ]
+  },
+  {
+    "nome": "Tacape",
+    "categoria": "simples",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "1d10",
+    "critico": "x2",
+    "alcance": null,
+    "tipoDano": [
+      "impacto"
+    ],
+    "descricao": "Versão maior e mais brutal de uma clava, às vezes reforçada com pregos.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Azagaia",
+    "categoria": "simples",
+    "tipo": [
+      "arremesso",
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d6",
+    "critico": "x2",
+    "alcance": "médio",
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Lança leve e flexível feita principalmente para ser arremessada.",
+    "observacoes": "Pode ser usada em corpo a corpo, mas com penalidade de –5 no teste de ataque.",
+    "tags": [
+      "arremesso",
+      "corpo a corpo com penalidade"
+    ]
+  },
+  {
+    "nome": "Besta leve",
+    "categoria": "simples",
+    "tipo": [
+      "distância"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d8",
+    "critico": "19",
+    "alcance": "médio",
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Arco montado sobre uma coronha, disparado por gatilho e carregado com virotes.",
+    "observacoes": "Recarregar é uma ação de movimento.",
+    "tags": [
+      "disparo",
+      "virotes",
+      "recarga: movimento"
+    ]
+  },
+  {
+    "nome": "Funda",
+    "categoria": "simples",
+    "tipo": [
+      "distância"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d4",
+    "critico": "x2",
+    "alcance": "médio",
+    "tipoDano": [
+      "impacto"
+    ],
+    "descricao": "Tira de couro usada para lançar pedras polidas.",
+    "observacoes": "Pode usar pedras comuns, reduzindo o dano em um passo. Recarregar é uma ação de movimento. Aplica Força às rolagens de dano.",
+    "tags": [
+      "disparo",
+      "pedras",
+      "força no dano",
+      "recarga: movimento"
+    ]
+  },
+  {
+    "nome": "Arco curto",
+    "categoria": "simples",
+    "tipo": [
+      "distância"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "1d6",
+    "critico": "x3",
+    "alcance": "médio",
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Arco comum, usado para caça e também por milícias e exércitos menos equipados.",
+    "observacoes": "Pode ser usado montado.",
+    "tags": [
+      "disparo",
+      "flechas",
+      "uso montado"
+    ]
+  },
+  {
+    "nome": "Machadinha",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo",
+      "arremesso"
+    ],
+    "empunhadura": [
+      "leve"
+    ],
+    "dano": "1d6",
+    "critico": "x3",
+    "alcance": "curto",
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Pequeno machado útil tanto como ferramenta quanto como arma.",
+    "observacoes": "Pode ser arremessada.",
+    "tags": [
+      "arremesso"
+    ]
+  },
+  {
+    "nome": "Cimitarra",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d6",
+    "critico": "18",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Espada de lâmina curva e muito afiada.",
+    "observacoes": "É uma arma ágil.",
+    "tags": [
+      "ágil"
+    ]
+  },
+  {
+    "nome": "Espada longa",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d8",
+    "critico": "19",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Espada reta de dois gumes, típica de soldados e guerreiros.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Florete",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d6",
+    "critico": "18",
+    "alcance": null,
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Espada de lâmina fina e leve, feita para golpes precisos.",
+    "observacoes": "É uma arma ágil.",
+    "tags": [
+      "ágil"
+    ]
+  },
+  {
+    "nome": "Machado de batalha",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d8",
+    "critico": "x3",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Machado adaptado especificamente para combate, capaz de causar ferimentos graves.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Mangual",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d8",
+    "critico": "x2",
+    "alcance": null,
+    "tipoDano": [
+      "impacto"
+    ],
+    "descricao": "Haste ligada por corrente a uma esfera de aço, capaz de se enroscar em armas inimigas.",
+    "observacoes": "É uma arma versátil e fornece +2 em testes para desarmar.",
+    "tags": [
+      "versátil",
+      "+2 desarmar"
+    ]
+  },
+  {
+    "nome": "Martelo de guerra",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d8",
+    "critico": "x3",
+    "alcance": null,
+    "tipoDano": [
+      "impacto"
+    ],
+    "descricao": "Ferramenta adaptada para combate, especialmente popular entre anões.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Picareta",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d6",
+    "critico": "x4",
+    "alcance": null,
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Ferramenta de mineração com ponta capaz de perfurar materiais resistentes.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Tridente",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo",
+      "arremesso"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d8",
+    "critico": "x2",
+    "alcance": "curto",
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Lança de três pontas, tradicional entre povos marinhos e gladiadores.",
+    "observacoes": "É uma arma versátil, fornece +2 em testes para derrubar e pode ser arremessada.",
+    "tags": [
+      "versátil",
+      "+2 derrubar",
+      "arremesso"
+    ]
+  },
+  {
+    "nome": "Alabarda",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "1d10",
+    "critico": "x3",
+    "alcance": null,
+    "tipoDano": [
+      "corte",
+      "perfuração"
+    ],
+    "descricao": "Haste longa com lâmina de machado na ponta.",
+    "observacoes": "É uma arma alongada.",
+    "tags": [
+      "alongada"
+    ]
+  },
+  {
+    "nome": "Alfange",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "2d4",
+    "critico": "18",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Versão maior da cimitarra, com lâmina larga e curva.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Gadanho",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "2d4",
+    "critico": "x4",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Versão maior da foice, originalmente criada para ceifar cereais.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Lança montada",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos",
+      "uma mão quando montado"
+    ],
+    "dano": "1d8",
+    "critico": "x3",
+    "alcance": null,
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Lança longa própria para combate montado.",
+    "observacoes": "É uma arma alongada. Quando montado, pode ser usada com uma mão. Em uma investida montada, causa +2d8 de dano; os dados extras não são multiplicados em crítico.",
+    "tags": [
+      "alongada",
+      "montaria",
+      "investida montada: +2d8"
+    ]
+  },
+  {
+    "nome": "Machado de guerra",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "1d12",
+    "critico": "x3",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Machado enorme de lâmina dupla, construído para golpes devastadores.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Marreta",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "3d4",
+    "critico": "x2",
+    "alcance": null,
+    "tipoDano": [
+      "impacto"
+    ],
+    "descricao": "Haste resistente com uma cabeça muito pesada de metal ou pedra.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Montante",
+    "categoria": "marcial",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "2d6",
+    "critico": "19",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Espada muito grande e pesada, com cerca de 1,5 m de comprimento.",
+    "observacoes": null,
+    "tags": []
+  },
+  {
+    "nome": "Arco longo",
+    "categoria": "marcial",
+    "tipo": [
+      "distância"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "1d8",
+    "critico": "x3",
+    "alcance": "médio",
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Arco reforçado de grande porte, voltado principalmente para uso militar.",
+    "observacoes": "Permite aplicar Força às rolagens de dano. Não pode ser usado enquanto estiver montado.",
+    "tags": [
+      "disparo",
+      "flechas",
+      "força no dano",
+      "não pode usar montado"
+    ]
+  },
+  {
+    "nome": "Besta pesada",
+    "categoria": "marcial",
+    "tipo": [
+      "distância"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "1d12",
+    "critico": "19",
+    "alcance": "médio",
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Versão maior e mais potente da besta leve.",
+    "observacoes": "Recarregar é uma ação padrão.",
+    "tags": [
+      "disparo",
+      "virotes",
+      "recarga: padrão"
+    ]
+  },
+  {
+    "nome": "Chicote",
+    "categoria": "exótica",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": "1d3",
+    "critico": "x2",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Chicote capaz de atingir e se enroscar em inimigos, membros ou armas.",
+    "observacoes": "Pode atacar inimigos a até 4,5 m. É ágil e versátil, fornecendo +2 em testes para derrubar ou desarmar.",
+    "tags": [
+      "alcance 4,5 m",
+      "ágil",
+      "versátil",
+      "+2 derrubar",
+      "+2 desarmar"
+    ]
+  },
+  {
+    "nome": "Espada bastarda",
+    "categoria": "exótica",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão",
+      "duas mãos"
+    ],
+    "dano": "1d10/1d12",
+    "critico": "19",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Espada maior e mais pesada que a espada longa, tradicional entre cavaleiros de Bielefeld.",
+    "observacoes": "É adaptável. Com uma mão, exige treinamento como arma exótica; com duas mãos, pode ser usada como arma marcial.",
+    "tags": [
+      "adaptável",
+      "exótica com uma mão",
+      "marcial com duas mãos"
+    ]
+  },
+  {
+    "nome": "Katana",
+    "categoria": "exótica",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão",
+      "duas mãos"
+    ],
+    "dano": "1d8/1d10",
+    "critico": "19",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Espada tradicional do samurai, de lâmina levemente curva e um único gume.",
+    "observacoes": "É adaptável e ágil. Com uma mão, exige treinamento como arma exótica; com duas mãos, pode ser usada como arma marcial.",
+    "tags": [
+      "adaptável",
+      "ágil",
+      "exótica com uma mão",
+      "marcial com duas mãos"
+    ]
+  },
+  {
+    "nome": "Machado anão",
+    "categoria": "exótica",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "uma mão",
+      "duas mãos"
+    ],
+    "dano": "1d10",
+    "critico": "x3",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Machado de grande porte tradicionalmente associado a guerreiros anões.",
+    "observacoes": "Com uma mão, exige treinamento como arma exótica; com duas mãos, pode ser usado como arma marcial.",
+    "tags": [
+      "exótica com uma mão",
+      "marcial com duas mãos"
+    ]
+  },
+  {
+    "nome": "Corrente de espinhos",
+    "categoria": "exótica",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "2d4/2d4",
+    "critico": "19",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Corrente armada com espinhos, capaz de atacar a distância curta de corpo a corpo e de enroscar adversários e armas.",
+    "observacoes": "Pode atacar inimigos a até 4,5 m. É ágil, dupla e versátil, fornecendo +2 em testes para derrubar ou desarmar.",
+    "tags": [
+      "alcance 4,5 m",
+      "ágil",
+      "dupla",
+      "versátil",
+      "+2 derrubar",
+      "+2 desarmar"
+    ]
+  },
+  {
+    "nome": "Machado táurico",
+    "categoria": "exótica",
+    "tipo": [
+      "corpo a corpo"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "2d8",
+    "critico": "x3",
+    "alcance": null,
+    "tipoDano": [
+      "corte"
+    ],
+    "descricao": "Machado ancestral dos minotauros, com haste longa e lâmina extremamente grossa.",
+    "observacoes": "É uma arma desbalanceada.",
+    "tags": [
+      "desbalanceada"
+    ]
+  },
+  {
+    "nome": "Rede",
+    "categoria": "exótica",
+    "tipo": [
+      "distância"
+    ],
+    "empunhadura": [
+      "uma mão"
+    ],
+    "dano": null,
+    "critico": null,
+    "alcance": "curto",
+    "tipoDano": [],
+    "descricao": "Rede com pequenos dentes e uma corda usada para controlar inimigos presos.",
+    "observacoes": "Ao acertar, não causa dano; o alvo fica enredado: deslocamento pela metade, não pode correr nem fazer investidas e sofre –2 na Defesa e em testes de ataque. Enquanto segura a corda, você pode tentar limitar o movimento do alvo com teste oposto de Força. O alvo pode se soltar com uma ação completa e teste de Força ou Acrobacia CD 20. A rede tem 5 PV e só pode afetar criaturas até uma categoria de tamanho maior que você.",
+    "tags": [
+      "enredar",
+      "controle",
+      "sem dano",
+      "5 PV",
+      "limite de tamanho"
+    ]
+  },
+  {
+    "nome": "Pistola",
+    "categoria": "arma de fogo",
+    "tipo": [
+      "distância"
+    ],
+    "empunhadura": [
+      "leve"
+    ],
+    "dano": "2d6",
+    "critico": "19/x3",
+    "alcance": "curto",
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "A arma de fogo mais comum.",
+    "observacoes": "Recarregar é uma ação padrão.",
+    "tags": [
+      "arma de fogo",
+      "balas",
+      "recarga: padrão"
+    ]
+  },
+  {
+    "nome": "Mosquete",
+    "categoria": "arma de fogo",
+    "tipo": [
+      "distância"
+    ],
+    "empunhadura": [
+      "duas mãos"
+    ],
+    "dano": "2d8",
+    "critico": "19/x3",
+    "alcance": "médio",
+    "tipoDano": [
+      "perfuração"
+    ],
+    "descricao": "Arma de fogo difícil de usar, mas de grande poder destrutivo.",
+    "observacoes": "Recarregar é uma ação padrão.",
+    "tags": [
+      "arma de fogo",
+      "balas",
+      "recarga: padrão"
+    ]
+  }
+]

@@ -127,6 +127,7 @@ function createApproachControls(snapshot, selectedApproachId, setSelectedApproac
   const selectedApproach = snapshot.approaches.find((approach) => approach.id === selectedApproachId)
     || snapshot.approaches[0];
   const selectedApproachAlreadyUsed = snapshot.usedApproachIds.includes(selectedApproach.id);
+  const actionsDisabled = selectedApproachAlreadyUsed || snapshot.resetPending;
   const dc = createElement("p", "extended-dc", getDcText(snapshot.rules, selectedApproach));
   const prompt = createElement("p", "extended-approach-prompt", getApproachPrompt(selectedApproach));
   const rollLabel = createElement("label");
@@ -159,10 +160,10 @@ function createApproachControls(snapshot, selectedApproachId, setSelectedApproac
   rollLabel.appendChild(rollText);
   rollLabel.appendChild(rollInput);
 
-  buttons.appendChild(createButton("Sucesso", "extended-action", () => onOutcome("success", parseManualRolls(rollInput.value)), selectedApproachAlreadyUsed));
-  buttons.appendChild(createButton("Sucesso +5", "extended-action", () => onOutcome("criticalSuccess", parseManualRolls(rollInput.value)), selectedApproachAlreadyUsed));
-  buttons.appendChild(createButton("Falha", "extended-action is-danger", () => onOutcome("failure", parseManualRolls(rollInput.value)), selectedApproachAlreadyUsed));
-  buttons.appendChild(createButton("Falha +5", "extended-action is-danger", () => onOutcome("criticalFailure", parseManualRolls(rollInput.value)), selectedApproachAlreadyUsed));
+  buttons.appendChild(createButton("Sucesso", "extended-action", () => onOutcome("success", parseManualRolls(rollInput.value)), actionsDisabled));
+  buttons.appendChild(createButton("Sucesso +5", "extended-action", () => onOutcome("criticalSuccess", parseManualRolls(rollInput.value)), actionsDisabled));
+  buttons.appendChild(createButton("Falha", "extended-action is-danger", () => onOutcome("failure", parseManualRolls(rollInput.value)), actionsDisabled));
+  buttons.appendChild(createButton("Falha +5", "extended-action is-danger", () => onOutcome("criticalFailure", parseManualRolls(rollInput.value)), actionsDisabled));
 
   controls.appendChild(approachLabel);
   controls.appendChild(rollLabel);
@@ -251,6 +252,27 @@ function createCurrentResult(snapshot, selectedEncounterItemByScene, onSelectIte
     section.appendChild(scene);
   });
 
+  return section;
+}
+
+function createPendingResetPanel(snapshot, onConfirmFloorReset) {
+  if (!snapshot.resetPending) return null;
+
+  const section = createElement("section", "extended-panel reset-pending-panel");
+  section.appendChild(createElement("h3", null, "Retorno ao início"));
+  section.appendChild(createElement("p", "result-detail", "O limite de falhas foi atingido. Resolva a cena atual antes de zerar o progresso do andar."));
+  section.appendChild(createButton("Retornar ao início do andar", "extended-action is-danger", onConfirmFloorReset));
+  return section;
+}
+
+function createPendingDescentPanel(snapshot, onConfirmPitDescent, onDismissPitDescent) {
+  if (!snapshot.descentPending) return null;
+
+  const section = createElement("section", "extended-panel pit-descent-panel");
+  section.appendChild(createElement("h3", null, "Descida pelo fosso"));
+  section.appendChild(createElement("p", "result-detail", "Uma armadilha de fosso leva ao andar inferior. O grupo pode descer ou continuar explorando o andar atual."));
+  section.appendChild(createButton("Descer para o próximo andar", "extended-action", onConfirmPitDescent));
+  section.appendChild(createButton("Continuar neste andar", "extended-action", onDismissPitDescent));
   return section;
 }
 
@@ -452,11 +474,15 @@ export function createExtendedExplorationRenderer({
   container,
   getSnapshot,
   onAdvanceFloor,
+  onConfirmFloorReset,
+  onConfirmPitDescent,
+  onDismissPitDescent,
   onOutcome,
   onResolveFinalEncounter,
   onRerollTacticalMap
 }) {
   let selectedApproachId = null;
+  let selectedFloor = null;
   const manualRollInput = { value: "" };
   const selectedEncounterItemByScene = new Map();
 
@@ -467,9 +493,13 @@ export function createExtendedExplorationRenderer({
 
   function render() {
     const snapshot = getSnapshot();
+    const firstApproachId = snapshot.approaches[0]?.id || null;
+    const selectedApproachExists = snapshot.approaches.some((approach) => approach.id === selectedApproachId);
 
-    if (!selectedApproachId && snapshot.approaches.length) {
-      selectedApproachId = snapshot.approaches[0].id;
+    if (selectedFloor !== snapshot.floor || !selectedApproachExists) {
+      selectedApproachId = firstApproachId;
+      manualRollInput.value = "";
+      selectedFloor = snapshot.floor;
     }
 
     container.innerHTML = "";
@@ -506,6 +536,19 @@ export function createExtendedExplorationRenderer({
         }
       );
       left.appendChild(currentEncounter);
+      const resetPanel = createPendingResetPanel(snapshot, () => {
+        onConfirmFloorReset();
+        render();
+      });
+      if (resetPanel) left.appendChild(resetPanel);
+      const descentPanel = createPendingDescentPanel(snapshot, () => {
+        onConfirmPitDescent();
+        render();
+      }, () => {
+        onDismissPitDescent();
+        render();
+      });
+      if (descentPanel) left.appendChild(descentPanel);
 
       const finalSceneId = snapshot.finalEncounter?.encounterNode?.id;
       left.appendChild(createFinalEncounter(

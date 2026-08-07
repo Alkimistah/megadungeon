@@ -481,6 +481,8 @@ Criar ou separar:
 - Ações de exploração específicas no formato `Perícia: Ação`, com 10 opções por andar.
 - Repetição de perícia permitida quando a ação é diferente; uma mesma ação não se repete no andar.
 - Qualquer resultado de teste bloqueia a ação usada no andar, seja sucesso ou falha.
+- Ao atingir o limite de falhas, a cena da última falha permanece ativa; o reset do andar só acontece quando o mestre confirma o retorno ao início.
+- Armadilhas com tag `fosso` nos andares 1 a 9 oferecem uma descida opcional: após resolver a cena, o mestre pode avançar para o próximo andar ou continuar explorando o andar atual.
 - Textos temáticos por ação aparecem abaixo da CD e no log de resolução.
 - Tempo base ajustado para 1 a 9 minutos nos andares 1 a 9, mantendo multiplicadores por ação.
 - Mapa tático com visualização expandida em tela cheia.
@@ -493,6 +495,7 @@ Criar ou separar:
 - Grupo iniciado junto em 4 quadrados adjacentes.
 - Armadilhas representadas como zonas de múltiplas células que podem bloquear ou pressionar o caminho.
 - Aranha Matriarca e filhotes adicionados ao catálogo de criaturas.
+- Encontros podem sortear armas compatíveis para criaturas armadas Pequenas ou Médias, preservando bônus de ataque e modificadores de dano da ficha base.
 
 ### Parcialmente Implementado
 
@@ -519,6 +522,7 @@ Criar ou separar:
 - Permitir edição leve do mapa tático, como mover grupo, inimigos, armadilhas e portas, antes de considerar edição célula por célula.
 - Exibir objetivo tático da cena, por exemplo "atravessar a armadilha", "segurar gargalo", "alcançar a porta", "interromper ritual" ou "sobreviver à emboscada".
 - Fazer o gerador de mapa considerar papéis de inimigo, como solo, grupo, enxame, atirador, defensor ou criatura que usa teias.
+- Fazer o mapa tático respeitar tamanho de criatura: Pequenas e Médias ocupam 1 quadrado; Grandes ocupam 2x2 quadrados adjacentes.
 - Adicionar validações automáticas de mapa por tipo de layout: número esperado de saídas, conectividade, distância inicial, cobertura e relevância da armadilha.
 - Criar prévias ou presets de mapas especiais para encontros finais e chefe.
 
