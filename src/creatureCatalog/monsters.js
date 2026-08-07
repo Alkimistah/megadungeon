@@ -236,6 +236,45 @@ export const aranhaGigante = {
     skillsText: null
 };
 
+export const aranhaMatriarca = {
+    id: "aranha-matriarca",
+    name: "Aranha Matriarca",
+    type: "monster",
+    subtype: "aranha",
+    size: "Grande",
+    challengeRating: 4,
+    description: [
+        "No coração de uma câmara tomada por seda grossa, casulos antigos e fios que tremem ao menor passo, a matriarca observa sua presa sem pressa.",
+        "Maior, mais velha e mais astuta que uma aranha gigante comum, ela usa o próprio covil como extensão do corpo, isolando aventureiros antes de afundar as presas."
+    ],
+    role: "solo",
+    roleSource: "custom",
+    source: { book: "Masmorra de Práxis", pdfFile: "aranha_matriarca_tormenta20_v2", pdfPage: null, bookPage: null },
+    stats: {
+        initiative: 10, perception: 8, defense: 23, fortitude: 16, reflex: 10, will: 4,
+        hitPoints: 140,
+        speedText: "12m (8q), escalar 12m (8q)",
+        senses: "visão no escuro",
+        defensesText: null,
+        attributes: { str: 5, dex: 4, con: 4, int: -5, wis: 1, cha: -4 }
+    },
+    actions: [
+        { name: "Corpo a Corpo", text: "2 mordidas +16 (2d8+3 mais veneno)." }
+    ],
+    abilities: [
+        { name: "Teia da Matriarca", timing: "padrão", text: "A aranha matriarca dispara uma massa de teias em um quadrado de 3m de lado em alcance curto. Criaturas na área ficam enredadas (Reflexos CD 18 evita). Uma criatura enredada pode se soltar com uma ação completa e um teste de Força ou Acrobacia (CD 20), ou cortando a teia (cada espaço de 1,5m tem 10 PV e RD 5). Fogo queima a teia em duas rodadas, mas causa 1d6 pontos de dano de fogo por rodada a todas as criaturas nela." },
+        { name: "Ninhada Voraz", timing: "movimento", text: "Uma vez por cena, a matriarca rasga um casulo preso às teias da sala e convoca um enxame de aranhas filhotes em um espaço livre em alcance curto. O enxame age no fim da rodada da matriarca. Se o enxame for destruído, a matriarca não pode convocá-lo novamente nesta cena." },
+        { name: "Covil Teioso", timing: "passiva", text: "A sala da matriarca é coberta por fios espessos. Para outras criaturas, áreas de teia contam como terreno difícil. A matriarca ignora esse terreno, pode escalar nas próprias teias sem teste e percebe automaticamente qualquer criatura tocando uma teia, como se tivesse percepção às cegas." },
+        { name: "Arrastar para o Ninho", timing: "movimento", text: "Uma vez por rodada, a matriarca escolhe uma criatura enredada em alcance curto. A criatura é puxada 6m em direção à matriarca; Reflexos CD 18 evita. Se terminar adjacente à matriarca, fica desprevenida até o início de seu próximo turno." },
+        { name: "Veneno", timing: "passiva", text: "Condição fraco (Fortitude CD 18 evita). Se a criatura já estiver fraca e falhar no teste, fica debilitada por 1 rodada." },
+        { name: "Última Postura", timing: "passiva", text: "Quando é reduzida a 70 PV ou menos pela primeira vez na cena, a matriarca remove uma condição que esteja sofrendo e usa Teia da Matriarca como ação livre. Até o fim da cena, seus ataques de mordida têm margem de ameaça 19." },
+        { name: "Uso sugerido", timing: null, text: "Mantenha várias áreas de teia já desenhadas na sala. A matriarca deve dividir o grupo com Teia da Matriarca, puxar alvos isolados com Arrastar para o Ninho e usar o enxame para travar conjuradores ou alvos isolados." }
+    ],
+    equipment: null,
+    treasure: "1d4 doses de veneno de aranha matriarca (CD 18 para extrair, T$ 80 cada dose), seda alva endurecida (T$ 200). Padrão.",
+    skillsText: "Furtividade +12 (+17 em áreas de teia)"
+};
+
 export const manticora = {
     id: "manticora",
     name: "Mantícora",
@@ -1285,7 +1324,7 @@ export const monsterCreatures = [
     // Manuais
     glop, glooop, mamaeGlop, cockatrice, basilisk, bulette, tendriculo,
     // Livro Básico
-    aranhaGigante, manticora, centopeiasDragao, grifo, ursoCoruja, serpe,
+    aranhaGigante, aranhaMatriarca, manticora, centopeiasDragao, grifo, ursoCoruja, serpe,
     hidra, lagash, ganchador, troll, trollDasCavernas,
     dragaoFilhote, dragaoJovem, dragaoAdulto, dragaoVeneravel, dragaoRei,
     uktril, geraktril, reishid, otyugh,

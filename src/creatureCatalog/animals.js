@@ -393,9 +393,47 @@ export const asaAssassina = {
     skillsText: null
 };
 
+export const aranhasFilhotes = {
+    id: "aranhas-filhotes",
+    name: "Aranhas Filhotes",
+    type: "animal",
+    subtype: "aranha",
+    size: "Enxame Minúsculo",
+    challengeRating: 1,
+    description: [
+        "Quando os casulos da matriarca se rompem, dezenas de aranhas recém-nascidas se espalham pelo chão, pelas paredes e por baixo das armaduras.",
+        "Sozinhas são frágeis; juntas, viram uma massa de picadas, distração e pânico."
+    ],
+    role: "minion",
+    roleSource: "custom",
+    source: { book: "Masmorra de Práxis", pdfFile: "aranha_matriarca_tormenta20_v2", pdfPage: null, bookPage: null },
+    stats: {
+        initiative: 7, perception: 3, defense: 16, fortitude: 5, reflex: 11, will: 0,
+        hitPoints: 30,
+        speedText: "9m (6q), escalar 9m (6q)",
+        senses: "visão no escuro",
+        defensesText: "imunidade a corte e perfuração",
+        attributes: { str: -4, dex: 5, con: 1, int: -5, wis: 0, cha: -5 }
+    },
+    actions: [
+        { name: "Enxame", text: "3d4 perfuração." }
+    ],
+    abilities: [
+        { name: "Distração", timing: "passiva", text: "Uma criatura que comece seu turno dentro do espaço do enxame não pode fazer ações que exijam concentração, como lançar magias, e sofre -2 em perícias (Fortitude CD 14 evita ambos). Estes efeitos duram até ela sair da área do enxame e se livrar das aranhas." },
+        { name: "Entrar nas Roupas", timing: "passiva", text: "Quando uma criatura sai do espaço do enxame, algumas aranhas ficam dentro de suas roupas, armadura ou equipamento. Se falhou no teste de resistência contra Distração, a criatura continua sofrendo os efeitos de Distração até gastar uma ação padrão para se livrar das aranhas." },
+        { name: "Teias Nativas", timing: "passiva", text: "O enxame ignora terreno difícil causado por teias. Enquanto estiver em uma área de teia, recebe +2 em Defesa e Reflexos." },
+        { name: "Veneno", timing: "passiva", text: "Condição fraco por 1 rodada; Fortitude CD 14 evita." },
+        { name: "Regra de Criação do Enxame", timing: null, text: "O enxame de aranhas filhotes é uma ameaça ND 1 criada para funcionar como extensão da Aranha Matriarca, não como encontro independente. Se convocado por Ninhada Voraz, não conceda XP separado pelo enxame; ele já faz parte do desafio da matriarca." },
+        { name: "Ajuste Rápido", timing: null, text: "Para deixar a luta mais leve, remova Veneno. Para deixá-la mais difícil, faça o enxame surgir automaticamente quando a matriarca cair a 70 PV ou menos, além do uso normal de Ninhada Voraz." }
+    ],
+    equipment: null,
+    treasure: "Nenhum.",
+    skillsText: "Furtividade +9"
+};
+
 export const animalCreatures = [
     // Manuais
-    giantRat, wolf, caveWolf,
+    giantRat, wolf, caveWolf, aranhasFilhotes,
     // Livro Básico
     gorlogg, cascavel, jiboia, naja, sucuri,
     // Ameaças de Arton

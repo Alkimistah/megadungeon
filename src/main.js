@@ -4,6 +4,8 @@ import { createExplorationState } from "./appState.js";
 import { FLOOR_RANGES, applyTheme, getFloorRange } from "./floorRanges.js";
 import { formatElapsedTime } from "./format.js";
 import { generateMapData } from "./generator.js";
+import { createExtendedExplorationRenderer } from "./extendedExplorationRenderer.js";
+import { createExtendedExplorationState } from "./extendedExplorationState.js";
 import { createRandomSeed, createRng } from "./random.js";
 import { createMapRenderer } from "./mapRenderer.js";
 import { createManualEncounterDialogController } from "./manualEncounterDialog.js";
@@ -13,6 +15,7 @@ import { decodeSessionCode, encodeSessionCode, isSessionCode } from "./sessionCo
 
 const elements = {
   svg: document.getElementById("map"),
+  extendedExploration: document.getElementById("extendedExploration"),
   info: document.getElementById("info"),
   timeTrackerValue: document.getElementById("timeTrackerValue"),
   floorRangeTitle: document.getElementById("floorRangeTitle"),
@@ -50,10 +53,11 @@ const elements = {
   nodeDialogContent: document.getElementById("nodeDialogContent")
 };
 
-const state = createExplorationState();
 let activeFloorRange = FLOOR_RANGES[0];
 let currentMapSeed = createRandomSeed();
 let infoMessageTimeout = null;
+const state = createExplorationState();
+const extendedState = createExtendedExplorationState(activeFloorRange, createRng(currentMapSeed));
 
 const nodeDialogController = createNodeDialogController({
   contentElement: elements.nodeDialogContent,
@@ -108,13 +112,61 @@ const manualEncounterDialogController = createManualEncounterDialogController({
   trapModeInput: elements.manualEncounterTrapModeInput
 });
 
+const extendedExplorationRenderer = createExtendedExplorationRenderer({
+  container: elements.extendedExploration,
+  getSnapshot: () => extendedState.getSnapshot(),
+  onAdvanceFloor: () => {
+    extendedState.advanceFloor();
+    elements.floorInput.value = String(extendedState.getSnapshot().floor);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onOutcome: (outcome, approachId, manualRolls) => {
+    extendedState.applyOutcome(outcome, approachId, manualRolls);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onResolveFinalEncounter: () => {
+    extendedState.resolveFinalEncounter();
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onRerollTacticalMap: (target) => {
+    extendedState.rerollTacticalMap(target);
+    refreshExplorationDisplay();
+    updateInfo();
+  }
+});
+
+function isExtendedExplorationMode() {
+  return activeFloorRange.mode === "extended-exploration";
+}
+
 function updateTimeTracker() {
-  elements.timeTrackerValue.textContent = formatElapsedTime(state.getElapsedMinutes());
+  const elapsedMinutes = isExtendedExplorationMode()
+    ? extendedState.getElapsedMinutes()
+    : state.getElapsedMinutes();
+
+  elements.timeTrackerValue.textContent = formatElapsedTime(elapsedMinutes);
 }
 
 function getCurrentSession() {
+  if (isExtendedExplorationMode()) {
+    const snapshot = extendedState.getSnapshot();
+
+    return {
+      v: 1,
+      mode: activeFloorRange.mode,
+      profile: activeFloorRange.id,
+      floor: snapshot.floor,
+      mapSeed: currentMapSeed,
+      extendedState: extendedState.exportSessionState()
+    };
+  }
+
   return {
     v: 1,
+    mode: "node-map",
     profile: activeFloorRange.id,
     floor: Number(elements.floorInput.value),
     depth: Number(elements.depthInput.value),
@@ -130,7 +182,8 @@ function getCurrentSessionCode() {
 }
 
 function updateInfo() {
-  elements.info.textContent = `Seed: ${currentMapSeed} | Clique para copiar sessão`;
+  const modeLabel = isExtendedExplorationMode() ? "Labirinto" : "Mapa";
+  elements.info.textContent = `${modeLabel} | Seed: ${currentMapSeed} | Clique para copiar sessão`;
 }
 
 function showInfoMessage(message) {
@@ -169,6 +222,8 @@ async function copyCurrentSessionCode() {
 }
 
 function drawGeneratedLevels(levels) {
+  elements.svg.hidden = false;
+  elements.extendedExploration.hidden = true;
   state.setLevels(levels);
   mapRenderer.drawMap(levels, activeFloorRange.theme.columnColors);
   refreshExplorationDisplay();
@@ -188,9 +243,23 @@ function resolveChosenRouteEncounters(levels, sessionState = {}) {
 function restoreSession(session) {
   applyFloorRange(session.profile);
   elements.floorInput.value = String(session.floor);
+  currentMapSeed = session.mapSeed;
+
+  if (isExtendedExplorationMode()) {
+    syncRecommendationsWithFloor();
+    extendedState.initialize(
+      activeFloorRange,
+      session.floor,
+      createRng(currentMapSeed),
+      session.extendedState
+    );
+    refreshExplorationDisplay();
+    updateInfo();
+    return;
+  }
+
   elements.depthInput.value = session.depth;
   elements.baseDcInput.value = session.baseDc;
-  currentMapSeed = session.mapSeed;
   setUnknownPathsMode(Boolean(session.unknownPaths));
 
   const levels = generateMapData(
@@ -210,6 +279,16 @@ function restoreSession(session) {
 }
 
 function refreshExplorationDisplay() {
+  if (isExtendedExplorationMode()) {
+    elements.svg.hidden = true;
+    elements.extendedExploration.hidden = false;
+    extendedExplorationRenderer.render();
+    updateTimeTracker();
+    return;
+  }
+
+  elements.svg.hidden = false;
+  elements.extendedExploration.hidden = true;
   mapRenderer.updateDisplay(state.getLevels(), state);
   updateTimeTracker();
 }
@@ -251,6 +330,8 @@ function applyFloorRange(floorRangeId) {
   applyTheme(activeFloorRange.theme);
   mapRenderer.setHiddenNodeIcon(activeFloorRange.hiddenNodeIcon);
   syncRecommendationsWithFloor();
+  document.body.classList.toggle("extended-exploration-mode", isExtendedExplorationMode());
+  elements.generateButton.textContent = isExtendedExplorationMode() ? "Iniciar andar" : "Gerar mapa";
   manualEncounterDialogController.syncProfileOptions();
 }
 
@@ -283,6 +364,18 @@ function setUnknownPathsMode(isEnabled) {
 }
 
 function generateMap() {
+  if (isExtendedExplorationMode()) {
+    currentMapSeed = createRandomSeed();
+    extendedState.initialize(
+      activeFloorRange,
+      Number(elements.floorInput.value),
+      createRng(currentMapSeed)
+    );
+    refreshExplorationDisplay();
+    updateInfo();
+    return;
+  }
+
   let depth = Number(elements.depthInput.value);
   let baseDC = Number(elements.baseDcInput.value);
 
@@ -341,12 +434,18 @@ function registerServiceWorker() {
       return;
     }
 
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      registrations.forEach((registration) => registration.unregister());
-    });
-
-    caches.keys().then((cacheNames) => {
-      cacheNames.forEach((cacheName) => caches.delete(cacheName));
+    Promise.all([
+      navigator.serviceWorker.getRegistrations().then((registrations) =>
+        Promise.all(registrations.map((registration) => registration.unregister()))
+      ),
+      caches.keys().then((cacheNames) =>
+        Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)))
+      )
+    ]).then(() => {
+      if (navigator.serviceWorker.controller && sessionStorage.getItem("dev-sw-cleared") !== "1") {
+        sessionStorage.setItem("dev-sw-cleared", "1");
+        window.location.reload();
+      }
     });
   });
 }
