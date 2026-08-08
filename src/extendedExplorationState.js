@@ -810,6 +810,48 @@ function createTacticalMap({ encounterNode, floor, rng, sceneEffects = [] }) {
   };
 }
 
+// Mapas preset dos encontros finais: um caractere por célula, legenda no
+// arquivo de dados do perfil (dungeon1to10FinalEncounters.js).
+const PRESET_CELL_BY_CODE = {
+  "#": "wall",
+  ".": "floor",
+  "P": "party",
+  "E": "enemy",
+  "H": "hidden",
+  "T": "trap",
+  "X": "pit",
+  "W": "web",
+  "D": "difficult",
+  "M": "mechanism",
+  "O": "objective",
+  "d": "door",
+  "V": "advantage",
+  "C": "obstacle",
+  "R": "reinforcement"
+};
+
+function createPresetTacticalMap(template, { enemyCount = 0, trapCount = 0 } = {}) {
+  if (!template?.length) return null;
+
+  const cells = [];
+  for (let y = 0; y < TACTICAL_HEIGHT; y += 1) {
+    const row = template[y] || "";
+    for (let x = 0; x < TACTICAL_WIDTH; x += 1) {
+      cells.push(PRESET_CELL_BY_CODE[row[x]] || "floor");
+    }
+  }
+
+  return {
+    cells,
+    enemyCount,
+    height: TACTICAL_HEIGHT,
+    preset: true,
+    template: "preset",
+    trapCount,
+    width: TACTICAL_WIDTH
+  };
+}
+
 function createSceneEffect(detail) {
   if (detail.includes("Sangue ainda fresco")) {
     return {
@@ -866,7 +908,87 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     addLog(message, "reset");
   }
 
-  function createFinalEncounter() {
+  function getFinalEncounterScenesForFloor() {
+    const tier = getTier(activeProfile, floor);
+    const scenes = activeProfile.extendedExploration.finalEncounters?.scenesByTier?.[tier?.id] || [];
+
+    return scenes.filter((scene) => getSceneVariantsForFloor(scene).length > 0);
+  }
+
+  function getSceneVariantsForFloor(scene) {
+    return scene.variants.filter((variant) => !variant.floors || variant.floors.includes(floor));
+  }
+
+  function countCompositionCreatures(variant) {
+    return (variant.creatures || []).reduce((total, entry) => total + (entry.quantity || 1), 0);
+  }
+
+  function createCuratedFinalEncounter(excludeSceneId = null) {
+    const scenes = getFinalEncounterScenesForFloor();
+    if (!scenes.length) return null;
+
+    const pool = scenes.filter((scene) => scene.id !== excludeSceneId);
+    const scene = pick(activeRng, pool.length ? pool : scenes);
+    const variant = pick(activeRng, getSceneVariantsForFloor(scene));
+    const gimmick = activeProfile.extendedExploration.finalEncounters?.gimmicksByFloor?.[floor] || null;
+    const seedSuffix = `final-${Date.now()}-${randomInt(activeRng, 1, 9999)}`;
+
+    const encounterNode = {
+      id: `extended-${floor}-${seedSuffix}`,
+      encounterSeed: `extended-${floor}-${seedSuffix}`,
+      type: "normal",
+      label: `${scene.title} (encontro final)`,
+      short: "E",
+      level: floor,
+      column: 0,
+      environment: {
+        terrain: {
+          name: floor >= 7 ? "Covil aracnídeo" : "Labirinto",
+          effect: "Sala fechada da masmorra; sem clima externo.",
+          features: []
+        },
+        climate: []
+      },
+      challenge: {
+        climate: 0,
+        encounter: variant.challenge,
+        terrain: 0,
+        total: variant.challenge
+      },
+      creature: null,
+      trap: null,
+      fixedComposition: {
+        creatures: variant.creatures,
+        traps: variant.traps
+      },
+      resolvedEncounter: null
+    };
+
+    resolveNodeEncounter(encounterNode, { mapSeed: `extended-floor-${floor}` });
+
+    return {
+      categoryId: "finalScene",
+      categoryLabel: scene.typeLabel,
+      challenge: variant.challenge,
+      detail: scene.detail,
+      encounterNode,
+      gimmick,
+      sceneEffects: [],
+      sceneId: scene.id,
+      sceneOptions: scenes.length,
+      tacticalMap: createPresetTacticalMap(variant.map || scene.map, {
+        enemyCount: countCompositionCreatures(variant),
+        trapCount: (variant.traps || []).length
+      }),
+      title: scene.title,
+      treasureNote: scene.treasureNote
+    };
+  }
+
+  function createFinalEncounter(excludeSceneId = null) {
+    const curated = createCuratedFinalEncounter(excludeSceneId);
+    if (curated) return curated;
+
     const tier = getTier(activeProfile, floor);
     const categoryId = tier?.finalEncounterCategory || "medium";
     const category = getCategory(activeProfile, categoryId);
@@ -1049,7 +1171,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       successes = rules.successesRequired;
       phase = "floorEncounter";
       finalEncounter = createFinalEncounter();
-      addLog("A saída foi encontrada. Resolva o encontro final antes de avançar.", "final");
+      addLog(`A saída foi encontrada. Encontro final: ${finalEncounter.title}. Resolva-o antes de avançar.`, "final");
     }
 
     return true;
@@ -1176,6 +1298,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       ? finalEncounter
       : currentResults.find((result) => result.id === target) || currentResult;
 
+    if (scene?.tacticalMap?.preset) return;
     if (!scene?.encounterNode?.resolvedEncounter?.items?.length) return;
 
     scene.tacticalMap = createTacticalMap({
@@ -1185,6 +1308,13 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       sceneEffects: scene.sceneEffects || []
     });
     addLog("Mapa tático regerado para a cena atual.", "state");
+  }
+
+  function rerollFinalEncounter() {
+    if (phase !== "floorEncounter" || !finalEncounter) return;
+
+    finalEncounter = createFinalEncounter(finalEncounter.sceneId || null);
+    addLog(`Encontro final sorteado novamente: ${finalEncounter.title}.`, "final");
   }
 
   function getBossEncounter() {
@@ -1263,6 +1393,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     initialize,
     resolveD100,
     resolveFinalEncounter,
+    rerollFinalEncounter,
     rerollTacticalMap
   };
 }

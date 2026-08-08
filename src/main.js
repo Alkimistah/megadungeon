@@ -147,6 +147,11 @@ const extendedExplorationRenderer = createExtendedExplorationRenderer({
     refreshExplorationDisplay();
     updateInfo();
   },
+  onRerollFinalEncounter: () => {
+    extendedState.rerollFinalEncounter();
+    refreshExplorationDisplay();
+    updateInfo();
+  },
   onRerollTacticalMap: (target) => {
     extendedState.rerollTacticalMap(target);
     refreshExplorationDisplay();

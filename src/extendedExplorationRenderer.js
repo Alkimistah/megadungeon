@@ -276,17 +276,31 @@ function createPendingDescentPanel(snapshot, onConfirmPitDescent, onDismissPitDe
   return section;
 }
 
+const TACTICAL_CELL_LABELS = {
+  advantage: "Vantagem/elevação",
+  difficult: "Terreno difícil",
+  door: "Porta (entrada/saída)",
+  enemy: "Inimigo",
+  floor: "Chão",
+  hidden: "Inimigo oculto/em potencial",
+  mechanism: "Mecanismo",
+  objective: "Objetivo/achado",
+  obstacle: "Obstáculo",
+  party: "Grupo",
+  pit: "Fosso/vão",
+  reinforcement: "Entrada de reforço",
+  trap: "Armadilha",
+  wall: "Parede",
+  web: "Teia/casulo"
+};
+
+const TACTICAL_LEGEND_ORDER = [
+  "wall", "party", "enemy", "hidden", "trap", "pit", "web",
+  "difficult", "mechanism", "objective", "door", "advantage", "obstacle", "reinforcement"
+];
+
 function getTacticalCellLabel(cell) {
-  return {
-    advantage: "Vantagem",
-    door: "Porta",
-    enemy: "Inimigo",
-    floor: "Chão",
-    obstacle: "Obstáculo",
-    party: "Grupo",
-    trap: "Armadilha",
-    wall: "Parede"
-  }[cell] || cell;
+  return TACTICAL_CELL_LABELS[cell] || cell;
 }
 
 function createTacticalGrid(tacticalMap) {
@@ -304,21 +318,15 @@ function createTacticalGrid(tacticalMap) {
   return grid;
 }
 
-function createTacticalLegend() {
+function createTacticalLegend(tacticalMap) {
   const legend = createElement("div", "tactical-legend");
+  const presentCells = new Set(tacticalMap?.cells || []);
+  const cells = TACTICAL_LEGEND_ORDER.filter((cell) => presentCells.has(cell));
 
-  [
-    ["wall", "Parede"],
-    ["party", "Grupo"],
-    ["enemy", "Inimigo"],
-    ["trap", "Armadilha"],
-    ["door", "Porta"],
-    ["advantage", "Vantagem"],
-    ["obstacle", "Obstáculo"]
-  ].forEach(([cell, label]) => {
+  cells.forEach((cell) => {
     const item = createElement("span", "tactical-legend-item");
     item.appendChild(createElement("span", `tactical-swatch is-${cell}`));
-    item.appendChild(document.createTextNode(label));
+    item.appendChild(document.createTextNode(getTacticalCellLabel(cell)));
     legend.appendChild(item);
   });
 
@@ -353,7 +361,7 @@ function openTacticalMapFullscreen(tacticalMap) {
   header.appendChild(createButton("Fechar", "extended-action is-compact", close));
   panel.appendChild(header);
   panel.appendChild(createTacticalGrid(tacticalMap));
-  panel.appendChild(createTacticalLegend());
+  panel.appendChild(createTacticalLegend(tacticalMap));
   overlay.appendChild(panel);
   document.body.appendChild(overlay);
 }
@@ -363,20 +371,23 @@ function createTacticalMap(scene, onRerollMap) {
 
   const section = createElement("div", "tactical-map-panel");
   const header = createElement("div", "tactical-map-header");
+  const mapKind = scene.tacticalMap.preset ? "Mapa da cena (fixo)" : "Mapa 14x10";
   const title = createElement(
     "strong",
     null,
-    `Mapa 14x10 | ${scene.tacticalMap.enemyCount} inimigo(s) | ${scene.tacticalMap.trapCount} armadilha(s)`
+    `${mapKind} | ${scene.tacticalMap.enemyCount} inimigo(s) | ${scene.tacticalMap.trapCount} armadilha(s)`
   );
   const actions = createElement("div", "tactical-map-actions");
 
   actions.appendChild(createButton("Expandir", "extended-action is-compact", () => openTacticalMapFullscreen(scene.tacticalMap)));
-  actions.appendChild(createButton("Gerar outro mapa", "extended-action is-compact", onRerollMap));
+  if (!scene.tacticalMap.preset) {
+    actions.appendChild(createButton("Gerar outro mapa", "extended-action is-compact", onRerollMap));
+  }
   header.appendChild(title);
   header.appendChild(actions);
   section.appendChild(header);
   section.appendChild(createTacticalGrid(scene.tacticalMap));
-  section.appendChild(createTacticalLegend());
+  section.appendChild(createTacticalLegend(scene.tacticalMap));
 
   return section;
 }
@@ -396,21 +407,25 @@ function createSceneEffects(scene) {
 }
 
 function createResolvedEncounter(scene, selectedItemKey, onSelectItem, onRerollMap) {
-  if (!scene?.encounterNode?.resolvedEncounter?.items?.length) return null;
+  const hasItems = Boolean(scene?.encounterNode?.resolvedEncounter?.items?.length);
+  const tacticalMap = createTacticalMap(scene, onRerollMap);
+
+  if (!hasItems && !tacticalMap) return null;
 
   const wrapper = createElement("div", "extended-encounter-result");
-  const selectedKey = selectedItemKey || getDefaultEncounterItemKey(scene.encounterNode);
-  const tacticalMap = createTacticalMap(scene, onRerollMap);
   const effects = createSceneEffects(scene);
 
   if (effects) wrapper.appendChild(effects);
   if (tacticalMap) wrapper.appendChild(tacticalMap);
-  wrapper.appendChild(createEncounterCombatPage(scene.encounterNode, selectedKey, onSelectItem));
+  if (hasItems) {
+    const selectedKey = selectedItemKey || getDefaultEncounterItemKey(scene.encounterNode);
+    wrapper.appendChild(createEncounterCombatPage(scene.encounterNode, selectedKey, onSelectItem));
+  }
 
   return wrapper;
 }
 
-function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor, selectedItemKey, onSelectItem, onRerollMap) {
+function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor, selectedItemKey, onSelectItem, onRerollMap, onRerollFinalEncounter) {
   const section = createElement("section", "extended-panel final-encounter-panel");
   const heading = createElement("h3", null, "Encontro final do andar");
 
@@ -421,18 +436,39 @@ function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor,
     return section;
   }
 
-  const challengeText = snapshot.finalEncounter.challenge > 0
-    ? `ND ${formatChallengeRating(snapshot.finalEncounter.challenge)}`
+  const finalEncounter = snapshot.finalEncounter;
+  const challengeText = finalEncounter.challenge > 0
+    ? `ND ${formatChallengeRating(finalEncounter.challenge)}`
     : "sem ND definido";
+  const typeText = finalEncounter.categoryLabel ? ` | ${finalEncounter.categoryLabel}` : "";
 
-  section.appendChild(createElement("p", "result-title", `${snapshot.finalEncounter.title} (${challengeText})`));
-  section.appendChild(createElement("p", "result-detail", snapshot.finalEncounter.detail));
+  section.appendChild(createElement("p", "result-title", `${finalEncounter.title} (${challengeText}${typeText})`));
+  section.appendChild(createElement("p", "result-detail", finalEncounter.detail));
 
-  const encounter = createResolvedEncounter(snapshot.finalEncounter, selectedItemKey, onSelectItem, onRerollMap);
+  if (finalEncounter.gimmick) {
+    const gimmick = createElement("p", "final-gimmick");
+    gimmick.appendChild(createElement("strong", null, `Gimmick do andar — ${finalEncounter.gimmick.name}: `));
+    gimmick.appendChild(document.createTextNode(finalEncounter.gimmick.detail));
+    section.appendChild(gimmick);
+  }
+
+  if (finalEncounter.treasureNote) {
+    const treasure = createElement("p", "final-treasure");
+    treasure.appendChild(createElement("strong", null, "Recompensa: "));
+    treasure.appendChild(document.createTextNode(`XP integral. ${finalEncounter.treasureNote}`));
+    section.appendChild(treasure);
+  }
+
+  const encounter = createResolvedEncounter(finalEncounter, selectedItemKey, onSelectItem, onRerollMap);
   if (encounter) section.appendChild(encounter);
 
   if (snapshot.phase === "floorEncounter") {
-    section.appendChild(createButton("Marcar encontro resolvido", "extended-action", onResolveFinalEncounter));
+    const actions = createElement("div", "tactical-map-actions");
+    actions.appendChild(createButton("Marcar encontro resolvido", "extended-action", onResolveFinalEncounter));
+    if (finalEncounter.sceneId && (finalEncounter.sceneOptions || 0) > 1) {
+      actions.appendChild(createButton("Sortear outra cena", "extended-action is-compact", onRerollFinalEncounter));
+    }
+    section.appendChild(actions);
   }
 
   if (snapshot.phase === "readyToAdvance") {
@@ -479,6 +515,7 @@ export function createExtendedExplorationRenderer({
   onDismissPitDescent,
   onOutcome,
   onResolveFinalEncounter,
+  onRerollFinalEncounter,
   onRerollTacticalMap
 }) {
   let selectedApproachId = null;
@@ -562,6 +599,10 @@ export function createExtendedExplorationRenderer({
         },
         () => {
           onRerollTacticalMap("final");
+          render();
+        },
+        () => {
+          onRerollFinalEncounter();
           render();
         }
       ));

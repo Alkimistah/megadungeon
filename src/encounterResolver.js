@@ -3,6 +3,7 @@ import { creatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
 import { applyWeaponVariation } from "./equipment/weaponVariation.js";
 import { createRng, pickWeighted } from "./random.js";
 import { createModificationPlan, getThreatParameters, THREAT_CHALLENGE_ORDER } from "./threatCreationRules.js";
+import { getTrapById } from "./traps.js";
 
 const ENCOUNTER_RESOLUTION_VERSION = 8;
 
@@ -541,28 +542,59 @@ function getEncounterSeed(node, mapSeed) {
   return `${mapSeed || "map"}:${node.encounterSeed || node.id}:encounter-v${ENCOUNTER_RESOLUTION_VERSION}`;
 }
 
+// Builds items from a fixed composition ({ creatures: [{ id, quantity }], traps: [trapId] })
+// declared by cenas curadas (encontros finais). Creatures keep weapon variation via rng;
+// traps are looked up in the catalog by id.
+function resolveFixedComposition(fixedComposition, rng) {
+  const creatureItems = (fixedComposition.creatures || [])
+    .map(({ id, quantity }) => {
+      const creature = getCreatureById(id);
+      return creature ? getCreatureSummary(creature, quantity || 1, rng) : null;
+    })
+    .filter(Boolean);
+  const trapItems = (fixedComposition.traps || [])
+    .map((trapId) => {
+      const trap = getTrapById(trapId);
+      return trap ? getTrapSummary(trap) : null;
+    })
+    .filter(Boolean);
+
+  return [...creatureItems, ...trapItems];
+}
+
 export function resolveNodeEncounter(node, { mapSeed } = {}) {
   if (!node) return null;
   if (node.resolvedEncounter?.version === ENCOUNTER_RESOLUTION_VERSION) return node.resolvedEncounter;
   if (node.resolvedEncounter) node.resolvedEncounter = null;
-  if (!node.creature && !node.trap) return null;
+  if (!node.creature && !node.trap && !node.fixedComposition) return null;
 
   const seed = getEncounterSeed(node, mapSeed);
   const rng = createRng(seed);
-  const creatureItems = resolveCreatureGroup(node, rng);
-  const trapItems = node.trap ? [getTrapSummary(node.trap)] : [];
-  const items = [...creatureItems, ...trapItems];
+  const items = node.fixedComposition
+    ? resolveFixedComposition(node.fixedComposition, rng)
+    : [...resolveCreatureGroup(node, rng), ...(node.trap ? [getTrapSummary(node.trap)] : [])];
 
   if (items.length === 0) return null;
 
+  // Composições fixas não passam pela divisão de orçamento dos perfis, então o
+  // budget é derivado dos próprios itens (ND de combate real + soma das armadilhas).
+  const creaturesBudget = node.fixedComposition
+    ? calculateCombatND(items.filter((item) => item.kind === "creature"))
+    : node.challenge?.creatures || 0;
+  const trapBudget = node.fixedComposition
+    ? roundToQuarter(items
+      .filter((item) => item.kind === "trap")
+      .reduce((total, item) => total + (item.challengeRating || 0), 0))
+    : node.challenge?.trap || 0;
+
   node.resolvedEncounter = {
     budget: {
-      creatures: node.challenge?.creatures || 0,
-      creaturesLabel: formatChallengeRating(node.challenge?.creatures || 0),
+      creatures: creaturesBudget,
+      creaturesLabel: formatChallengeRating(creaturesBudget),
       total: node.challenge?.total || 0,
       totalLabel: formatChallengeRating(node.challenge?.total || 0),
-      trap: node.challenge?.trap || 0,
-      trapLabel: formatChallengeRating(node.challenge?.trap || 0)
+      trap: trapBudget,
+      trapLabel: formatChallengeRating(trapBudget)
     },
     items,
     seed,

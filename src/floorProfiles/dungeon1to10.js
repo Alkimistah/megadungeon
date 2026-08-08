@@ -1,4 +1,5 @@
 import { assetUrl } from "../assetUrl.js";
+import { dungeon1to10FinalEncounters } from "./dungeon1to10FinalEncounters.js";
 
 export const dungeon1to10Profile = {
   id: "dungeon-1-10",
@@ -247,10 +248,11 @@ export const dungeon1to10Profile = {
         "Silêncio absoluto: próximo combate pode ser evitado com boa abordagem."
       ]
     },
+    finalEncounters: dungeon1to10FinalEncounters,
     boss: {
       creatureId: "aranha-matriarca",
       supportCreatureId: "aranhas-filhotes",
-      challengeOptions: [3, 4],
+      challengeOptions: [4],
       reward: "Cristal verde"
     }
   },
@@ -268,6 +270,23 @@ export const dungeon1to10Profile = {
     scrollbarTrack: "#171513",
     scrollbarThumb: "#74634f",
     mapGlow: "rgba(70, 96, 128, 0.13)",
+    tacticalColors: {
+      wall: "#050505",
+      floor: "#b9b0a1",
+      party: "#2d6fc5",
+      enemy: "#b72f28",
+      hidden: "#c65a42",
+      trap: "#2e9f50",
+      pit: "#24593c",
+      web: "#8a68b0",
+      difficult: "#c07a36",
+      mechanism: "#d4b13f",
+      objective: "#3fa7b8",
+      door: "#7a4c24",
+      advantage: "#ece3cb",
+      obstacle: "#6b6760",
+      reinforcement: "#c65a42"
+    },
     columnColors: [
       "#d5c2a1",
       "#8ea6c8",

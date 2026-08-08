@@ -28,18 +28,7 @@ Esta seção concentra decisões que dependem de definição do mestre. Cada res
 
 ### Encontros Finais
 
-- Qual é o encontro final obrigatório de cada andar de 1 a 9?
-- Esses encontros finais devem ter tabela própria por andar ou uma lista comum com modificadores por andar?
-- Cada encontro final deve ser sempre médio/difícil ou pode incluir obstáculo, armadilha, negociação, anomalia ou cena mista?
-- Quais gimmicks diferenciam cada encontro final dos encontros genéricos do mesmo tier?
-- Que recompensa, loot ou ganho narrativo cada encontro final deve conceder?
-
-### Andar 10 e Chefe
-
-- A Matriarca Aracnídea deve ser enfrentada sozinha, com filhotes, com ovos, com armadilhas ou com ondas de reforços?
-- O ND final desejado do andar 10 deve ser 3, 4 ou variar conforme configuração?
-- Quais elementos da sala do chefe são obrigatórios: teias, ovos, poços rasos, terreno difícil, pilares, cristal verde, portas ou rotas alternativas?
-- A recompensa principal do cristal verde tem efeito mecânico imediato ou apenas valor narrativo/tesouro?
+- Quais são os encontros concretos da lista de cada tier e qual é o gimmick específico de cada andar de 1 a 9? (A estrutura, os tipos de cena e a regra de tesouro já estão decididos; falta autorar o conteúdo.)
 
 ### Tabelas d100
 
@@ -204,6 +193,7 @@ Esse mapa não substitui o labirinto abstrato. Ele representa apenas a sala, cor
 Formato base:
 
 - matriz de 14 colunas por 10 linhas;
+- exceção: a sala do chefe do andar 10 usa mapa maior, de ao menos 14x20;
 - cada célula representa um quadrado do mapa físico do usuário;
 - o tamanho real do quadrado não importa para o app;
 - o mapa deve ser legível como grade e fácil de copiar para uma mesa física.
@@ -273,12 +263,14 @@ O andar 10 é a sala do chefe e não usa exploração por testes estendidos.
 O app deve apresentar:
 
 - sala da Matriarca Aracnídea;
-- crias ou aranhas menores, conforme configuração;
-- ND 3 ou 4;
-- teias, poços rasos, ovos e terreno difícil como elementos inclusos da sala;
-- recompensa principal: cristal verde.
+- crias presentes desde o início do combate;
+- ovos que eclodem como reforços durante a luta;
+- ND 4 fixo;
+- teias como perigo ativo e terreno difícil, com pilares/cobertura na sala;
+- mapa tático maior que o padrão: ao menos 14x20;
+- recompensa principal: cristal verde (tesouro multiplicador, sem efeito mecânico).
 
-O andar 10 deve ter uma tela de chefe ou estado especial, sem exigir sucessos/falhas para avanço.
+O andar 10 deve ter uma tela de chefe ou estado especial, sem exigir sucessos/falhas para avanço. Após o chefe ser resolvido, o app apresenta a tela de conclusão da etapa 1-10 com resumo de XP, tesouros e log.
 
 ## Layout Ideal
 
@@ -497,6 +489,9 @@ Criar ou separar:
 - Aranha Matriarca e filhotes adicionados ao catálogo de criaturas.
 - Encontros podem sortear armas compatíveis para criaturas armadas Pequenas ou Médias, preservando bônus de ataque e modificadores de dano da ficha base.
 - Mímico Menor ND 2 adicionado como adaptação do Mímico para aparecer nos andares avançados de 1 a 10.
+- Subconjunto de inimigos permitido por andar implementado nos andares 1 a 9 via lista de permissão no perfil; a seleção de criaturas usa apenas essas listas, impedindo criaturas de tiers posteriores ou tematicamente inadequadas.
+- Encontros finais curados implementados: 25 cenas por tier com gimmick por andar (dungeon1to10FinalEncounters.js), composição fixa de criaturas/armadilhas do catálogo, ND por variante de andar, mapa preset 14x10 fixo por cena, gimmick e recompensa exibidos no painel, e botão de sortear outra cena do tier.
+- Mapa tático com legenda expandida: inimigo oculto/em potencial, fosso/vão, teia/casulo, terreno difícil, mecanismo, objetivo/achado, entrada de reforço e porta como entrada/saída; legenda exibe apenas os tipos presentes no mapa e as cores são configuráveis por perfil via tema (tacticalColors).
 
 ### Parcialmente Implementado
 
@@ -505,14 +500,13 @@ Criar ou separar:
 - Encontros finais existem como etapa obrigatória, mas ainda precisam de tabelas próprias por andar ou variações mais marcantes.
 - As tabelas d100 estão estruturadas, mas precisam ser conferidas contra a versão definitiva do material.
 - A seleção de ações por andar existe, mas ainda deve ser revisada contra a versão definitiva do documento de perícias e ações.
+- As listas de criaturas permitidas por andar existem e são aplicadas, mas ainda precisam ser validadas contra a definição final do mestre por andar, tier ou subtema.
 
 ### Pendente
 
-- Definir e implementar o subconjunto de inimigos permitido para cada andar, tier ou subtema dos andares 1 a 10.
-- Impedir que o perfil dos andares 1 a 10 selecione criaturas de tiers posteriores ou ameaças tematicamente inadequadas.
-- Criar tabelas de encontro final próprias por andar, com gimmicks, objetivos, armadilhas, recompensas e composição distinta dos encontros genéricos.
-- Completar a sala do chefe do andar 10 com Matriarca Aracnídea, crias, ovos, teias, terreno difícil, recompensa principal e regras específicas.
-- Estruturar loot e XP dos encontros finais e achados úteis.
+- Validar em mesa as listas de encontro final implementadas (NDs, CDs de negociação e valores custom dos obstáculos).
+- Completar a sala do chefe do andar 10: Matriarca com crias desde o início, ovos que eclodem como reforços, teias ativas, pilares/cobertura, mapa de ao menos 14x20, tesouro do cristal verde e tela de conclusão da etapa.
+- Implementar a regra de tesouro padrão por ND nos encontros finais: tesouro adicional em cenas de combate/armadilha e condicionado ao sucesso em cenas específicas.
 - Associar cada tipo de armadilha a padrões táticos diferentes no mapa, em vez de usar apenas uma zona genérica.
 - Ajustar balanceamento para personagens de nível 1 a 4, especialmente quantidade de inimigos, ND agregado, dano de armadilhas e frequência de falhas.
 - Revisar persistência de sessão para garantir que estado mecânico, encontro atual, mapas atuais e efeitos pendentes carreguem sem fragilidade.
@@ -531,7 +525,17 @@ Criar ou separar:
 
 ### Decisões Fechadas
 
-- O encontro final de cada andar deve ser diferente dos encontros genéricos do tier. Idealmente, cada andar terá tabela própria ou variações com mais gimmicks, objetivos, terreno, armadilhas ou comportamento especial.
+- O encontro final de cada andar deve ser diferente dos encontros genéricos do tier. Estrutura definida: lista comum de encontros finais por tier, com gimmick/modificador próprio por andar aplicado por cima.
+- O encontro final pode ser de qualquer tipo de cena: combate com gimmick, combate com armadilha, obstáculo/armadilha como ameaça principal ou negociação/anomalia.
+- Todo encontro final tem ND definido, respeitando o ND máximo do andar, e concede tesouro padrão: rolagem na tabela de tesouros do livro para esse ND. Em cenas de combate ou armadilha, esse tesouro é adicional ao que as criaturas já soltam; em cenas específicas (eventos, negociação, anomalia), o grupo só ganha o tesouro se for bem-sucedido.
+- Sinais diretos da Matriarca (teias, ovos, crias) entram nos encontros finais a partir do andar 7, escalando até o covil no andar 10.
+- Reforços em combate são proibidos nos andares 1 a 4 (toda a composição começa em cena). Nos andares 5 a 9, reforços são limitados a 1 criatura ou enxame a cada 2 rodadas, com máximo total por cena, e o ND somado incluindo reforços respeita o teto do andar. Habilidades de ficha que geram crias (ex.: Mamãe Glop) não contam como reforço externo.
+- Toda cena de encontro final deve ser mecanicamente explícita: criatura com ficha do catálogo (nunca "um vigia" abstrato), armadilha exata do catálogo com CD/dano/detecção/desarme, posicionamento no mapa e regras de rodada quando houver. A especificação proposta está em ENCONTROS_FINAIS_ANDARES_1_A_9.md.
+- A luta da Matriarca inclui crias presentes desde o início, ovos que eclodem como reforços durante o combate e teias como perigo ativo que restringe movimento.
+- O ND da luta contra a Matriarca no andar 10 é fixo em 4, sem variação para 3.
+- A sala do chefe usa mapa tático maior que o padrão: ao menos 14x20, com teias (terreno difícil), ovos como objetos no mapa e pilares/cobertura como elementos obrigatórios. Poços rasos são opcionais.
+- O cristal verde não tem efeito mecânico: é tesouro. Todos os inimigos soltam cristais (normalmente azuis) conforme o ND, convertidos em dinheiro no comércio da cidade; o cristal verde é um cristal multiplicador, valendo o dobro ou o quádruplo do cristal azul de mesmo ND.
+- Depois da vitória contra a Matriarca, o app mostra uma tela de conclusão da etapa 1-10 (estado `completed`) com resumo de XP, tesouros e log; a etapa 11-20 é um perfil separado iniciado manualmente.
 - O encontro final concede XP integral sempre. Ele é obrigatório e garante algum ganho de XP e loot por andar, mesmo quando os personagens tiveram poucas ou muitas falhas durante a exploração.
 - Os andares 1 a 10 não permitem retorno manual a andares anteriores. O fluxo é sempre avançar.
 - As cores do mapa tático devem ser configuráveis por perfil/tema de andares, não fixas globalmente.

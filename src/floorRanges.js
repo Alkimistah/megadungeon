@@ -22,5 +22,15 @@ export function applyTheme(theme) {
     root.style.setProperty(name, value);
   });
 
+  const tacticalCellTypes = [
+    "wall", "floor", "party", "enemy", "hidden", "trap", "pit", "web",
+    "difficult", "mechanism", "objective", "door", "advantage", "obstacle", "reinforcement"
+  ];
+  tacticalCellTypes.forEach((cell) => {
+    const color = theme.tacticalColors?.[cell];
+    if (color) root.style.setProperty(`--tactical-${cell}`, color);
+    else root.style.removeProperty(`--tactical-${cell}`);
+  });
+
   document.querySelector('meta[name="theme-color"]').setAttribute("content", theme.header);
 }
