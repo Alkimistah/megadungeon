@@ -522,6 +522,33 @@ svg {
   background: #8a4038;
 }
 
+.extended-action.is-door-open {
+  width: 100%;
+  border-color: #d8c586;
+  background: #46391c;
+  color: #fff0b7;
+  filter: drop-shadow(0 0 8px rgba(216, 197, 134, 0.32));
+}
+
+.extended-action.is-door-open:hover {
+  background: #584722;
+}
+
+.extended-action.is-next-floor {
+  border-color: #f2d982;
+  background: #5b4518;
+  box-shadow: inset 0 0 0 1px rgba(255, 242, 184, 0.32), 0 0 16px rgba(216, 197, 134, 0.22);
+}
+
+.extended-action.is-next-floor:hover {
+  background: #6a531d;
+}
+
+.final-encounter-actions {
+  display: grid;
+  gap: 8px;
+}
+
 .extended-encounter-result {
   display: grid;
   gap: 12px;
@@ -583,10 +610,19 @@ svg {
 }
 
 .tactical-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   min-width: 0;
   min-height: 0;
   border: 1px solid rgba(18, 16, 14, 0.42);
   background: #b9b0a1;
+  color: #f2ede1;
+  font-family: Consolas, monospace;
+  font-size: clamp(7px, 1.2vw, 12px);
+  font-weight: 700;
+  line-height: 1;
 }
 
 .tactical-cell.is-wall,
@@ -613,6 +649,7 @@ svg {
 .tactical-swatch.is-hidden {
   background: var(--tactical-floor, #b9b0a1);
   box-shadow: inset 0 0 0 2px var(--tactical-hidden, #c65a42);
+  color: var(--tactical-hidden, #c65a42);
 }
 
 .tactical-cell.is-trap,
@@ -638,6 +675,7 @@ svg {
 .tactical-cell.is-mechanism,
 .tactical-swatch.is-mechanism {
   background: var(--tactical-mechanism, #d4b13f);
+  color: #4a3b28;
 }
 
 .tactical-cell.is-objective,
@@ -653,6 +691,7 @@ svg {
 .tactical-cell.is-advantage,
 .tactical-swatch.is-advantage {
   background: var(--tactical-advantage, #ece3cb);
+  color: #4a3b28;
 }
 
 .tactical-cell.is-advantage {
@@ -690,9 +729,18 @@ svg {
 }
 
 .tactical-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   width: 12px;
   height: 12px;
   border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #f2ede1;
+  font-family: Consolas, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .tactical-fullscreen {
@@ -721,6 +769,58 @@ svg {
 .tactical-fullscreen-panel .tactical-grid {
   width: min(100%, calc((100vh - 180px) * 1.4), 920px);
   justify-self: center;
+}
+
+.tactical-map-fullscreen {
+  padding: 0;
+}
+
+.tactical-map-fullscreen-panel {
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  padding: 12px;
+  border-radius: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.tactical-map-fullscreen-panel .tactical-grid {
+  width: min(100%, calc((100vh - 116px) * 1.4));
+  max-height: calc(100vh - 116px);
+  align-self: center;
+}
+
+.scene-modal-panel {
+  width: min(96vw, 880px);
+  max-height: 92vh;
+  overflow-y: auto;
+  display: grid;
+  gap: 12px;
+}
+
+.scene-modal-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.scene-modal-tabs .extended-action.is-selected {
+  background: var(--action-hover);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.scene-modal-body,
+.scene-modal-content {
+  display: grid;
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .scene-modal-panel {
+    width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+  }
 }
 
 .exploration-log {

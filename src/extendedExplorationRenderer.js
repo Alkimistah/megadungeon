@@ -216,45 +216,6 @@ function getSceneKey(scene) {
   return scene?.id || scene?.encounterNode?.id || `${scene?.roll}-${scene?.categoryId}`;
 }
 
-function createCurrentResult(snapshot, selectedEncounterItemByScene, onSelectItem, onRerollMap) {
-  const section = createElement("section", "extended-panel");
-  const heading = createElement("h3", null, "Cena atual");
-  const results = snapshot.currentResults?.length
-    ? snapshot.currentResults
-    : snapshot.currentResult ? [snapshot.currentResult] : [];
-
-  section.appendChild(heading);
-
-  if (!results.length) {
-    const empty = createElement("p", "hidden-environment-notice", "Nenhuma cena d100 resolvida ainda. Registre uma falha para gerar a próxima cena.");
-    section.appendChild(empty);
-    return section;
-  }
-
-  results.forEach((result, index) => {
-    const scene = createElement("div", "current-scene-card");
-    const challengeText = result.challenge > 0 ? ` | ND ${formatChallengeRating(result.challenge)}` : "";
-    const sourceText = result.rollSource === "manual" ? "manual" : "automático";
-    const titlePrefix = results.length > 1 ? `Rolagem ${index + 1}: ` : "";
-    const title = createElement("p", "result-title", `${titlePrefix}d100 ${result.roll} (${sourceText}): ${result.categoryLabel}${challengeText}`);
-    const detail = createElement("p", "result-detail", result.detail);
-    const sceneKey = getSceneKey(result);
-    const encounter = createResolvedEncounter(
-      result,
-      selectedEncounterItemByScene.get(sceneKey),
-      (nextKey) => onSelectItem(sceneKey, nextKey),
-      () => onRerollMap(result.id || "current")
-    );
-
-    scene.appendChild(title);
-    scene.appendChild(detail);
-    if (encounter) scene.appendChild(encounter);
-    section.appendChild(scene);
-  });
-
-  return section;
-}
-
 function createPendingResetPanel(snapshot, onConfirmFloorReset) {
   if (!snapshot.resetPending) return null;
 
@@ -294,6 +255,20 @@ const TACTICAL_CELL_LABELS = {
   web: "Teia/casulo"
 };
 
+const TACTICAL_CELL_GLYPHS = {
+  advantage: "✦",
+  difficult: "D",
+  enemy: "E",
+  hidden: "?",
+  mechanism: "M",
+  objective: "!",
+  party: "G",
+  pit: "F",
+  reinforcement: "R",
+  trap: "T",
+  web: "W"
+};
+
 const TACTICAL_LEGEND_ORDER = [
   "wall", "party", "enemy", "hidden", "trap", "pit", "web",
   "difficult", "mechanism", "objective", "door", "advantage", "obstacle", "reinforcement"
@@ -311,7 +286,9 @@ function createTacticalGrid(tacticalMap) {
 
   tacticalMap.cells.forEach((cell) => {
     const tile = createElement("span", `tactical-cell is-${cell}`);
+    const glyph = TACTICAL_CELL_GLYPHS[cell];
     tile.title = getTacticalCellLabel(cell);
+    if (glyph) tile.textContent = glyph;
     grid.appendChild(tile);
   });
 
@@ -325,7 +302,11 @@ function createTacticalLegend(tacticalMap) {
 
   cells.forEach((cell) => {
     const item = createElement("span", "tactical-legend-item");
-    item.appendChild(createElement("span", `tactical-swatch is-${cell}`));
+    const swatch = createElement("span", `tactical-swatch is-${cell}`);
+    const glyph = TACTICAL_CELL_GLYPHS[cell];
+
+    if (glyph) swatch.textContent = glyph;
+    item.appendChild(swatch);
     item.appendChild(document.createTextNode(getTacticalCellLabel(cell)));
     legend.appendChild(item);
   });
@@ -334,8 +315,8 @@ function createTacticalLegend(tacticalMap) {
 }
 
 function openTacticalMapFullscreen(tacticalMap) {
-  const overlay = createElement("div", "tactical-fullscreen");
-  const panel = createElement("div", "tactical-fullscreen-panel");
+  const overlay = createElement("div", "tactical-fullscreen tactical-map-fullscreen");
+  const panel = createElement("div", "tactical-fullscreen-panel tactical-map-fullscreen-panel");
   const header = createElement("div", "tactical-map-header");
   const title = createElement(
     "strong",
@@ -366,7 +347,59 @@ function openTacticalMapFullscreen(tacticalMap) {
   document.body.appendChild(overlay);
 }
 
-function createTacticalMap(scene, onRerollMap) {
+function openSceneModal({ title, tabs, initialTabIndex = 0 }) {
+  const overlay = createElement("div", "tactical-fullscreen scene-modal");
+  const panel = createElement("div", "tactical-fullscreen-panel scene-modal-panel");
+  const header = createElement("div", "tactical-map-header");
+  const tabBar = createElement("div", "scene-modal-tabs");
+  const body = createElement("div", "scene-modal-body");
+  let activeTabIndex = Math.min(initialTabIndex, tabs.length - 1);
+
+  function close() {
+    document.removeEventListener("keydown", onKeyDown);
+    overlay.remove();
+  }
+
+  function onKeyDown(event) {
+    if (event.key === "Escape") close();
+  }
+
+  function renderTabBar() {
+    [...tabBar.children].forEach((child, index) => {
+      child.classList.toggle("is-selected", index === activeTabIndex);
+    });
+  }
+
+  function renderBody() {
+    body.innerHTML = "";
+    body.appendChild(tabs[activeTabIndex].renderContent(renderBody, close));
+  }
+
+  tabs.forEach((tab, index) => {
+    tabBar.appendChild(createButton(tab.label, "extended-action is-compact", () => {
+      activeTabIndex = index;
+      renderTabBar();
+      renderBody();
+    }));
+  });
+
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) close();
+  });
+  document.addEventListener("keydown", onKeyDown);
+
+  header.appendChild(createElement("strong", null, title));
+  header.appendChild(createButton("Fechar", "extended-action is-compact", close));
+  panel.appendChild(header);
+  if (tabs.length > 1) panel.appendChild(tabBar);
+  panel.appendChild(body);
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+  renderTabBar();
+  renderBody();
+}
+
+function createTacticalMap(scene, onRerollMap, extraActions = []) {
   if (!scene?.tacticalMap) return null;
 
   const section = createElement("div", "tactical-map-panel");
@@ -380,6 +413,7 @@ function createTacticalMap(scene, onRerollMap) {
   const actions = createElement("div", "tactical-map-actions");
 
   actions.appendChild(createButton("Expandir", "extended-action is-compact", () => openTacticalMapFullscreen(scene.tacticalMap)));
+  extraActions.forEach((action) => actions.appendChild(action));
   if (!scene.tacticalMap.preset) {
     actions.appendChild(createButton("Gerar outro mapa", "extended-action is-compact", onRerollMap));
   }
@@ -406,9 +440,9 @@ function createSceneEffects(scene) {
   return list;
 }
 
-function createResolvedEncounter(scene, selectedItemKey, onSelectItem, onRerollMap) {
+function createResolvedEncounter(scene, selectedItemKey, onSelectItem, onRerollMap, tacticalMapActions = []) {
   const hasItems = Boolean(scene?.encounterNode?.resolvedEncounter?.items?.length);
-  const tacticalMap = createTacticalMap(scene, onRerollMap);
+  const tacticalMap = createTacticalMap(scene, onRerollMap, tacticalMapActions);
 
   if (!hasItems && !tacticalMap) return null;
 
@@ -425,7 +459,101 @@ function createResolvedEncounter(scene, selectedItemKey, onSelectItem, onRerollM
   return wrapper;
 }
 
-function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor, selectedItemKey, onSelectItem, onRerollMap, onRerollFinalEncounter) {
+function hasOpenableContent(scene) {
+  return Boolean(scene?.encounterNode?.resolvedEncounter?.items?.length || scene?.tacticalMap);
+}
+
+function createFinalGimmick(gimmickData) {
+  if (!gimmickData) return null;
+
+  const gimmick = createElement("p", "final-gimmick");
+  gimmick.appendChild(createElement("strong", null, `Gimmick do andar — ${gimmickData.name}: `));
+  gimmick.appendChild(document.createTextNode(gimmickData.detail));
+
+  return gimmick;
+}
+
+function buildSceneModalContent(scene, rerollTarget, selectedEncounterItemByScene, onRerollTacticalMap, refresh, tacticalMapActions = []) {
+  const wrapper = createElement("div", "scene-modal-content");
+  const sceneKey = getSceneKey(scene);
+
+  if (scene.detail) wrapper.appendChild(createElement("p", "result-detail", scene.detail));
+  const gimmick = createFinalGimmick(scene.gimmick);
+  if (gimmick) wrapper.appendChild(gimmick);
+
+  const encounter = createResolvedEncounter(
+    scene,
+    selectedEncounterItemByScene.get(sceneKey),
+    (nextKey) => {
+      selectedEncounterItemByScene.set(sceneKey, nextKey);
+      refresh();
+    },
+    () => {
+      onRerollTacticalMap(rerollTarget);
+      refresh();
+    },
+    tacticalMapActions
+  );
+  if (encounter) wrapper.appendChild(encounter);
+
+  return wrapper;
+}
+
+function createCurrentResult(snapshot, selectedEncounterItemByScene, onRerollTacticalMap) {
+  const section = createElement("section", "extended-panel");
+  const heading = createElement("h3", null, "Cena atual");
+  const results = snapshot.currentResults?.length
+    ? snapshot.currentResults
+    : snapshot.currentResult ? [snapshot.currentResult] : [];
+
+  section.appendChild(heading);
+
+  if (!results.length) {
+    const empty = createElement("p", "hidden-environment-notice", "Nenhuma cena d100 resolvida ainda. Registre uma falha para gerar a próxima cena.");
+    section.appendChild(empty);
+    return section;
+  }
+
+  results.forEach((result, index) => {
+    const scene = createElement("div", "current-scene-card");
+    const challengeText = result.challenge > 0 ? ` | ND ${formatChallengeRating(result.challenge)}` : "";
+    const sourceText = result.rollSource === "manual" ? "manual" : "automático";
+    const titlePrefix = results.length > 1 ? `Rolagem ${index + 1}: ` : "";
+    const title = createElement("p", "result-title", `${titlePrefix}d100 ${result.roll} (${sourceText}): ${result.categoryLabel}${challengeText}`);
+    const detail = createElement("p", "result-detail", result.detail);
+    const effects = createSceneEffects(result);
+
+    scene.appendChild(title);
+    scene.appendChild(detail);
+    if (effects) scene.appendChild(effects);
+    section.appendChild(scene);
+  });
+
+  const openable = results.filter(hasOpenableContent);
+  if (openable.length) {
+    section.appendChild(createButton(
+      results.length > 1 ? "Abrir cenas" : "Abrir cena completa",
+      "extended-action",
+      () => openSceneModal({
+        title: results.length > 1 ? "Cenas da falha atual" : "Cena atual",
+        tabs: openable.map((result, index) => ({
+          label: openable.length > 1 ? `Rolagem ${index + 1}` : "Cena",
+          renderContent: (refresh) => buildSceneModalContent(
+            result,
+            result.id || "current",
+            selectedEncounterItemByScene,
+            onRerollTacticalMap,
+            refresh
+          )
+        }))
+      })
+    ));
+  }
+
+  return section;
+}
+
+function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor, selectedEncounterItemByScene, onRerollTacticalMap, onRerollFinalEncounter) {
   const section = createElement("section", "extended-panel final-encounter-panel");
   const heading = createElement("h3", null, "Encontro final do andar");
 
@@ -443,14 +571,6 @@ function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor,
   const typeText = finalEncounter.categoryLabel ? ` | ${finalEncounter.categoryLabel}` : "";
 
   section.appendChild(createElement("p", "result-title", `${finalEncounter.title} (${challengeText}${typeText})`));
-  section.appendChild(createElement("p", "result-detail", finalEncounter.detail));
-
-  if (finalEncounter.gimmick) {
-    const gimmick = createElement("p", "final-gimmick");
-    gimmick.appendChild(createElement("strong", null, `Gimmick do andar — ${finalEncounter.gimmick.name}: `));
-    gimmick.appendChild(document.createTextNode(finalEncounter.gimmick.detail));
-    section.appendChild(gimmick);
-  }
 
   if (finalEncounter.treasureNote) {
     const treasure = createElement("p", "final-treasure");
@@ -459,20 +579,40 @@ function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor,
     section.appendChild(treasure);
   }
 
-  const encounter = createResolvedEncounter(finalEncounter, selectedItemKey, onSelectItem, onRerollMap);
-  if (encounter) section.appendChild(encounter);
+  if (hasOpenableContent(finalEncounter)) {
+    section.appendChild(createButton(
+      "Abrir encontro completo",
+      "extended-action",
+      () => openSceneModal({
+        title: finalEncounter.title,
+        tabs: [{
+          label: "Encontro",
+          renderContent: (refresh, close) => buildSceneModalContent(
+            finalEncounter,
+            "final",
+            selectedEncounterItemByScene,
+            onRerollTacticalMap,
+            refresh,
+            finalEncounter.sceneId && (finalEncounter.sceneOptions || 0) > 1
+              ? [createButton("Sortear outra cena", "extended-action is-compact", () => {
+                onRerollFinalEncounter();
+                close();
+              })]
+              : []
+          )
+        }]
+      })
+    ));
+  }
 
   if (snapshot.phase === "floorEncounter") {
-    const actions = createElement("div", "tactical-map-actions");
-    actions.appendChild(createButton("Marcar encontro resolvido", "extended-action", onResolveFinalEncounter));
-    if (finalEncounter.sceneId && (finalEncounter.sceneOptions || 0) > 1) {
-      actions.appendChild(createButton("Sortear outra cena", "extended-action is-compact", onRerollFinalEncounter));
-    }
+    const actions = createElement("div", "final-encounter-actions");
+    actions.appendChild(createButton("Marcar encontro resolvido", "extended-action is-door-open", onResolveFinalEncounter));
     section.appendChild(actions);
   }
 
   if (snapshot.phase === "readyToAdvance") {
-    section.appendChild(createButton("Avançar para o próximo andar", "extended-action", onAdvanceFloor));
+    section.appendChild(createButton("Avançar para o próximo andar", "extended-action is-door-open is-next-floor", onAdvanceFloor));
   }
 
   return section;
@@ -563,14 +703,7 @@ export function createExtendedExplorationRenderer({
       const currentEncounter = createCurrentResult(
         snapshot,
         selectedEncounterItemByScene,
-        (sceneKey, nextKey) => {
-          selectedEncounterItemByScene.set(sceneKey, nextKey);
-          render();
-        },
-        (target) => {
-          onRerollTacticalMap(target);
-          render();
-        }
+        onRerollTacticalMap
       );
       left.appendChild(currentEncounter);
       const resetPanel = createPendingResetPanel(snapshot, () => {
@@ -587,20 +720,12 @@ export function createExtendedExplorationRenderer({
       });
       if (descentPanel) left.appendChild(descentPanel);
 
-      const finalSceneId = snapshot.finalEncounter?.encounterNode?.id;
       left.appendChild(createFinalEncounter(
         snapshot,
         onResolveFinalEncounter,
         onAdvanceFloor,
-        finalSceneId ? selectedEncounterItemByScene.get(finalSceneId) : null,
-        (nextKey) => {
-          selectedEncounterItemByScene.set(finalSceneId, nextKey);
-          render();
-        },
-        () => {
-          onRerollTacticalMap("final");
-          render();
-        },
+        selectedEncounterItemByScene,
+        onRerollTacticalMap,
         () => {
           onRerollFinalEncounter();
           render();
