@@ -44,6 +44,7 @@ const elements = {
   legendClose: document.getElementById("legendClose"),
   rangeDialog: document.getElementById("rangeDialog"),
   floorRangeInput: document.getElementById("floorRangeInput"),
+  initialUnknownPathsField: document.getElementById("initialUnknownPathsField"),
   initialUnknownPathsInput: document.getElementById("initialUnknownPathsInput"),
   rangeConfirm: document.getElementById("rangeConfirm"),
   nodeDialog: document.getElementById("nodeDialog"),
@@ -576,11 +577,18 @@ function bindEvents() {
   });
 }
 
+function syncInitialUnknownPathsVisibility() {
+  const selectedProfile = getFloorRange(elements.floorRangeInput.value);
+  elements.initialUnknownPathsField.hidden = selectedProfile.mode === "extended-exploration";
+}
+
 function boot() {
   bindEvents();
   setupInstallButton();
   registerServiceWorker();
   populateFloorRangeSelect();
+  elements.floorRangeInput.addEventListener("change", syncInitialUnknownPathsVisibility);
+  syncInitialUnknownPathsVisibility();
   applyFloorRange(activeFloorRange.id);
   generateMap();
 

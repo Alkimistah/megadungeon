@@ -62,7 +62,21 @@ h1 {
   padding-top: 4px;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .settings-panel[hidden] {
+  display: none;
+}
+
+.extended-exploration-mode .node-map-only {
+  display: none;
+}
+
+/* svg não é HTMLElement: a propriedade .hidden não reflete atributo, então
+   o seletor [hidden] não casa; o modo estendido esconde o mapa por classe. */
+.extended-exploration-mode #map {
   display: none;
 }
 

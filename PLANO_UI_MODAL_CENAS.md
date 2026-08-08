@@ -230,6 +230,72 @@ Roteiro de teste no navegador (perfil "Andares de 1 a 10", andar 1):
 6. Registrar 3 sucessos com abordagens diferentes → "Encontro final do andar" mostra resumo (título/ND/gimmick/recompensa) + botão; modal abre com detalhe completo, mapa fixo e fichas; "Marcar encontro resolvido" e "Sortear outra cena" continuam na tela.
 7. Tela estreita (viewport ~375px): modal ocupa a tela inteira e rola verticalmente.
 
+## Passo 7 — Glifos nas células do mapa tático (pendência aprovada)
+
+Contexto: a visualização aprovada dos encontros finais mostrava letras/símbolos dentro das células (G no grupo, E no inimigo, "?" no oculto, R no ponto de reforço, ✦ na vantagem etc.), o que permite ler o mapa sem consultar a legenda. A implementação atual do app renderiza células **só com cor** (spans vazios com tooltip), porque estendeu o padrão antigo do `createTacticalGrid` — os glifos não foram portados. Este passo corrige isso. Independente da modal; pode ser feito antes.
+
+Arquivos: `src/extendedExplorationRenderer.js` e `src/styles.css`.
+
+1. Adicionar no topo do renderer, junto de `TACTICAL_CELL_LABELS`:
+
+```js
+const TACTICAL_CELL_GLYPHS = {
+  advantage: "✦",
+  difficult: "D",
+  enemy: "E",
+  hidden: "?",
+  mechanism: "M",
+  objective: "!",
+  party: "G",
+  pit: "F",
+  reinforcement: "R",
+  trap: "T",
+  web: "W"
+};
+```
+
+(Parede, chão, porta e obstáculo ficam sem glifo, como na visualização aprovada.)
+
+2. Em `createTacticalGrid`, depois de criar cada `tile`:
+
+```js
+const glyph = TACTICAL_CELL_GLYPHS[cell];
+if (glyph) tile.textContent = glyph;
+```
+
+3. Em `createTacticalLegend`, aplicar o mesmo glifo no swatch (`tactical-swatch`), para a legenda casar com o mapa.
+
+4. CSS — as células são fluidas (`minmax(0, 1fr)` com `aspect-ratio` no grid); o texto não pode quebrar o layout:
+
+```css
+.tactical-cell,
+.tactical-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  line-height: 1;
+  font-family: Consolas, monospace;
+  font-weight: 700;
+  font-size: clamp(7px, 1.2vw, 12px);
+  color: #f2ede1;
+}
+
+.tactical-cell.is-advantage,
+.tactical-cell.is-mechanism,
+.tactical-swatch.is-advantage,
+.tactical-swatch.is-mechanism {
+  color: #4a3b28;
+}
+
+.tactical-cell.is-hidden,
+.tactical-swatch.is-hidden {
+  color: var(--tactical-hidden, #c65a42);
+}
+```
+
+Cuidado: `.tactical-cell` já tem regras (`min-width: 0; min-height: 0; border; background`) — **acrescentar** propriedades, não substituir o bloco. Verificar no fullscreen (`Expandir`) que os glifos escalam bem.
+
 ## Critérios de aceite
 
 - "Cena atual" e "Encontro final" nunca renderizam mapa/fichas inline; apenas resumo + botão.
