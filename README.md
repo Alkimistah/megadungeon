@@ -1,13 +1,15 @@
 # Mega Dungeon
 
-Gerador procedural de andares e encontros para Tormenta20. Cria mapas em grafo com layout em "taça", geração determinística por seed, rastreamento de exploração e exportação de sessão como código portátil.
+Gerador procedural de exploração e encontros para Tormenta20. O app tem dois modos de jogo implementados: exploração estendida para os andares 1 a 10, representando um labirinto abstrato com eventos d100 e encontros finais curados; e mapa em grafo para os andares 11 a 20, representando uma região maior com nodos, rotas ramificadas e encontros por sala. Os andares 21 a 30 estão em planejamento como um arquipélago aberto.
 
 ## O que o app faz
 
-- Gera um mapa de nós com múltiplos níveis e caminhos ramificados.
-- Cada nó tem tipo de sala (normal, elite, armadilha, tesouro, boss, acampamento), perícia de descoberta, DC, ND calculado, ambiente (clima + terreno) e perfil de criatura quando aplicável.
+- Para os andares 1 a 10, conduz um teste estendido por andar: ações de perícia acumulam sucessos, falhas geram eventos d100, presságios, vantagens, anomalias, encontros e mapas táticos.
+- Para os andares 1 a 10, apresenta encontros finais por tier, sala especial da Aranha Matriarca no andar 10 e conclusão da etapa ao vencer o chefe.
+- Para os andares 11 a 20, gera um mapa de nós com múltiplos níveis e caminhos ramificados.
+- Cada nó do mapa 11 a 20 tem tipo de sala (normal, elite, armadilha, tesouro, boss, acampamento), perícia de descoberta, DC, ND calculado, ambiente (clima + terreno) e perfil de criatura quando aplicável.
 - O jogador navega pelo mapa escolhendo rotas, marcando encontros como explorados ou tentados, e descansando em acampamentos.
-- O estado completo (mapa + progresso) é exportado como um código de sessão que pode ser copiado e restaurado a qualquer momento — sem conta, sem backend.
+- O estado completo da exploração é exportado como um código de sessão que pode ser copiado e restaurado a qualquer momento, sem conta e sem backend.
 - Funciona offline e pode ser instalado como PWA.
 
 ## Desenvolvimento local
@@ -38,9 +40,13 @@ A pasta `dist/` gerada pelo build pode ser servida por qualquer host estático (
 src/
 ├── main.js           # Entrada; bindings de UI e orquestração
 ├── generator.js      # Algoritmo de geração do mapa
-├── appState.js       # Estado de exploração (rota, tempo, visibilidade)
+├── appState.js       # Estado de exploração do mapa em nodos
+├── extendedExplorationState.js # Estado dos andares 1 a 10
+├── extendedExplorationRenderer.js # UI dos andares 1 a 10
 ├── mapRenderer.js    # Renderização SVG
 ├── nodeDialog.js     # Modal de detalhes do nó
+├── encounterResolver.js # Resolve encontros com criatura, armadilha e mapa tático
+├── manualEncounterDialog.js # Gerador manual de encontro
 ├── challenge.js      # Cálculo de ND
 ├── creatures.js      # Tipos de criatura e perfil de encontro
 ├── creatureCatalog/  # Fichas por tipo, fonte e papel; inclui Livro Básico e Ameaças de Arton
@@ -51,28 +57,33 @@ src/
 ├── environment.js    # Geração de clima e terreno
 ├── tables.js         # Tabelas de perícias por tipo de sala
 ├── floorRanges.js    # Gerenciamento de perfis de andar
-├── floorProfiles/    # Um arquivo por faixa de andares
+├── floorProfiles/    # Perfis dungeon1to10 e forest11to20
 ├── random.js         # RNG com seed (cyrb128 + sfc32)
 └── sessionCode.js    # Codificação/decodificação do código de sessão
 ```
 
 Toda a documentação técnica detalhada — arquitetura, sistemas, estrutura de dados, fluxo da aplicação e pontos de extensão — está em [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
-## Adicionando uma nova faixa de andares
+Documentos de requisitos por etapa:
 
-1. Criar `src/floorProfiles/meuPerfil.js` seguindo a estrutura de `forest11to20.js`.
+- [`REQUISITOS_ANDARES_1_A_10.md`](REQUISITOS_ANDARES_1_A_10.md)
+- [`REQUISITOS_ANDARES_11_A_20.md`](REQUISITOS_ANDARES_11_A_20.md)
+- [`REQUISITOS_ANDARES_21_A_30.md`](REQUISITOS_ANDARES_21_A_30.md)
+
+## Perfis de andar
+
+Os perfis atuais são:
+
+- `dungeon1to10`: exploração estendida dos andares 1 a 10, com ações por andar, tabela d100, efeitos mecânicos, mapas táticos, encontros finais e chefe do andar 10.
+- `forest11to20`: mapa em nodos dos andares 11 a 20, usado como representação de uma área maior com rotas pré-geradas.
+
+Para adicionar uma nova faixa de andares:
+
+1. Criar `src/floorProfiles/meuPerfil.js` seguindo a estrutura do perfil mais próximo.
 2. Exportar o novo perfil em `src/floorProfiles/index.js`.
-3. Ele aparece automaticamente no seletor da interface.
+3. Definir o modo de exploração, tema, regras de ND e regras específicas do perfil.
 
-O perfil define pesos de tipos de sala, NDs por faixa de nível, pesos de tipos de criatura por terreno, regras de armadilhas, tema visual (cores CSS), e regras de geração de clima e terreno.
+## Melhorias possíveis
 
-## Próximos objetivos (não necessariamente ordem de prioridade)
-
-- Adicionar gerador de quests automático para dinheiro em paralelo com as runs (objetivos criados fora da dungeon que podem ser checksdos e são únicos por run na dungeon)
-- Adicionar botão de próximo andar no mapa, quando chegar no final dos encontros determinados.
-- Melhorar as descrições de monstros, armadilhas e visualização das telas de combate.
-- Fazer um cálculo de XP por encontro/combate, que condiza com o XP total do evento/combate e tenha os cálculos corretos.
-- Melhorar a visualização de ND por evento, dar mais ou menos peso em momentos específicos para desafios específicos.
-- Adaptar armadilhas para diferentes tipos de terreno e conjunto de andares (talvez gerar uma descrição específica para como a armadilha é ativada ou como ela se localiza no evento).
-- Adicionar mais faixas de andares (atualmente apenas Floresta 11-20) e regras para essas faixas.
-- Adicionar tabelas de encontros, tesouros e eventos específicos por perfil.
+- Adicionar mapas táticos aos encontros dos andares 11 a 20, mantendo o mapa em nodos como representação principal dessa faixa.
+- Evoluir os andares 21 a 30 como arquipélago aberto com 10 ilhas e ilha final de boss bloqueada por progresso.
