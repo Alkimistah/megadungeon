@@ -70,7 +70,9 @@ Requisitos:
 - acima dessas ficam 3 ilhas de dificuldade intermediária;
 - acima dessas ficam 2 ilhas avançadas;
 - no topo fica a ilha 30, a ilha do boss;
-- ilhas 21 a 29 ficam disponíveis desde o início;
+- ilhas 21 a 24 ficam disponíveis desde o início;
+- ilhas 25 a 27 ficam disponíveis após as ilhas 21 a 24 estarem marcadas como objetivo concluído;
+- ilhas 28 e 29 ficam disponíveis após as ilhas 25 a 27 estarem marcadas como objetivo concluído;
 - ilha 30 fica bloqueada até as outras 9 ilhas estarem concluídas;
 - cada ilha deve ter nome, número, objetivo e estado;
 - cada ilha concluída deve mostrar um check próximo ao marcador;
@@ -121,7 +123,6 @@ Exemplos de tipos de objetivo:
 - explorar ruínas e encontrar a saída;
 - libertar prisioneiros ou aliados;
 - interromper um culto, máquina ou processo mágico;
-- conquistar acesso à ilha final.
 
 O objetivo deve ter:
 
@@ -141,17 +142,17 @@ Quando uma ilha for selecionada, o app deve abrir uma modal ou ficha detalhada c
 A quantidade de objetivos ou encontros deve ser definida pelo andar que a ilha representa. Exemplo inicial:
 
 | Ilha | Quantidade sugerida de objetivos/encontros |
-|---|---:|
-| 21 | 4 |
-| 22 | 6 |
-| 23 | a definir |
-| 24 | a definir |
-| 25 | a definir |
-| 26 | a definir |
-| 27 | a definir |
-| 28 | a definir |
-| 29 | a definir |
-| 30 | boss e cenas finais a definir |
+|---|-------------------------------------------:|
+| 21 |                                          3 |
+| 22 |                                          3 |
+| 23 |                                          5 |
+| 24 |                                          5 |
+| 25 |                                          7 |
+| 26 |                                          7 |
+| 27 |                                          9 |
+| 28 |                                          9 |
+| 29 |                                         11 |
+| 30 |              boss e cenas finais a definir |
 
 Cada objetivo/encontro pode ter:
 
@@ -171,11 +172,13 @@ O app deve controlar um progresso global da etapa.
 
 Modelo definido:
 
-- as ilhas 21 a 29 ficam acessíveis desde o início;
+- ilhas 21 a 24 ficam disponíveis desde o início;
+- ilhas 25 a 27 ficam disponíveis após as ilhas 21 a 24 estarem marcadas como objetivo concluído;
+- ilhas 28 e 29 ficam disponíveis após as ilhas 25 a 27 estarem marcadas como objetivo concluído;
 - cada ilha concluída concede 1 fragmento do mapa de rotas;
 - o barco exibe um ícone para cada fragmento obtido;
 - a ilha 30 é desbloqueada quando os 9 fragmentos forem obtidos;
-- na prática, a ilha 30 só fica acessível quando todas as outras ilhas estiverem marcadas como OK.
+- na prática, a ilha 30 só fica acessível quando todas as outras ilhas estiverem marcadas como objetivo concluído.
 
 Esse modelo torna a etapa aberta na ordem de exploração, mas fechada na condição de conclusão: o grupo escolhe a sequência das ilhas, porém precisa resolver todas antes de alcançar o boss.
 
@@ -235,7 +238,7 @@ Regra de reset: objetivos/encontros resolvidos durante uma exploração só cont
 
 ### 8. Tempo, Descanso e Viagem Entre Ilhas
 
-Cada exploração de ilha consome 8 horas e representa um dia de esforço. Depois de explorar uma ilha, o grupo não pode explorar outra até descansar no barco.
+Cada exploração de ilha consome 8 horas e representa um dia de esforço. Após explorar uma ilha, o grupo não pode explorar outra até descansar no barco.
 
 O app deve:
 
@@ -332,11 +335,11 @@ Como ainda não há fórmula/tabela fechada para converter essa progressão em N
 Uma possibilidade é escalar por grupos de ilhas:
 
 | Ilhas | Função | ND sugerido |
-|---|---|---|
-| 21-24 | base da pirâmide, 4 ilhas iniciais | a definir |
-| 25-27 | faixa intermediária, 3 ilhas | a definir |
-| 28-29 | faixa avançada, 2 ilhas | a definir |
-| 30 | boss | a definir |
+|---|---|-------------|
+| 21-24 | base da pirâmide, 4 ilhas iniciais | 8           |
+| 25-27 | faixa intermediária, 3 ilhas | 9           |
+| 28-29 | faixa avançada, 2 ilhas | 10          |
+| 30 | boss | 11          |
 
 Os valores devem ser definidos a partir do patamar real dos personagens e das ameaças escolhidas.
 
@@ -659,7 +662,9 @@ Criar ou separar:
 - O mapa mostra o barco como base da pirâmide.
 - O barco funciona como acampamento.
 - As ilhas aparecem em pirâmide: 4 ilhas iniciais, 3 intermediárias, 2 avançadas e 1 ilha de boss.
-- Ilhas 21 a 29 ficam acessíveis desde o início.
+- Ilhas 21 a 24 ficam disponíveis desde o início;
+- Ilhas 25 a 27 ficam disponíveis após as ilhas 21 a 24 estarem marcadas como objetivo concluído;
+- Ilhas 28 e 29 ficam disponíveis após as ilhas 25 a 27 estarem marcadas como objetivo concluído;
 - Ilha 30 começa bloqueada.
 - Cada ilha possui nome, conceito, objetivo, estado e recompensa.
 - O usuário pode escolher qualquer ilha acessível.
@@ -765,7 +770,7 @@ O fluxo deve priorizar escolha aberta e controle manual do mestre. A primeira ve
 ## Passo a Passo Inicial Recomendado
 
 1. Criar o perfil `archipelago-21-30` e o modo `archipelago`, ainda com dados simples de ilha.
-2. Renderizar o mapa estratégico em pirâmide com barco na base, 9 ilhas acessíveis e ilha 30 bloqueada.
+2. Renderizar o mapa estratégico em pirâmide com barco na base, 4 ilhas acessíveis, 5 ilhas travadas e ilha 30 bloqueada.
 3. Implementar ficha/modal da ilha com estado, clima diário, objetivos/encontros placeholder e ações de exploração.
 4. Implementar barco como acampamento: descanso reseta esforço do dia, tempo de exploração e progresso parcial.
 5. Implementar regra de 1 exploração por descanso, consumo de 8 horas e bloqueio de novas explorações até descansar.
