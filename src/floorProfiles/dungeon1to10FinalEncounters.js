@@ -1,5 +1,4 @@
 // Encontros finais curados dos andares 1 a 9.
-// Especificação completa: ENCONTROS_FINAIS_ANDARES_1_A_9.md.
 //
 // Mapas preset 14x10 usam um caractere por célula:
 //   # parede    . chão       P grupo      E inimigo     H inimigo oculto/em potencial

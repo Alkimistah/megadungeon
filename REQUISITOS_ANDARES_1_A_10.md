@@ -14,56 +14,6 @@ Portanto, a visualização ideal não é reaproveitar diretamente o mapa de nodo
 
 Criar um modo de exploração para os andares 1 a 10 que permita ao mestre conduzir a progressão do grupo por testes estendidos, registrar sucessos e falhas, resolver rolagens d100, gerar cenas de exploração e disparar um encontro obrigatório antes de avançar ao próximo andar.
 
-## Perguntas Pendentes Para Próximos Patches
-
-Esta seção concentra decisões que dependem de definição do mestre. Cada resposta pode virar um patch futuro no perfil dos andares 1 a 10, nas tabelas de encontro, nas tabelas d100 ou no gerador de mapa tático.
-
-### Catálogo de Inimigos
-
-- Quais inimigos, nomes específicos, tipos ou categorias podem aparecer nos andares 1 a 10?
-- Quais inimigos do catálogo geral devem ser proibidos nesses andares, mesmo que o ND pareça compatível?
-- A seleção deve ser definida por andar individual, por tier de andares ou por subtema, como labirinto comum, área abandonada, área ocupada e covil aracnídeo?
-- Existem inimigos exclusivos desses andares que ainda precisam ser criados além da Aranha Matriarca e seus filhotes?
-- Em quais andares começam a aparecer criaturas aracnídeas, teias, ovos ou sinais diretos da Matriarca?
-
-### Encontros Finais
-
-- Quais são os encontros concretos da lista de cada tier e qual é o gimmick específico de cada andar de 1 a 9? (A estrutura, os tipos de cena e a regra de tesouro já estão decididos; falta autorar o conteúdo.)
-
-### Tabelas d100
-
-- As faixas e resultados da tabela d100 atualizada estão finais ou ainda precisam de revisão?
-- Quais resultados d100 devem virar estados mecânicos automáticos e quais devem virar apenas notas acionáveis para o mestre?
-- Existem resultados que devem ser diferentes por andar, mesmo dentro do mesmo tier?
-- A chance de combate, armadilha, tesouro e evento deve mudar conforme o andar aumenta?
-
-### Armadilhas e Obstáculos
-
-- Quais tipos de armadilha podem aparecer em cada tier: fosso, arame, lâmina, runa, gás, queda de pedras, teia, pressão, alarme ou outro?
-- Quais armadilhas devem bloquear passagem e quais apenas pressionam deslocamento?
-- Uma armadilha pode aparecer junto de inimigos como complicador secundário ou deve ser sempre a ameaça principal quando for resultado de armadilha?
-- Qual deve ser o dano, CD, perícia de detecção/desarme e XP de cada tipo de armadilha?
-
-### Mapa Tático
-
-- O gerador deve continuar apenas com botão de gerar outro mapa ou precisa permitir edição leve, como mover inimigos, grupo, portas e armadilhas?
-- Quais layouts devem ser mais comuns em cada andar: corredor, T, cruz, sala, corredor com sala, sala com corredor, gargalo, pilares ou sala irregular?
-- Portas devem ser raras, comuns ou variar por andar?
-- Posições de vantagem devem aparecer em todos os encontros, apenas em alguns ou somente quando o resultado indicar vantagem?
-
-### Progressão, Tempo e Balanceamento
-
-- Qual deve ser a CD base, quantidade de sucessos, limite de falhas e tempo base de teste para cada andar?
-- Os multiplicadores de tempo por abordagem devem ser iguais em todos os andares ou variar por andar?
-- O app deve alertar quando a sequência de eventos estiver ficando perigosa demais para personagens de nível 1 a 4?
-- Como XP e loot devem ser distribuídos quando o grupo teve muitos encontros antes do encontro final obrigatório?
-
-### Sessão e Histórico
-
-- O código de sessão deve preservar apenas o estado mecânico atual ou também o log textual completo da exploração?
-- O mapa tático atual deve ser preservado no código de sessão ou pode ser regenerado ao carregar?
-- Estados pendentes de presságio/vantagem devem ser exportados sempre com a sessão?
-
 ## Princípios de Design
 
 - A unidade principal da exploração é o andar atual, não um nodo de mapa.
@@ -193,7 +143,7 @@ Esse mapa não substitui o labirinto abstrato. Ele representa apenas a sala, cor
 Formato base:
 
 - matriz de 14 colunas por 10 linhas;
-- exceção: a sala do chefe do andar 10 usa mapa maior, de ao menos 14x20;
+- exceção: a sala do chefe do andar 10 usa mapa maior, atualmente 20x14;
 - cada célula representa um quadrado do mapa físico do usuário;
 - o tamanho real do quadrado não importa para o app;
 - o mapa deve ser legível como grade e fácil de copiar para uma mesa física.
@@ -267,7 +217,7 @@ O app deve apresentar:
 - ovos que eclodem como reforços durante a luta;
 - ND 4 fixo;
 - teias como perigo ativo e terreno difícil, com pilares/cobertura na sala;
-- mapa tático maior que o padrão: ao menos 14x20;
+- mapa tático maior que o padrão: 20x14;
 - recompensa principal: cristal verde (tesouro multiplicador, sem efeito mecânico).
 
 O andar 10 deve ter uma tela de chefe ou estado especial, sem exigir sucessos/falhas para avanço. Após o chefe ser resolvido, o app apresenta a tela de conclusão da etapa 1-10 com resumo de XP, tesouros e log.
@@ -455,7 +405,7 @@ Criar ou separar:
 - O andar 10 abre como sala de chefe, sem testes estendidos.
 - Encontros, armadilhas e chefe podem gerar um mapa tático 14x10.
 - O mapa tático indica paredes, grupo, inimigos, armadilhas, portas e posições de vantagem.
-- A sessão preserva estado, progresso, log e resultados gerados.
+- A sessão preserva estado mecânico, progresso e log recente; cenas, mapas e encontros podem ser regenerados nesta versão.
 - Os encontros e armadilhas respeitam o patamar de personagens nível 1 a 4.
 - Os inimigos usados nos andares 1 a 10 vêm apenas do subconjunto permitido para esse perfil, tier ou andar.
 - Armadilhas no mapa tático criam empecilho real: bloqueiam ou pressionam rotas, protegem inimigos, ocupam mais de uma célula quando necessário e não aparecem como marcador irrelevante isolado.
@@ -493,32 +443,9 @@ Criar ou separar:
 - Encontros finais curados implementados: 25 cenas por tier com gimmick por andar (dungeon1to10FinalEncounters.js), composição fixa de criaturas/armadilhas do catálogo, ND por variante de andar, mapa preset 14x10 fixo por cena, gimmick e recompensa exibidos no painel, e botão de sortear outra cena do tier.
 - Mapa tático com legenda expandida: inimigo oculto/em potencial, fosso/vão, teia/casulo, terreno difícil, mecanismo, objetivo/achado, entrada de reforço e porta como entrada/saída; legenda exibe apenas os tipos presentes no mapa e as cores são configuráveis por perfil via tema (tacticalColors).
 - Sala do chefe do andar 10 implementada: encontro ND 4 com ficha da Aranha Matriarca e Aranhas Filhotes, mapa fixo 20x14 com portas laterais de 2 quadrados na entrada e saída, grupo em 4 quadrados alinhado ao centro da entrada, Matriarca Grande ocupando 2x2 perto da saída, área 4x4 de teia ao redor dela, quatro zonas de teia 3x3 nos cantos internos com ovo/casulo no centro, teias 2x2 adicionais no centro, frente da saída e rotas laterais, oito pilares, recompensa do cristal verde e tela de conclusão da etapa.
-
-### Parcialmente Implementado
-
-- Presságios e vantagens já podem ser tratados como estados, mas ainda precisam de cobertura completa por tabela e comunicação visual refinada de criação, aplicação e consumo.
-- O mapa tático já tem validações importantes, mas ainda precisa de ajuste fino por tipo de encontro, tipo de armadilha e gimmick de andar.
-- Encontros finais existem como etapa obrigatória, mas ainda precisam de tabelas próprias por andar ou variações mais marcantes.
-- As tabelas d100 estão estruturadas, mas precisam ser conferidas contra a versão definitiva do material.
-- A seleção de ações por andar existe, mas ainda deve ser revisada contra a versão definitiva do documento de perícias e ações.
-- As listas de criaturas permitidas por andar existem e são aplicadas, mas ainda precisam ser validadas contra a definição final do mestre por andar, tier ou subtema.
-
-### Pendente
-
-- Validar em mesa as listas de encontro final implementadas (NDs, CDs de negociação e valores custom dos obstáculos).
-- Associar cada tipo de armadilha a padrões táticos diferentes no mapa, em vez de usar apenas uma zona genérica.
-- Ajustar balanceamento para personagens de nível 1 a 4, especialmente quantidade de inimigos, ND agregado, dano de armadilhas e frequência de falhas.
-- Revisar persistência de sessão para garantir que estado mecânico, encontro atual, mapas atuais e efeitos pendentes carreguem sem fragilidade.
-
-### Melhorias Futuras
-
-- Criar pesos de criaturas por tema: labirinto comum, área abandonada, área ocupada, covil aracnídeo e sala de chefe.
-- Permitir edição leve do mapa tático, como mover grupo, inimigos, armadilhas e portas, antes de considerar edição célula por célula.
-- Exibir objetivo tático da cena, por exemplo "atravessar a armadilha", "segurar gargalo", "alcançar a porta", "interromper ritual" ou "sobreviver à emboscada".
-- Fazer o gerador de mapa considerar papéis de inimigo, como solo, grupo, enxame, atirador, defensor ou criatura que usa teias.
-- Fazer o mapa tático respeitar tamanho de criatura: Pequenas e Médias ocupam 1 quadrado; Grandes ocupam 2x2 quadrados adjacentes.
-- Adicionar validações automáticas de mapa por tipo de layout: número esperado de saídas, conectividade, distância inicial, cobertura e relevância da armadilha.
-- Criar prévias ou presets de mapas especiais para encontros finais e chefe.
+- Persistência mínima da exploração implementada: código de sessão preserva andar, fase, sucessos, falhas, ações usadas, tempo, estados de reset/descida e log recente; cenas, mapas e encontros podem ser regenerados nesta versão.
+- Mapas táticos gerados por falhas d100 especializados por ameaça: fossos usam `pit`, redes/teias usam `web`, projéteis usam mecanismo e linha de tiro, runas/símbolos usam marcação arcana, gás/área usa zona de risco, impacto/desabamento usa obstáculos e terreno difícil, mantendo fallback genérico para armadilhas não reconhecidas.
+- Efeitos mecânicos de presságio, vantagem, evento e anomalia implementados para os resultados com consequência sistêmica definida: "Sala se reconstrói sozinha" e a versão negativa de "Corredor troca de lugar" removem 1 sucesso; a versão positiva de "Corredor troca de lugar" e "Corredor encurta" adicionam 1 sucesso; "Rota circular evidente" remove 1 falha; "Vozes repetem frases do grupo" e "Sombras agem com atraso" aumentam a dificuldade do próximo teste relevante em 1; "Cheiro de ácido/sangue/ferrugem", "Corrente de ar diferente" e "Visão do andar seguinte" reduzem a dificuldade do próximo teste relevante em 2; "Passagem estreita" posiciona 1 marcador do grupo isolado na próxima cena; "Cristais falsos brilham" posiciona o grupo adjacente à ameaça principal; "Gravidade falha por instantes" exibe teste de Reflexos DC do andar e dano por tier; "Parede respira lentamente" exibe teste de Fortitude DC do andar e consequência de enjoo no próximo combate. Resultados deliberadamente narrativos permanecem como texto para condução do mestre. Todos os efeitos mecânicos registram log e aparecem como efeito na cena, na linha de CD ou no mapa tático.
 
 ## Decisões e Pontos de Atenção
 
@@ -529,18 +456,17 @@ Criar ou separar:
 - Todo encontro final tem ND definido, respeitando o ND máximo do andar, e concede tesouro padrão: rolagem na tabela de tesouros do livro para esse ND. Em cenas de combate ou armadilha, esse tesouro é adicional ao que as criaturas já soltam; em cenas específicas (eventos, negociação, anomalia), o grupo só ganha o tesouro se for bem-sucedido.
 - Sinais diretos da Matriarca (teias, ovos, crias) entram nos encontros finais a partir do andar 7, escalando até o covil no andar 10.
 - Reforços em combate são proibidos nos andares 1 a 4 (toda a composição começa em cena). Nos andares 5 a 9, reforços são limitados a 1 criatura ou enxame a cada 2 rodadas, com máximo total por cena, e o ND somado incluindo reforços respeita o teto do andar. Habilidades de ficha que geram crias (ex.: Mamãe Glop) não contam como reforço externo.
-- Toda cena de encontro final deve ser mecanicamente explícita: criatura com ficha do catálogo (nunca "um vigia" abstrato), armadilha exata do catálogo com CD/dano/detecção/desarme, posicionamento no mapa e regras de rodada quando houver. A especificação proposta está em ENCONTROS_FINAIS_ANDARES_1_A_9.md.
+- Toda cena de encontro final deve ser mecanicamente explícita: criatura com ficha do catálogo (nunca "um vigia" abstrato), armadilha exata do catálogo com CD/dano/detecção/desarme, posicionamento no mapa e regras de rodada quando houver. A fonte atual dessas cenas é `src/floorProfiles/dungeon1to10FinalEncounters.js`.
 - A luta da Matriarca inclui crias presentes desde o início, ovos que eclodem como reforços durante o combate e teias como perigo ativo que restringe movimento.
 - O ND da luta contra a Matriarca no andar 10 é fixo em 4, sem variação para 3.
-- A sala do chefe usa mapa tático maior que o padrão: ao menos 14x20, com teias (terreno difícil), ovos como objetos no mapa e pilares/cobertura como elementos obrigatórios. Poços rasos são opcionais.
+- A sala do chefe usa mapa tático maior que o padrão: 20x14, com teias (terreno difícil), ovos como objetos no mapa e pilares/cobertura como elementos obrigatórios. Poços rasos são opcionais.
 - O cristal verde não tem efeito mecânico: é tesouro. Todos os inimigos soltam cristais (normalmente azuis) conforme o ND, convertidos em dinheiro no comércio da cidade; o cristal verde é um cristal multiplicador, valendo o dobro ou o quádruplo do cristal azul de mesmo ND.
 - Depois da vitória contra a Matriarca, o app mostra uma tela de conclusão da etapa 1-10 (estado `completed`) com resumo de XP, tesouros e log; a etapa 11-20 é um perfil separado iniciado manualmente.
 - O encontro final concede XP integral sempre. Ele é obrigatório e garante algum ganho de XP e loot por andar, mesmo quando os personagens tiveram poucas ou muitas falhas durante a exploração.
 - Os andares 1 a 10 não permitem retorno manual a andares anteriores. O fluxo é sempre avançar.
 - As cores do mapa tático devem ser configuráveis por perfil/tema de andares, não fixas globalmente.
 - Presságios e vantagens podem virar estados mecânicos automáticos, desde que o app deixe claro quando o estado foi criado e quando foi aplicado.
-- O histórico de exploração pode ser preservado no código de sessão se isso não complicar o carregamento. Se gerar complexidade excessiva, basta preservar o estado mecânico atual.
-- O mapa tático não precisa ser editável célula por célula na primeira versão. Um botão para gerar outro layout é suficiente.
+- O código de sessão preserva estado mecânico, ações usadas, tempo e log recente; cenas, mapas e encontros podem ser regenerados ao carregar nesta versão.
 
 ### Tempo de Exploração
 
@@ -571,34 +497,22 @@ Exemplos:
 - Se cair "Rota circular evidente: remove 1 falha se o grupo mudar a abordagem", o app poderia esperar uma condição e remover a falha automaticamente.
 - Se cair "Sangue ainda fresco: próxima criatura pode estar ferida", o app poderia marcar o próximo encontro com uma sugestão de PV reduzido.
 
-Decisão: esses efeitos podem virar estados mecânicos automáticos, mas a interface deve comunicar explicitamente que o estado foi aplicado. Exemplo: "Estado aplicado: próxima criatura começa ferida" ao cair o presságio, e "Estado consumido: inimigos entram com 75% dos PV" quando o próximo encontro é gerado.
+Decisão: esses efeitos podem virar estados mecânicos automáticos, mas a interface deve comunicar explicitamente quando o presságio surge e quando ele se cumpre. Exemplo: "Rastro de sangue fresco: a próxima criatura entra ferida" ao cair o presságio, e "O presságio se cumpre nesta cena" quando o próximo encontro é gerado.
 
 ### Log de Exploração
 
 O log é o histórico que aparece no painel do labirinto, registrando sucessos, falhas, d100, resets, encontros finais e avanço de andar.
 
-Exemplo:
+Exemplo narrativo do formato atual:
 
 ```text
-Exploração iniciada no andar 1.
-Sobrevivência: Orientar-se: sucesso (1/3).
-Percepção: Observar: falha (1/5).
-d100 74: Encontro médio, ND 1/2.
+O grupo entra na masmorra, começando sua jornada no primeiro andar.
+Sobrevivência: Orientar-se: o grupo avança pelo labirinto (1/3 sucessos).
+Percepção: Observar: a masmorra resiste ao avanço (1/5 falhas).
+A masmorra responde ao erro. d100 74 (manual): Encontro médio, ND 1/2.
 ```
 
-Decisão: preservar o log no código de sessão é desejável enquanto isso não tornar o carregamento frágil ou excessivamente complexo. Caso vire problema técnico, o requisito mínimo é preservar o estado mecânico atual.
-
-### Edição do Mapa Tático
-
-A dúvida original era se "editável célula por célula" significa permitir que o mestre altere o mapa durante a aventura, clicando em cada quadrado para trocar parede, chão, inimigo, armadilha, porta etc.
-
-Opções:
-
-- Apenas gerar novamente: o app cria outro layout 14x10 se o mestre não gostar.
-- Edição leve: mover/remover marcadores como inimigos, grupo, armadilhas e portas.
-- Edição completa: clicar célula por célula para trocar qualquer tile.
-
-Decisão: na primeira versão, basta gerar novamente o mapa tático. Edição célula por célula pode ficar para uma etapa posterior se o uso real mostrar necessidade.
+Decisão: preservar no código de sessão o estado mecânico atual, ações usadas, tempo e log recente. Cenas, mapas e encontros podem ser regenerados ao carregar nesta versão.
 
 ## Decisão Arquitetural Recomendada
 

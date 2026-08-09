@@ -11,6 +11,8 @@ const TACTICAL_WIDTH = 14;
 const TACTICAL_HEIGHT = 10;
 const BOSS_TACTICAL_WIDTH = 20;
 const BOSS_TACTICAL_HEIGHT = 14;
+const MENTAL_SOCIAL_SKILLS = ["Conhecimento", "Diplomacia", "Enganação", "Intimidação", "Intuição", "Misticismo", "Nobreza", "Religião", "Vontade"];
+const SUBSTANCE_TRACE_SKILLS = ["Cura", "Investigação", "Ladinagem", "Misticismo", "Ofício", "Percepção", "Sobrevivência"];
 
 function getFloorRules(profile, floor) {
   return profile.extendedExploration.progressByFloor[floor] || null;
@@ -29,6 +31,46 @@ function getCategory(profile, categoryId) {
 
 function getCategoryChallenge(category, tier) {
   return category.challengeByTier[tier?.id] ?? category.challengeByTier.default ?? 0;
+}
+
+function getGravityDamageDice(floor) {
+  if (floor <= 2) return "1d6";
+  if (floor <= 4) return "2d6";
+  if (floor <= 6) return "3d6";
+  return "4d6";
+}
+
+function getFloorName(floor) {
+  return {
+    1: "primeiro andar",
+    2: "segundo andar",
+    3: "terceiro andar",
+    4: "quarto andar",
+    5: "quinto andar",
+    6: "sexto andar",
+    7: "sétimo andar",
+    8: "oitavo andar",
+    9: "nono andar",
+    10: "décimo andar"
+  }[floor] || `andar ${floor}`;
+}
+
+function getFloorArrivalLog(floor, isInitial = false, rng = Math.random) {
+  if (floor === 10) {
+    return isInitial
+      ? "A jornada começa diante da câmara final: fios grossos, casulos e silêncio anunciam a presença da Matriarca Aracnídea."
+      : "O grupo desce até o décimo andar, onde a masmorra se abre no covil da Matriarca Aracnídea.";
+  }
+
+  if (isInitial || floor === 1) {
+    return "O grupo entra na masmorra, começando sua jornada no primeiro andar.";
+  }
+
+  return pick(rng, [
+    `O grupo desce mais profundamente na masmorra, chegando ao ${getFloorName(floor)}.`,
+    `A escadaria termina em corredores mais escuros: o grupo alcança o ${getFloorName(floor)}.`,
+    `A masmorra engole mais alguns passos, e o grupo chega ao ${getFloorName(floor)}.`
+  ]);
 }
 
 function getApproach(profile, approachId) {
@@ -101,8 +143,8 @@ function getApproachNarrative(approach, outcome) {
   }[approach.skill] || `Um personagem tenta ${actionLower} para avançar pelo labirinto.`;
 
   return isSuccess
-    ? `${prefix} A leitura estava correta.`
-    : `${prefix} A tentativa não encontra uma rota segura.`;
+    ? `${prefix} A leitura se confirma, e a masmorra cede alguns metros de caminho.`
+    : `${prefix} O caminho parece promissor por um instante, mas a masmorra distorce a rota.`;
 }
 
 function clampRoll(value) {
@@ -131,7 +173,24 @@ function createSceneDetail(profile, categoryId, rng) {
   const table = profile.extendedExploration.commonTables[categoryId];
 
   if (table?.length) {
-    return pick(rng, table);
+    const detail = pick(rng, table);
+
+    if (detail.includes("Corredor troca de lugar")) {
+      return pick(rng, [
+        "Corredor troca de lugar: as paredes apagam a rota mapeada e removem 1 sucesso do progresso do andar.",
+        "Corredor troca de lugar: a mudança revela um atalho improvável e adiciona 1 sucesso ao progresso do andar."
+      ]);
+    }
+
+    if (detail.includes("Cheiro de ácido, sangue ou ferrugem")) {
+      return pick(rng, [
+        "Cheiro de ácido: o odor corrosivo denuncia perigo químico ou passagem recém-aberta, reduzindo em 2 a dificuldade do próximo teste apropriado.",
+        "Cheiro de sangue: o rastro metálico conduz a sinais recentes, reduzindo em 2 a dificuldade do próximo teste apropriado.",
+        "Cheiro de ferrugem: o ar denuncia metal velho, mecanismo ou armadilha, reduzindo em 2 a dificuldade do próximo teste apropriado."
+      ]);
+    }
+
+    return detail;
   }
 
   if (categoryId === "obstacle") {
@@ -486,6 +545,73 @@ function placePartyFormation(cells, rng) {
   if (selected) setCells(cells, selected, "party");
 }
 
+function distanceBetween([x1, y1], [x2, y2]) {
+  return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+}
+
+function clearMarker(cells, marker) {
+  getMarkerPositions(cells, marker).forEach(([x, y]) => {
+    cells[y][x] = "floor";
+  });
+}
+
+function getThreatPositions(cells) {
+  const priority = ["trap", "pit", "mechanism", "enemy", "web", "difficult", "reinforcement"];
+
+  for (const marker of priority) {
+    const positions = getMarkerPositions(cells, marker);
+    if (positions.length) return positions;
+  }
+
+  return [];
+}
+
+function isAdjacentToAny(position, targets) {
+  return targets.some((target) => distanceBetween(position, target) === 1);
+}
+
+function placePartyAdjacentToThreat(cells, rng) {
+  const threats = getThreatPositions(cells);
+  if (!threats.length) return;
+
+  clearMarker(cells, "party");
+  const formations = shufflePositions(getPartyFormations(), rng)
+    .filter((formation) =>
+      isFormationFree(cells, formation) && formation.some((position) => isAdjacentToAny(position, threats))
+    );
+
+  if (formations.length) {
+    setCells(cells, formations[0], "party");
+    return;
+  }
+
+  placePartyFormation(cells, rng);
+}
+
+function isolatePartyMarker(cells, rng) {
+  const partyPositions = getMarkerPositions(cells, "party");
+  if (partyPositions.length < 2) return;
+
+  const remaining = partyPositions.slice(0, -1);
+  const [removedX, removedY] = partyPositions[partyPositions.length - 1];
+  cells[removedY][removedX] = "floor";
+
+  const candidates = shufflePositions(allFreePositions(cells), rng)
+    .map((position) => ({
+      distance: Math.min(...remaining.map((partyPosition) => distanceBetween(position, partyPosition))),
+      position
+    }))
+    .sort((a, b) => b.distance - a.distance);
+  const selected = candidates.find((candidate) => candidate.distance >= 4) || candidates[0];
+
+  if (selected) {
+    const [x, y] = selected.position;
+    cells[y][x] = "party";
+  } else {
+    cells[removedY][removedX] = "party";
+  }
+}
+
 function getRoomPlan(rng) {
   return pick(rng, [
     {
@@ -607,7 +733,7 @@ function placeOptionalDoors(cells, rng, openPassages) {
 }
 
 function isWalkableCell(cell) {
-  return ["floor", "door", "party", "enemy", "trap", "advantage"].includes(cell);
+  return ["floor", "door", "party", "enemy", "trap", "web", "difficult", "mechanism", "objective", "reinforcement", "advantage"].includes(cell);
 }
 
 function isTrapPlacementCell(cell) {
@@ -683,6 +809,153 @@ function placeTrapZone(cells, openPassages, trapCount, rng) {
   if (!selected) return;
 
   setCells(cells, selected.slice(0, Math.min(selected.length, targetSize)), "trap");
+}
+
+function normalizeTag(tag) {
+  return String(tag || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-BR");
+}
+
+function trapHasAnyTag(trap, tags) {
+  const normalizedTags = (trap?.tags || []).map(normalizeTag);
+  const normalizedName = normalizeTag(`${trap?.id || ""} ${trap?.name || ""}`);
+
+  return tags.some((tag) =>
+    normalizedTags.includes(normalizeTag(tag)) || normalizedName.includes(normalizeTag(tag))
+  );
+}
+
+function hasArachnidCreature(encounterNode) {
+  return Boolean(encounterNode?.resolvedEncounter?.items?.some((item) =>
+    item.kind === "creature" && normalizeTag(`${item.creatureId || ""} ${item.name || ""}`).includes("aranh")
+  ));
+}
+
+function getTacticalThreatKind(encounterNode) {
+  const trap = encounterNode?.trap;
+
+  if (trapHasAnyTag(trap, ["fosso", "queda", "estacas"])) return "pit";
+  if (trapHasAnyTag(trap, ["lamina", "pendulo", "corte", "multiplos ataques"])) return "blade";
+  if (trapHasAnyTag(trap, ["virote", "projetil", "perfuracao"])) return "projectile";
+  if (trapHasAnyTag(trap, ["magica", "runa", "simbolo"])) return "rune";
+  if (trapHasAnyTag(trap, ["gas", "veneno", "nuvem"])) return "gas";
+  if (trapHasAnyTag(trap, ["impacto", "bloco", "desabamento"])) return "rubble";
+  if (trapHasAnyTag(trap, ["rede", "agarrado", "teia"])) return "web";
+  if (hasArachnidCreature(encounterNode)) return "webCombat";
+
+  return trap ? "generic" : "none";
+}
+
+function setCellsIfOpen(cells, positions, marker) {
+  positions.forEach(([x, y]) => {
+    if (["floor", "trap", "web", "difficult", "advantage"].includes(cells[y]?.[x])) {
+      cells[y][x] = marker;
+    }
+  });
+}
+
+function getThreatCenter(cells, openPassages) {
+  const partyCenter = getCenter(getMarkerPositions(cells, "party"));
+  const enemyPositions = getMarkerPositions(cells, "enemy");
+  const targetCenter = enemyPositions.length ? getCenter(enemyPositions) : getEdgeCenter(openPassages);
+
+  return [
+    Math.min(Math.max(Math.round((partyCenter[0] + targetCenter[0]) / 2), 2), TACTICAL_WIDTH - 3),
+    Math.min(Math.max(Math.round((partyCenter[1] + targetCenter[1]) / 2), 2), TACTICAL_HEIGHT - 3)
+  ];
+}
+
+function placePitThreat(cells, openPassages) {
+  const [centerX, centerY] = getThreatCenter(cells, openPassages);
+  const horizontal = centerY >= 3 && centerY <= TACTICAL_HEIGHT - 4;
+  const pitCells = horizontal
+    ? Array.from({ length: TACTICAL_WIDTH - 4 }, (_, index) => [index + 2, centerY])
+    : Array.from({ length: TACTICAL_HEIGHT - 4 }, (_, index) => [centerX, index + 2]);
+
+  setCellsIfOpen(cells, pitCells, "pit");
+}
+
+function placeBladeThreat(cells, openPassages) {
+  const [centerX, centerY] = getThreatCenter(cells, openPassages);
+  const bladeCells = [
+    [centerX, centerY],
+    [centerX + 1, centerY],
+    [centerX, centerY + 1]
+  ];
+
+  setCellsIfOpen(cells, bladeCells, "trap");
+}
+
+function placeProjectileThreat(cells, openPassages) {
+  const [centerX, centerY] = getThreatCenter(cells, openPassages);
+  const wallX = centerX < TACTICAL_WIDTH / 2 ? TACTICAL_WIDTH - 2 : 1;
+  const lineStart = Math.min(wallX, centerX);
+  const lineEnd = Math.max(wallX, centerX);
+
+  setCellsIfOpen(
+    cells,
+    Array.from({ length: lineEnd - lineStart + 1 }, (_, index) => [lineStart + index, centerY]),
+    "trap"
+  );
+  setCellsIfOpen(cells, [[wallX, centerY]], "mechanism");
+}
+
+function placeAreaThreat(cells, openPassages, marker = "trap") {
+  const [centerX, centerY] = getThreatCenter(cells, openPassages);
+  const area = [
+    [centerX - 1, centerY - 1], [centerX, centerY - 1],
+    [centerX - 1, centerY], [centerX, centerY]
+  ];
+
+  setCellsIfOpen(cells, area, marker);
+}
+
+function placeRubbleThreat(cells, openPassages) {
+  const [centerX, centerY] = getThreatCenter(cells, openPassages);
+  const rubble = [
+    [centerX - 1, centerY], [centerX, centerY], [centerX + 1, centerY],
+    [centerX, centerY - 1], [centerX, centerY + 1]
+  ];
+
+  setCellsIfOpen(cells, rubble.slice(0, 2), "obstacle");
+  setCellsIfOpen(cells, rubble.slice(2), "difficult");
+}
+
+function placeWebThreat(cells, openPassages, rng, includeEgg = false) {
+  const [centerX, centerY] = getThreatCenter(cells, openPassages);
+  const web = [];
+
+  for (let y = centerY - 1; y <= centerY + 1; y += 1) {
+    for (let x = centerX - 1; x <= centerX + 1; x += 1) {
+      web.push([x, y]);
+    }
+  }
+
+  setCellsIfOpen(cells, web, "web");
+  if (includeEgg) setCellsIfOpen(cells, [[centerX, centerY]], "reinforcement");
+
+  const extra = shufflePositions(allFreePositions(cells), rng).slice(0, 4);
+  setCellsIfOpen(cells, extra, "web");
+}
+
+function placeThreatFeature(cells, { encounterNode, floor, openPassages, trapCount, rng }) {
+  const threatKind = getTacticalThreatKind(encounterNode);
+
+  if (threatKind === "none") return;
+  if (threatKind === "pit") return placePitThreat(cells, openPassages);
+  if (threatKind === "blade") return placeBladeThreat(cells, openPassages);
+  if (threatKind === "projectile") return placeProjectileThreat(cells, openPassages);
+  if (threatKind === "rune") return placeAreaThreat(cells, openPassages, "mechanism");
+  if (threatKind === "gas") return placeAreaThreat(cells, openPassages, "trap");
+  if (threatKind === "rubble") return placeRubbleThreat(cells, openPassages);
+  if (threatKind === "web") return placeWebThreat(cells, openPassages, rng, true);
+  if (threatKind === "webCombat") {
+    return placeWebThreat(cells, openPassages, rng, threatKind === "webCombat");
+  }
+
+  return placeTrapZone(cells, openPassages, trapCount, rng);
 }
 
 function getWalkablePositions(cells) {
@@ -782,6 +1055,8 @@ function createTacticalMap({ encounterNode, floor, rng, sceneEffects = [] }) {
   const enemyCount = getEncounterEnemyCount(encounterNode);
   const trapCount = hasTrap(encounterNode) ? 1 : 0;
   const hasAdvantage = sceneEffects.some((effect) => effect.type === "partyAdvantage");
+  const hasIsolatedParty = sceneEffects.some((effect) => effect.type === "isolatedParty");
+  const hasAdjacentThreat = sceneEffects.some((effect) => effect.type === "partyAdjacentToThreat");
   const cells = createEmptyTacticalMap();
   const templates = floor >= 7
     ? ["pillars", "split", "alcoves", "irregular", "columns", "choke", "side-rooms", "rubble", "webbed", "corridor-2", "t-junction", "cross", "corridor-room", "room-corridor"]
@@ -795,13 +1070,15 @@ function createTacticalMap({ encounterNode, floor, rng, sceneEffects = [] }) {
 
   placePartyFormation(cells, rng);
   placeMarkers(cells, plan.enemies, "enemy", enemyCount, rng);
-  placeTrapZone(cells, openPassages, trapCount, rng);
 
   if (hasAdvantage) {
     placeMarkers(cells, plan.advantages, "advantage", 2, rng);
   }
 
   normalizeTacticalConnectivity(cells);
+  placeThreatFeature(cells, { encounterNode, floor, openPassages, trapCount, rng });
+  if (hasAdjacentThreat) placePartyAdjacentToThreat(cells, rng);
+  if (hasIsolatedParty) isolatePartyMarker(cells, rng);
 
   return {
     cells: cells.flat(),
@@ -951,22 +1228,158 @@ function createBossEncounterNode(profile, floor, boss) {
 function createSceneEffect(detail) {
   if (detail.includes("Sangue ainda fresco")) {
     return {
-      label: "Próximo encontro: inimigos entram feridos",
+      label: "Rastro de sangue fresco: a próxima criatura entra ferida",
       type: "enemyWounded",
       value: 0.75,
-      note: "Aplique PV inicial em 75% para cada inimigo gerado."
+      note: "Os sinais apontam para uma luta recente. Aplique PV inicial em 75% para cada inimigo gerado."
     };
   }
 
   if (detail.includes("Som de patrulha") || detail.includes("Teias, ossos") || detail.includes("menos surpreendente")) {
     return {
-      label: "Próximo encontro: grupo começa em posição de vantagem",
+      label: "O grupo antecipa o perigo: próxima cena começa com vantagem",
       type: "partyAdvantage",
-      note: "O mapa inclui posições claras de vantagem para o grupo."
+      note: "A ameaça deixa sinais suficientes para preparação. O mapa inclui posições claras de vantagem para o grupo."
+    };
+  }
+
+  if (detail.includes("Passagem estreita")) {
+    return {
+      label: "A passagem aperta: um personagem começa isolado na próxima cena",
+      type: "isolatedParty",
+      note: "O grupo atravessa em fila e perde coesão. O mapa posiciona 1 marcador do grupo separado dos demais."
+    };
+  }
+
+  if (detail.includes("Cristais falsos brilham")) {
+    return {
+      label: "Cristais falsos atraem o grupo para perto da ameaça",
+      type: "partyAdjacentToThreat",
+      note: "O brilho funciona como isca. O mapa posiciona o grupo adjacente à criatura, armadilha ou ameaça principal."
     };
   }
 
   return null;
+}
+
+function createImmediateSceneEffect(detail, profile, floor) {
+  if (detail.includes("Sala se reconstrói sozinha") || detail.includes("remove 1 sucesso")) {
+    return {
+      label: "A sala se reconstrói e apaga parte da rota",
+      type: "loseSuccess",
+      value: 1
+    };
+  }
+
+  if (detail.includes("adiciona 1 sucesso") || detail.includes("Corredor encurta")) {
+    return {
+      label: "Um atalho se revela entre os corredores",
+      type: "gainSuccess",
+      value: 1
+    };
+  }
+
+  if (detail.includes("Rota circular evidente")) {
+    return {
+      label: "A rota circular finalmente faz sentido",
+      type: "removeFailure",
+      value: 1
+    };
+  }
+
+  if (detail.includes("Gravidade falha por instantes")) {
+    const dc = getFloorRules(profile, floor)?.baseDc || 10;
+    const damage = getGravityDamageDice(floor);
+
+    return {
+      label: `A gravidade falha: teste de Reflexos DC ${dc}`,
+      type: "sceneInstruction",
+      note: `O chão foge sob os pés por um instante. Cada personagem faz teste de Reflexos DC ${dc}; em falha, sofre ${damage} de dano.`
+    };
+  }
+
+  if (detail.includes("Parede respira lentamente")) {
+    const dc = getFloorRules(profile, floor)?.baseDc || 10;
+
+    return {
+      label: `A parede respira: teste de Fortitude DC ${dc}`,
+      type: "sceneInstruction",
+      note: `A pedra pulsa como carne viva. O grupo faz teste de Fortitude DC ${dc}; em falha, fica enjoado no próximo combate.`
+    };
+  }
+
+  return null;
+}
+
+function createTestEffectId(type) {
+  return `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function createPendingTestEffect(detail, currentFloor) {
+  if (detail.includes("Vozes repetem frases do grupo")) {
+    return {
+      id: createTestEffectId("voices"),
+      label: "As vozes da masmorra confundem o próximo teste: dificuldade +1",
+      type: "testModifier",
+      dcModifier: 1,
+      skills: MENTAL_SOCIAL_SKILLS,
+      note: "As paredes devolvem frases do grupo em tons errados. Aplica-se ao próximo teste mental ou social relevante."
+    };
+  }
+
+  if (detail.includes("Sombras agem com atraso")) {
+    return {
+      id: createTestEffectId("delayed-shadows"),
+      label: "As sombras se atrasam e traem os sentidos: dificuldade +1",
+      type: "testModifier",
+      dcModifier: 1,
+      skills: ["Intuição", "Vontade"],
+      note: "Os movimentos não batem com os reflexos na parede. Aplica-se ao próximo teste de Intuição ou Vontade."
+    };
+  }
+
+  if (detail.includes("Cheiro de ácido") || detail.includes("Cheiro de sangue") || detail.includes("Cheiro de ferrugem")) {
+    return {
+      id: createTestEffectId("trace-scent"),
+      label: `${detail.split(":")[0]} guia o caminho: dificuldade -2`,
+      type: "testModifier",
+      dcModifier: -2,
+      skills: SUBSTANCE_TRACE_SKILLS,
+      note: "O odor denuncia algo que a pedra tentava esconder. Aplica-se ao próximo teste apropriado para interpretar rastros, substâncias, mecanismos ou passagem."
+    };
+  }
+
+  if (detail.includes("Corrente de ar diferente")) {
+    return {
+      id: createTestEffectId("air-current"),
+      label: "Uma corrente de ar revela a rota: dificuldade -2",
+      type: "testModifier",
+      dcModifier: -2,
+      skills: ["Percepção", "Sobrevivência"],
+      note: "O vento carrega cheiro de espaço aberto. Aplica-se ao próximo teste de Percepção ou Sobrevivência para rota."
+    };
+  }
+
+  if (detail.includes("Visão do andar seguinte")) {
+    return {
+      id: createTestEffectId("next-floor-vision"),
+      label: "Um vislumbre do andar inferior permanece na memória: dificuldade -2",
+      type: "testModifier",
+      dcModifier: -2,
+      targetFloor: Math.min(currentFloor + 1, 10),
+      note: "A masmorra mostra uma imagem breve do caminho adiante. Aplica-se ao primeiro teste do próximo andar."
+    };
+  }
+
+  return null;
+}
+
+function isTestEffectApplicable(effect, approach) {
+  if (!effect || !approach) return false;
+  if (effect.targetFloor) return false;
+  if (!effect.skills?.length) return true;
+
+  return effect.skills.includes(approach.skill);
 }
 
 export function createExtendedExplorationState(profile, rng = Math.random) {
@@ -984,6 +1397,8 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
   let log = [];
   let elapsedMinutes = 0;
   let pendingSceneEffects = [];
+  let pendingTestEffects = [];
+  let nextFloorTestEffects = [];
   let resetPending = false;
   let descentPending = false;
 
@@ -991,7 +1406,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     log = [createLogEntry(message, kind), ...log].slice(0, INITIAL_LOG_LIMIT);
   }
 
-  function resetFloorProgress(message = "O grupo retornou ao início do andar.") {
+  function resetFloorProgress(message = "A masmorra dobra os caminhos sobre si mesmos; o grupo volta ao início do andar.") {
     successes = 0;
     failures = 0;
     usedApproachIds = new Set();
@@ -1000,6 +1415,8 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     finalEncounter = null;
     bossEncounter = null;
     pendingSceneEffects = [];
+    pendingTestEffects = [];
+    nextFloorTestEffects = [];
     resetPending = false;
     descentPending = false;
     phase = floor === 10 ? "boss" : "exploring";
@@ -1125,13 +1542,18 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     finalEncounter = null;
     bossEncounter = null;
     pendingSceneEffects = [];
+    pendingTestEffects = nextFloorTestEffects
+      .filter((effect) => effect.targetFloor === floor)
+      .map((effect) => {
+        const { targetFloor, ...activeEffect } = effect;
+        return activeEffect;
+      });
+    nextFloorTestEffects = nextFloorTestEffects.filter((effect) => effect.targetFloor !== floor);
     resetPending = false;
     descentPending = false;
     phase = floor === 10 ? "boss" : "exploring";
     addLog(
-      floor === 10
-        ? "O grupo alcançou a sala da Matriarca Aracnídea."
-        : `O grupo entrou no andar ${floor}.`,
+      getFloorArrivalLog(floor, false, activeRng),
       "floor"
     );
   }
@@ -1144,11 +1566,23 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     return results.some(sceneHasPitTrap);
   }
 
-  function refreshSceneEncounter(scene) {
+function refreshSceneEncounter(scene) {
     if (!scene?.encounterNode) return scene;
 
     resolveNodeEncounter(scene.encounterNode, { mapSeed: `extended-floor-${floor}` });
     return scene;
+  }
+
+  function restoreFinalEncounter(sessionState) {
+    if (sessionState.finalEncounter) {
+      return refreshSceneEncounter(sessionState.finalEncounter);
+    }
+
+    if (phase === "floorEncounter" || phase === "readyToAdvance") {
+      return createFinalEncounter();
+    }
+
+    return null;
   }
 
   function initialize(nextProfile, nextFloor, nextRng, sessionState = null) {
@@ -1164,11 +1598,13 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       currentResult = refreshSceneEncounter(sessionState.currentResult || null);
       currentResults = (sessionState.currentResults || (currentResult ? [currentResult] : []))
         .map(refreshSceneEncounter);
-      finalEncounter = refreshSceneEncounter(sessionState.finalEncounter || null);
+      finalEncounter = restoreFinalEncounter(sessionState);
       bossEncounter = refreshSceneEncounter(sessionState.bossEncounter || null);
       log = sessionState.log || [];
       elapsedMinutes = sessionState.elapsedMinutes || 0;
       pendingSceneEffects = sessionState.pendingSceneEffects || [];
+      pendingTestEffects = sessionState.pendingTestEffects || [];
+      nextFloorTestEffects = sessionState.nextFloorTestEffects || [];
       resetPending = Boolean(sessionState.resetPending);
       descentPending = Boolean(sessionState.descentPending ?? hasPitTrapResult(currentResults));
       return;
@@ -1186,12 +1622,14 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     log = [];
     elapsedMinutes = 0;
     pendingSceneEffects = [];
+    pendingTestEffects = [];
+    nextFloorTestEffects = [];
     resetPending = false;
     descentPending = false;
     addLog(
       phase === "boss"
-        ? "A exploração começa na sala da Matriarca Aracnídea."
-        : `Exploração iniciada no andar ${floor}.`,
+        ? getFloorArrivalLog(10, true, activeRng)
+        : getFloorArrivalLog(floor, true, activeRng),
       "floor"
     );
   }
@@ -1208,17 +1646,91 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     const detail = createSceneDetail(activeProfile, categoryId, activeRng);
     const seedSuffix = `d100-${roll}-${Date.now()}-${randomInt(activeRng, 1, 9999)}`;
     const sceneEffect = createSceneEffect(detail);
+    const immediateEffect = createImmediateSceneEffect(detail, activeProfile, floor);
+    const pendingTestEffect = createPendingTestEffect(detail, floor);
+    const immediateEffects = [];
     let sceneEffects = [];
     let encounterNode = null;
 
+    if (immediateEffect?.type === "loseSuccess" || immediateEffect?.type === "gainSuccess") {
+      const previousSuccesses = successes;
+      const rules = getFloorRules(activeProfile, floor);
+      successes = immediateEffect.type === "loseSuccess"
+        ? Math.max(0, successes - immediateEffect.value)
+        : Math.min(rules?.successesRequired || successes + immediateEffect.value, successes + immediateEffect.value);
+      const changedSuccesses = Math.abs(previousSuccesses - successes);
+      const appliedEffect = {
+        ...immediateEffect,
+        appliedValue: changedSuccesses,
+        note: changedSuccesses > 0
+          ? `O progresso do andar caiu de ${previousSuccesses} para ${successes} sucesso${successes === 1 ? "" : "s"}.`
+          : immediateEffect.type === "loseSuccess"
+            ? "O grupo já estava sem sucessos acumulados; nenhum progresso foi perdido."
+            : "O grupo já estava no máximo de sucessos deste andar; nenhum progresso foi adicionado."
+      };
+
+      if (immediateEffect.type === "gainSuccess" && changedSuccesses > 0) {
+        appliedEffect.note = `O progresso do andar subiu de ${previousSuccesses} para ${successes} sucesso${successes === 1 ? "" : "s"}.`;
+      }
+
+      immediateEffects.push(appliedEffect);
+      addLog(
+        changedSuccesses > 0
+          ? `${appliedEffect.label}. Progresso do andar: ${previousSuccesses} -> ${successes}.`
+          : `${appliedEffect.label}, mas o progresso não muda.`,
+        "state"
+      );
+    }
+
+    if (immediateEffect?.type === "removeFailure") {
+      const previousFailures = failures;
+      failures = Math.max(0, failures - immediateEffect.value);
+      const removedFailures = previousFailures - failures;
+      const appliedEffect = {
+        ...immediateEffect,
+        appliedValue: removedFailures,
+        note: removedFailures > 0
+          ? `As falhas do andar caíram de ${previousFailures} para ${failures}.`
+          : "O grupo já estava sem falhas acumuladas; nenhuma falha foi removida."
+      };
+      immediateEffects.push(appliedEffect);
+      addLog(
+        removedFailures > 0
+          ? `${appliedEffect.label}. Falhas acumuladas: ${previousFailures} -> ${failures}.`
+          : `${appliedEffect.label}, mas não havia falhas para remover.`,
+        "state"
+      );
+    }
+
+    if (immediateEffect?.type === "sceneInstruction") {
+      immediateEffects.push(immediateEffect);
+      addLog(`${immediateEffect.label}. ${immediateEffect.note}`, "state");
+    }
+
+    if (pendingTestEffect?.targetFloor) {
+      nextFloorTestEffects.push(pendingTestEffect);
+      immediateEffects.push({
+        ...pendingTestEffect,
+        note: `${pendingTestEffect.note} Estado guardado para o andar ${pendingTestEffect.targetFloor}.`
+      });
+      addLog(`${pendingTestEffect.label}. O presságio fica guardado para o andar ${pendingTestEffect.targetFloor}.`, "state");
+    } else if (pendingTestEffect) {
+      pendingTestEffects.push(pendingTestEffect);
+      immediateEffects.push(pendingTestEffect);
+      addLog(`${pendingTestEffect.label}.`, "state");
+    }
+
     if (sceneEffect) {
       pendingSceneEffects.push(sceneEffect);
-      addLog(`Estado aplicado: ${sceneEffect.label}.`, "state");
+      addLog(`${sceneEffect.label}.`, "state");
     }
 
     if (COMBAT_CATEGORIES.has(categoryId) || categoryId === "obstacle") {
       sceneEffects = pendingSceneEffects.filter((effect) =>
-        effect.type === "enemyWounded" || effect.type === "partyAdvantage"
+        effect.type === "enemyWounded"
+          || effect.type === "partyAdvantage"
+          || effect.type === "isolatedParty"
+          || effect.type === "partyAdjacentToThreat"
       );
       pendingSceneEffects = pendingSceneEffects.filter((effect) =>
         !sceneEffects.includes(effect)
@@ -1241,6 +1753,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       detail,
       encounterNode,
       id: seedSuffix,
+      immediateEffects,
       roll,
       rollSource,
       sceneEffects,
@@ -1250,29 +1763,29 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     };
 
     const challengeText = challenge > 0 ? `, ND ${formatChallengeRating(challenge)}` : "";
-    addLog(`d100 ${roll} (${rollSource === "manual" ? "manual" : "automático"}): ${category.label}${challengeText}. ${detail}`, "roll");
-    sceneEffects.forEach((effect) => addLog(`Estado consumido no encontro: ${effect.label}.`, "state"));
+    addLog(`A masmorra responde ao erro. d100 ${roll} (${rollSource === "manual" ? "manual" : "automático"}): ${category.label}${challengeText}. ${detail}`, "roll");
+    sceneEffects.forEach((effect) => addLog(`O presságio se cumpre nesta cena: ${effect.label}.`, "state"));
 
     return currentResult;
   }
 
   function completeSuccess(approach) {
     if (usedApproachIds.has(approach.id)) {
-      addLog(`${approach.label} já foi usada neste andar. Escolha outra ação.`, "warning");
+      addLog(`${approach.label} já abriu caminho neste andar; a masmorra exige uma abordagem diferente.`, "warning");
       return false;
     }
 
     successes += 1;
     usedApproachIds.add(approach.id);
     addLog(getApproachNarrative(approach, "success"), "info");
-    addLog(`${approach.label}: sucesso (${successes}/${getFloorRules(activeProfile, floor).successesRequired}).`, "success");
+    addLog(`${approach.label}: o grupo avança pelo labirinto (${successes}/${getFloorRules(activeProfile, floor).successesRequired} sucessos).`, "success");
 
     const rules = getFloorRules(activeProfile, floor);
     if (successes >= rules.successesRequired) {
       successes = rules.successesRequired;
       phase = "floorEncounter";
       finalEncounter = createFinalEncounter();
-      addLog(`A saída foi encontrada. Encontro final: ${finalEncounter.title}. Resolva-o antes de avançar.`, "final");
+      addLog(`A saída do andar finalmente aparece, mas algo ainda bloqueia a passagem: ${finalEncounter.title}. Resolva a cena antes de descer.`, "final");
     }
 
     return true;
@@ -1281,7 +1794,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
   function applyOutcome(outcome, approachId, manualRolls = []) {
     if (phase !== "exploring") return;
     if (resetPending) {
-      addLog("Resolva a cena atual antes de retornar ao início do andar.", "warning");
+      addLog("A cena atual ainda precisa ser resolvida antes que a masmorra arraste o grupo de volta ao início.", "warning");
       return;
     }
 
@@ -1293,18 +1806,28 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       if (failures >= rules.failureLimit) {
         descentPending = false;
         resetPending = true;
-        addLog("O grupo deixou o fosso para trás, mas o limite de falhas foi atingido. Resolva a cena atual; depois retorne ao início do andar.", "warning");
+        addLog("O grupo deixa o fosso para trás, mas o labirinto já cobrou erros demais. Resolva a cena; depois retorne ao início do andar.", "warning");
         return;
       }
 
       descentPending = false;
-      addLog("O grupo deixou o fosso para trás e continuou explorando o andar atual.", "state");
+      addLog("O grupo deixa o fosso para trás e insiste em explorar este andar.", "state");
     }
 
     if (usedApproachIds.has(approach.id)) {
-      addLog(`${approach.label} já foi usada neste andar. Escolha outra ação.`, "warning");
+      addLog(`${approach.label} já marcou este trecho do labirinto; escolha outra ação para seguir adiante.`, "warning");
       return;
     }
+
+    const consumedTestEffects = pendingTestEffects.filter((effect) =>
+      isTestEffectApplicable(effect, approach)
+    );
+    pendingTestEffects = pendingTestEffects.filter((effect) =>
+      !consumedTestEffects.includes(effect)
+    );
+    consumedTestEffects.forEach((effect) => {
+      addLog(`O presságio interfere no teste: ${effect.label} em ${approach.label}.`, "state");
+    });
 
     if (outcome === "success" || outcome === "criticalSuccess") {
       const changed = completeSuccess(approach);
@@ -1312,11 +1835,11 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
 
       const explorationMinutes = getExplorationMinutes(activeProfile, floor, approach);
       elapsedMinutes += explorationMinutes;
-      addLog(`${approach.label}: ${explorationMinutes}min de exploração.`, "time");
+      addLog(`${approach.label}: mais ${explorationMinutes}min se perdem nos corredores.`, "time");
 
       if (outcome === "criticalSuccess" && failures > 0) {
         failures -= 1;
-        addLog("Sucesso superior: removeu 1 falha acumulada.", "success");
+        addLog("O avanço foi limpo e preciso; uma falha acumulada deixa de pesar sobre o grupo.", "success");
       }
 
       return;
@@ -1324,12 +1847,12 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
 
     const explorationMinutes = getExplorationMinutes(activeProfile, floor, approach);
     elapsedMinutes += explorationMinutes;
-    addLog(`${approach.label}: ${explorationMinutes}min de exploração.`, "time");
+    addLog(`${approach.label}: ${explorationMinutes}min desaparecem em voltas, portas falsas e corredores repetidos.`, "time");
 
     usedApproachIds.add(approach.id);
     addLog(getApproachNarrative(approach, outcome), "info");
     failures += 1;
-    addLog(`${approach.label}: falha (${failures}/${rules.failureLimit}).`, "failure");
+    addLog(`${approach.label}: a masmorra resiste ao avanço (${failures}/${rules.failureLimit} falhas).`, "failure");
 
     const rollCount = outcome === "criticalFailure" ? 2 : 1;
     currentResults = [];
@@ -1341,20 +1864,27 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
 
     if (hasPitTrapResult(currentResults) && floor < 10) {
       descentPending = true;
-      addLog("Fosso encontrado. Resolva a cena atual; depois o grupo pode descer para o próximo andar.", "warning");
+      addLog("Um fosso se abre como uma descida incerta. Resolva a cena; depois o grupo pode usá-lo para alcançar o andar inferior.", "warning");
     }
 
     if (failures >= rules.failureLimit && !descentPending) {
       failures = rules.failureLimit;
       resetPending = true;
-      addLog("Limite de falhas atingido. Resolva a cena atual; depois retorne ao início do andar.", "warning");
+      addLog("Erros demais acumulados: o labirinto se fecha ao redor do grupo. Resolva a cena; depois retorne ao início do andar.", "warning");
+    }
+
+    if (!resetPending && !descentPending && successes >= rules.successesRequired && phase === "exploring") {
+      successes = rules.successesRequired;
+      phase = "floorEncounter";
+      finalEncounter = createFinalEncounter();
+      addLog(`A saída do andar finalmente aparece, mas ainda há uma última ameaça: ${finalEncounter.title}. Resolva a cena antes de descer.`, "final");
     }
   }
 
   function confirmFloorReset() {
     if (!resetPending) return;
 
-    resetFloorProgress("Falhas demais: depois de resolver a cena, o grupo retornou ao início do andar e zerou o progresso.");
+    resetFloorProgress("Falhas demais: depois da cena, a masmorra reorganiza os caminhos e devolve o grupo ao início do andar.");
   }
 
   function confirmPitDescent() {
@@ -1362,7 +1892,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
 
     const nextFloor = Math.min(floor + 1, 10);
     enterFloor(nextFloor);
-    addLog(`O grupo desceu pelo fosso até o andar ${nextFloor}.`, "floor");
+    addLog(`O grupo aceita a queda controlada pelo fosso e alcança o ${getFloorName(nextFloor)}.`, "floor");
   }
 
   function dismissPitDescent() {
@@ -1374,18 +1904,18 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     if (rules && failures >= rules.failureLimit) {
       failures = rules.failureLimit;
       resetPending = true;
-      addLog("O grupo contornou o fosso, mas o limite de falhas foi atingido. Resolva a cena atual; depois retorne ao início do andar.", "warning");
+      addLog("O grupo contorna o fosso, mas o labirinto já cobrou erros demais. Resolva a cena; depois retorne ao início do andar.", "warning");
       return;
     }
 
-    addLog("O grupo contornou o fosso e continuou explorando o andar atual.", "state");
+    addLog("O grupo contorna o fosso e continua procurando a saída por conta própria.", "state");
   }
 
   function resolveFinalEncounter() {
     if (phase !== "floorEncounter") return;
 
     phase = "readyToAdvance";
-    addLog("Encontro final resolvido. O próximo andar está liberado.", "final");
+    addLog("A ameaça final do andar cai. A passagem para descer está livre.", "final");
   }
 
   function advanceFloor() {
@@ -1398,7 +1928,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     if (phase !== "boss") return;
 
     phase = "completed";
-    addLog("A Matriarca foi derrotada. A etapa dos andares 1 a 10 foi concluída.", "final");
+    addLog("A Matriarca cai entre fios rompidos e casulos vazios. Os dez primeiros andares foram conquistados.", "final");
   }
 
   function rerollTacticalMap(target = "current") {
@@ -1415,14 +1945,14 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       rng: activeRng,
       sceneEffects: scene.sceneEffects || []
     });
-    addLog("Mapa tático regerado para a cena atual.", "state");
+    addLog("A cena tática foi redesenhada para representar outra leitura da sala.", "state");
   }
 
   function rerollFinalEncounter() {
     if (phase !== "floorEncounter" || !finalEncounter) return;
 
     finalEncounter = createFinalEncounter(finalEncounter.sceneId || null);
-    addLog(`Encontro final sorteado novamente: ${finalEncounter.title}.`, "final");
+    addLog(`A sala final muda de forma. Novo encontro revelado: ${finalEncounter.title}.`, "final");
   }
 
   function getBossEncounter() {
@@ -1435,7 +1965,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
         categoryId: "boss",
         categoryLabel: "Chefe",
         challenge: boss.challengeOptions?.[0] || 4,
-        detail: "Arena 20x14 com entrada e saída laterais por portas de 2 quadrados. O grupo começa alinhado ao centro da entrada. A Matriarca ocupa 2x2 quadrados perto da saída; a área 4x4 ao redor dela está tomada por teias. Os quatro cantos internos têm zonas de teia 3x3 com ovo/casulo no centro, que podem eclodir como reforços. Teias 2x2 adicionais pressionam o centro, a frente da saída e rotas laterais. Oito pilares oferecem cobertura e controle de movimento.",
+        detail: "A arena tem 20x14 quadrados, com portas laterais de entrada e saída. O grupo começa alinhado ao centro da entrada. A Matriarca ocupa 2x2 quadrados perto da saída; ao redor dela, uma área 4x4 está tomada por teias. Nos quatro cantos internos, zonas 3x3 de teia guardam ovos e casulos que podem eclodir como reforços. Teias menores pressionam o centro, a frente da saída e as rotas laterais, enquanto oito pilares oferecem cobertura e controle de movimento.",
         encounterNode: createBossEncounterNode(activeProfile, floor, boss),
         sceneEffects: [],
         tacticalMap: createBossTacticalMap(),
@@ -1457,16 +1987,14 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
 
   function exportSessionState() {
     return {
-      currentResult,
-      currentResults,
       descentPending,
       elapsedMinutes,
       failures,
-      finalEncounter,
-      bossEncounter,
       floor,
       log,
+      nextFloorTestEffects,
       pendingSceneEffects,
+      pendingTestEffects,
       phase,
       resetPending,
       successes,
@@ -1492,7 +2020,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
         ? {
           reward: activeProfile.extendedExploration.boss.reward,
           title: "Andares 1-10 conquistados!",
-          text: "A Matriarca Aracnídea foi eliminada. Entregue XP integral do encontro ND 4, o cristal verde e registre os tesouros dessa conquista."
+          text: "A Matriarca Aracnídea foi eliminada, e o primeiro grande trecho da masmorra fica para trás. Entregue XP integral do encontro ND 4, o cristal verde e registre os tesouros dessa conquista."
         }
         : null,
       currentResult,
@@ -1504,6 +2032,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       floor,
       log,
       pendingSceneEffects,
+      pendingTestEffects,
       phase,
       resetPending,
       rules: rulesWithTime,

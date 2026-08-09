@@ -20,14 +20,27 @@ function createButton(label, className, onClick, disabled = false) {
   return button;
 }
 
-function getDcText(rules, approach) {
+function getApplicableTestEffects(snapshot, approach) {
+  return (snapshot.pendingTestEffects || []).filter((effect) => {
+    if (!effect.skills?.length) return true;
+    return effect.skills.includes(approach?.skill);
+  });
+}
+
+function getDcText(snapshot, approach) {
+  const rules = snapshot.rules;
   if (!rules || !approach) return "—";
 
-  const dc = rules.baseDc + approach.dcModifier;
+  const testEffects = getApplicableTestEffects(snapshot, approach);
+  const testModifier = testEffects.reduce((total, effect) => total + (effect.dcModifier || 0), 0);
+  const dc = rules.baseDc + approach.dcModifier + testModifier;
   const modifier = approach.dcModifier > 0 ? `+${approach.dcModifier}` : "0";
   const minutes = Math.max(Math.round((rules.baseMinutes || 10) * (approach.timeMultiplier || 1)), 1);
+  const effectText = testEffects.length
+    ? ` | Estado: ${testEffects.map((effect) => effect.label).join(", ")}`
+    : "";
 
-  return `${approach.skill} CD ${dc} (${modifier}) | ${minutes}min`;
+  return `${approach.skill} CD ${dc} (${modifier}) | ${minutes}min${effectText}`;
 }
 
 function getApproachPrompt(approach) {
@@ -58,7 +71,7 @@ function parseManualRolls(value) {
 function createMeter(snapshot) {
   const meter = createElement("section", "labyrinth-meter");
   const title = createElement("div", "labyrinth-meter-title");
-  const titleText = createElement("strong", null, "Labirinto");
+  const titleText = createElement("strong", null, "Caminho pelo labirinto");
   const subtitle = createElement("span", null, snapshot.tier?.label || "Sala do chefe");
   const path = createElement("div", "labyrinth-path");
   const failures = createElement("div", "failure-track");
@@ -99,7 +112,7 @@ function createMeter(snapshot) {
 function createHeader(snapshot) {
   const header = createElement("section", "extended-header");
   const title = createElement("div");
-  const type = createElement("p", "node-dialog-type", snapshot.phase === "boss" ? "Chefe" : "Exploração estendida");
+  const type = createElement("p", "node-dialog-type", snapshot.phase === "boss" ? "Chefe" : "Travessia da masmorra");
   const heading = createElement("h2", null, `Andar ${snapshot.floor}`);
   const meta = createElement("p", "node-dialog-meta");
 
@@ -119,7 +132,7 @@ function createHeader(snapshot) {
 
 function createApproachControls(snapshot, selectedApproachId, setSelectedApproachId, manualRollInput, onOutcome) {
   const section = createElement("section", "extended-panel");
-  const heading = createElement("h3", null, "Teste de exploração");
+  const heading = createElement("h3", null, "Próxima abordagem");
   const controls = createElement("div", "extended-controls");
   const approachLabel = createElement("label");
   const approachText = document.createTextNode("Abordagem");
@@ -128,7 +141,7 @@ function createApproachControls(snapshot, selectedApproachId, setSelectedApproac
     || snapshot.approaches[0];
   const selectedApproachAlreadyUsed = snapshot.usedApproachIds.includes(selectedApproach.id);
   const actionsDisabled = selectedApproachAlreadyUsed || snapshot.resetPending;
-  const dc = createElement("p", "extended-dc", getDcText(snapshot.rules, selectedApproach));
+  const dc = createElement("p", "extended-dc", getDcText(snapshot, selectedApproach));
   const prompt = createElement("p", "extended-approach-prompt", getApproachPrompt(selectedApproach));
   const rollLabel = createElement("label");
   const rollText = document.createTextNode("d100 manual");
@@ -182,7 +195,7 @@ function createApproachControls(snapshot, selectedApproachId, setSelectedApproac
 
 function createUsedSkills(snapshot) {
   const container = createElement("div", "used-skills");
-  const label = createElement("strong", null, "Ações usadas neste andar:");
+  const label = createElement("strong", null, "Caminhos já tentados neste andar:");
   const value = createElement(
     "span",
     null,
@@ -196,14 +209,19 @@ function createUsedSkills(snapshot) {
 }
 
 function createPendingEffects(snapshot) {
-  if (!snapshot.pendingSceneEffects?.length) return null;
+  const effects = [
+    ...(snapshot.pendingSceneEffects || []),
+    ...(snapshot.pendingTestEffects || [])
+  ];
+
+  if (!effects.length) return null;
 
   const container = createElement("div", "pending-effects");
-  const label = createElement("strong", null, "Estados pendentes:");
+  const label = createElement("strong", null, "Presságios pendentes:");
   const value = createElement(
     "span",
     null,
-    snapshot.pendingSceneEffects.map((effect) => effect.label).join(", ")
+    effects.map((effect) => effect.label).join(", ")
   );
 
   container.appendChild(label);
@@ -220,9 +238,9 @@ function createPendingResetPanel(snapshot, onConfirmFloorReset) {
   if (!snapshot.resetPending) return null;
 
   const section = createElement("section", "extended-panel reset-pending-panel");
-  section.appendChild(createElement("h3", null, "Retorno ao início"));
-  section.appendChild(createElement("p", "result-detail", "O limite de falhas foi atingido. Resolva a cena atual antes de zerar o progresso do andar."));
-  section.appendChild(createButton("Retornar ao início do andar", "extended-action is-danger", onConfirmFloorReset));
+  section.appendChild(createElement("h3", null, "O labirinto se fecha"));
+  section.appendChild(createElement("p", "result-detail", "Erros demais chamaram a atenção da masmorra. Resolva a cena atual antes de voltar ao início do andar."));
+  section.appendChild(createButton("Voltar ao início do andar", "extended-action is-danger", onConfirmFloorReset));
   return section;
 }
 
@@ -230,8 +248,8 @@ function createPendingDescentPanel(snapshot, onConfirmPitDescent, onDismissPitDe
   if (!snapshot.descentPending) return null;
 
   const section = createElement("section", "extended-panel pit-descent-panel");
-  section.appendChild(createElement("h3", null, "Descida pelo fosso"));
-  section.appendChild(createElement("p", "result-detail", "Uma armadilha de fosso leva ao andar inferior. O grupo pode descer ou continuar explorando o andar atual."));
+  section.appendChild(createElement("h3", null, "Fosso para o andar inferior"));
+  section.appendChild(createElement("p", "result-detail", "A queda revela uma rota bruta para baixo. O grupo pode aceitar a descida ou continuar procurando a saída deste andar."));
   section.appendChild(createButton("Descer para o próximo andar", "extended-action", onConfirmPitDescent));
   section.appendChild(createButton("Continuar neste andar", "extended-action", onDismissPitDescent));
   return section;
@@ -432,13 +450,18 @@ function createTacticalMap(scene, onRerollMap, extraActions = []) {
 }
 
 function createSceneEffects(scene) {
-  if (!scene?.sceneEffects?.length) return null;
+  const effects = [
+    ...(scene?.immediateEffects || []),
+    ...(scene?.sceneEffects || [])
+  ];
+
+  if (!effects.length) return null;
 
   const list = createElement("ul", "scene-effects");
-  scene.sceneEffects.forEach((effect) => {
+  effects.forEach((effect) => {
     const item = createElement("li");
     item.appendChild(createElement("strong", null, effect.label));
-    item.appendChild(document.createTextNode(` — ${effect.note}`));
+    if (effect.note) item.appendChild(document.createTextNode(` — ${effect.note}`));
     list.appendChild(item);
   });
 
@@ -506,7 +529,7 @@ function buildSceneModalContent(scene, rerollTarget, selectedEncounterItemByScen
 
 function createCurrentResult(snapshot, selectedEncounterItemByScene, onRerollTacticalMap) {
   const section = createElement("section", "extended-panel");
-  const heading = createElement("h3", null, "Cena atual");
+  const heading = createElement("h3", null, "Cena revelada");
   const results = snapshot.currentResults?.length
     ? snapshot.currentResults
     : snapshot.currentResult ? [snapshot.currentResult] : [];
@@ -514,7 +537,7 @@ function createCurrentResult(snapshot, selectedEncounterItemByScene, onRerollTac
   section.appendChild(heading);
 
   if (!results.length) {
-    const empty = createElement("p", "hidden-environment-notice", "Nenhuma cena d100 resolvida ainda. Registre uma falha para gerar a próxima cena.");
+    const empty = createElement("p", "hidden-environment-notice", "Nenhuma cena d100 foi revelada ainda. Quando o grupo falhar, a masmorra responderá.");
     section.appendChild(empty);
     return section;
   }
@@ -537,10 +560,10 @@ function createCurrentResult(snapshot, selectedEncounterItemByScene, onRerollTac
   const openable = results.filter(hasOpenableContent);
   if (openable.length) {
     section.appendChild(createButton(
-      results.length > 1 ? "Abrir cenas" : "Abrir cena completa",
+      results.length > 1 ? "Abrir cenas reveladas" : "Abrir cena completa",
       "extended-action",
       () => openSceneModal({
-        title: results.length > 1 ? "Cenas da falha atual" : "Cena atual",
+        title: results.length > 1 ? "Cenas reveladas pela falha" : "Cena revelada pela masmorra",
         tabs: openable.map((result, index) => ({
           label: openable.length > 1 ? `Rolagem ${index + 1}` : "Cena",
           renderContent: (refresh) => buildSceneModalContent(
@@ -560,12 +583,12 @@ function createCurrentResult(snapshot, selectedEncounterItemByScene, onRerollTac
 
 function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor, selectedEncounterItemByScene, onRerollTacticalMap, onRerollFinalEncounter) {
   const section = createElement("section", "extended-panel final-encounter-panel");
-  const heading = createElement("h3", null, "Encontro final do andar");
+  const heading = createElement("h3", null, "Última ameaça do andar");
 
   section.appendChild(heading);
 
   if (!snapshot.finalEncounter) {
-    section.appendChild(createElement("p", "hidden-environment-notice", "Complete os sucessos do andar para revelar a sala final."));
+    section.appendChild(createElement("p", "hidden-environment-notice", "Quando o grupo encontrar a saída, a última ameaça deste andar será revelada."));
     return section;
   }
 
@@ -612,12 +635,12 @@ function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor,
 
   if (snapshot.phase === "floorEncounter") {
     const actions = createElement("div", "final-encounter-actions");
-    actions.appendChild(createButton("Marcar encontro resolvido", "extended-action is-door-open", onResolveFinalEncounter));
+    actions.appendChild(createButton("Marcar ameaça resolvida", "extended-action is-door-open", onResolveFinalEncounter));
     section.appendChild(actions);
   }
 
   if (snapshot.phase === "readyToAdvance") {
-    section.appendChild(createButton("Avançar para o próximo andar", "extended-action is-door-open is-next-floor", onAdvanceFloor));
+    section.appendChild(createButton("Descer para o próximo andar", "extended-action is-door-open is-next-floor", onAdvanceFloor));
   }
 
   return section;
@@ -629,7 +652,7 @@ function createBossPanel(snapshot, selectedEncounterItemByScene, onResolveBossEn
 
   section.appendChild(createElement("h3", null, boss.title));
   section.appendChild(createElement("p", "result-title", `ND ${boss.challengeLabel}`));
-  section.appendChild(createElement("p", "result-detail", `Criatura principal: ${boss.mainCreatureName}. Apoio desde o início: ${boss.supportCreatureName}. Recompensa: ${boss.reward}.`));
+  section.appendChild(createElement("p", "result-detail", `No centro do covil está ${boss.mainCreatureName}. Desde o início, ${boss.supportCreatureName} se movem pelas teias. Recompensa: ${boss.reward}.`));
   section.appendChild(createElement("p", "result-detail", boss.detail));
 
   if (boss.treasureNote) {
@@ -656,7 +679,7 @@ function createBossPanel(snapshot, selectedEncounterItemByScene, onResolveBossEn
       }]
     })
   ));
-  section.appendChild(createButton("Marcar Matriarca resolvida", "extended-action is-door-open", onResolveBossEncounter));
+  section.appendChild(createButton("Marcar Matriarca derrotada", "extended-action is-door-open", onResolveBossEncounter));
 
   return section;
 }
@@ -674,7 +697,7 @@ function createCompletedPanel(snapshot) {
 
 function createLog(snapshot) {
   const section = createElement("section", "extended-panel log-panel");
-  const heading = createElement("h3", null, "Log");
+  const heading = createElement("h3", null, "Crônica da exploração");
   const list = createElement("ul", "exploration-log");
 
   snapshot.log.forEach((entry) => {
