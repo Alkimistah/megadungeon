@@ -492,6 +492,7 @@ Criar ou separar:
 - Subconjunto de inimigos permitido por andar implementado nos andares 1 a 9 via lista de permissão no perfil; a seleção de criaturas usa apenas essas listas, impedindo criaturas de tiers posteriores ou tematicamente inadequadas.
 - Encontros finais curados implementados: 25 cenas por tier com gimmick por andar (dungeon1to10FinalEncounters.js), composição fixa de criaturas/armadilhas do catálogo, ND por variante de andar, mapa preset 14x10 fixo por cena, gimmick e recompensa exibidos no painel, e botão de sortear outra cena do tier.
 - Mapa tático com legenda expandida: inimigo oculto/em potencial, fosso/vão, teia/casulo, terreno difícil, mecanismo, objetivo/achado, entrada de reforço e porta como entrada/saída; legenda exibe apenas os tipos presentes no mapa e as cores são configuráveis por perfil via tema (tacticalColors).
+- Sala do chefe do andar 10 implementada: encontro ND 4 com ficha da Aranha Matriarca e Aranhas Filhotes, mapa fixo 20x14 com portas laterais de 2 quadrados na entrada e saída, grupo em 4 quadrados alinhado ao centro da entrada, Matriarca Grande ocupando 2x2 perto da saída, área 4x4 de teia ao redor dela, quatro zonas de teia 3x3 nos cantos internos com ovo/casulo no centro, teias 2x2 adicionais no centro, frente da saída e rotas laterais, oito pilares, recompensa do cristal verde e tela de conclusão da etapa.
 
 ### Parcialmente Implementado
 
@@ -505,8 +506,6 @@ Criar ou separar:
 ### Pendente
 
 - Validar em mesa as listas de encontro final implementadas (NDs, CDs de negociação e valores custom dos obstáculos).
-- Completar a sala do chefe do andar 10: Matriarca com crias desde o início, ovos que eclodem como reforços, teias ativas, pilares/cobertura, mapa de ao menos 14x20, tesouro do cristal verde e tela de conclusão da etapa.
-- Implementar a regra de tesouro padrão por ND nos encontros finais: tesouro adicional em cenas de combate/armadilha e condicionado ao sucesso em cenas específicas.
 - Associar cada tipo de armadilha a padrões táticos diferentes no mapa, em vez de usar apenas uma zona genérica.
 - Ajustar balanceamento para personagens de nível 1 a 4, especialmente quantidade de inimigos, ND agregado, dano de armadilhas e frequência de falhas.
 - Revisar persistência de sessão para garantir que estado mecânico, encontro atual, mapas atuais e efeitos pendentes carreguem sem fragilidade.

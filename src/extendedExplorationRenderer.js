@@ -239,6 +239,7 @@ function createPendingDescentPanel(snapshot, onConfirmPitDescent, onDismissPitDe
 
 const TACTICAL_CELL_LABELS = {
   advantage: "Vantagem/elevação",
+  boss: "Chefe Grande",
   difficult: "Terreno difícil",
   door: "Porta (entrada/saída)",
   enemy: "Inimigo",
@@ -257,6 +258,7 @@ const TACTICAL_CELL_LABELS = {
 
 const TACTICAL_CELL_GLYPHS = {
   advantage: "✦",
+  boss: "B",
   difficult: "D",
   enemy: "E",
   hidden: "?",
@@ -270,7 +272,7 @@ const TACTICAL_CELL_GLYPHS = {
 };
 
 const TACTICAL_LEGEND_ORDER = [
-  "wall", "party", "enemy", "hidden", "trap", "pit", "web",
+  "wall", "party", "boss", "enemy", "hidden", "trap", "pit", "web",
   "difficult", "mechanism", "objective", "door", "advantage", "obstacle", "reinforcement"
 ];
 
@@ -283,6 +285,9 @@ function createTacticalGrid(tacticalMap) {
 
   grid.style.setProperty("--tactical-width", String(tacticalMap.width));
   grid.style.setProperty("--tactical-height", String(tacticalMap.height));
+  grid.style.setProperty("--tactical-aspect", `${tacticalMap.width} / ${tacticalMap.height}`);
+  grid.style.setProperty("--tactical-fit-ratio", String(tacticalMap.width / tacticalMap.height));
+  grid.style.setProperty("--tactical-max-width", `${tacticalMap.width * 40}px`);
 
   tacticalMap.cells.forEach((cell) => {
     const tile = createElement("span", `tactical-cell is-${cell}`);
@@ -321,7 +326,7 @@ function openTacticalMapFullscreen(tacticalMap) {
   const title = createElement(
     "strong",
     null,
-    `Mapa 14x10 | ${tacticalMap.enemyCount} inimigo(s) | ${tacticalMap.trapCount} armadilha(s)`
+    `Mapa ${tacticalMap.width}x${tacticalMap.height} | ${tacticalMap.enemyCount} inimigo(s) | ${tacticalMap.trapCount} zona(s) de risco`
   );
 
   function close() {
@@ -404,11 +409,11 @@ function createTacticalMap(scene, onRerollMap, extraActions = []) {
 
   const section = createElement("div", "tactical-map-panel");
   const header = createElement("div", "tactical-map-header");
-  const mapKind = scene.tacticalMap.preset ? "Mapa da cena (fixo)" : "Mapa 14x10";
+  const mapKind = scene.tacticalMap.preset ? "Mapa da cena (fixo)" : "Mapa";
   const title = createElement(
     "strong",
     null,
-    `${mapKind} | ${scene.tacticalMap.enemyCount} inimigo(s) | ${scene.tacticalMap.trapCount} armadilha(s)`
+    `${mapKind} ${scene.tacticalMap.width}x${scene.tacticalMap.height} | ${scene.tacticalMap.enemyCount} inimigo(s) | ${scene.tacticalMap.trapCount} zona(s) de risco`
   );
   const actions = createElement("div", "tactical-map-actions");
 
@@ -618,14 +623,51 @@ function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor,
   return section;
 }
 
-function createBossPanel(snapshot) {
+function createBossPanel(snapshot, selectedEncounterItemByScene, onResolveBossEncounter) {
   const section = createElement("section", "extended-panel boss-panel");
   const boss = snapshot.bossEncounter;
 
   section.appendChild(createElement("h3", null, boss.title));
   section.appendChild(createElement("p", "result-title", `ND ${boss.challengeLabel}`));
-  section.appendChild(createElement("p", "result-detail", `Criatura principal: ${boss.creatureId}. Apoio: ${boss.supportCreatureId}. Recompensa: ${boss.reward}.`));
-  section.appendChild(createElement("p", "hidden-environment-notice", "A composição completa do chefe será ligada ao resolvedor de encontros na próxima etapa."));
+  section.appendChild(createElement("p", "result-detail", `Criatura principal: ${boss.mainCreatureName}. Apoio desde o início: ${boss.supportCreatureName}. Recompensa: ${boss.reward}.`));
+  section.appendChild(createElement("p", "result-detail", boss.detail));
+
+  if (boss.treasureNote) {
+    const treasure = createElement("p", "final-treasure");
+    treasure.appendChild(createElement("strong", null, "Recompensa: "));
+    treasure.appendChild(document.createTextNode(`XP integral do encontro ND ${boss.challengeLabel}. ${boss.treasureNote}`));
+    section.appendChild(treasure);
+  }
+
+  section.appendChild(createButton(
+    "Abrir encontro da Matriarca",
+    "extended-action",
+    () => openSceneModal({
+      title: boss.title,
+      tabs: [{
+        label: "Encontro",
+        renderContent: (refresh) => buildSceneModalContent(
+          boss,
+          "boss",
+          selectedEncounterItemByScene,
+          () => {},
+          refresh
+        )
+      }]
+    })
+  ));
+  section.appendChild(createButton("Marcar Matriarca resolvida", "extended-action is-door-open", onResolveBossEncounter));
+
+  return section;
+}
+
+function createCompletedPanel(snapshot) {
+  const section = createElement("section", "extended-panel boss-panel");
+  const summary = snapshot.completedSummary;
+
+  section.appendChild(createElement("h3", null, summary.title));
+  section.appendChild(createElement("p", "result-detail", summary.text));
+  section.appendChild(createElement("p", "final-treasure", `Recompensa principal: ${summary.reward}.`));
 
   return section;
 }
@@ -654,6 +696,7 @@ export function createExtendedExplorationRenderer({
   onConfirmPitDescent,
   onDismissPitDescent,
   onOutcome,
+  onResolveBossEncounter,
   onResolveFinalEncounter,
   onRerollFinalEncounter,
   onRerollTacticalMap
@@ -688,7 +731,12 @@ export function createExtendedExplorationRenderer({
     const right = createElement("div", "extended-side-column");
 
     if (snapshot.phase === "boss") {
-      left.appendChild(createBossPanel(snapshot));
+      left.appendChild(createBossPanel(snapshot, selectedEncounterItemByScene, () => {
+        onResolveBossEncounter();
+        render();
+      }));
+    } else if (snapshot.phase === "completed") {
+      left.appendChild(createCompletedPanel(snapshot));
     } else {
       left.appendChild(createApproachControls(
         snapshot,

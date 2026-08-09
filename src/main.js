@@ -143,6 +143,11 @@ const extendedExplorationRenderer = createExtendedExplorationRenderer({
     refreshExplorationDisplay();
     updateInfo();
   },
+  onResolveBossEncounter: () => {
+    extendedState.resolveBossEncounter();
+    refreshExplorationDisplay();
+    updateInfo();
+  },
   onResolveFinalEncounter: () => {
     extendedState.resolveFinalEncounter();
     refreshExplorationDisplay();

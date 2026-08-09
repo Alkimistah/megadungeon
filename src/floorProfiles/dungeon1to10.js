@@ -253,7 +253,8 @@ export const dungeon1to10Profile = {
       creatureId: "aranha-matriarca",
       supportCreatureId: "aranhas-filhotes",
       challengeOptions: [4],
-      reward: "Cristal verde"
+      reward: "Cristal verde",
+      rewardDetail: "Tesouro sem efeito mecânico; vale como cristal multiplicador, definido em mesa como dobro ou quádruplo de um cristal azul de mesmo ND."
     }
   },
   theme: {

@@ -1,5 +1,6 @@
 import { formatChallengeRating } from "./challenge.js";
 import { assignCreatureProfile } from "./creatures.js";
+import { getCreatureById } from "./creatureCatalog/index.js";
 import { resolveNodeEncounter } from "./encounterResolver.js";
 import { pick, randomInt } from "./random.js";
 import { assignTrapProfile } from "./traps.js";
@@ -8,6 +9,8 @@ const INITIAL_LOG_LIMIT = 40;
 const COMBAT_CATEGORIES = new Set(["easy", "medium", "hard"]);
 const TACTICAL_WIDTH = 14;
 const TACTICAL_HEIGHT = 10;
+const BOSS_TACTICAL_WIDTH = 20;
+const BOSS_TACTICAL_HEIGHT = 14;
 
 function getFloorRules(profile, floor) {
   return profile.extendedExploration.progressByFloor[floor] || null;
@@ -826,6 +829,7 @@ const PRESET_CELL_BY_CODE = {
   "O": "objective",
   "d": "door",
   "V": "advantage",
+  "B": "boss",
   "C": "obstacle",
   "R": "reinforcement"
 };
@@ -833,10 +837,12 @@ const PRESET_CELL_BY_CODE = {
 function createPresetTacticalMap(template, { enemyCount = 0, trapCount = 0 } = {}) {
   if (!template?.length) return null;
 
+  const height = template.length;
+  const width = Math.max(...template.map((row) => row.length));
   const cells = [];
-  for (let y = 0; y < TACTICAL_HEIGHT; y += 1) {
+  for (let y = 0; y < height; y += 1) {
     const row = template[y] || "";
-    for (let x = 0; x < TACTICAL_WIDTH; x += 1) {
+    for (let x = 0; x < width; x += 1) {
       cells.push(PRESET_CELL_BY_CODE[row[x]] || "floor");
     }
   }
@@ -844,12 +850,102 @@ function createPresetTacticalMap(template, { enemyCount = 0, trapCount = 0 } = {
   return {
     cells,
     enemyCount,
-    height: TACTICAL_HEIGHT,
+    height,
     preset: true,
     template: "preset",
     trapCount,
-    width: TACTICAL_WIDTH
+    width
   };
+}
+
+function createBossTacticalMap() {
+  const cells = Array.from({ length: BOSS_TACTICAL_HEIGHT }, (_, y) =>
+    Array.from({ length: BOSS_TACTICAL_WIDTH }, (_, x) =>
+      x === 0 || y === 0 || x === BOSS_TACTICAL_WIDTH - 1 || y === BOSS_TACTICAL_HEIGHT - 1 ? "wall" : "floor"
+    )
+  );
+  const webCenters = [[2, 2], [17, 2], [2, 11], [17, 11]];
+
+  setCells(cells, [[0, 6], [0, 7]], "door");
+  setCells(cells, [[19, 6], [19, 7]], "door");
+  setCells(cells, [[1, 6], [2, 6], [1, 7], [2, 7]], "party");
+  setCells(cells, [
+    [4, 4], [8, 4], [11, 4], [15, 4],
+    [4, 9], [8, 9], [11, 9], [15, 9]
+  ], "obstacle");
+
+  for (let y = 5; y <= 8; y += 1) {
+    for (let x = 12; x <= 15; x += 1) {
+      cells[y][x] = "web";
+    }
+  }
+  setCells(cells, [[13, 6], [14, 6], [13, 7], [14, 7]], "boss");
+  setCells(cells, [
+    [17, 6], [18, 6], [17, 7], [18, 7],
+    [5, 5], [6, 5], [5, 6], [6, 6],
+    [10, 2], [11, 2], [10, 3], [11, 3],
+    [8, 11], [9, 11], [8, 12], [9, 12],
+    [9, 8], [10, 8], [9, 9], [10, 9]
+  ], "web");
+
+  webCenters.forEach(([centerX, centerY]) => {
+    for (let y = centerY - 1; y <= centerY + 1; y += 1) {
+      for (let x = centerX - 1; x <= centerX + 1; x += 1) {
+        cells[y][x] = "web";
+      }
+    }
+    cells[centerY][centerX] = "reinforcement";
+  });
+
+  return {
+    cells: cells.flat(),
+    enemyCount: 2,
+    height: BOSS_TACTICAL_HEIGHT,
+    preset: true,
+    template: "boss-arachnid-arena",
+    trapCount: webCenters.length,
+    width: BOSS_TACTICAL_WIDTH
+  };
+}
+
+function createBossEncounterNode(profile, floor, boss) {
+  const encounterNode = {
+    id: `extended-${floor}-boss`,
+    encounterSeed: `extended-${floor}-boss`,
+    type: "boss",
+    label: "Sala da Matriarca Aracnídea",
+    short: "B",
+    level: floor,
+    column: 0,
+    environment: {
+      terrain: {
+        name: "Covil aracnídeo",
+        effect: "Sala ampla fechada da masmorra, tomada por teias espessas, ovos e pilares.",
+        features: []
+      },
+      climate: []
+    },
+    challenge: {
+      climate: 0,
+      encounter: boss.challengeOptions?.[0] || 4,
+      terrain: 0,
+      total: boss.challengeOptions?.[0] || 4
+    },
+    creature: null,
+    trap: null,
+    fixedComposition: {
+      creatures: [
+        { id: boss.creatureId, quantity: 1 },
+        { id: boss.supportCreatureId, quantity: 1 }
+      ],
+      traps: []
+    },
+    resolvedEncounter: null
+  };
+
+  resolveNodeEncounter(encounterNode, { mapSeed: `extended-floor-${floor}` });
+
+  return encounterNode;
 }
 
 function createSceneEffect(detail) {
@@ -884,6 +980,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
   let currentResult = null;
   let currentResults = [];
   let finalEncounter = null;
+  let bossEncounter = null;
   let log = [];
   let elapsedMinutes = 0;
   let pendingSceneEffects = [];
@@ -901,6 +998,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     currentResult = null;
     currentResults = [];
     finalEncounter = null;
+    bossEncounter = null;
     pendingSceneEffects = [];
     resetPending = false;
     descentPending = false;
@@ -1025,6 +1123,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     currentResult = null;
     currentResults = [];
     finalEncounter = null;
+    bossEncounter = null;
     pendingSceneEffects = [];
     resetPending = false;
     descentPending = false;
@@ -1066,6 +1165,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       currentResults = (sessionState.currentResults || (currentResult ? [currentResult] : []))
         .map(refreshSceneEncounter);
       finalEncounter = refreshSceneEncounter(sessionState.finalEncounter || null);
+      bossEncounter = refreshSceneEncounter(sessionState.bossEncounter || null);
       log = sessionState.log || [];
       elapsedMinutes = sessionState.elapsedMinutes || 0;
       pendingSceneEffects = sessionState.pendingSceneEffects || [];
@@ -1082,6 +1182,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     currentResult = null;
     currentResults = [];
     finalEncounter = null;
+    bossEncounter = null;
     log = [];
     elapsedMinutes = 0;
     pendingSceneEffects = [];
@@ -1293,6 +1394,13 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     enterFloor(Math.min(floor + 1, 10));
   }
 
+  function resolveBossEncounter() {
+    if (phase !== "boss") return;
+
+    phase = "completed";
+    addLog("A Matriarca foi derrotada. A etapa dos andares 1 a 10 foi concluída.", "final");
+  }
+
   function rerollTacticalMap(target = "current") {
     const scene = target === "final"
       ? finalEncounter
@@ -1319,12 +1427,30 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
 
   function getBossEncounter() {
     const boss = activeProfile.extendedExploration.boss;
+    const mainCreature = getCreatureById(boss.creatureId);
+    const supportCreature = getCreatureById(boss.supportCreatureId);
+
+    if (!bossEncounter) {
+      bossEncounter = {
+        categoryId: "boss",
+        categoryLabel: "Chefe",
+        challenge: boss.challengeOptions?.[0] || 4,
+        detail: "Arena 20x14 com entrada e saída laterais por portas de 2 quadrados. O grupo começa alinhado ao centro da entrada. A Matriarca ocupa 2x2 quadrados perto da saída; a área 4x4 ao redor dela está tomada por teias. Os quatro cantos internos têm zonas de teia 3x3 com ovo/casulo no centro, que podem eclodir como reforços. Teias 2x2 adicionais pressionam o centro, a frente da saída e rotas laterais. Oito pilares oferecem cobertura e controle de movimento.",
+        encounterNode: createBossEncounterNode(activeProfile, floor, boss),
+        sceneEffects: [],
+        tacticalMap: createBossTacticalMap(),
+        title: "Sala da Matriarca Aracnídea",
+        treasureNote: `${boss.reward}. ${boss.rewardDetail || ""}`.trim()
+      };
+    }
 
     return {
+      ...bossEncounter,
       creatureId: boss.creatureId,
+      mainCreatureName: mainCreature?.name || boss.creatureId,
       supportCreatureId: boss.supportCreatureId,
+      supportCreatureName: supportCreature?.name || boss.supportCreatureId,
       reward: boss.reward,
-      title: "Sala da Matriarca Aracnídea",
       challengeLabel: boss.challengeOptions.map(formatChallengeRating).join(" ou ")
     };
   }
@@ -1337,6 +1463,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
       elapsedMinutes,
       failures,
       finalEncounter,
+      bossEncounter,
       floor,
       log,
       pendingSceneEffects,
@@ -1361,6 +1488,13 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     return {
       approaches: getFloorApproaches(activeProfile, floor),
       bossEncounter: phase === "boss" ? getBossEncounter() : null,
+      completedSummary: phase === "completed"
+        ? {
+          reward: activeProfile.extendedExploration.boss.reward,
+          title: "Andares 1-10 conquistados!",
+          text: "A Matriarca Aracnídea foi eliminada. Entregue XP integral do encontro ND 4, o cristal verde e registre os tesouros dessa conquista."
+        }
+        : null,
       currentResult,
       currentResults,
       descentPending,
@@ -1392,6 +1526,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     getSnapshot,
     initialize,
     resolveD100,
+    resolveBossEncounter,
     resolveFinalEncounter,
     rerollFinalEncounter,
     rerollTacticalMap

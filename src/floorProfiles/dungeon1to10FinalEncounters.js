@@ -55,7 +55,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Guardião Relutante",
         typeLabel: "Combate com gimmick",
         detail: "O guardião defende a posição de vantagem junto à saída e não persegue além de 2 células da porta; o animal fica 2 células à frente. Ao cair à metade dos PV, ele oferece passagem em troca da vida.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#......#.....#",
@@ -78,7 +78,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Ninho na Saída",
         typeLabel: "Combate com gimmick",
         detail: "Entulho (terreno difícil) cerca a saída. A cascavel é perigo oculto: Percepção CD 15 ao entrar na área; quem termina movimento adjacente sem a ter notado sofre o bote com surpresa. Sem reforços: o ninho inteiro já está em cena.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         variants: [
           {
             floors: [1],
@@ -123,7 +123,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Corredor Armado",
         typeLabel: "Combate + armadilha",
         detail: "O arame farpado fecha toda a largura do corredor — não há avanço sem atravessá-lo ou desarmá-lo. Os goblins atiram por cima do arame e só aceitam corpo a corpo depois que alguém cruza.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         variants: [
           {
             floors: [1],
@@ -237,7 +237,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Posto de Guarda",
         typeLabel: "Combate com gimmick",
         detail: "Os três ocupam o único gargalo entre as salas em formação disciplinada: enquanto o Orc Combatente estiver de pé, nenhum deles pode ser flanqueado nem cede a empurrão. Quando ele cai, os goblins fogem ao chegar à metade dos PV.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#......#.....#",
@@ -259,7 +259,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Torreta Goblin",
         typeLabel: "Combate + armadilha",
         detail: "Virote montado como torreta fixa na parede: dispara 1 virote por rodada (1d10+2, Reflexos CD 20) na linha do corredor enquanto houver goblin adjacente à manivela. Ladinagem CD 20 trava a manivela. Um goblin opera, dois defendem; o recuo lateral ao norte sai da linha de tiro.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "####.....#####",
@@ -281,7 +281,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Matilha na Descida",
         typeLabel: "Combate com gimmick",
         detail: "Todos começam ocultos nas alcovas: Furtividade deles contra Percepção do grupo; surpresa na 1ª rodada se não detectados. Focam o personagem mais isolado.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         variants: [
           {
             floors: [3],
@@ -344,7 +344,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Fosso do Vigia",
         typeLabel: "Combate + armadilha",
         detail: "O fosso camuflado cobre toda a largura da passagem — não há contorno. Atravessar exige saltar (Atletismo CD 20), descer e escalar pelo fundo (2 movimentos + Atletismo CD 20) ou travar a tampa (Ladinagem CD 20). Os vigias ficam na plataforma elevada com visão livre sobre o fosso (mureta como cobertura) e atiram em quem estiver na travessia.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#.......XX.VE#",
@@ -390,7 +390,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Chefe de Guerra",
         typeLabel: "Combate com gimmick",
         detail: "A muralha interna tem uma única passagem e o Orc Chefe a ocupa em posição de vantagem: só um personagem o ataca por vez em corpo a corpo. Empurrão, manobras ou ataques à distância abrem a luta. A escolta é narrativa e foge na 1ª rodada.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#........##..#",
@@ -412,7 +412,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Colônia de Gosma",
         typeLabel: "Combate com gimmick",
         detail: "A criatura Grande (2x2 no mapa) bloqueia o caminho até a saída, cercada de gosma (terreno difícil). No andar 6, a geração de glops é habilidade da ficha da Mamãe Glop, não reforço externo.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#............#",
@@ -435,7 +435,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Guarita das Lâminas",
         typeLabel: "Combate + armadilha",
         detail: "As duas únicas passagens entre as salas têm lâminas na parede (2d6+5, Reflexos CD 20; Investigação CD 25; Ladinagem CD 20) — não há caminho limpo. O gnoll conhece os gatilhos, troca de passagem para flanquear e tenta empurrar personagens para as células armadas.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#.....#......#",
@@ -503,7 +503,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Teias na Porta",
         typeLabel: "Combate + armadilha",
         detail: "Uma barreira contínua de teia atravessa a sala e fecha todas as rotas até a saída (regras da Rede: Reflexos CD 20 ou agarrado; escapar com Acrobacia CD 20, ação completa; fogo destrói um trecho com 5 PV). O enxame fica atrás da barreira e ataca quem ficar agarrado. No andar 8 a barreira é mais espessa (3 zonas).",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#........W...#",
@@ -525,7 +525,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Caçadora do Teto",
         typeLabel: "Combate com gimmick",
         detail: "A Aranha Gigante começa camuflada no teto: Percepção do grupo contra a Furtividade dela; primeiro ataque com surpresa se não vista. Após atacar, gasta movimento para voltar ao teto/teias. Teias laterais são terreno difícil apenas para o grupo. Contramedidas: ataques à distância, ações preparadas, fogo nas teias.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#..W......W..#",
@@ -547,7 +547,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Porta Falsa",
         typeLabel: "Combate com gimmick",
         detail: "O Mímico Menor está disfarçado de segunda porta, colado na saída real. Investigação CD 20, ou tocar com um objeto, revela o disfarce; caso contrário, o primeiro a interagir sofre ataque com surpresa + adesivo (agarrado).",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#............#",
@@ -616,7 +616,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Guardiã do Covil",
         typeLabel: "Combate com gimmick",
         detail: "A cortina de teia fecha todas as rotas até a descida (terreno difícil só para o grupo). A Guardiã (2x2) defende a descida e não a abandona; o enxame de filhotes assedia quem ficar preso nas teias.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#......W.....#",
@@ -638,7 +638,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Travessia dos Casulos",
         typeLabel: "Combate + armadilha",
         detail: "Um campo de teia corta a sala de ponta a ponta, com os enxames dentro dele. Objetivo explícito: levar todos os personagens à descida — a cena termina quando o último cruzar. Exterminar não é necessário; os filhotes não perseguem além das teias.",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#.....WW.....#",
@@ -704,7 +704,7 @@ export const dungeon1to10FinalEncounters = {
         title: "Sentinela da Dungeon",
         typeLabel: "Combate com gimmick",
         detail: "A dungeon testa o grupo uma última vez: o Mímico Menor está plantado como baú diante da descida, parecendo o tesouro do andar. Investigação CD 20 revela; caso contrário, surpresa + adesivo. Os filhotes à espreita entram na 2ª rodada pelo ponto de reforço (única entrada da cena).",
-        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais das criaturas.",
+        treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
           "#.........R..#",

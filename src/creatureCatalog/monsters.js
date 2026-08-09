@@ -256,17 +256,18 @@ export const aranhaMatriarca = {
         speedText: "12m (8q), escalar 12m (8q)",
         senses: "visão no escuro",
         defensesText: null,
-        attributes: { str: 5, dex: 4, con: 4, int: -5, wis: 1, cha: -4 }
+        attributes: { str: 5, dex: 4, con: 4, int: -4, wis: 1, cha: -4 }
     },
     actions: [
         { name: "Corpo a Corpo", text: "2 mordidas +16 (2d8+3 mais veneno)." }
     ],
     abilities: [
         { name: "Teia da Matriarca", timing: "padrão", text: "A aranha matriarca dispara uma massa de teias em um quadrado de 3m de lado em alcance curto. Criaturas na área ficam enredadas (Reflexos CD 18 evita). Uma criatura enredada pode se soltar com uma ação completa e um teste de Força ou Acrobacia (CD 20), ou cortando a teia (cada espaço de 1,5m tem 10 PV e RD 5). Fogo queima a teia em duas rodadas, mas causa 1d6 pontos de dano de fogo por rodada a todas as criaturas nela." },
-        { name: "Ninhada Voraz", timing: "movimento", text: "Uma vez por cena, a matriarca rasga um casulo preso às teias da sala e convoca um enxame de aranhas filhotes em um espaço livre em alcance curto. O enxame age no fim da rodada da matriarca. Se o enxame for destruído, a matriarca não pode convocá-lo novamente nesta cena." },
+        { name: "Ninhada Voraz", timing: "movimento", text: "Uma vez por turno, a matriarca pode rasgar um casulo preso às teias da sala e convocar um enxame de aranhas filhotes em um espaço livre em alcance curto. O enxame age no fim da rodada da matriarca. Se o enxame for destruído, a matriarca não pode convocá-lo novamente nesta cena." },
         { name: "Covil Teioso", timing: "passiva", text: "A sala da matriarca é coberta por fios espessos. Para outras criaturas, áreas de teia contam como terreno difícil. A matriarca ignora esse terreno, pode escalar nas próprias teias sem teste e percebe automaticamente qualquer criatura tocando uma teia, como se tivesse percepção às cegas." },
         { name: "Arrastar para o Ninho", timing: "movimento", text: "Uma vez por rodada, a matriarca escolhe uma criatura enredada em alcance curto. A criatura é puxada 6m em direção à matriarca; Reflexos CD 18 evita. Se terminar adjacente à matriarca, fica desprevenida até o início de seu próximo turno." },
         { name: "Veneno", timing: "passiva", text: "Condição fraco (Fortitude CD 18 evita). Se a criatura já estiver fraca e falhar no teste, fica debilitada por 1 rodada." },
+        { name: "Salto Aracnídeo", timing: "completa", text: "A aranha matriarca usa os fios do covil para dar um salto habilidoso, deslocando-se até duas vezes seu deslocamento para uma área de teia. Esse movimento não provoca reações. Ao fim do deslocamento, ela faz um ataque de mordida contra uma criatura dentro de seu alcance." },
         { name: "Última Postura", timing: "passiva", text: "Quando é reduzida a 70 PV ou menos pela primeira vez na cena, a matriarca remove uma condição que esteja sofrendo e usa Teia da Matriarca como ação livre. Até o fim da cena, seus ataques de mordida têm margem de ameaça 19." },
         { name: "Uso sugerido", timing: null, text: "Mantenha várias áreas de teia já desenhadas na sala. A matriarca deve dividir o grupo com Teia da Matriarca, puxar alvos isolados com Arrastar para o Ninho e usar o enxame para travar conjuradores ou alvos isolados." }
     ],
