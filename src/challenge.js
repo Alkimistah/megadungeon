@@ -5,6 +5,16 @@ const CHALLENGE_LABELS = new Map([
   [0.75, "3/4"]
 ]);
 
+const SPECIAL_CHALLENGE_RATINGS = new Set(["S", "S+"]);
+
+export function isSpecialChallengeRating(value) {
+  return SPECIAL_CHALLENGE_RATINGS.has(value);
+}
+
+export function getChallengeRatingForStatistics(value) {
+  return isSpecialChallengeRating(value) ? 20 : value;
+}
+
 export function roundToQuarter(value) {
   return Math.round(value * 4) / 4;
 }
@@ -18,6 +28,8 @@ function getRuleValue(table, key, fallback = 0) {
 }
 
 export function formatChallengeRating(value) {
+  if (typeof value !== "number") return String(value ?? "0");
+
   const rounded = roundToQuarter(value);
   const whole = Math.floor(rounded);
   const fraction = roundToQuarter(rounded - whole);

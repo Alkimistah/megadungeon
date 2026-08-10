@@ -1,4 +1,4 @@
-import { formatChallengeRating } from "./challenge.js";
+import { formatChallengeRating, roundToQuarter } from "./challenge.js";
 import { pickWeighted } from "./random.js";
 
 export const TRAP_SOURCES = {
@@ -575,12 +575,15 @@ const NON_TRAP_ROOM_TYPES = new Set(["camp", "treasure"]);
 const NON_TRAP_UNKNOWN_LABELS = new Set(["Acampamento", "Tesouro"]);
 const CREATURE_ROOM_TYPES = new Set(["normal", "elite", "boss"]);
 
-function roundToQuarter(value) {
-  return Math.round(value * 4) / 4;
-}
-
 function getTrapRules(profile) {
   return profile.trapRules || {};
+}
+
+function clampChallenge(value, rules) {
+  const minimum = rules.minimum ?? 0;
+  const maximum = rules.maximum ?? value;
+
+  return Math.min(Math.max(value, minimum), maximum);
 }
 
 function isTrapNode(node) {
@@ -681,6 +684,15 @@ export function assignTrapProfile(node, profile, rng) {
   const remainingCreatureChallenge = role === "primary"
     ? 0
     : Math.max(0, roundToQuarter(node.challenge.encounter - trapChallenge));
+  const effectiveEncounterChallenge = role === "primary"
+    ? roundToQuarter(trapChallenge)
+    : node.challenge.encounter;
+  const totalChallenge = role === "primary"
+    ? clampChallenge(
+      effectiveEncounterChallenge + (node.challenge.climate || 0) + (node.challenge.terrain || 0),
+      profile.challengeRules || {}
+    )
+    : node.challenge.total;
 
   node.trap = {
     ...selectedTrap,
@@ -690,8 +702,10 @@ export function assignTrapProfile(node, profile, rng) {
     targetChallenge,
     targetChallengeLabel: formatChallengeRating(targetChallenge)
   };
+  node.challenge.encounter = effectiveEncounterChallenge;
   node.challenge.trap = roundToQuarter(trapChallenge);
   node.challenge.creatures = roundToQuarter(remainingCreatureChallenge);
+  node.challenge.total = roundToQuarter(totalChallenge);
   node.challenge.encounterBudgetLabel = role === "primary"
     ? `ND ${formatChallengeRating(node.challenge.trap)} em armadilha principal`
     : `ND ${formatChallengeRating(node.challenge.creatures)} em criaturas + ND ${formatChallengeRating(node.challenge.trap)} em armadilha`;

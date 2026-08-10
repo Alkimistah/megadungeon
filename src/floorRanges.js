@@ -23,8 +23,10 @@ export function applyTheme(theme) {
   });
 
   const tacticalCellTypes = [
-    "wall", "floor", "party", "enemy", "hidden", "trap", "pit", "web",
-    "difficult", "mechanism", "objective", "door", "advantage", "obstacle", "reinforcement"
+    "wall", "floor", "party", "enemy", "hidden", "trap", "water", "current",
+    "tree", "foliage", "swamp", "wet", "clearing", "slope", "trench", "wind",
+    "concealment", "pit", "web", "difficult", "mechanism", "objective", "door",
+    "advantage", "obstacle", "reinforcement"
   ];
   tacticalCellTypes.forEach((cell) => {
     const color = theme.tacticalColors?.[cell];

@@ -190,16 +190,32 @@ function guaranteeAtLeastOneTreasure(levels, rng) {
 
   if (treasureExists) return;
 
-  const candidates = levels.flat().filter((node) => node.type !== "boss");
+  const preferredCandidates = levels.flat().filter((node) => node.type !== "boss" && node.type !== "camp");
+  const fallbackCandidates = levels.flat().filter((node) => node.type !== "boss");
+  const candidates = preferredCandidates.length > 0 ? preferredCandidates : fallbackCandidates;
+
+  if (candidates.length === 0) return;
+
   const target = pick(rng, candidates);
   applyRoomType(target, treasureRoom);
 }
 
-function getCampLevelIndexes(levels) {
+function getCampRules(profile) {
+  return profile.encounterRules?.camps || {
+    fullLevelEvery: null,
+    guaranteedOneEvery: 4,
+    extraNodeChance: 0
+  };
+}
+
+function getCampLevelIndexes(levels, every) {
+  if (!every) return [];
+
   return levels
     .map((_, levelIndex) => levelIndex)
-    .filter((levelIndex) => (levelIndex + 1) % 4 === 0);
+    .filter((levelIndex) => (levelIndex + 1) % every === 0);
 }
+
 function pickCampNode(levelNodes, rng) {
   const preferredCandidates = levelNodes.filter(
     (node) => node.type === "normal" || node.type === "trap"
@@ -212,14 +228,48 @@ function pickCampNode(levelNodes, rng) {
   return candidates.length > 0 ? pick(rng, candidates) : pick(rng, levelNodes);
 }
 
-function addCampsIfEligible(levels, rng) {
-  getCampLevelIndexes(levels).forEach((levelIndex) => {
+function addGuaranteedCampLevels(levels, rng, every) {
+  getCampLevelIndexes(levels, every).forEach((levelIndex) => {
     const levelNodes = levels[levelIndex].filter((node) => node.type !== "boss");
 
     if (levelNodes.length > 0) {
       applyRoomType(pickCampNode(levelNodes, rng), campRoom);
     }
   });
+}
+
+function addFullCampLevels(levels, every) {
+  getCampLevelIndexes(levels, every).forEach((levelIndex) => {
+    levels[levelIndex]
+      .filter((node) => node.type !== "boss")
+      .forEach((node) => applyRoomType(node, campRoom));
+  });
+}
+
+function addRandomExtraCamps(levels, rng, chance, excludedEvery) {
+  if (!chance) return;
+
+  levels.forEach((levelNodes, levelIndex) => {
+    if (excludedEvery && (levelIndex + 1) % excludedEvery === 0) return;
+
+    levelNodes.forEach((node) => {
+      if (node.type !== "boss" && rng() < chance) {
+        applyRoomType(node, campRoom);
+      }
+    });
+  });
+}
+
+function addCampsIfEligible(levels, profile, rng) {
+  const rules = getCampRules(profile);
+
+  if (rules.fullLevelEvery) {
+    addFullCampLevels(levels, rules.fullLevelEvery);
+  } else {
+    addGuaranteedCampLevels(levels, rng, rules.guaranteedOneEvery);
+  }
+
+  addRandomExtraCamps(levels, rng, rules.extraNodeChance, rules.fullLevelEvery);
 }
 
 function getCupLevelNodeCount(levelIndex, depth, edgeNodeCount, middleNodeCount) {
@@ -404,9 +454,9 @@ export function generateMapData(depth, baseDC, profile, floor, rng = Math.random
   const levels = createSlayLikeMap(depth, profile, rng);
 
   addFinalBoss(levels, profile, floor);
-  guaranteeAtLeastOneTreasure(levels, rng);
   convertMergedPathsToUnknown(levels);
-  addCampsIfEligible(levels, rng);
+  addCampsIfEligible(levels, profile, rng);
+  guaranteeAtLeastOneTreasure(levels, rng);
   assignUnknownReveals(levels, rng);
   assignEnvironments(levels, profile, rng);
   assignChallengeRatings(levels, profile, floor);

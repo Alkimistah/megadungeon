@@ -13,7 +13,8 @@ const CREATURE_TYPE_LABELS = {
   spirit: "Espírito",
   humanoid: "Humanoide",
   monster: "Monstro",
-  undead: "Morto-vivo"
+  undead: "Morto-vivo",
+  event: "Evento"
 };
 
 const TERRAIN_AFFINITIES = {

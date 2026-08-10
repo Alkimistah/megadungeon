@@ -69,7 +69,8 @@ O app deve gerar um grafo dirigido acíclico com layout em "taça":
 - garantia de que todo nodo do próximo nível seja alcançável;
 - chance de conexão secundária para criar escolhas reais;
 - nodos com 3 ou mais entradas podem virar caminhos desconhecidos;
-- acampamentos podem aparecer em níveis divisíveis por 4;
+- todos os nodos de níveis divisíveis por 4 viram acampamento;
+- nodos individuais de acampamento podem aparecer em outros níveis com chance baixa;
 - ao menos um tesouro deve existir no mapa quando possível;
 - no andar 20, o último nível deve conter o boss final quando a regra do perfil permitir.
 
@@ -261,7 +262,8 @@ Acampamentos devem funcionar como pontos de descanso.
 
 O app deve:
 
-- inserir acampamentos em níveis elegíveis;
+- transformar todos os nodos de níveis elegíveis em acampamento;
+- permitir acampamentos raros em outros níveis;
 - permitir marcar descanso;
 - zerar o tempo decorrido ao descansar;
 - exibir estado visual do acampamento descansado;
@@ -535,13 +537,10 @@ Critérios adicionais para a melhoria de mapas táticos:
 - Boss final do andar 20 com Quimera ND 8.
 - Modal de nodo com teste, exploração, desafio, ambiente, criatura, armadilha e ações de estado.
 - Gerador manual de encontros como apoio separado.
+- Mapa tático 20x14 para encontros resolvidos de nodos 11-20, com terreno aberto, água, cobertura, elevação, terreno difícil e riscos derivados de clima/terreno.
 
 ### Melhorias Possíveis
 
-- Adicionar mapa tático aos encontros dos andares 11 a 20.
-- Criar layouts táticos por terreno externo, como floresta, pântano, margem de rio, colina, clareira e ruína.
-- Fazer o mapa tático refletir quantidade real de inimigos, armadilhas incidentais e elementos de terreno.
-- Exibir mapa tático dentro da modal do nodo, preferencialmente recolhido ou em visualização expandida.
 - Adicionar testes automatizados para validade dos mapas táticos 11-20 quando essa melhoria for implementada.
 
 ## Decisões e Pontos de Atenção

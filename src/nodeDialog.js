@@ -2,11 +2,14 @@ import { formatChallengeRating } from "./challenge.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getDamageType } from "./damageTypes.js";
 import { getWeaponVariationLabel } from "./equipment/weaponVariation.js";
+import { createNodeTacticalMap } from "./nodeTacticalMap.js";
+import { openTacticalMapFullscreen } from "./tacticalMapRenderer.js";
 import { getTrapById } from "./traps.js";
 import { assetUrl } from "./assetUrl.js";
 
 const COMBAT_ICON = assetUrl("/assets/icons/winged-sword.svg");
 const ENVIRONMENT_ICON = assetUrl("/assets/icons/earth-arrow-left.svg");
+const TACTICAL_MAP_ICON = assetUrl("/assets/icons/game-icons--treasure-map.svg");
 
 function createEnvironmentGroup(title, items) {
   const section = document.createElement("section");
@@ -260,15 +263,25 @@ function createEnvironmentColumns(node) {
   return columns;
 }
 
-function createModalFooter(pageToggleButton, alignment = "end") {
+function createModalFooter(pageToggleButton, alignment = "end", tacticalMapButton = null) {
   const footer = document.createElement("footer");
+  const leftSlot = document.createElement("div");
+  const centerSlot = document.createElement("div");
+  const rightSlot = document.createElement("div");
 
-  footer.className = `modal-footer is-${alignment}`;
+  footer.className = "modal-footer";
+  leftSlot.className = "modal-footer-slot is-left";
+  centerSlot.className = "modal-footer-slot is-center";
+  rightSlot.className = "modal-footer-slot is-right";
 
   if (pageToggleButton) {
-    footer.appendChild(pageToggleButton);
+    (alignment === "start" ? leftSlot : rightSlot).appendChild(pageToggleButton);
   }
+  if (tacticalMapButton) centerSlot.appendChild(tacticalMapButton);
 
+  footer.appendChild(leftSlot);
+  footer.appendChild(centerSlot);
+  footer.appendChild(rightSlot);
   return footer;
 }
 
@@ -666,6 +679,10 @@ export function createNodeDialogController({
     return state.isNodeChosen(node) && Boolean(node.resolvedEncounter?.items?.length);
   }
 
+  function canShowTacticalMap(node) {
+    return canShowCombatPage(node);
+  }
+
   function getViewMode(node) {
     const viewMode = viewModeByNode.get(node.id) || "environment";
 
@@ -704,6 +721,17 @@ export function createNodeDialogController({
     actions.appendChild(createRouteChoiceControl(node));
 
     return actions;
+  }
+
+  function createTacticalMapControl(node) {
+    if (!canShowTacticalMap(node)) return null;
+
+    return createIconButton(
+      "icon-button modal-tactical-map-toggle",
+      TACTICAL_MAP_ICON,
+      "Abrir mapa tático",
+      () => openTacticalMapFullscreen(createNodeTacticalMap(node))
+    );
   }
 
   function getSelectedEncounterItemKey(node) {
@@ -767,9 +795,10 @@ export function createNodeDialogController({
     }
 
     const pageToggleButton = canShowCombatPage(node) ? createPageToggleControl(node, viewMode) : null;
+    const tacticalMapButton = createTacticalMapControl(node);
 
     contentElement.appendChild(createDivider());
-    contentElement.appendChild(createModalFooter(pageToggleButton, viewMode === "combat" ? "start" : "end"));
+    contentElement.appendChild(createModalFooter(pageToggleButton, viewMode === "combat" ? "start" : "end", tacticalMapButton));
 
     if (!dialogElement.open) {
       dialogElement.showModal();

@@ -33,6 +33,10 @@ export const forest11to20Profile = {
   },
   encounterRules: {
     boss: { enabled: true, finalFloorOnly: true },
+    camps: {
+      fullLevelEvery: 4,
+      extraNodeChance: 0.02
+    },
     roomTypes: [
       { type: "normal", label: "Encontro normal", short: "N", weight: 62 },
       { type: "elite", label: "Encontro elite", short: "E", weight: 11 },
@@ -181,6 +185,34 @@ export const forest11to20Profile = {
     scrollbarTrack: "#162117",
     scrollbarThumb: "#5f8a66",
     mapGlow: "rgba(64, 122, 74, 0.14)",
+    tacticalColors: {
+      wall: "#182014",
+      floor: "#8e966a",
+      party: "#2d6fc5",
+      enemy: "#b72f28",
+      hidden: "#c8d0b0",
+      trap: "#5a8f3e",
+      water: "#2f7899",
+      current: "#23627d",
+      tree: "#243c24",
+      foliage: "#4f7f38",
+      swamp: "#4c5a36",
+      wet: "#587c71",
+      clearing: "#a5a66f",
+      slope: "#8d8851",
+      trench: "#40382b",
+      wind: "#c9d7c0",
+      concealment: "#9ead94",
+      pit: "#2d3027",
+      web: "#8a68b0",
+      difficult: "#587044",
+      mechanism: "#d4b13f",
+      objective: "#3fa7b8",
+      door: "#7a4c24",
+      advantage: "#c5b76f",
+      obstacle: "#334a2f",
+      reinforcement: "#c65a42"
+    },
     columnColors: [
       "#9fc88e",
       "#7fb678",

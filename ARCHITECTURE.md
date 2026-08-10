@@ -17,7 +17,9 @@ Mega Dungeon/
 │   ├── mapRenderer.js       # Renderização SVG do mapa em nodos
 │   ├── nodeDialog.js        # Controlador do modal de detalhes do nó
 │   ├── manualEncounterDialog.js # Gerador manual de encontro
-│   ├── encounterResolver.js # Composição de encontros, armadilhas e mapas táticos
+│   ├── encounterResolver.js # Composição de encontros e armadilhas
+│   ├── nodeTacticalMap.js   # Mapas táticos abertos para nodos 11-20
+│   ├── tacticalMapRenderer.js # Renderização compartilhada de mapas táticos
 │   ├── challenge.js         # Cálculo de Nível de Desafio (ND)
 │   ├── environment.js       # Geração de clima e terreno
 │   ├── tables.js            # Tabelas de perícias e tipos de sala
@@ -124,7 +126,7 @@ O mapa em nodos é usado pelos andares 11 a 20. Ele é um grafo dirigido acícli
 - Cada nó do nível N se conecta ao nó mais próximo e menos utilizado do nível N+1.
 - Todo nó do próximo nível recebe ao menos uma conexão (garantia de acessibilidade).
 - 18% de chance de conexão secundária para nós próximos.
-- Acampamentos são inseridos em níveis divisíveis por 4.
+- Acampamentos são inseridos conforme `encounterRules.camps`; por padrão, um nodo é convertido a cada 4 níveis, enquanto o perfil 11-20 converte o nível inteiro a cada 4 níveis e permite nodos raros de acampamento fora desses níveis.
 
 ---
 
@@ -275,7 +277,9 @@ A subpasta `creatureCatalog/ameacasArton/` contém cadastros importados dos PDFs
 
 `generalCreatureAbilities.js` centraliza habilidades gerais de ameaças vindas do PDF textual de habilidades gerais, como Agarrar Aprimorado, Bando, Enxame, Evasão, Magias, Redução de Dano, Vulnerabilidade e sentidos especiais. Cada registro é um resumo estruturado com categoria, parâmetros esperados e fonte por página, para servir como base de seleção e composição em variantes de criaturas.
 
-`traps.js` centraliza o catálogo de armadilhas do Livro Básico e de Ameaças de Arton e as regras de atribuição aos nodos. Nodos do tipo `trap` ou desconhecidos revelados como Armadilha recebem armadilha principal; encontros normais, elites e boss podem receber armadilha incidental conforme `trapRules.incidentalChanceByRoomType`. Armadilhas não aumentam `challenge.total`; elas consomem parte de `challenge.encounter` e reduzem `challenge.creatures`.
+`traps.js` centraliza o catálogo de armadilhas do Livro Básico e de Ameaças de Arton e as regras de atribuição aos nodos. Nodos do tipo `trap` ou desconhecidos revelados como Armadilha recebem armadilha principal; encontros normais, elites e boss podem receber armadilha incidental conforme `trapRules.incidentalChanceByRoomType`. Armadilhas incidentais não aumentam `challenge.total`; elas consomem parte de `challenge.encounter` e reduzem `challenge.creatures`. Armadilhas principais definem o ND base efetivo do encontro antes da soma de clima e terreno.
+
+`nodeTacticalMap.js` gera mapas táticos 20x14 para encontros resolvidos dos andares 11 a 20. O mapa é aberto, sem paredes por padrão, e deriva água, cobertura, terreno difícil, elevação, visibilidade e zonas de risco de `node.environment`, `node.trap` e `node.resolvedEncounter`. `tacticalMapRenderer.js` compartilha a grade, legenda e modal fullscreen entre esses mapas e a exploração estendida.
 
 ### 8. Criação e Modificação de Ameaças (`threatCreationRules.js`)
 

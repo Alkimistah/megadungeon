@@ -1,5 +1,6 @@
 import { formatChallengeRating } from "./challenge.js";
 import { createEncounterCombatPage, getDefaultEncounterItemKey } from "./nodeDialog.js";
+import { createTacticalMapPanel } from "./tacticalMapRenderer.js";
 
 function createElement(tagName, className = null, text = null) {
   const element = document.createElement(tagName);
@@ -423,30 +424,11 @@ function openSceneModal({ title, tabs, initialTabIndex = 0 }) {
 }
 
 function createTacticalMap(scene, onRerollMap, extraActions = []) {
-  if (!scene?.tacticalMap) return null;
-
-  const section = createElement("div", "tactical-map-panel");
-  const header = createElement("div", "tactical-map-header");
-  const mapKind = scene.tacticalMap.preset ? "Mapa da cena (fixo)" : "Mapa";
-  const title = createElement(
-    "strong",
-    null,
-    `${mapKind} ${scene.tacticalMap.width}x${scene.tacticalMap.height} | ${scene.tacticalMap.enemyCount} inimigo(s) | ${scene.tacticalMap.trapCount} zona(s) de risco`
-  );
-  const actions = createElement("div", "tactical-map-actions");
-
-  actions.appendChild(createButton("Expandir", "extended-action is-compact", () => openTacticalMapFullscreen(scene.tacticalMap)));
-  extraActions.forEach((action) => actions.appendChild(action));
-  if (!scene.tacticalMap.preset) {
-    actions.appendChild(createButton("Gerar outro mapa", "extended-action is-compact", onRerollMap));
-  }
-  header.appendChild(title);
-  header.appendChild(actions);
-  section.appendChild(header);
-  section.appendChild(createTacticalGrid(scene.tacticalMap));
-  section.appendChild(createTacticalLegend(scene.tacticalMap));
-
-  return section;
+  return createTacticalMapPanel(scene?.tacticalMap, {
+    extraActions,
+    mapKind: scene?.tacticalMap?.preset ? "Mapa da cena (fixo)" : "Mapa",
+    onRerollMap
+  });
 }
 
 function createSceneEffects(scene) {

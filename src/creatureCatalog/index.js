@@ -4,6 +4,7 @@ import { humanoidCreatures } from "./humanoids.js";
 import { monsterCreatures } from "./monsters.js";
 import { spiritCreatures } from "./spirits.js";
 import { undeadCreatures } from "./undead.js";
+import { eventCreatures } from "./events.js";
 import { sourceByCreatureId } from "./sources.js";
 import { inferThreatRole, getThreatRole } from "../threatCreationRules.js";
 export { animalCreatures } from "./animals.js";
@@ -12,6 +13,7 @@ export { humanoidCreatures } from "./humanoids.js";
 export { monsterCreatures } from "./monsters.js";
 export { spiritCreatures } from "./spirits.js";
 export { undeadCreatures } from "./undead.js";
+export { eventCreatures } from "./events.js";
 export { sourceByCreatureId } from "./sources.js";
 
 const creaturesByTypeRaw = {
@@ -20,7 +22,8 @@ const creaturesByTypeRaw = {
   spirit: spiritCreatures,
   humanoid: humanoidCreatures,
   monster: monsterCreatures,
-  undead: undeadCreatures
+  undead: undeadCreatures,
+  event: eventCreatures
 };
 
 function uniqueSources(sources) {
