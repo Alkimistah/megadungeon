@@ -343,11 +343,39 @@ Uma possibilidade é escalar por grupos de ilhas:
 
 Os valores devem ser definidos a partir do patamar real dos personagens e das ameaças escolhidas.
 
+Essa mesma pirâmide também deve orientar o sorteio de temas por seed. A seed deve escolher 4 temas de dificuldade inicial para as ilhas 21 a 24, 3 temas de dificuldade intermediária para as ilhas 25 a 27 e 2 temas de dificuldade avançada para as ilhas 28 e 29. A ilha 30 deve ser fixa e reservada para o boss.
+
 ### 10. Identidade das Ilhas
 
 Cada ilha deve ter um tema próprio, com pequena variação local. O tema pode ser definido diretamente pelo número do andar/ilha ou sorteado por seed.
 
 Como o grupo pode sair da masmorra e retornar depois com progresso parcial em várias ilhas, a geração aleatória precisa ser persistente e específica. Se temas ou objetivos forem sorteados, o código de sessão deve preservar o resultado gerado para cada ilha, não apenas a seed global mínima.
+
+Modelo recomendado de geração:
+
+- a lista total de temas deve ser maior que 10;
+- a seed sorteia exatamente 9 temas não repetidos para as ilhas 21 a 29, respeitando o grau de dificuldade da pirâmide;
+- a ilha 30 não participa do sorteio e usa o tema fixo de ilha dos dinossauros;
+- o resultado gerado deve ser salvo no código de sessão para que o arquipélago não mude entre retornos à campanha;
+- temas podem ter variações internas, mas a identidade principal da ilha deve permanecer estável.
+
+Distribuição inicial sugerida de temas por dificuldade:
+
+| Dificuldade | Ilhas | Temas possíveis |
+|---|---|---|
+| Inicial | 21-24 | ilha tropical; ilha manguezal; atol circular; costa do coral; ilha dos náufragos; ilha de algas gigantes; ilha de névoa; ilha-cemitério de navios |
+| Intermediária | 25-27 | ilha vulcânica; navio abandonado; ilha das ruínas ciclópicas; ilha-labirinto de cavernas marinhas; ilha tomada por piratas; ilha sagrada ou proibida; ilha de maré impossível; ilha de cristal |
+| Avançada | 28-29 | iceberg; ilha flutuante; ilha de tempestades eternas; ilha viva; ilha de sal e ossos; ilha elemental |
+| Boss | 30 | ilha dos dinossauros |
+
+Critério de classificação:
+
+- ilhas iniciais devem ter obstáculos claros, leitura visual simples e risco ambiental moderado;
+- ilhas intermediárias podem exigir interação mais forte com água, ruínas, facções, navegação interna ou perigos ambientais constantes;
+- ilhas avançadas devem concentrar alterações fortes de terreno, clima extremo, efeitos mágicos ou risco de cena mais complexo;
+- a ilha do boss deve ser reconhecível desde o início no mapa, mas permanecer bloqueada até os 9 fragmentos serem obtidos.
+
+Tema definido para a ilha do boss: ilha dos dinossauros. O boss planejado é uma versão ND 11 do Rei Tirano, ainda a ser criada e cadastrada no catálogo.
 
 Exemplos iniciais:
 
@@ -696,20 +724,41 @@ Criar ou separar:
 
 ### Implementado
 
-- Ainda não há perfil implementado para os andares 21 a 30.
-- Ainda não há modo de exploração `archipelago`.
-- Ainda não há mapa estratégico de ilhas.
+- Perfil `archipelago-21-30` criado e registrado na seleção de perfis.
+- Modo de exploração `archipelago` criado com estado próprio.
+- Mapa estratégico do arquipélago renderizado em pirâmide, com 4 ilhas iniciais, 3 intermediárias, 2 avançadas e ilha 30 no topo.
+- Barco exibido na base da pirâmide com ícone próprio e ação de descanso ao clicar.
+- Modal de ilha implementada para exibir estado, dificuldade, ND base, descrição narrativa, objetivos e ações.
+- Títulos das ilhas ficam ocultos até a ilha ser visitada ou concluída.
+- Ilha 30 fica bloqueada até a obtenção dos 9 fragmentos.
+- Conclusão de ilhas 21 a 29 concede fragmentos e atualiza o progresso global.
+- Exploração de ilha consome 8 horas e bloqueia nova exploração até o próximo descanso.
+- Descanso no barco reseta esforço do dia, contador de tempo de exploração e progresso parcial de ilhas não concluídas.
+- Estado do arquipélago preserva ilhas, temas, objetivos, visitas, conclusões, fragmentos, clima diário, exploração ativa e log.
+- Temas das ilhas 21 a 29 são sorteados por seed a partir de pools separados por dificuldade.
+- Ilha 30 usa tema fixo de ilha dos dinossauros.
+- Ícones SVG de barco, ilha não explorada e temas de ilha foram integrados ao mapa.
+- Ícones de ilhas visitadas/em andamento usam coloração branca; ilhas concluídas usam coloração esverdeada.
+- Alguns SVGs de ilha tiveram fundos opacos e linhas removidos para evitar blocos coloridos no mapa.
+
+### Pendências Conhecidas
+
+- Ainda existem ícones de ilhas com arte incorreta ou com transparência imperfeita que devem ser revisados/substituídos.
+- Alguns SVGs vieram com camadas de fundo embutidas; quando recoloridos pelo CSS, essas camadas podem aparecer como retângulos ou massas verdes/brancas. Esses arquivos devem ser corrigidos na origem ou substituídos por versões realmente transparentes.
+- A validação visual dos ícones precisa ser repetida após qualquer troca de SVG, especialmente nos estados visitada, em andamento, concluída e bloqueada.
+- Os fragmentos obtidos ainda são representados principalmente por contador/progresso; a exibição visual individual no barco pode evoluir.
+- Mapas táticos específicos por tema de ilha ainda não foram implementados.
+- Encontros, criaturas, armadilhas e recompensas definitivas por ilha ainda não foram fechados.
 
 ### A Definir
 
 - Nome final da etapa.
-- Boss da ilha 30.
 - Fórmula ou tabela exata de ND por ilha, baseada no grupo nível 7 a 10.
-- Lista definitiva das 10 ilhas.
+- Ficha definitiva do boss da ilha 30: versão ND 11 do Rei Tirano.
+- Lista final dos temas disponíveis em cada grau de dificuldade.
 - Objetivo definitivo de cada ilha.
 - Quantidade definitiva de objetivos/encontros de cada ilha.
 - Regra numérica para determinar automaticamente a quantidade de objetivos/encontros por ilha.
-- Se os temas de ilha serão fixos por número ou sorteados por seed.
 - Se viagem entre ilhas terá risco mecânico ou será apenas seleção livre.
 - Se as ilhas terão uma cena principal única ou múltiplas cenas internas.
 - Como vantagens obtidas nas ilhas afetam a ilha do boss.
@@ -738,6 +787,9 @@ Criar ou separar:
 - Fragmentos são apenas contador/chave para desbloquear a ilha 30; não possuem mecânica própria além disso.
 - O mapa visual deve ser uma pirâmide com barco na base, 4 ilhas iniciais, 3 intermediárias, 2 avançadas e 1 ilha de boss no topo.
 - O mapa principal é estratégico, não tático.
+- As ilhas 21 a 29 devem ter tema sorteado por seed a partir de pools separados por dificuldade.
+- A ilha 30 tem tema fixo: ilha dos dinossauros.
+- O boss planejado da ilha 30 é uma versão ND 11 do Rei Tirano, ainda pendente de criação.
 
 ### Pontos de Atenção
 
@@ -765,16 +817,17 @@ Implementar os andares 21 a 30 como um terceiro modo de exploração: `archipela
 
 Esse modo deve compartilhar sistemas comuns com os modos anteriores, mas precisa de estado e renderização próprios. A estrutura mais adequada é um mapa estratégico de ilhas, com fichas de objetivo por ilha e cenas táticas abertas sob demanda.
 
-O fluxo deve priorizar escolha aberta e controle manual do mestre. A primeira versão deve resolver bem seleção de ilha, barco como acampamento, uma exploração por descanso, reset de progresso parcial no descanso, registro de objetivo, progresso global, clima persistente do dia, novos climas após descanso, desbloqueio da ilha final e persistência explícita por ilha. Mapas táticos e cenas detalhadas podem evoluir por ilha conforme os objetivos forem fechados.
+O fluxo deve priorizar escolha aberta e controle manual do mestre. A primeira versão já cobre seleção de ilha, barco como acampamento, uma exploração por descanso, reset de progresso parcial no descanso, registro de objetivo, progresso global, clima persistente do dia, novos climas após descanso, desbloqueio da ilha final e persistência explícita por ilha. Mapas táticos e cenas detalhadas ainda devem evoluir por ilha conforme os objetivos forem fechados.
 
-## Passo a Passo Inicial Recomendado
+## Passo a Passo Inicial
 
-1. Criar o perfil `archipelago-21-30` e o modo `archipelago`, ainda com dados simples de ilha.
-2. Renderizar o mapa estratégico em pirâmide com barco na base, 4 ilhas acessíveis, 5 ilhas travadas e ilha 30 bloqueada.
-3. Implementar ficha/modal da ilha com estado, clima diário, objetivos/encontros placeholder e ações de exploração.
-4. Implementar barco como acampamento: descanso reseta esforço do dia, tempo de exploração e progresso parcial.
-5. Implementar regra de 1 exploração por descanso, consumo de 8 horas e bloqueio de novas explorações até descansar.
-6. Implementar conclusão de ilha: todos os objetivos/encontros do dia resolvidos geram check, fragmento e ícone no barco.
-7. Implementar desbloqueio da ilha 30 quando os 9 fragmentos forem obtidos.
-8. Implementar persistência explícita por ilha: tema, variação, objetivos/encontros, climas diários, progresso ativo e fragmentos.
-9. Só depois evoluir balanceamento de ND, quantidade final de objetivos, temas definitivos, ataques ao barco e boss.
+1. Criar o perfil `archipelago-21-30` e o modo `archipelago`, ainda com dados simples de ilha. Implementado.
+2. Renderizar o mapa estratégico em pirâmide com barco na base, 4 ilhas acessíveis, 5 ilhas travadas e ilha 30 bloqueada. Implementado.
+3. Implementar ficha/modal da ilha com estado, clima diário, objetivos/encontros placeholder e ações de exploração. Implementado.
+4. Implementar barco como acampamento: descanso reseta esforço do dia, tempo de exploração e progresso parcial. Implementado.
+5. Implementar regra de 1 exploração por descanso, consumo de 8 horas e bloqueio de novas explorações até descansar. Implementado.
+6. Implementar conclusão de ilha: todos os objetivos/encontros do dia resolvidos geram check, fragmento e progresso global. Implementado.
+7. Implementar desbloqueio da ilha 30 quando os 9 fragmentos forem obtidos. Implementado.
+8. Implementar persistência explícita por ilha: tema, variação, objetivos/encontros, climas diários, progresso ativo e fragmentos. Implementado.
+9. Integrar ícones de barco, ilha não explorada e temas de ilha, com estado visual por visita/conclusão. Parcialmente implementado; ainda há pendência de revisão/substituição de ícones incorretos.
+10. Evoluir balanceamento de ND, quantidade final de objetivos, temas definitivos, ataques ao barco, mapas táticos insulares e boss.

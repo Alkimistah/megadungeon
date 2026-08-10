@@ -4,6 +4,8 @@ import { createExplorationState } from "./appState.js";
 import { FLOOR_RANGES, applyTheme, getFloorRange } from "./floorRanges.js";
 import { formatElapsedTime } from "./format.js";
 import { generateMapData } from "./generator.js";
+import { createArchipelagoRenderer } from "./archipelagoRenderer.js";
+import { createArchipelagoState } from "./archipelagoState.js";
 import { createExtendedExplorationRenderer } from "./extendedExplorationRenderer.js";
 import { createExtendedExplorationState } from "./extendedExplorationState.js";
 import { createRandomSeed, createRng } from "./random.js";
@@ -59,6 +61,7 @@ let currentMapSeed = createRandomSeed();
 let infoMessageTimeout = null;
 const state = createExplorationState();
 const extendedState = createExtendedExplorationState(activeFloorRange, createRng(currentMapSeed));
+const archipelagoState = createArchipelagoState(activeFloorRange, createRng(currentMapSeed));
 
 const nodeDialogController = createNodeDialogController({
   contentElement: elements.nodeDialogContent,
@@ -165,12 +168,43 @@ const extendedExplorationRenderer = createExtendedExplorationRenderer({
   }
 });
 
+const archipelagoRenderer = createArchipelagoRenderer({
+  container: elements.extendedExploration,
+  getSnapshot: () => archipelagoState.getSnapshot(),
+  onCompleteIsland: (floor) => {
+    archipelagoState.completeIsland(floor);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onExploreIsland: (floor) => {
+    archipelagoState.exploreIsland(floor);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onResolveObjective: (floor, objectiveId) => {
+    archipelagoState.resolveObjective(floor, objectiveId);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onRestAtBoat: () => {
+    archipelagoState.restAtBoat();
+    refreshExplorationDisplay();
+    updateInfo();
+  }
+});
+
 function isExtendedExplorationMode() {
   return activeFloorRange.mode === "extended-exploration";
 }
 
+function isArchipelagoMode() {
+  return activeFloorRange.mode === "archipelago";
+}
+
 function updateTimeTracker() {
-  const elapsedMinutes = isExtendedExplorationMode()
+  const elapsedMinutes = isArchipelagoMode()
+    ? archipelagoState.getElapsedMinutes()
+    : isExtendedExplorationMode()
     ? extendedState.getElapsedMinutes()
     : state.getElapsedMinutes();
 
@@ -178,6 +212,19 @@ function updateTimeTracker() {
 }
 
 function getCurrentSession() {
+  if (isArchipelagoMode()) {
+    const snapshot = archipelagoState.getSnapshot();
+
+    return {
+      v: 1,
+      mode: activeFloorRange.mode,
+      profile: activeFloorRange.id,
+      floor: snapshot.activeExploration?.floor || 21,
+      mapSeed: currentMapSeed,
+      archipelagoState: archipelagoState.exportSessionState()
+    };
+  }
+
   if (isExtendedExplorationMode()) {
     const snapshot = extendedState.getSnapshot();
 
@@ -209,7 +256,11 @@ function getCurrentSessionCode() {
 }
 
 function updateInfo() {
-  const modeLabel = isExtendedExplorationMode() ? "Labirinto" : "Mapa";
+  const modeLabel = isArchipelagoMode()
+    ? "Arquipélago"
+    : isExtendedExplorationMode()
+    ? "Labirinto"
+    : "Mapa";
   elements.info.textContent = `${modeLabel} | Seed: ${currentMapSeed} | Clique para copiar sessão`;
 }
 
@@ -285,6 +336,17 @@ function restoreSession(session) {
     return;
   }
 
+  if (isArchipelagoMode()) {
+    archipelagoState.initialize(
+      activeFloorRange,
+      createRng(currentMapSeed),
+      session.archipelagoState
+    );
+    refreshExplorationDisplay();
+    updateInfo();
+    return;
+  }
+
   elements.depthInput.value = session.depth;
   elements.baseDcInput.value = session.baseDc;
   setUnknownPathsMode(Boolean(session.unknownPaths));
@@ -306,9 +368,18 @@ function restoreSession(session) {
 }
 
 function refreshExplorationDisplay() {
+  if (isArchipelagoMode()) {
+    elements.svg.hidden = true;
+    elements.extendedExploration.hidden = false;
+    archipelagoRenderer.render();
+    updateTimeTracker();
+    return;
+  }
+
   if (isExtendedExplorationMode()) {
     elements.svg.hidden = true;
     elements.extendedExploration.hidden = false;
+    elements.extendedExploration.className = "extended-exploration";
     extendedExplorationRenderer.render();
     updateTimeTracker();
     return;
@@ -358,11 +429,16 @@ function applyFloorRange(floorRangeId) {
   mapRenderer.setHiddenNodeIcon(activeFloorRange.hiddenNodeIcon);
   syncRecommendationsWithFloor();
   document.body.classList.toggle("extended-exploration-mode", isExtendedExplorationMode());
-  elements.legendToggle.hidden = isExtendedExplorationMode();
-  if (isExtendedExplorationMode()) {
+  document.body.classList.toggle("archipelago-mode", isArchipelagoMode());
+  elements.legendToggle.hidden = isExtendedExplorationMode() || isArchipelagoMode();
+  if (isExtendedExplorationMode() || isArchipelagoMode()) {
     setLegendOpen(false);
   }
-  elements.generateButton.textContent = isExtendedExplorationMode() ? "Iniciar andar" : "Gerar mapa";
+  elements.generateButton.textContent = isArchipelagoMode()
+    ? "Gerar arquipélago"
+    : isExtendedExplorationMode()
+    ? "Iniciar andar"
+    : "Gerar mapa";
   manualEncounterDialogController.syncProfileOptions();
 }
 
@@ -390,11 +466,22 @@ function setUnknownPathsMode(isEnabled) {
   elements.unknownPathsInput.checked = isEnabled;
   elements.initialUnknownPathsInput.checked = isEnabled;
   document.body.classList.toggle("unknown-paths", isEnabled);
+
+  if (isArchipelagoMode()) return;
+
   refreshExplorationDisplay();
   nodeDialogController.rerenderCurrent();
 }
 
 function generateMap() {
+  if (isArchipelagoMode()) {
+    currentMapSeed = createRandomSeed();
+    archipelagoState.initialize(activeFloorRange, createRng(currentMapSeed));
+    refreshExplorationDisplay();
+    updateInfo();
+    return;
+  }
+
   if (isExtendedExplorationMode()) {
     currentMapSeed = createRandomSeed();
     extendedState.initialize(
@@ -584,7 +671,7 @@ function bindEvents() {
 
 function syncInitialUnknownPathsVisibility() {
   const selectedProfile = getFloorRange(elements.floorRangeInput.value);
-  elements.initialUnknownPathsField.hidden = selectedProfile.mode === "extended-exploration";
+  elements.initialUnknownPathsField.hidden = selectedProfile.mode !== "node-map" && selectedProfile.mode !== undefined;
 }
 
 function boot() {
