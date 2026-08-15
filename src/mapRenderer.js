@@ -60,6 +60,30 @@ function createCheckLabel(node) {
   return checkGroup;
 }
 
+function createMissionLabel(node) {
+  if (!node.missionBindings?.length) return null;
+
+  const missionGroup = createSvgElement("g");
+  const background = createSvgElement("rect");
+  const label = createSvgElement("text");
+
+  label.textContent = "Missão";
+  label.setAttribute("y", "-32");
+  label.setAttribute("class", "mission-node-text");
+
+  background.setAttribute("class", "mission-node-background");
+  background.setAttribute("x", "-28");
+  background.setAttribute("y", "-45");
+  background.setAttribute("width", "56");
+  background.setAttribute("height", "18");
+  background.setAttribute("rx", "4");
+
+  missionGroup.setAttribute("class", "mission-node-label");
+  missionGroup.append(background, label);
+
+  return missionGroup;
+}
+
 export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("/assets/icons/hidden-forest.svg") }) {
   let activeHiddenNodeIcon = hiddenNodeIcon;
   let nodeElements = new Map();
@@ -111,9 +135,15 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
         group.appendChild(createCheckLabel(node));
       }
 
+      const missionLabel = createMissionLabel(node);
+      if (missionLabel) group.appendChild(missionLabel);
+
       group.setAttribute("role", "button");
       group.setAttribute("tabindex", "0");
-      group.setAttribute("aria-label", `${node.label}, encontro ${node.level}, coluna ${node.column + 1}`);
+      group.setAttribute(
+        "aria-label",
+        `${node.label}, encontro ${node.level}, coluna ${node.column + 1}${node.missionBindings?.length ? ", missão vinculada" : ""}`
+      );
       group.addEventListener("click", () => onNodeOpen(node));
       group.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {

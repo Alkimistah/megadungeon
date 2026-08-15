@@ -171,6 +171,94 @@ export const forest11to20Profile = {
       "Solo encharcado": 0.25
     }
   },
+  missionRules: {
+    enabled: true,
+    offerCount: 7,
+    missionFloors: [11, 12, 13, 14, 15, 16, 17, 18, 19],
+    allowedCategories: [
+      "extermination",
+      "collection",
+      "exploration",
+      "recovery",
+      "investigation",
+      "rescue",
+      "escort",
+      "specialHunt",
+      "trial",
+      "anomalous"
+    ],
+    categoryWeights: {
+      extermination: 10,
+      collection: 15,
+      exploration: 13,
+      recovery: 10,
+      investigation: 12,
+      rescue: 8,
+      escort: 8,
+      specialHunt: 7,
+      trial: 8,
+      anomalous: 9
+    },
+    rewardChallengeByFloor: {
+      11: 1,
+      12: 1,
+      13: 2,
+      14: 2,
+      15: 3,
+      16: 3,
+      17: 4,
+      18: 4,
+      19: 5
+    },
+    targetPools: {
+      locations: [
+        "uma clareira encoberta",
+        "uma trilha alagada",
+        "um curso d'água interrompido",
+        "uma ruína tomada por raízes",
+        "um acampamento abandonado"
+      ],
+      materials: [
+        "fungos luminescentes",
+        "amostras de veneno diluído",
+        "minerais expostos pela chuva",
+        "sementes de vegetação agressiva",
+        "água de neblina condensada"
+      ],
+      objects: [
+        "uma caixa de instrumentos",
+        "um mapa de trilhas antigo",
+        "um relicário preso em raízes",
+        "um pacote de suprimentos",
+        "uma bússola desregulada"
+      ],
+      mementos: [
+        "uma bússola com nome gravado",
+        "um broche preso em raízes",
+        "um caderno de campo encharcado",
+        "um amuleto deixado em um acampamento",
+        "uma faca de caça familiar"
+      ],
+      clues: [
+        "marcas de arrasto na lama",
+        "pegadas sobrepostas por chuva recente",
+        "cinzas frias em uma clareira",
+        "ossos marcados por ferramenta"
+      ],
+      challenges: [
+        "cruzar terreno inundado",
+        "abrir passagem por vegetação densa",
+        "seguir uma trilha sem deixar rastro",
+        "resistir a um fenômeno climático"
+      ],
+      phenomena: [
+        "neblina que apaga sons próximos",
+        "chuva quente localizada",
+        "raízes que mudam a rota",
+        "vento que carrega vozes falsas"
+      ]
+    }
+  },
   theme: {
     page: "#111a13",
     header: "#1d3424",

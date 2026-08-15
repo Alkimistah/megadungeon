@@ -59,8 +59,11 @@
         <button id="info" type="button" title="Copiar seed da sessão atual"></button>
       </div>
     </header>
-    <button id="reloadAppButton" class="reload-button floating-reload" type="button" aria-label="Recarregar aplicativo"><img src="/assets/icons/return-arrow.svg" alt="" /></button>
-    <button id="manualEncounterButton" class="reload-button floating-encounter" type="button" aria-label="Gerar encontro manual"><img src="/assets/icons/sword-spin.svg" alt="" /></button>
+    <div class="floating-tools" aria-label="Ferramentas globais">
+      <button id="reloadAppButton" class="reload-button" type="button" aria-label="Recarregar aplicativo"><img src="/assets/icons/return-arrow.svg" alt="" /></button>
+      <button id="manualEncounterButton" class="reload-button" type="button" aria-label="Gerar encontro manual"><img src="/assets/icons/sword-spin.svg" alt="" /></button>
+      <button id="missionButton" class="reload-button" type="button" aria-label="Ver missões selecionadas" title="Missões"><img src="/assets/icons/game-icons--tied-scroll.svg" alt="" /></button>
+    </div>
 
     <div id="timeTracker" class="time-tracker" aria-live="polite">
       <span>Tempo de exploração</span>
@@ -151,6 +154,21 @@
         </label>
 
         <button id="rangeConfirm" type="submit">Iniciar exploração</button>
+      </form>
+    </dialog>
+
+    <dialog id="missionDialog" aria-labelledby="missionDialogTitle">
+      <form method="dialog" class="node-dialog mission-dialog">
+        <div class="node-dialog-header">
+          <div>
+            <p class="node-dialog-type">Quadro e acompanhamento</p>
+            <h2 id="missionDialogTitle">Missões</h2>
+            <p class="node-dialog-meta">Selecione até três ofertas ou acompanhe as missões ativas.</p>
+          </div>
+          <button id="missionClose" class="icon-button" type="button" aria-label="Fechar"><img src="/assets/icons/close-modal.svg" alt="" /></button>
+        </div>
+
+        <div id="missionDialogContent"></div>
       </form>
     </dialog>
 

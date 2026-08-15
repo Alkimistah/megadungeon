@@ -350,5 +350,93 @@ export const dungeon1to10Profile = {
       elite: 0.08,
       boss: 0.12
     }
+  },
+  missionRules: {
+    enabled: true,
+    offerCount: 7,
+    missionFloors: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    allowedCategories: [
+      "extermination",
+      "collection",
+      "exploration",
+      "recovery",
+      "investigation",
+      "rescue",
+      "escort",
+      "specialHunt",
+      "trial",
+      "anomalous"
+    ],
+    categoryWeights: {
+      extermination: 16,
+      collection: 13,
+      exploration: 10,
+      recovery: 10,
+      investigation: 10,
+      rescue: 8,
+      escort: 6,
+      specialHunt: 8,
+      trial: 9,
+      anomalous: 10
+    },
+    rewardChallengeByFloor: {
+      1: 0.25,
+      2: 0.5,
+      3: 1,
+      4: 1,
+      5: 2,
+      6: 2,
+      7: 2,
+      8: 2,
+      9: 3
+    },
+    targetPools: {
+      locations: [
+        "uma sala com marcas recentes",
+        "um corredor que mudou de lugar",
+        "uma porta instável",
+        "um trecho tomado por cristais falsos",
+        "uma sala de descanso suspeita"
+      ],
+      materials: [
+        "lascas de cristal contaminado",
+        "amostras de teia endurecida",
+        "poeira de pedra reconfigurada",
+        "fragmentos de armadilha quebrada",
+        "resíduo de gosma"
+      ],
+      objects: [
+        "uma pulseira danificada",
+        "um mapa riscado por outro grupo",
+        "uma chave marcada com runas",
+        "uma bolsa de ferramentas perdida",
+        "um diário rasgado"
+      ],
+      mementos: [
+        "um medalhão de um explorador que ficou para trás",
+        "um diário de campo com uma dedicatória",
+        "uma aliança presa a restos de equipamento",
+        "um retrato protegido por couro encerado",
+        "uma ferramenta marcada com iniciais"
+      ],
+      clues: [
+        "pegadas que terminam na parede",
+        "um símbolo repetido em ângulos impossíveis",
+        "vestígios frescos sem origem evidente",
+        "um eco que responde com atraso"
+      ],
+      challenges: [
+        "atravessar uma passagem estreita",
+        "desativar uma fechadura instável",
+        "resistir à pressão mental da masmorra",
+        "reconstruir uma rota segura"
+      ],
+      phenomena: [
+        "gravidade falhando por instantes",
+        "sombras agindo com atraso",
+        "paredes respirando lentamente",
+        "portas surgindo e sumindo"
+      ]
+    }
   }
 };

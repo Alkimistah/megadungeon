@@ -11,6 +11,31 @@ const COMBAT_ICON = assetUrl("/assets/icons/winged-sword.svg");
 const ENVIRONMENT_ICON = assetUrl("/assets/icons/earth-arrow-left.svg");
 const TACTICAL_MAP_ICON = assetUrl("/assets/icons/game-icons--treasure-map.svg");
 
+function createNodeMissionNotice(node, onOpenMission) {
+  if (!node.missionBindings?.length) return null;
+
+  const notice = document.createElement("div");
+  const title = document.createElement("strong");
+  const text = document.createElement("span");
+  const actions = document.createElement("div");
+
+  notice.className = "mission-inline-indicator";
+  actions.className = "mission-context-actions";
+  title.textContent = "Missão";
+  text.textContent = node.missionBindings.map((mission) => mission.title).join(", ");
+  node.missionBindings.forEach((mission) => {
+    const button = document.createElement("button");
+    button.className = "extended-action is-compact mission-context-action";
+    button.type = "button";
+    button.textContent = "Realizar missão";
+    button.addEventListener("click", () => onOpenMission(mission.id));
+    actions.appendChild(button);
+  });
+  notice.append(title, text, actions);
+
+  return notice;
+}
+
 function createEnvironmentGroup(title, items) {
   const section = document.createElement("section");
   const heading = document.createElement("h3");
@@ -612,6 +637,7 @@ export function createNodeDialogController({
   onAttempt,
   onChooseRoute,
   onExplore,
+  onOpenMission = () => {},
   onRest,
   state,
   titleElement,
@@ -787,6 +813,8 @@ export function createNodeDialogController({
     setNodeDialogMeta(metaElement, checkText, explorationText, challengeText);
     contentElement.innerHTML = "";
     contentElement.appendChild(createModalActions(node));
+    const missionNotice = createNodeMissionNotice(node, onOpenMission);
+    if (missionNotice) contentElement.appendChild(missionNotice);
 
     if (viewMode === "combat") {
       renderCombatPage(node);

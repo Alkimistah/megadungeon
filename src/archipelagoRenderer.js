@@ -57,9 +57,11 @@ function createIconButton({ className, icon, label, onClick, type = "button" }) 
 
 export function createArchipelagoRenderer({
   container,
+  getMissionsForFloor = () => [],
   getSnapshot,
   onCompleteIsland,
   onExploreIsland,
+  onOpenMission = () => {},
   onResolveObjective,
   onRestAtBoat
 }) {
@@ -86,6 +88,7 @@ export function createArchipelagoRenderer({
   }
 
   function renderIslandButton(island) {
+    const missions = getMissionsForFloor(island.floor);
     const button = document.createElement("button");
     button.className = [
       "archipelago-island",
@@ -93,7 +96,8 @@ export function createArchipelagoRenderer({
       island.themeId ? `archipelago-island-theme-${island.themeId}` : "",
       isIslandRevealed(island) ? "" : "is-unexplored",
       island.completed ? "is-completed" : "",
-      island.available ? "" : "is-locked"
+      island.available ? "" : "is-locked",
+      missions.length ? "has-mission" : ""
     ].filter(Boolean).join(" ");
     button.type = "button";
     button.setAttribute("aria-disabled", String(!island.available && !island.completed));
@@ -103,6 +107,7 @@ export function createArchipelagoRenderer({
       <img class="archipelago-island-icon" src="${assetUrl(isIslandRevealed(island) && island.icon ? island.icon : UNEXPLORED_ISLAND_ICON)}" alt="" />
       <strong>${getIslandDisplayName(island)}</strong>
       <span>${island.status}</span>
+      ${missions.length ? `<span class="mission-island-badge">Missão</span>` : ""}
     `;
     button.addEventListener("click", () => openIslandDialog(island.floor));
     return button;
@@ -138,6 +143,22 @@ export function createArchipelagoRenderer({
   function renderObjectiveList(island, snapshot) {
     const list = document.createElement("div");
     list.className = "archipelago-objectives";
+    const missions = getMissionsForFloor(island.floor);
+    const canRunMissions = missions.length && (island.visited || snapshot.activeExploration?.floor === island.floor);
+
+    if (canRunMissions) {
+      const missionActions = document.createElement("div");
+      missionActions.className = "mission-context-panel";
+      missionActions.innerHTML = `<strong>Missão disponível</strong><span>${missions.map((mission) => mission.title).join(", ")}</span>`;
+      missions.forEach((mission) => {
+        missionActions.appendChild(createButton({
+          className: "archipelago-small-action mission-context-action",
+          label: "Realizar missão",
+          onClick: () => onOpenMission(mission.id)
+        }));
+      });
+      list.appendChild(missionActions);
+    }
 
     if (!island.visited && !island.completed) {
       const hidden = document.createElement("div");
@@ -165,6 +186,12 @@ export function createArchipelagoRenderer({
         </div>
         <p>${objective.description}</p>
       `;
+      if (missions.length) {
+        const indicator = document.createElement("div");
+        indicator.className = "mission-inline-indicator";
+        indicator.innerHTML = `<strong>Missão</strong><span>${missions.map((mission) => mission.title).join(", ")}</span>`;
+        item.appendChild(indicator);
+      }
       item.appendChild(createButton({
         className: "archipelago-small-action",
         disabled: !canResolve,

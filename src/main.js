@@ -11,6 +11,10 @@ import { createExtendedExplorationState } from "./extendedExplorationState.js";
 import { createRandomSeed, createRng } from "./random.js";
 import { createMapRenderer } from "./mapRenderer.js";
 import { createManualEncounterDialogController } from "./manualEncounterDialog.js";
+import { createMissionDialogController } from "./missions/missionDialog.js";
+import { createMissionGenerationContext, generateMissionOffers } from "./missions/missionGenerator.js";
+import { materializeMissionsForCurrentContent } from "./missions/missionProfileAdapters.js";
+import { createMissionState } from "./missions/missionState.js";
 import { resolveNodeEncounter } from "./encounterResolver.js";
 import { createNodeDialogController } from "./nodeDialog.js";
 import { decodeSessionCode, encodeSessionCode, isSessionCode } from "./sessionCode.js";
@@ -29,6 +33,10 @@ const elements = {
   generateButton: document.getElementById("generateButton"),
   installButton: document.getElementById("installButton"),
   reloadAppButton: document.getElementById("reloadAppButton"),
+  missionButton: document.getElementById("missionButton"),
+  missionClose: document.getElementById("missionClose"),
+  missionDialog: document.getElementById("missionDialog"),
+  missionDialogContent: document.getElementById("missionDialogContent"),
   manualEncounterButton: document.getElementById("manualEncounterButton"),
   manualEncounterChallengeInput: document.getElementById("manualEncounterChallengeInput"),
   manualEncounterClose: document.getElementById("manualEncounterClose"),
@@ -62,6 +70,12 @@ let infoMessageTimeout = null;
 const state = createExplorationState();
 const extendedState = createExtendedExplorationState(activeFloorRange, createRng(currentMapSeed));
 const archipelagoState = createArchipelagoState(activeFloorRange, createRng(currentMapSeed));
+const missionState = createMissionState();
+let missionDialogController = null;
+
+function openMissionById(missionId) {
+  missionDialogController?.openMission(missionId);
+}
 
 const nodeDialogController = createNodeDialogController({
   contentElement: elements.nodeDialogContent,
@@ -87,6 +101,7 @@ const nodeDialogController = createNodeDialogController({
     refreshExplorationDisplay();
     nodeDialogController.open(node);
   },
+  onOpenMission: openMissionById,
   onRest: (node) => {
     state.restAtNode(node);
     refreshExplorationDisplay();
@@ -116,9 +131,30 @@ const manualEncounterDialogController = createManualEncounterDialogController({
   trapModeInput: elements.manualEncounterTrapModeInput
 });
 
+missionDialogController = createMissionDialogController({
+  closeButton: elements.missionClose,
+  contentElement: elements.missionDialogContent,
+  dialogElement: elements.missionDialog,
+  getOffers: () => missionState.getOffers(),
+  getProfile: () => activeFloorRange,
+  getSelected: () => missionState.getSelected(),
+  onConfirmSelection: (selectedMissionIds) => {
+    missionState.confirmSelection(selectedMissionIds);
+    generateMap({ reuseSeed: true });
+  },
+  onMarkCompleted: (missionId) => {
+    missionState.markCompleted(missionId);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  openButton: elements.missionButton
+});
+
 const extendedExplorationRenderer = createExtendedExplorationRenderer({
   container: elements.extendedExploration,
   getSnapshot: () => extendedState.getSnapshot(),
+  getMissionsForFloor: (floor) => missionState.getMissionsForFloor(floor),
+  onOpenMission: openMissionById,
   onAdvanceFloor: () => {
     extendedState.advanceFloor();
     elements.floorInput.value = String(extendedState.getSnapshot().floor);
@@ -170,6 +206,7 @@ const extendedExplorationRenderer = createExtendedExplorationRenderer({
 
 const archipelagoRenderer = createArchipelagoRenderer({
   container: elements.extendedExploration,
+  getMissionsForFloor: (floor) => missionState.getMissionsForFloor(floor),
   getSnapshot: () => archipelagoState.getSnapshot(),
   onCompleteIsland: (floor) => {
     archipelagoState.completeIsland(floor);
@@ -181,6 +218,7 @@ const archipelagoRenderer = createArchipelagoRenderer({
     refreshExplorationDisplay();
     updateInfo();
   },
+  onOpenMission: openMissionById,
   onResolveObjective: (floor, objectiveId) => {
     archipelagoState.resolveObjective(floor, objectiveId);
     refreshExplorationDisplay();
@@ -221,6 +259,7 @@ function getCurrentSession() {
       profile: activeFloorRange.id,
       floor: snapshot.activeExploration?.floor || 21,
       mapSeed: currentMapSeed,
+      missions: missionState.exportSessionState(),
       archipelagoState: archipelagoState.exportSessionState()
     };
   }
@@ -234,6 +273,7 @@ function getCurrentSession() {
       profile: activeFloorRange.id,
       floor: snapshot.floor,
       mapSeed: currentMapSeed,
+      missions: missionState.exportSessionState(),
       extendedState: extendedState.exportSessionState()
     };
   }
@@ -247,6 +287,7 @@ function getCurrentSession() {
     baseDc: Number(elements.baseDcInput.value),
     unknownPaths: state.isUnknownPathsEnabled(),
     mapSeed: currentMapSeed,
+    missions: missionState.exportSessionState(),
     state: state.exportSessionState()
   };
 }
@@ -318,10 +359,54 @@ function resolveChosenRouteEncounters(levels, sessionState = {}) {
   });
 }
 
+function materializeActiveMissions({ floor = Number(elements.floorInput.value), levels = null } = {}) {
+  const selectedMissions = missionState.getSelected();
+
+  if (!selectedMissions.length) return;
+
+  missionState.replaceSelected(materializeMissionsForCurrentContent({
+    floor,
+    levels,
+    missions: selectedMissions
+  }));
+}
+
+function getMissionWorldDraft() {
+  if (!isArchipelagoMode()) return null;
+
+  const draftState = createArchipelagoState(activeFloorRange, createRng(currentMapSeed));
+  const snapshot = draftState.getSnapshot();
+
+  return {
+    islands: snapshot.islands.map((island) => ({
+      baseChallenge: island.baseChallenge,
+      difficulty: island.difficulty,
+      floor: island.floor,
+      name: island.name,
+      objectives: island.objectives,
+      themeId: island.themeId,
+      themeName: island.themeName
+    }))
+  };
+}
+
+function openMissionSelectionForNewExploration() {
+  const context = createMissionGenerationContext({
+    currentSeed: currentMapSeed,
+    profile: activeFloorRange,
+    worldDraft: getMissionWorldDraft()
+  });
+  const offers = generateMissionOffers(context);
+
+  missionState.startBoard(activeFloorRange.id, offers);
+  missionDialogController.openSelection();
+}
+
 function restoreSession(session) {
   applyFloorRange(session.profile);
   elements.floorInput.value = String(session.floor);
   currentMapSeed = session.mapSeed;
+  missionState.importSessionState(session.missions);
 
   if (isExtendedExplorationMode()) {
     syncRecommendationsWithFloor();
@@ -331,6 +416,7 @@ function restoreSession(session) {
       createRng(currentMapSeed),
       session.extendedState
     );
+    materializeActiveMissions({ floor: session.floor });
     refreshExplorationDisplay();
     updateInfo();
     return;
@@ -342,6 +428,7 @@ function restoreSession(session) {
       createRng(currentMapSeed),
       session.archipelagoState
     );
+    materializeActiveMissions({ floor: session.floor });
     refreshExplorationDisplay();
     updateInfo();
     return;
@@ -362,6 +449,7 @@ function restoreSession(session) {
   state.setLevels(levels);
   state.importSessionState(session.state);
   resolveChosenRouteEncounters(levels, session.state);
+  materializeActiveMissions({ floor: session.floor, levels });
   mapRenderer.drawMap(levels, activeFloorRange.theme.columnColors);
   refreshExplorationDisplay();
   updateInfo(levels);
@@ -473,22 +561,24 @@ function setUnknownPathsMode(isEnabled) {
   nodeDialogController.rerenderCurrent();
 }
 
-function generateMap() {
+function generateMap({ reuseSeed = false } = {}) {
   if (isArchipelagoMode()) {
-    currentMapSeed = createRandomSeed();
+    if (!reuseSeed) currentMapSeed = createRandomSeed();
     archipelagoState.initialize(activeFloorRange, createRng(currentMapSeed));
+    materializeActiveMissions({ floor: archipelagoState.getSnapshot().activeExploration?.floor || activeFloorRange.floors[0] });
     refreshExplorationDisplay();
     updateInfo();
     return;
   }
 
   if (isExtendedExplorationMode()) {
-    currentMapSeed = createRandomSeed();
+    if (!reuseSeed) currentMapSeed = createRandomSeed();
     extendedState.initialize(
       activeFloorRange,
       Number(elements.floorInput.value),
       createRng(currentMapSeed)
     );
+    materializeActiveMissions({ floor: Number(elements.floorInput.value) });
     refreshExplorationDisplay();
     updateInfo();
     return;
@@ -505,7 +595,7 @@ function generateMap() {
 
   elements.depthInput.value = depth;
   elements.baseDcInput.value = baseDC;
-  currentMapSeed = createRandomSeed();
+  if (!reuseSeed) currentMapSeed = createRandomSeed();
 
   const levels = generateMapData(
     depth,
@@ -515,6 +605,7 @@ function generateMap() {
     createRng(currentMapSeed)
   );
 
+  materializeActiveMissions({ floor: Number(elements.floorInput.value), levels });
   drawGeneratedLevels(levels);
 }
 
@@ -651,9 +742,12 @@ function bindEvents() {
       return;
     }
 
+    event.preventDefault();
     applyFloorRange(elements.floorRangeInput.value);
     setUnknownPathsMode(elements.initialUnknownPathsInput.checked);
-    generateMap();
+    currentMapSeed = createRandomSeed();
+    elements.rangeDialog.close();
+    openMissionSelectionForNewExploration();
   });
 
   document.addEventListener("click", (event) => {

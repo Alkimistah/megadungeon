@@ -131,6 +131,35 @@ function createHeader(snapshot) {
   return header;
 }
 
+function createMissionIndicatorList(missions, onOpenMission) {
+  if (!missions?.length) return null;
+
+  const container = createElement("div", "mission-inline-indicator");
+  const label = createElement("strong", null, "Missão");
+  const value = createElement("span", null, missions.map((mission) => mission.title).join(", "));
+  const actions = createElement("div", "mission-context-actions");
+
+  missions.forEach((mission) => {
+    actions.appendChild(createButton(
+      "Realizar missão",
+      "extended-action is-compact mission-context-action",
+      () => onOpenMission(mission.id)
+    ));
+  });
+
+  container.append(label, value, actions);
+  return container;
+}
+
+function createHeaderWithMissions(snapshot, missions, onOpenMission) {
+  const header = createHeader(snapshot);
+  const missionIndicator = createMissionIndicatorList(missions, onOpenMission);
+
+  if (missionIndicator) header.appendChild(missionIndicator);
+
+  return header;
+}
+
 function createApproachControls(snapshot, selectedApproachId, setSelectedApproachId, manualRollInput, onOutcome) {
   const section = createElement("section", "extended-panel");
   const heading = createElement("h3", null, "Próxima abordagem");
@@ -696,6 +725,8 @@ function createLog(snapshot) {
 export function createExtendedExplorationRenderer({
   container,
   getSnapshot,
+  getMissionsForFloor = () => [],
+  onOpenMission = () => {},
   onAdvanceFloor,
   onConfirmFloorReset,
   onConfirmPitDescent,
@@ -718,6 +749,7 @@ export function createExtendedExplorationRenderer({
 
   function render() {
     const snapshot = getSnapshot();
+    const floorMissions = getMissionsForFloor(snapshot.floor);
     const firstApproachId = snapshot.approaches[0]?.id || null;
     const selectedApproachExists = snapshot.approaches.some((approach) => approach.id === selectedApproachId);
 
@@ -728,7 +760,7 @@ export function createExtendedExplorationRenderer({
     }
 
     container.innerHTML = "";
-    container.appendChild(createHeader(snapshot));
+    container.appendChild(createHeaderWithMissions(snapshot, floorMissions, onOpenMission));
     container.appendChild(createMeter(snapshot));
 
     const body = createElement("div", "extended-layout");

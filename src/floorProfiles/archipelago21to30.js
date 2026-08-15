@@ -114,6 +114,90 @@ export const archipelago21to30Profile = {
       status: "pending-catalog"
     }
   },
+  missionRules: {
+    enabled: true,
+    offerCount: 7,
+    missionFloors: [21, 22, 23, 24, 25, 26, 27, 28, 29],
+    allowedCategories: [
+      "collection",
+      "exploration",
+      "recovery",
+      "investigation",
+      "rescue",
+      "escort",
+      "trial",
+      "anomalous"
+    ],
+    categoryWeights: {
+      collection: 13,
+      exploration: 17,
+      recovery: 13,
+      investigation: 14,
+      rescue: 10,
+      escort: 8,
+      trial: 11,
+      anomalous: 14
+    },
+    rewardChallengeByFloor: {
+      21: 8,
+      22: 8,
+      23: 8,
+      24: 8,
+      25: 9,
+      26: 9,
+      27: 9,
+      28: 10,
+      29: 10
+    },
+    targetPools: {
+      locations: [
+        "uma rota de desembarque instável",
+        "um marco visível apenas na maré certa",
+        "um ponto alto da ilha",
+        "uma passagem entre recifes",
+        "uma ruína costeira"
+      ],
+      materials: [
+        "amostras de coral vivo",
+        "fragmentos de mapa náutico",
+        "sal cristalizado incomum",
+        "algas resistentes à magia",
+        "areia marcada por energia planar"
+      ],
+      objects: [
+        "um sextante quebrado",
+        "um diário de bordo",
+        "uma caixa lacrada",
+        "um amuleto preso aos recifes",
+        "uma vela com inscrições antigas"
+      ],
+      mementos: [
+        "um diário de bordo de alguém que não voltou",
+        "um medalhão preso a um destroço",
+        "um mapa dobrado dentro de uma garrafa",
+        "uma fita de família amarrada ao mastro",
+        "um anel perdido entre recifes"
+      ],
+      clues: [
+        "marcas no casco de um navio",
+        "coordenadas gravadas em pedra",
+        "pegadas que somem na água",
+        "um sinal repetido por aves"
+      ],
+      challenges: [
+        "atravessar a maré no tempo certo",
+        "ancorar sem perder suprimentos",
+        "estabilizar uma rota até o fragmento",
+        "superar um tabu local"
+      ],
+      phenomena: [
+        "maré correndo contra o vento",
+        "bruma que duplica vozes",
+        "recifes que mudam de posição",
+        "um brilho sob a água que acompanha o grupo"
+      ]
+    }
+  },
   theme: {
     page: "#0e1718",
     header: "#17363a",
