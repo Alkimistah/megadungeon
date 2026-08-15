@@ -353,7 +353,8 @@ export const dungeon1to10Profile = {
   },
   missionRules: {
     enabled: true,
-    offerCount: 7,
+    offerCountMin: 1,
+    offerCountMax: 8,
     missionFloors: [1, 2, 3, 4, 5, 6, 7, 8, 9],
     allowedCategories: [
       "extermination",
@@ -368,14 +369,14 @@ export const dungeon1to10Profile = {
       "anomalous"
     ],
     categoryWeights: {
-      extermination: 16,
+      extermination: 22,
       collection: 13,
       exploration: 10,
       recovery: 10,
       investigation: 10,
       rescue: 8,
       escort: 6,
-      specialHunt: 8,
+      specialHunt: 12,
       trial: 9,
       anomalous: 10
     },

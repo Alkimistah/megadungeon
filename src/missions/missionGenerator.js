@@ -5,6 +5,9 @@ import { DEFAULT_CATEGORY_WEIGHTS, DEFAULT_ISSUER_WEIGHTS, DIFFICULTY_MULTIPLIER
 import { calculateMissionReward } from "./missionRewards.js";
 import { getMissionFloors, validateMission } from "./missionValidator.js";
 
+const CATEGORY_REWARD_BONUS = 1.15;
+const DIRECT_COMBAT_CATEGORIES = new Set(["extermination", "specialHunt"]);
+
 function slugify(value) {
   return String(value)
     .normalize("NFD")
@@ -31,6 +34,15 @@ function getWeightedCategories(profile, usedCategories) {
     }));
 }
 
+function getMissionSources(profile, categoryId) {
+  const sources = profile.missionRules?.issuerWeights || DEFAULT_ISSUER_WEIGHTS;
+  const compatible = sources.filter((source) =>
+    !source.categories?.length || source.categories.includes(categoryId)
+  );
+
+  return compatible.length ? compatible : sources;
+}
+
 function getRewardChallengeByFloor(profile, floor) {
   const challenge = profile.missionRules?.rewardChallengeByFloor?.[floor];
 
@@ -38,6 +50,14 @@ function getRewardChallengeByFloor(profile, floor) {
 
   const baseDc = profile.recommendations?.baseDcByFloor?.[floor] || 15;
   return Math.max(0.25, Math.min(10, Math.round((baseDc - 10) / 5)));
+}
+
+function getRewardMultiplier(categoryId, multiplier) {
+  const baseMultiplier = Number(multiplier) || 1;
+
+  return DIRECT_COMBAT_CATEGORIES.has(categoryId)
+    ? baseMultiplier
+    : baseMultiplier * CATEGORY_REWARD_BONUS;
 }
 
 function getCreatureTarget(profile, floor, rng) {
@@ -264,7 +284,7 @@ function getObjectivePhrase(objective) {
     return `${objective.quantity} inimigos do tipo ${objective.targetName}`;
   }
 
-  const quantityText = objective.quantity > 1 ? `${objective.quantity}x ` : "";
+  const quantityText = objective.quantity > 1 ? `${objective.quantity} ` : "";
   return `${quantityText}${objective.targetName}`;
 }
 
@@ -272,7 +292,59 @@ function capitalizeFirst(value) {
   return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : value;
 }
 
-function createMissionText({ destination, issuer, objective }) {
+function getDestinationPhrase(destination) {
+  if (destination.kind === "progress") return "ao longo da faixa";
+  if (destination.label?.startsWith("Andar ")) return `no ${destination.label}`;
+  if (destination.label?.startsWith("Ilha ")) return `na ${destination.label}`;
+
+  return `em ${destination.label}`;
+}
+
+function getSourceKind(source) {
+  return source?.kind || "request";
+}
+
+function createRequestSentence(source, actionText, destinationText) {
+  if (getSourceKind(source) === "writtenRequest") {
+    return `${source.label} traz uma instrução direta: ${actionText} ${destinationText}.`;
+  }
+
+  return `${source.label} pede que o grupo ${actionText} ${destinationText}.`;
+}
+
+function createRecordSentence(source, objective, targetPhrase, destinationText) {
+  if (objective.kind === "investigate") {
+    return `${source.label} indica ${targetPhrase} ${destinationText} como pista a investigar.`;
+  }
+
+  if (objective.kind === "deliverMemento") {
+    return `${source.label} aponta ${targetPhrase} ${destinationText} como item a entregar.`;
+  }
+
+  if (["recover", "recoverMemento"].includes(objective.kind)) {
+    return `${source.label} aponta ${targetPhrase} ${destinationText} como item a recuperar.`;
+  }
+
+  return `${source.label} aponta ${targetPhrase} ${destinationText} como prioridade da exploração.`;
+}
+
+function createSignalSentence(objective, targetPhrase, destinationText) {
+  if (objective.kind === "stabilize") {
+    return `Uma missão sem fornecedor aparece destacada no mural: estabilize ou registre ${targetPhrase} ${destinationText}.`;
+  }
+
+  if (objective.kind === "hunt") {
+    return `Uma missão sem fornecedor aparece destacada no mural: siga o rastro de ${targetPhrase} ${destinationText}.`;
+  }
+
+  if (objective.kind === "completeTrial") {
+    return `Uma missão sem fornecedor aparece destacada no mural: supere o desafio: ${targetPhrase} ${destinationText}.`;
+  }
+
+  return `Uma missão sem fornecedor aparece destacada no mural: investigue ${targetPhrase} ${destinationText}.`;
+}
+
+function createMissionText({ destination, objective, source }) {
   const targetPhrase = getObjectivePhrase(objective);
   const ndText = objective.challenge ? `ND ${formatChallengeRating(objective.challenge)}` : "ND por contexto";
   const verbByKind = {
@@ -282,7 +354,7 @@ function createMissionText({ destination, issuer, objective }) {
     deliverMemento: "entregue",
     escort: "proteja",
     explore: "explore",
-    hunt: "cace",
+    hunt: "rastreie e elimine",
     investigate: "investigue",
     recover: "recupere",
     recoverMemento: "recupere",
@@ -290,14 +362,21 @@ function createMissionText({ destination, issuer, objective }) {
     stabilize: "estabilize ou registre"
   };
   const verb = verbByKind[objective.kind] || "resolva";
-  const destinationText = destination.kind === "progress"
-    ? "ao longo da faixa"
-    : `em ${destination.label}`;
+  const actionText = objective.kind === "completeTrial"
+    ? `supere o desafio: ${targetPhrase}`
+    : `${verb} ${targetPhrase}`;
+  const destinationText = getDestinationPhrase(destination);
   const progressText = destination.kind === "progress" && objective.targetType === "creature"
     ? " Qualquer inimigo desse tipo encontrado durante o progresso conta para esse objetivo."
     : "";
+  const sourceKind = getSourceKind(source);
+  const mainText = sourceKind === "record"
+    ? createRecordSentence(source, objective, targetPhrase, destinationText)
+    : sourceKind === "signal"
+      ? createSignalSentence(objective, targetPhrase, destinationText)
+      : createRequestSentence(source, actionText, destinationText);
 
-  return capitalizeFirst(`${issuer} solicita que o grupo ${verb} ${targetPhrase} ${destinationText}. A tarefa usa ${ndText} como referência de recompensa.${progressText}`);
+  return capitalizeFirst(`${mainText} A tarefa usa ${ndText} como referência de recompensa.${progressText}`);
 }
 
 function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
@@ -308,8 +387,9 @@ function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
     ? getProgressDestination(profile)
     : getDestination(profile, floor, context.worldDraft);
   const objective = createObjective({ categoryId, floor, profile, rng });
-  const issuer = pickWeighted(rng, profile.missionRules?.issuerWeights || DEFAULT_ISSUER_WEIGHTS).label;
+  const source = pickWeighted(rng, getMissionSources(profile, categoryId));
   const difficulty = pickWeighted(rng, DIFFICULTY_MULTIPLIERS);
+  const rewardMultiplier = getRewardMultiplier(categoryId, difficulty.value);
   const title = pick(rng, category.titleTemplates);
   const proofType = pick(rng, category.proofTemplates);
   const turnInValue = objective.targetType === "creature"
@@ -322,7 +402,7 @@ function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
     : objective.turnInValue;
   const reward = calculateMissionReward({
     challenge: objective.challenge,
-    multiplier: difficulty.value,
+    multiplier: rewardMultiplier,
     quantity: objective.quantity,
     turnInValue
   });
@@ -338,9 +418,11 @@ function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
     status: "offered",
     category: category.id,
     categoryLabel: category.label,
-    issuer,
+    issuer: source.label,
+    sourceId: source.id || slugify(source.label),
+    sourceKind: getSourceKind(source),
     title,
-    description: createMissionText({ destination, issuer, objective }),
+    description: createMissionText({ destination, objective, source }),
     destination,
     objective: {
       kind: objective.kind,
@@ -369,6 +451,13 @@ function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
   };
 }
 
+function getOfferCount(rules, rng) {
+  const minimum = Math.max(1, Number(rules.offerCountMin || 1));
+  const maximum = Math.max(minimum, Number(rules.offerCountMax || 8));
+
+  return randomInt(rng, minimum, maximum);
+}
+
 export function createMissionGenerationContext({ currentSeed, profile, worldDraft = null }) {
   return {
     currentSeed,
@@ -383,8 +472,8 @@ export function createMissionGenerationContext({ currentSeed, profile, worldDraf
 
 export function generateMissionOffers(context) {
   const rules = context.profile.missionRules || {};
-  const offerCount = rules.offerCount || 7;
   const rng = createRng(`${context.currentSeed}|missions|${context.profileId}`);
+  const offerCount = getOfferCount(rules, rng);
   const offers = [];
   const usedCategories = new Set();
   const usedIds = new Set();

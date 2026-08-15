@@ -116,7 +116,8 @@ export const archipelago21to30Profile = {
   },
   missionRules: {
     enabled: true,
-    offerCount: 7,
+    offerCountMin: 1,
+    offerCountMax: 8,
     missionFloors: [21, 22, 23, 24, 25, 26, 27, 28, 29],
     allowedCategories: [
       "collection",

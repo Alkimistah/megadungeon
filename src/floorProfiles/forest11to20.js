@@ -173,7 +173,8 @@ export const forest11to20Profile = {
   },
   missionRules: {
     enabled: true,
-    offerCount: 7,
+    offerCountMin: 1,
+    offerCountMax: 8,
     missionFloors: [11, 12, 13, 14, 15, 16, 17, 18, 19],
     allowedCategories: [
       "extermination",
@@ -188,14 +189,14 @@ export const forest11to20Profile = {
       "anomalous"
     ],
     categoryWeights: {
-      extermination: 10,
+      extermination: 16,
       collection: 15,
       exploration: 13,
       recovery: 10,
       investigation: 12,
       rescue: 8,
       escort: 8,
-      specialHunt: 7,
+      specialHunt: 12,
       trial: 8,
       anomalous: 9
     },

@@ -12,7 +12,8 @@ export function calculateMissionReward({
   const safeQuantity = Math.max(1, Number(quantity) || 1);
   const quantityFactor = Math.max(1, Math.log2(safeQuantity + 1) / 2);
   const resolvedTurnInValue = turnInValue ?? unitValue * safeQuantity;
-  const completionBonus = Math.round(unitValue * quantityFactor * multiplier);
+  const effectiveMultiplier = Math.max(1, Number(multiplier) || 1);
+  const completionBonus = Math.round(unitValue * quantityFactor * effectiveMultiplier);
   const totalPayout = resolvedTurnInValue + completionBonus;
 
   return {
@@ -20,9 +21,11 @@ export function calculateMissionReward({
     bonus,
     challenge,
     completionBonus,
+    effectiveMultiplier,
     multiplier,
+    quantity: safeQuantity,
     quantityFactor: Number(quantityFactor.toFixed(2)),
-    text: `T$ ${totalPayout} pela conclusão${resolvedTurnInValue > 0 ? " e entrega da prova" : ""}.`,
+    text: `T$ ${totalPayout} pela conclusão${resolvedTurnInValue > 0 ? " e entrega do objetivo" : ""}.`,
     totalPayout,
     turnInValue: resolvedTurnInValue,
     unitValue,

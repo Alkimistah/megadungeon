@@ -749,6 +749,7 @@ Criar ou separar:
 - Os fragmentos obtidos ainda são representados principalmente por contador/progresso; a exibição visual individual no barco pode evoluir.
 - Mapas táticos específicos por tema de ilha ainda não foram implementados.
 - Encontros, criaturas, armadilhas e recompensas definitivas por ilha ainda não foram fechados.
+- A adaptação definitiva do módulo de missões para os andares 21 a 30 fica pendente até o modo `archipelago` estar mais maduro. Por enquanto, não avaliar balanceamento, categorias, textos, vínculos ou recompensas de missões dessa faixa como critério final.
 
 ### A Definir
 
@@ -810,6 +811,7 @@ Criar ou separar:
 - Definir o boss da ilha 30.
 - Decidir se a ilha 30 terá objetivos preliminares ou se abre diretamente a luta contra o boss.
 - Definir ataques ao barco durante descanso: chance, ND, composição e quando usar.
+- Revisar missões nos andares 21 a 30 depois que objetivos, encontros, recompensas e mapas táticos por ilha estiverem definidos.
 
 ## Decisão Arquitetural Recomendada
 

@@ -5,6 +5,29 @@ export function createMissionState() {
   let selectionLocked = false;
   let history = [];
 
+  function getRequiredProgress(mission) {
+    return Math.max(1, Number(mission.objective?.quantity || mission.progress?.required || 1));
+  }
+
+  function shouldTrackProgress(mission) {
+    return mission.category === "extermination" || mission.integration?.capability === "progress-counter";
+  }
+
+  function normalizeMissionProgress(mission) {
+    if (!shouldTrackProgress(mission)) return { ...mission };
+
+    const required = getRequiredProgress(mission);
+    const current = Math.min(required, Math.max(0, Number(mission.progress?.current || 0)));
+
+    return {
+      ...mission,
+      progress: {
+        current,
+        required
+      }
+    };
+  }
+
   function startBoard(nextProfileId, nextOffers) {
     profileId = nextProfileId;
     offers = nextOffers.map((mission) => ({ ...mission, status: "offered" }));
@@ -17,13 +40,13 @@ export function createMissionState() {
 
     selected = offers
       .filter((mission) => ids.has(mission.id))
-      .map((mission) => ({ ...mission, status: "selected" }));
+      .map((mission) => normalizeMissionProgress({ ...mission, status: "selected" }));
     offers = [];
     selectionLocked = true;
   }
 
   function replaceSelected(nextSelected) {
-    selected = nextSelected.map((mission) => ({ ...mission }));
+    selected = nextSelected.map((mission) => normalizeMissionProgress(mission));
   }
 
   function markCompleted(missionId) {
@@ -38,6 +61,30 @@ export function createMissionState() {
       }
       : mission
     );
+  }
+
+  function adjustProgress(missionId, delta) {
+    selected = selected.map((mission) => {
+      if (mission.id !== missionId || !shouldTrackProgress(mission) || mission.status === "completed") {
+        return mission;
+      }
+
+      const withProgress = normalizeMissionProgress(mission);
+      const required = withProgress.progress.required;
+      const current = Math.min(required, Math.max(0, withProgress.progress.current + delta));
+
+      return {
+        ...withProgress,
+        progress: {
+          current,
+          required
+        },
+        integration: {
+          ...withProgress.integration,
+          state: current >= required ? "ready" : "pending"
+        }
+      };
+    });
   }
 
   function getOffers() {
@@ -69,7 +116,7 @@ export function createMissionState() {
   function importSessionState(sessionState = null) {
     profileId = sessionState?.profileId || null;
     offers = [];
-    selected = sessionState?.selected || [];
+    selected = (sessionState?.selected || []).map((mission) => normalizeMissionProgress(mission));
     selectionLocked = Boolean(sessionState?.selectionLocked);
     history = sessionState?.history || [];
   }
@@ -83,6 +130,7 @@ export function createMissionState() {
   }
 
   return {
+    adjustProgress,
     confirmSelection,
     exportSessionState,
     getMissionsForFloor,

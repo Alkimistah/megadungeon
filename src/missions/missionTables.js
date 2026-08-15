@@ -94,10 +94,11 @@ export const DIFFICULTY_MULTIPLIERS = [
 ];
 
 export const DEFAULT_ISSUER_WEIGHTS = [
-  { label: "o posto avançado", weight: 28 },
-  { label: "um pesquisador da guilda", weight: 18 },
-  { label: "um relatório recuperado", weight: 14 },
-  { label: "a equipe de contenção", weight: 18 },
-  { label: "um patrono anônimo", weight: 10 },
-  { label: "a própria pulseira", weight: 12 }
+  { id: "responsavel-posto", label: "um responsável do posto avançado", kind: "request", weight: 24 },
+  { id: "pesquisador-guilda", label: "um pesquisador da guilda", kind: "request", weight: 16, categories: ["collection", "exploration", "investigation", "anomalous"] },
+  { id: "equipe-contencao", label: "a equipe de contenção", kind: "request", weight: 18, categories: ["extermination", "specialHunt", "trial", "anomalous"] },
+  { id: "patrono-anonimo", label: "um patrono anônimo", kind: "request", weight: 10 },
+  { id: "pedido-posto", label: "um pedido deixado no posto", kind: "writtenRequest", weight: 12, categories: ["recovery", "rescue", "escort"] },
+  { id: "registro-recuperado", label: "um registro recuperado", kind: "record", weight: 10, categories: ["exploration", "investigation", "recovery", "rescue"] },
+  { id: "missao-sem-fornecedor", label: "missão sem fornecedor", kind: "signal", weight: 8, categories: ["anomalous", "exploration", "specialHunt", "trial"] }
 ];

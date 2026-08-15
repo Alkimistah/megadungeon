@@ -1972,6 +1972,49 @@ svg {
   outline-offset: 1px;
 }
 
+.encounter-mission-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, #50c878 45%, white 25%);
+  border-radius: 999px;
+  background: color-mix(in srgb, #1f6f43 26%, var(--surface) 74%);
+  color: #ecfff2;
+  font-size: 12px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.encounter-mission-panel {
+  display: grid;
+  gap: 7px;
+  padding: 9px 10px;
+  border: 1px solid color-mix(in srgb, #50c878 45%, var(--border) 55%);
+  border-radius: 6px;
+  background: color-mix(in srgb, #1f6f43 18%, var(--surface) 82%);
+  color: #dff7e7;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.encounter-mission-panel strong {
+  color: #fff;
+}
+
+.encounter-mission-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.encounter-mission-action {
+  min-height: 28px;
+  padding: 5px 9px;
+}
+
 .encounter-detail-panel {
   overflow: hidden;
 }
@@ -2229,11 +2272,13 @@ svg {
 }
 
 #missionDialog.is-selection-mode .mission-list {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   justify-content: center;
   align-items: start;
   gap: 12px;
+  width: min(100%, 1012px);
+  margin-inline: auto;
 }
 
 .mission-card {
@@ -2312,7 +2357,6 @@ svg {
 }
 
 .mission-proof,
-.mission-reward,
 .mission-map-note {
   margin: 0;
   color: #d8c8b7;
@@ -2321,9 +2365,61 @@ svg {
   overflow-wrap: anywhere;
 }
 
-.mission-proof strong,
+.mission-proof strong {
+  color: #fff7e8;
+}
+
+.mission-reward {
+  display: grid;
+  gap: 7px;
+  padding: 9px 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background: rgba(8, 8, 8, 0.22);
+  color: #d8c8b7;
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.mission-reward-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+button.mission-reward-summary {
+  cursor: pointer;
+}
+
+button.mission-reward-summary:focus-visible {
+  outline: 2px solid var(--border);
+  outline-offset: 3px;
+}
+
+.mission-reward-summary span {
+  color: #c9b7a4;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .mission-reward strong {
   color: #fff7e8;
+  font-size: 14px;
+}
+
+.mission-reward-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 4px 10px;
 }
 
 .mission-availability {
@@ -2345,6 +2441,47 @@ svg {
 
 .mission-availability strong {
   color: #fff7e8;
+}
+
+.mission-progress {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background: rgba(8, 8, 8, 0.22);
+  color: #d8c8b7;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.mission-progress.is-ready {
+  border-color: color-mix(in srgb, #50c878 55%, white 45%);
+  background: color-mix(in srgb, #1f6f43 24%, var(--surface) 76%);
+}
+
+.mission-progress strong {
+  color: #fff7e8;
+}
+
+.mission-progress span {
+  grid-column: 1;
+}
+
+.mission-progress-controls {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.mission-progress-button {
+  min-width: 34px;
+  padding-inline: 10px;
+  font-size: 16px;
+  line-height: 1;
 }
 
 .mission-card-actions {

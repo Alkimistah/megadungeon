@@ -156,6 +156,7 @@ function advanceNodeMapFloor() {
 const nodeDialogController = createNodeDialogController({
   contentElement: elements.nodeDialogContent,
   dialogElement: elements.nodeDialog,
+  getActiveMissions: () => missionState.getSelected(),
   metaElement: elements.nodeDialogMeta,
   onAttempt: (node) => {
     state.markAttempted(node);
@@ -171,6 +172,11 @@ const nodeDialogController = createNodeDialogController({
 
     refreshExplorationDisplay();
     nodeDialogController.open(node);
+  },
+  onAdjustMissionProgress: (missionId, delta) => {
+    missionState.adjustProgress(missionId, delta);
+    refreshExplorationDisplay();
+    updateInfo();
   },
   onExplore: (node) => {
     state.markExplored(node);
@@ -200,7 +206,13 @@ const manualEncounterDialogController = createManualEncounterDialogController({
   creatureTypeInput: elements.manualEncounterCreatureTypeInput,
   dialogElement: elements.manualEncounterDialog,
   formElement: elements.manualEncounterForm,
+  getActiveMissions: () => missionState.getSelected(),
   getProfile: () => activeFloorRange,
+  onAdjustMissionProgress: (missionId, delta) => {
+    missionState.adjustProgress(missionId, delta);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
   openButton: elements.manualEncounterButton,
   resultElement: elements.manualEncounterResult,
   terrainInput: elements.manualEncounterTerrainInput,
@@ -219,6 +231,11 @@ missionDialogController = createMissionDialogController({
     missionState.confirmSelection(selectedMissionIds);
     generateMap({ reuseSeed: true });
   },
+  onAdjustProgress: (missionId, delta) => {
+    missionState.adjustProgress(missionId, delta);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
   onMarkCompleted: (missionId) => {
     missionState.markCompleted(missionId);
     refreshExplorationDisplay();
@@ -229,9 +246,15 @@ missionDialogController = createMissionDialogController({
 
 const extendedExplorationRenderer = createExtendedExplorationRenderer({
   container: elements.extendedExploration,
+  getActiveMissions: () => missionState.getSelected(),
   getSnapshot: () => extendedState.getSnapshot(),
   getMissionsForFloor: (floor) => missionState.getMissionsForFloor(floor),
   onOpenMission: openMissionById,
+  onAdjustMissionProgress: (missionId, delta) => {
+    missionState.adjustProgress(missionId, delta);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
   onAdvanceFloor: () => {
     extendedState.advanceFloor();
     elements.floorInput.value = String(extendedState.getSnapshot().floor);

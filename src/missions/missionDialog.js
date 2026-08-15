@@ -19,11 +19,88 @@ function createMissionMeta(mission) {
   ].filter(Boolean).join(" | ");
 }
 
-function renderReward(mission) {
-  const reward = createElement("p", "mission-reward");
-  reward.appendChild(createElement("strong", null, "Recompensa: "));
-  reward.appendChild(document.createTextNode(mission.reward?.text || "A definir."));
+function formatMoney(value) {
+  return `T$ ${Math.max(0, Number(value) || 0)}`;
+}
+
+function formatMultiplier(value) {
+  const multiplier = Math.max(1, Number(value) || 1);
+
+  return String(Number(multiplier.toFixed(2)));
+}
+
+function renderReward(mission, { expanded = false, onToggle = null } = {}) {
+  const reward = createElement("div", "mission-reward");
+  const rewardData = mission.reward || {};
+  const total = formatMoney(rewardData.totalPayout);
+  const turnInValue = Number(rewardData.turnInValue || 0);
+  const completionBonus = Number(rewardData.completionBonus || 0);
+  const unitValue = Number(rewardData.unitValue || 0);
+  const summary = onToggle
+    ? createElement("button", "mission-reward-summary")
+    : createElement("div", "mission-reward-summary");
+  const details = createElement("div", "mission-reward-details");
+
+  if (onToggle) summary.type = "button";
+  summary.setAttribute("aria-expanded", String(expanded));
+  summary.appendChild(createElement("strong", null, `Recompensa: ${total}`));
+  if (onToggle) {
+    summary.appendChild(createElement("span", null, expanded ? "Ocultar detalhes" : "Ver detalhes"));
+    summary.addEventListener("click", (event) => {
+      event.stopPropagation();
+      onToggle(mission.id);
+    });
+  }
+  reward.appendChild(summary);
+
+  if (!mission.reward) {
+    reward.appendChild(createElement("span", null, "A definir."));
+    return reward;
+  }
+
+  details.appendChild(createElement("span", null, `Entrega/cristais: ${formatMoney(turnInValue)}`));
+  details.appendChild(createElement("span", null, `Bônus: ${formatMoney(completionBonus)}`));
+  details.appendChild(createElement(
+    "span",
+    null,
+    `Base: ND ${rewardData.challengeLabel || "?"}${unitValue ? ` = ${formatMoney(unitValue)}` : ""}`
+  ));
+  details.appendChild(createElement(
+    "span",
+    null,
+    `Cálculo: qtd. ${rewardData.quantity ?? mission.objective?.quantity ?? 1}, fator ${rewardData.quantityFactor ?? 1}, mult. ${formatMultiplier(rewardData.effectiveMultiplier ?? rewardData.multiplier ?? 1)}`
+  ));
+  if (expanded) reward.appendChild(details);
+
   return reward;
+}
+
+function getMissionProgress(mission) {
+  if (mission.category !== "extermination" && mission.integration?.capability !== "progress-counter") {
+    return null;
+  }
+
+  const required = Math.max(1, Number(mission.progress?.required || mission.objective?.quantity || 1));
+  const current = Math.min(required, Math.max(0, Number(mission.progress?.current || 0)));
+
+  return {
+    current,
+    ready: current >= required,
+    required
+  };
+}
+
+function getMissionStatusLabel(mission, context = null) {
+  if (mission.status === "completed") return "Concluída";
+  const progress = getMissionProgress(mission);
+
+  if (progress?.ready) return "Pronta";
+  if (progress && progress.current > 0) return "Em progresso";
+  if (context?.kind === "node") return "Disponível";
+  if (context?.kind === "pending-node") return "Aguardando nodo";
+  if (mission.integration?.bindings?.length) return "Vinculada";
+
+  return "Aceita";
 }
 
 function getPrimaryBinding(mission) {
@@ -65,9 +142,13 @@ function getMissionAvailability(mission, context = null) {
   }
 
   if (mission.destination?.kind === "progress") {
+    const progress = getMissionProgress(mission);
+
     return {
-      label: "Progresso",
-      text: `${mission.destination.label}. Conte qualquer alvo compatível encontrado durante a exploração.`,
+      label: progress?.ready ? "Pronta para entregar" : "Progresso",
+      text: progress
+        ? `${mission.destination.label}. Progresso: ${progress.current}/${progress.required}.`
+        : `${mission.destination.label}. Conte qualquer alvo compatível encontrado durante a exploração.`,
       canOpen: false
     };
   }
@@ -77,6 +158,37 @@ function getMissionAvailability(mission, context = null) {
     text: mission.destination?.label ? `Destino: ${mission.destination.label}.` : "Aguardando contexto da exploração.",
     canOpen: false
   };
+}
+
+function renderMissionProgress(mission, onAdjustProgress = null) {
+  const progress = getMissionProgress(mission);
+
+  if (!progress) return null;
+
+  const wrapper = createElement("div", `mission-progress ${progress.ready ? "is-ready" : ""}`);
+  const text = createElement(
+    "span",
+    null,
+    `${progress.current} de ${formatCountLabel(progress.required, "alvo", "alvos")}`
+  );
+  const controls = createElement("div", "mission-progress-controls");
+  const decrement = createElement("button", "extended-action is-compact mission-progress-button", "-");
+  const increment = createElement("button", "extended-action is-compact mission-progress-button", "+");
+
+  decrement.type = "button";
+  increment.type = "button";
+  decrement.disabled = progress.current <= 0 || mission.status === "completed";
+  increment.disabled = progress.current >= progress.required || mission.status === "completed";
+  decrement.setAttribute("aria-label", `Diminuir progresso de ${mission.title}`);
+  increment.setAttribute("aria-label", `Aumentar progresso de ${mission.title}`);
+  decrement.addEventListener("click", () => onAdjustProgress?.(mission.id, -1));
+  increment.addEventListener("click", () => onAdjustProgress?.(mission.id, 1));
+
+  wrapper.appendChild(createElement("strong", null, progress.ready ? "Objetivo pronto" : "Progresso"));
+  controls.append(decrement, increment);
+  wrapper.append(text, controls);
+
+  return wrapper;
 }
 
 function renderMissionAvailability(mission, context) {
@@ -192,7 +304,10 @@ function renderMissionCard(mission, {
   disabled = false,
   missionContext = null,
   onOpenMission = null,
+  onAdjustProgress = null,
+  onToggleReward = null,
   onToggle = null,
+  rewardExpanded = false,
   selectable = false,
   onComplete = null
 } = {}) {
@@ -201,7 +316,7 @@ function renderMissionCard(mission, {
   const titleBlock = createElement("div");
   const category = createElement("p", "node-dialog-type", createMissionMeta(mission));
   const title = createElement("h3", null, mission.title);
-  const status = createElement("span", "mission-status", mission.status === "completed" ? "Concluída" : "Pendente");
+  const status = createElement("span", "mission-status", getMissionStatusLabel(mission, missionContext));
 
   titleBlock.append(category, title);
   header.appendChild(titleBlock);
@@ -238,7 +353,12 @@ function renderMissionCard(mission, {
   proof.appendChild(createElement("strong", null, "Objetivo: "));
   proof.appendChild(document.createTextNode(mission.proofType || "Confirmação do mestre."));
   card.appendChild(proof);
-  card.appendChild(renderReward(mission));
+  const progress = selectable ? null : renderMissionProgress(mission, onAdjustProgress);
+  if (progress) card.appendChild(progress);
+  card.appendChild(renderReward(mission, {
+    expanded: rewardExpanded,
+    onToggle: selectable ? null : onToggleReward
+  }));
 
   if (!selectable) {
     card.appendChild(renderMissionAvailability(mission, missionContext));
@@ -265,9 +385,9 @@ function renderMissionCard(mission, {
   return card;
 }
 
-function renderMissionRunContent(mission, onComplete, context = null, profile = null) {
+function renderMissionRunContent(mission, onComplete, context = null, profile = null, onAdjustProgress = null, rewardExpanded = false, onToggleReward = null) {
   const container = createElement("div", "mission-run");
-  const card = renderMissionCard(mission, { onComplete });
+  const card = renderMissionCard(mission, { onAdjustProgress, onComplete, onToggleReward, rewardExpanded });
   const guidance = createElement("section", "mission-run-guidance");
   const node = context?.kind === "node" ? context.node : null;
   const pendingNode = context?.kind === "pending-node";
@@ -324,12 +444,23 @@ export function createMissionDialogController({
   getProfile,
   getSelected,
   onConfirmSelection,
+  onAdjustProgress,
   onMarkCompleted,
   openButton
 }) {
   const selectedOfferIds = new Set();
+  const expandedRewardIds = new Set();
   let mode = "view";
   let allowSelectionClose = false;
+
+  function toggleReward(missionId, renderCallback) {
+    if (expandedRewardIds.has(missionId)) {
+      expandedRewardIds.delete(missionId);
+    } else {
+      expandedRewardIds.add(missionId);
+    }
+    renderCallback();
+  }
 
   function renderSelection() {
     const offers = getOffers();
@@ -398,11 +529,17 @@ export function createMissionDialogController({
 
       list.appendChild(renderMissionCard(mission, {
         missionContext,
+        onAdjustProgress: (missionId, delta) => {
+          onAdjustProgress?.(missionId, delta);
+          renderView();
+        },
         onComplete: (missionId) => {
           onMarkCompleted(missionId);
           renderView();
         },
-        onOpenMission: renderMissionRun
+        onOpenMission: renderMissionRun,
+        onToggleReward: (missionId) => toggleReward(missionId, renderView),
+        rewardExpanded: expandedRewardIds.has(mission.id)
       }));
     });
     contentElement.appendChild(list);
@@ -422,7 +559,10 @@ export function createMissionDialogController({
     contentElement.appendChild(renderMissionRunContent(mission, (completedMissionId) => {
       onMarkCompleted(completedMissionId);
       renderMissionRun(completedMissionId);
-    }, getMissionContext(mission), getProfile()));
+    }, getMissionContext(mission), getProfile(), (missionId, delta) => {
+      onAdjustProgress?.(missionId, delta);
+      renderMissionRun(missionId);
+    }, expandedRewardIds.has(mission.id), (missionId) => toggleReward(missionId, () => renderMissionRun(missionId))));
   }
 
   function openSelection() {

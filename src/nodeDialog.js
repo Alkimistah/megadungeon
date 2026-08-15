@@ -2,6 +2,7 @@ import { formatChallengeRating } from "./challenge.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getDamageType } from "./damageTypes.js";
 import { getWeaponVariationLabel } from "./equipment/weaponVariation.js";
+import { getEncounterMissionMatches } from "./missions/missionEncounterIntegration.js";
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { openTacticalMapFullscreen } from "./tacticalMapRenderer.js";
 import { getTrapById } from "./traps.js";
@@ -328,7 +329,57 @@ function createEncounterBudget(node) {
   return budget;
 }
 
-function createEncounterList(node, selectedKey, onSelect) {
+function formatMissionMatchText(match) {
+  if (match.count <= 0) return `${match.mission.title}: meta atingida`;
+
+  const countText = match.count === 1 ? "1 alvo" : `${match.count} alvos`;
+
+  return `${match.mission.title}: conta ${countText}`;
+}
+
+function createEncounterMissionBadge(match) {
+  const badge = document.createElement("span");
+
+  badge.className = "encounter-mission-badge";
+  badge.textContent = formatMissionMatchText(match);
+
+  return badge;
+}
+
+function createEncounterMissionPanel(matches, onAdjustMissionProgress = null) {
+  if (!matches.length) return null;
+
+  const panel = document.createElement("div");
+  const title = document.createElement("strong");
+
+  panel.className = "encounter-mission-panel";
+  title.textContent = "Conta para missão";
+  panel.appendChild(title);
+  matches.forEach((match) => {
+    const row = document.createElement("div");
+    const line = document.createElement("span");
+
+    row.className = "encounter-mission-row";
+    line.textContent = `${formatMissionMatchText(match)} (${match.current}/${match.required})`;
+    row.appendChild(line);
+
+    if (onAdjustMissionProgress && match.count > 0) {
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "extended-action is-compact encounter-mission-action";
+      button.textContent = `Somar ${match.count}`;
+      button.addEventListener("click", () => onAdjustMissionProgress(match.mission.id, match.count));
+      row.appendChild(button);
+    }
+
+    panel.appendChild(row);
+  });
+
+  return panel;
+}
+
+function createEncounterList(node, selectedKey, onSelect, missions = []) {
   const panel = document.createElement("section");
   const heading = document.createElement("h3");
   const list = document.createElement("div");
@@ -351,6 +402,9 @@ function createEncounterList(node, selectedKey, onSelect) {
       ? `${item.quantity} x ${item.name}`
       : `${item.quantity} x ${item.name}`;
     button.appendChild(name);
+    getEncounterMissionMatches(item, missions).forEach((match) => {
+      button.appendChild(createEncounterMissionBadge(match));
+    });
     button.addEventListener("click", () => onSelect(key));
     list.appendChild(button);
   });
@@ -440,9 +494,10 @@ function appendCreatureSheetAbilities(section, entries, { preferEntryName = fals
   });
 }
 
-function createCreatureDetail(item) {
-    const creature = item.creatureData ?? getCreatureById(item.creatureId);
+function createCreatureDetail(item, missions = [], onAdjustMissionProgress = null) {
+  const creature = item.creatureData ?? getCreatureById(item.creatureId);
   const section = document.createElement("section");
+  const missionPanel = createEncounterMissionPanel(getEncounterMissionMatches(item, missions), onAdjustMissionProgress);
 
   section.className = "encounter-detail-card creature-detail-card tormenta-creature-sheet";
 
@@ -452,6 +507,7 @@ function createCreatureDetail(item) {
     section.appendChild(heading);
     section.appendChild(createDetailLine("Quantidade", String(item.quantity)));
     section.appendChild(createDetailLine("ND", `ND ${item.challengeLabel}`));
+    if (missionPanel) section.appendChild(missionPanel);
     section.appendChild(createDetailLine("Aviso", "Criatura não encontrada no catálogo atual."));
     return section;
   }
@@ -480,6 +536,7 @@ function createCreatureDetail(item) {
   header.appendChild(challenge);
   section.appendChild(header);
   section.appendChild(subtitle);
+  if (missionPanel) section.appendChild(missionPanel);
   section.appendChild(createDivider());
 
   const perceptionText = [formatModifier(stats.perception), stats.senses].filter(Boolean).join(", ");
@@ -583,7 +640,7 @@ function createTrapDetail(node, item) {
   return section;
 }
 
-function createEncounterDetail(node, selectedKey) {
+function createEncounterDetail(node, selectedKey, missions = [], onAdjustMissionProgress = null) {
   const panel = document.createElement("div");
   const selectedItem = node.resolvedEncounter.items.find((item, index) =>
     getEncounterItemKey(item, index) === selectedKey
@@ -593,7 +650,7 @@ function createEncounterDetail(node, selectedKey) {
   panel.appendChild(
     selectedItem.kind === "trap"
       ? createTrapDetail(node, selectedItem)
-      : createCreatureDetail(selectedItem)
+      : createCreatureDetail(selectedItem, missions, onAdjustMissionProgress)
   );
 
   return panel;
@@ -605,19 +662,19 @@ function getFirstEncounterItemKey(node) {
     : null;
 }
 
-function createCombatPage(node, selectedKey, onSelect) {
+function createCombatPage(node, selectedKey, onSelect, missions = [], onAdjustMissionProgress = null) {
   const page = document.createElement("div");
   const currentSelectedKey = selectedKey || getFirstEncounterItemKey(node);
 
   page.className = "combat-page";
-  page.appendChild(createEncounterList(node, currentSelectedKey, onSelect));
-  page.appendChild(createEncounterDetail(node, currentSelectedKey));
+  page.appendChild(createEncounterList(node, currentSelectedKey, onSelect, missions));
+  page.appendChild(createEncounterDetail(node, currentSelectedKey, missions, onAdjustMissionProgress));
 
   return page;
 }
 
-export function createEncounterCombatPage(node, selectedKey, onSelect = () => {}) {
-  return createCombatPage(node, selectedKey, onSelect);
+export function createEncounterCombatPage(node, selectedKey, onSelect = () => {}, missions = [], onAdjustMissionProgress = null) {
+  return createCombatPage(node, selectedKey, onSelect, missions, onAdjustMissionProgress);
 }
 
 export function getDefaultEncounterItemKey(node) {
@@ -640,6 +697,8 @@ export function createNodeDialogController({
   onAttempt,
   onChooseRoute,
   onExplore,
+  getActiveMissions = () => [],
+  onAdjustMissionProgress = null,
   onOpenMission = () => {},
   onRest,
   state,
@@ -798,6 +857,9 @@ export function createNodeDialogController({
 
     contentElement.appendChild(createCombatPage(node, selectedKey, (nextSelectedKey) => {
       selectedEncounterItemByNode.set(node.id, nextSelectedKey);
+      render(node);
+    }, getActiveMissions(), (missionId, delta) => {
+      onAdjustMissionProgress?.(missionId, delta);
       render(node);
     }));
   }

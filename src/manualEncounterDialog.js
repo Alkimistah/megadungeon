@@ -160,7 +160,9 @@ export function createManualEncounterDialogController({
   creatureTypeInput,
   dialogElement,
   formElement,
+  getActiveMissions = () => [],
   getProfile,
+  onAdjustMissionProgress = null,
   openButton,
   resultElement,
   terrainInput,
@@ -183,6 +185,9 @@ export function createManualEncounterDialogController({
     selectedItemKey = selectedItemKey || getDefaultEncounterItemKey(currentNode);
     resultElement.appendChild(createEncounterCombatPage(currentNode, selectedItemKey, (nextKey) => {
       selectedItemKey = nextKey;
+      renderResult();
+    }, getActiveMissions(), (missionId, delta) => {
+      onAdjustMissionProgress?.(missionId, delta);
       renderResult();
     }));
   }
@@ -236,4 +241,3 @@ export function createManualEncounterDialogController({
     syncProfileOptions
   };
 }
-
