@@ -13,6 +13,8 @@ Mega Dungeon/
 │   ├── appState.js          # Estado da exploração por mapa em nodos
 │   ├── extendedExplorationState.js    # Estado dos andares 1 a 10
 │   ├── extendedExplorationRenderer.js # UI dos andares 1 a 10
+│   ├── archipelagoState.js             # Estado dos andares 21 a 30
+│   ├── archipelagoRenderer.js          # UI do arquipélago
 │   ├── generator.js         # Algoritmo de geração procedural do mapa em nodos
 │   ├── mapRenderer.js       # Renderização SVG do mapa em nodos
 │   ├── nodeDialog.js        # Controlador do modal de detalhes do nó
@@ -28,7 +30,9 @@ Mega Dungeon/
 │   │   ├── index.js         # Re-exporta todos os perfis
 │   │   ├── dungeon1to10.js  # Perfil: labirinto, andares 1-10
 │   │   ├── dungeon1to10FinalEncounters.js # Encontros finais 1-9 e chefe 10
-│   │   └── forest11to20.js  # Perfil: Floresta, andares 11-20
+│   │   ├── forest11to20.js  # Perfil: Floresta, andares 11-20
+│   │   └── archipelago21to30.js # Perfil: arquipélago, andares 21-30
+│   ├── missions/            # Geração, estado, integração e UI de missões
 │   ├── creatureCatalog/     # Fichas de criaturas por tipo e fonte
 │   ├── equipment/           # Variações e dados de equipamento
 │   ├── random.js            # RNG com seed (cyrb128 + sfc32)
@@ -40,7 +44,7 @@ Mega Dungeon/
 │   ├── manifest.webmanifest # Manifesto PWA
 │   └── sw.js                # Service Worker para suporte offline
 ├── index.html               # Ponto de entrada HTML
-└── package.json             # Dependências (apenas Vite como devDependency)
+└── package.json             # Scripts e dependências de desenvolvimento (Vite e Playwright)
 ```
 
 ---
@@ -72,15 +76,23 @@ main.js → seleciona perfil
         │       ├── extendedExplorationState.js    → inicializa andar, sucessos, falhas e log
         │       └── extendedExplorationRenderer.js → renderiza painel, cenas e mapas táticos
         │
-        └── mode: node-map
-                ├── generator.js    → gera estrutura de nós e links
-                ├── appState.js     → inicializa rota, visibilidade e tempo
-                └── mapRenderer.js  → renderiza SVG na tela
+        ├── mode: node-map
+        │       ├── generator.js    → gera estrutura de nós e links
+        │       ├── appState.js     → inicializa rota, visibilidade e tempo
+        │       └── mapRenderer.js  → renderiza SVG na tela
+        │
+        └── mode: archipelago
+                ├── archipelagoState.js    → controla viagem e progresso
+                └── archipelagoRenderer.js → renderiza ilhas e ações
 ```
 
 Os andares 1 a 10 usam o modo `extended-exploration`: o labirinto é abstrato, o progresso é medido por sucessos/falhas, e cenas táticas surgem dinamicamente a partir de falhas d100, encontros finais e sala de chefe.
 
 Os andares 11 a 20 usam o modo `node-map`: o mapa em grafo é a representação principal de uma região maior, com rotas e salas pré-geradas. Esse modo deve permanecer como base para essa faixa; uma melhoria possível é adicionar mapas táticos aos encontros abertos pelos nodos, sem substituir o grafo.
+
+Os andares 21 a 30 usam o modo `archipelago`: a base funcional de navegação, persistência e progresso fica em `archipelagoState.js`, enquanto `archipelagoRenderer.js` controla sua apresentação. Conteúdo definitivo, mapas táticos e parte da revisão visual dessa faixa continuam evoluindo separadamente.
+
+O módulo `missions/` é transversal aos perfis. Ele gera ofertas para a faixa ativa, preserva as missões escolhidas no código de sessão e usa adaptadores para integrá-las ao modo atual sem fazer o gerador conhecer diretamente cada estrutura de exploração.
 
 ---
 
@@ -320,6 +332,7 @@ Cada arquivo de perfil define o comportamento completo de uma faixa de andares. 
 Perfis atuais:
 - `dungeon1to10.js`: andares 1 a 10, modo `extended-exploration`, regras de progresso, ações por andar, tabelas d100, efeitos mecânicos, tema e encontros finais.
 - `forest11to20.js`: andares 11 a 20, modo `node-map`, regras de grafo, ambiente, criaturas, armadilhas e boss do andar 20.
+- `archipelago21to30.js`: andares 21 a 30, modo `archipelago`, regras de viagem, ilhas, progresso e estado persistente da faixa.
 
 **Estrutura de um perfil:**
 
@@ -473,4 +486,79 @@ O app funciona offline via Service Worker (`public/sw.js`) com cache de todos os
 | Novo efeito dos andares 1-10 | Tabelas e resolvedores em `dungeon1to10.js` + aplicação em `extendedExplorationState.js` |
 | Novo encontro final dos andares 1-10 | `dungeon1to10FinalEncounters.js`, usando fichas do catálogo e mapa tático coerente |
 | Mapa tático para encontros 11-20 | Integrar `encounterResolver.js` ao modal de nó sem substituir o grafo de `forest11to20.js` |
+| Nova categoria ou integração de missão | `missions/missionTables.js`, `missionGenerator.js` e o adaptador do perfil em `missionProfileAdapters.js` |
 | Internacionalização | Strings de label estão em `tables.js` e nos perfis |
+
+---
+
+## Prioridade Arquitetural Próxima
+
+### Decisão atual sobre framework
+
+O projeto deve continuar em JavaScript vanilla com ES Modules e Vite nesta etapa. Seu destino principal é uma aplicação estática no GitHub Pages, instalada ou aberta como PWA em um tablet, sem backend e sem necessidade atual de roteamento entre páginas. Adicionar React, Vue ou outro runtime não resolveria os principais pontos de pressão existentes e aumentaria o custo e o risco de uma reescrita.
+
+O alerta de chunk acima de 500 kB também não justifica uma migração. Nos arquivos-fonte medidos, `creatureCatalog/` representa aproximadamente 1,0 MB de cerca de 1,55 MB de JavaScript e `creatureCatalog/index.js` importa todos os tipos antecipadamente. Portanto, a primeira investigação de carregamento deve tratar dados e imports antecipados; trocar a camada de UI não reduziria esse conteúdo.
+
+A prioridade imediata é modularizar incrementalmente a base atual, preservando comportamento, códigos de sessão, funcionamento offline e compatibilidade com GitHub Pages.
+
+### Ordem recomendada
+
+#### 1. Atualizar e proteger os contratos entre módulos
+
+**Como proceder:** documentar com JSDoc as estruturas compartilhadas de perfil, nodo, encontro resolvido, cena, missão e estado de sessão. Ativar `checkJs` gradualmente, começando pelos módulos de estado e persistência, sem converter todo o projeto para TypeScript de uma vez.
+
+**Motivo:** os objetos atravessam estados, renderizadores, adaptadores de missão e persistência. Contratos explícitos reduzem regressões durante as extrações seguintes e oferecem boa parte do benefício de tipagem sem exigir uma troca de stack.
+
+**Concluído quando:** os principais objetos compartilhados possuem tipos verificáveis e alterações incompatíveis são detectadas no desenvolvimento ou no build.
+
+#### 2. Dividir `extendedExplorationState.js` por responsabilidade
+
+**Como proceder:** extrair, em mudanças pequenas, a resolução de ações e efeitos, a geração de cenas d100, os encontros finais, a criação de mapas táticos e a serialização. `extendedExplorationState.js` deve permanecer como fachada do modo e manter sua API pública durante a transição.
+
+**Motivo:** o arquivo concentra mais de 2.000 linhas e várias regras independentes. Separá-las diminui o impacto de cada alteração, melhora testes unitários e evita que detalhes de mapa, evento e progressão dependam acidentalmente uns dos outros.
+
+**Concluído quando:** o estado principal apenas coordena módulos menores, a API consumida pelo renderer permanece estável e os testes dos andares 1 a 10 continuam passando.
+
+#### 3. Transformar `main.js` em uma camada de aplicação menor
+
+**Como proceder:** criar controladores próprios para `extended-exploration`, `node-map` e `archipelago`. Cada controlador deve expor operações uniformes de inicialização, renderização, exportação e restauração. Missões e diálogos continuam como serviços transversais, recebendo o contexto do controlador ativo.
+
+**Motivo:** `main.js` possui aproximadamente 900 linhas e conhece detalhes dos três modos. Uma camada menor reduz condicionais por modo, torna o ciclo de vida mais previsível e prepara o carregamento sob demanda sem introduzir um framework.
+
+**Concluído quando:** `main.js` seleciona e conecta o modo ativo, mas não implementa regras de progressão nem detalhes de renderização de cada perfil.
+
+#### 4. Reduzir o carregamento inicial com imports sob demanda
+
+**Como proceder:** medir primeiro o bundle e o tablet-alvo. Depois, aplicar `import()` a áreas fechadas, começando por modos não selecionados, modal de missões, gerador manual e recursos táticos grandes. Avaliar a divisão do catálogo por tipo ou por conjunto realmente permitido no perfil antes de configurar `manualChunks`.
+
+**Motivo:** os três perfis, o módulo de missões e todo o catálogo são importados no início. A divisão por funcionalidade pode reduzir download, análise e execução iniciais sem alterar a interface ou adicionar runtime de UI.
+
+**Concluído quando:** o primeiro chunk diminui de forma mensurável, os recursos continuam disponíveis offline depois de carregados e não há atraso incômodo ao abrir uma funcionalidade pela primeira vez.
+
+#### 5. Criar uma referência de desempenho no tablet
+
+**Como proceder:** medir no dispositivo usado nas sessões o primeiro carregamento, recarregamento, abertura das principais modais e interação com mapas. Registrar tamanho transferido e tempo de execução do JavaScript antes e depois de cada otimização. Definir o orçamento de desempenho a partir dessa referência real.
+
+**Motivo:** o tamanho do bundle é um indicador, não o resultado percebido. A prioridade do app é funcionar de forma confiável no tablet; otimizações devem responder a demora observada nesse dispositivo.
+
+**Concluído quando:** existe uma referência reproduzível e limites claros para detectar regressões relevantes no uso real.
+
+### Reavaliação de framework
+
+Um framework só deve ser reavaliado se, depois dessa modularização, continuar ocorrendo ao menos um destes problemas de forma recorrente:
+
+- erros de sincronização entre estado e DOM em fluxos comuns;
+- duplicação significativa de controles ou componentes interativos;
+- mudanças simples de UI exigindo alterações coordenadas em muitos módulos;
+- necessidade real de múltiplas páginas, rotas ou montagem dinâmica de grandes áreas da aplicação;
+- dificuldade crescente para testar renderização e ciclo de vida dos painéis.
+
+Se esses sinais aparecerem, a avaliação deve começar com uma prova pequena em um módulo isolado, como uma modal independente, comparando complexidade, tamanho final e desempenho no tablet. Preact é um candidato coerente para esse teste por permitir adoção incremental; uma reescrita integral não deve ser o primeiro passo.
+
+### Restrições para a refatoração
+
+- manter a saída como site estático compatível com o caminho `/megadungeon/` do GitHub Pages;
+- preservar instalação e uso offline pelo Service Worker;
+- manter compatibilidade dos códigos de sessão existentes;
+- não misturar refatoração estrutural com alterações de regras ou balanceamento;
+- executar testes automatizados, build e QA dos fluxos principais a cada extração relevante.
