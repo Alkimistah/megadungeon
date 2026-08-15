@@ -46,6 +46,7 @@ const elements = {
   manualEncounterResult: document.getElementById("manualEncounterResult"),
   manualEncounterTerrainInput: document.getElementById("manualEncounterTerrainInput"),
   manualEncounterTrapModeInput: document.getElementById("manualEncounterTrapModeInput"),
+  advanceNodeFloorButton: document.getElementById("advanceNodeFloorButton"),
   settingsToggle: document.getElementById("settingsToggle"),
   settingsToggleIcon: document.getElementById("settingsToggleIcon"),
   settingsPanel: document.getElementById("settingsPanel"),
@@ -72,9 +73,84 @@ const extendedState = createExtendedExplorationState(activeFloorRange, createRng
 const archipelagoState = createArchipelagoState(activeFloorRange, createRng(currentMapSeed));
 const missionState = createMissionState();
 let missionDialogController = null;
+let renderedNodeMapFloor = null;
 
 function openMissionById(missionId) {
   missionDialogController?.openMission(missionId);
+}
+
+function getMissionContext(mission) {
+  const nodeBinding = (mission.integration?.bindings || [])
+    .find((binding) => binding.kind === "node" && binding.nodeId !== undefined);
+
+  if (!nodeBinding) {
+    return isNodeMapMode()
+      ? { kind: "pending-node" }
+      : null;
+  }
+
+  const node = state.getLevels()
+    .flat()
+    .find((candidate) => candidate.id === nodeBinding.nodeId);
+
+  if (!node) {
+    return isNodeMapMode()
+      ? { kind: "pending-node" }
+      : null;
+  }
+
+  if (!state.isNodeChosen(node)) {
+    return { kind: "pending-node" };
+  }
+
+  resolveNodeEncounter(node, { mapSeed: currentMapSeed });
+
+  return {
+    kind: "node",
+    node
+  };
+}
+
+function getActiveFloorIndex() {
+  return activeFloorRange.floors.indexOf(Number(elements.floorInput.value));
+}
+
+function hasNextNodeMapFloor() {
+  const index = getActiveFloorIndex();
+
+  return index >= 0 && index < activeFloorRange.floors.length - 1;
+}
+
+function isTopLevelRouteChosen() {
+  if (renderedNodeMapFloor !== Number(elements.floorInput.value)) return false;
+
+  const levels = state.getLevels();
+  const topLevel = levels[levels.length - 1] || [];
+
+  return topLevel.some((node) => state.isNodeChosen(node));
+}
+
+function syncNodeFloorAdvanceControl() {
+  if (!elements.advanceNodeFloorButton) return;
+
+  const canAdvance = isNodeMapMode() && hasNextNodeMapFloor() && isTopLevelRouteChosen();
+
+  elements.advanceNodeFloorButton.disabled = !canAdvance;
+  elements.advanceNodeFloorButton.textContent = hasNextNodeMapFloor()
+    ? "Avançar andar"
+    : "Último andar";
+}
+
+function advanceNodeMapFloor() {
+  if (elements.advanceNodeFloorButton.disabled) return;
+
+  const nextFloor = activeFloorRange.floors[getActiveFloorIndex() + 1];
+
+  if (!nextFloor) return;
+
+  elements.floorInput.value = String(nextFloor);
+  syncRecommendationsWithFloor();
+  generateMap();
 }
 
 const nodeDialogController = createNodeDialogController({
@@ -135,6 +211,7 @@ missionDialogController = createMissionDialogController({
   closeButton: elements.missionClose,
   contentElement: elements.missionDialogContent,
   dialogElement: elements.missionDialog,
+  getMissionContext,
   getOffers: () => missionState.getOffers(),
   getProfile: () => activeFloorRange,
   getSelected: () => missionState.getSelected(),
@@ -237,6 +314,10 @@ function isExtendedExplorationMode() {
 
 function isArchipelagoMode() {
   return activeFloorRange.mode === "archipelago";
+}
+
+function isNodeMapMode() {
+  return activeFloorRange.mode === "node-map" || activeFloorRange.mode === undefined;
 }
 
 function updateTimeTracker() {
@@ -343,6 +424,7 @@ async function copyCurrentSessionCode() {
 function drawGeneratedLevels(levels) {
   elements.svg.hidden = false;
   elements.extendedExploration.hidden = true;
+  renderedNodeMapFloor = Number(elements.floorInput.value);
   state.setLevels(levels);
   mapRenderer.drawMap(levels, activeFloorRange.theme.columnColors);
   refreshExplorationDisplay();
@@ -364,8 +446,11 @@ function materializeActiveMissions({ floor = Number(elements.floorInput.value), 
 
   if (!selectedMissions.length) return;
 
+  const islands = isArchipelagoMode() ? archipelagoState.getSnapshot().islands : null;
+
   missionState.replaceSelected(materializeMissionsForCurrentContent({
     floor,
+    islands,
     levels,
     missions: selectedMissions
   }));
@@ -409,6 +494,7 @@ function restoreSession(session) {
   missionState.importSessionState(session.missions);
 
   if (isExtendedExplorationMode()) {
+    renderedNodeMapFloor = null;
     syncRecommendationsWithFloor();
     extendedState.initialize(
       activeFloorRange,
@@ -423,6 +509,7 @@ function restoreSession(session) {
   }
 
   if (isArchipelagoMode()) {
+    renderedNodeMapFloor = null;
     archipelagoState.initialize(
       activeFloorRange,
       createRng(currentMapSeed),
@@ -447,6 +534,7 @@ function restoreSession(session) {
   );
 
   state.setLevels(levels);
+  renderedNodeMapFloor = session.floor;
   state.importSessionState(session.state);
   resolveChosenRouteEncounters(levels, session.state);
   materializeActiveMissions({ floor: session.floor, levels });
@@ -460,6 +548,7 @@ function refreshExplorationDisplay() {
     elements.svg.hidden = true;
     elements.extendedExploration.hidden = false;
     archipelagoRenderer.render();
+    syncNodeFloorAdvanceControl();
     updateTimeTracker();
     return;
   }
@@ -469,6 +558,7 @@ function refreshExplorationDisplay() {
     elements.extendedExploration.hidden = false;
     elements.extendedExploration.className = "extended-exploration";
     extendedExplorationRenderer.render();
+    syncNodeFloorAdvanceControl();
     updateTimeTracker();
     return;
   }
@@ -476,6 +566,7 @@ function refreshExplorationDisplay() {
   elements.svg.hidden = false;
   elements.extendedExploration.hidden = true;
   mapRenderer.updateDisplay(state.getLevels(), state);
+  syncNodeFloorAdvanceControl();
   updateTimeTracker();
 }
 
@@ -564,6 +655,7 @@ function setUnknownPathsMode(isEnabled) {
 function generateMap({ reuseSeed = false } = {}) {
   if (isArchipelagoMode()) {
     if (!reuseSeed) currentMapSeed = createRandomSeed();
+    renderedNodeMapFloor = null;
     archipelagoState.initialize(activeFloorRange, createRng(currentMapSeed));
     materializeActiveMissions({ floor: archipelagoState.getSnapshot().activeExploration?.floor || activeFloorRange.floors[0] });
     refreshExplorationDisplay();
@@ -573,6 +665,7 @@ function generateMap({ reuseSeed = false } = {}) {
 
   if (isExtendedExplorationMode()) {
     if (!reuseSeed) currentMapSeed = createRandomSeed();
+    renderedNodeMapFloor = null;
     extendedState.initialize(
       activeFloorRange,
       Number(elements.floorInput.value),
@@ -662,11 +755,14 @@ function registerServiceWorker() {
 function bindEvents() {
   elements.floorInput.addEventListener("change", () => {
     syncRecommendationsWithFloor();
+    syncNodeFloorAdvanceControl();
   });
 
   elements.generateButton.addEventListener("click", () => {
     generateMap();
   });
+
+  elements.advanceNodeFloorButton.addEventListener("click", advanceNodeMapFloor);
 
   elements.info.addEventListener("click", () => {
     copyCurrentSessionCode().catch(() => {

@@ -101,11 +101,3 @@ export const DEFAULT_ISSUER_WEIGHTS = [
   { label: "um patrono anônimo", weight: 10 },
   { label: "a própria pulseira", weight: 12 }
 ];
-
-export const DEFAULT_COMPLICATIONS = [
-  "A prova precisa chegar inteira; destruição ou consumo invalida a entrega.",
-  "O alvo mudou de posição recentemente, então sinais antigos podem enganar.",
-  "Outra ameaça se interessa pelo mesmo objetivo.",
-  "A área apresenta instabilidade suficiente para impedir uma solução puramente mecânica.",
-  "O contratante aceita improvisos, mas exige uma explicação clara do que foi feito."
-];

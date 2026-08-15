@@ -14,6 +14,7 @@ const WALKABLE_CELLS = new Set([
   "floor",
   "foliage",
   "hidden",
+  "objective",
   "party",
   "enemy",
   "boss",
@@ -319,16 +320,31 @@ function placeTrapFeature(cells, node, rng) {
   if (fallback) cells[fallback[1]][fallback[0]] = "trap";
 }
 
+function placeMissionObjective(cells, mission, rng) {
+  if (!mission) return 0;
+
+  const center = getThreatCenter(cells);
+  const candidates = shuffle(getFreePositions(cells), rng)
+    .filter((position) => distance(position, center) <= 6)
+    .sort((first, second) => distance(first, center) - distance(second, center));
+  const target = candidates[0] || getFreePositions(cells)[0];
+
+  if (!target) return 0;
+
+  cells[target[1]][target[0]] = "objective";
+  return 1;
+}
+
 function protectMarkers(cells) {
-  getPositions(cells, (cell) => ["party", "enemy", "boss"].includes(cell)).forEach(([x, y]) => {
+  getPositions(cells, (cell) => ["party", "enemy", "boss", "objective"].includes(cell)).forEach(([x, y]) => {
     if (!isWalkable(cells[y][x])) cells[y][x] = "floor";
   });
 }
 
-export function createNodeTacticalMap(node) {
-  if (!node?.resolvedEncounter?.items?.length) return null;
+export function createNodeTacticalMap(node, { mission = null } = {}) {
+  if (!node || (!node.resolvedEncounter?.items?.length && !mission)) return null;
 
-  const rng = createRng(`${node.resolvedEncounter.seed || node.encounterSeed || node.id}:node-tactical-map`);
+  const rng = createRng(`${node.resolvedEncounter?.seed || node.encounterSeed || node.id}:node-tactical-map${mission ? `:${mission.id}` : ""}`);
   const cells = createEmptyMap();
 
   applyTerrain(cells, node, rng);
@@ -336,6 +352,7 @@ export function createNodeTacticalMap(node) {
   placeParty(cells);
   placeEnemies(cells, node, rng);
   placeTrapFeature(cells, node, rng);
+  const objectiveCount = placeMissionObjective(cells, mission, rng);
   protectMarkers(cells);
 
   return {
@@ -343,6 +360,7 @@ export function createNodeTacticalMap(node) {
     climate: node.environment?.climate || [],
     enemyCount: getEnemyCount(node),
     height: HEIGHT,
+    objectiveCount,
     terrain: node.environment?.terrain || null,
     template: normalizeText(node.environment?.terrain?.name || "aberto"),
     trapCount: getTrapCount(node),

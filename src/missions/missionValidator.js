@@ -24,6 +24,15 @@ export function validateMission(mission, context) {
     errors.push("Quantidade inválida.");
   }
 
+  if (mission.category === "extermination") {
+    if (destination.kind !== "progress") {
+      errors.push("Extermínio deve ser uma missão de progresso da faixa.");
+    }
+    if ((mission.objective?.quantity || 0) < 4) {
+      errors.push("Extermínio deve exigir pelo menos quatro inimigos.");
+    }
+  }
+
   return {
     errors,
     valid: errors.length === 0

@@ -1,8 +1,12 @@
 import { createRng, randomInt } from "../random.js";
 import { trapCatalog } from "../traps.js";
 
-const WIDTH = 16;
-const HEIGHT = 12;
+const DEFAULT_WIDTH = 16;
+const DEFAULT_HEIGHT = 12;
+const EXTENDED_EXPLORATION_WIDTH = 14;
+const EXTENDED_EXPLORATION_HEIGHT = 10;
+const EXTENDED_EXPLORATION_BOSS_WIDTH = 20;
+const EXTENDED_EXPLORATION_BOSS_HEIGHT = 14;
 const COMBAT_KINDS = new Set(["defeat", "hunt"]);
 const OBJECTIVE_HEAVY_KINDS = new Set([
   "collect",
@@ -48,16 +52,27 @@ const GENERIC_MECHANISM_RISKS = [
   }
 ];
 
-function createEmptyCells() {
-  return Array.from({ length: HEIGHT }, () => Array.from({ length: WIDTH }, () => "floor"));
+function getMissionMapSize(mission, profile) {
+  if (profile?.mode !== "extended-exploration") {
+    return { height: DEFAULT_HEIGHT, width: DEFAULT_WIDTH };
+  }
+
+  return {
+    height: mission.destination?.floor % 10 === 0 ? EXTENDED_EXPLORATION_BOSS_HEIGHT : EXTENDED_EXPLORATION_HEIGHT,
+    width: mission.destination?.floor % 10 === 0 ? EXTENDED_EXPLORATION_BOSS_WIDTH : EXTENDED_EXPLORATION_WIDTH
+  };
 }
 
-function inBounds(x, y) {
-  return x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT;
+function createEmptyCells(size) {
+  return Array.from({ length: size.height }, () => Array.from({ length: size.width }, () => "floor"));
 }
 
-function setCell(cells, x, y, value, overwrite = ["floor"]) {
-  if (!inBounds(x, y) || !overwrite.includes(cells[y][x])) return false;
+function inBounds(x, y, size) {
+  return x >= 0 && y >= 0 && x < size.width && y < size.height;
+}
+
+function setCell(cells, x, y, value, overwrite = ["floor"], size) {
+  if (!inBounds(x, y, size) || !overwrite.includes(cells[y][x])) return false;
 
   cells[y][x] = value;
   return true;
@@ -74,11 +89,11 @@ function shuffle(items, rng) {
   return copy;
 }
 
-function getFreePositions(cells) {
+function getFreePositions(cells, size) {
   const positions = [];
 
-  for (let y = 1; y < HEIGHT - 1; y += 1) {
-    for (let x = 1; x < WIDTH - 1; x += 1) {
+  for (let y = 1; y < size.height - 1; y += 1) {
+    for (let x = 1; x < size.width - 1; x += 1) {
       if (["floor", "difficult", "foliage", "concealment"].includes(cells[y][x])) {
         positions.push([x, y]);
       }
@@ -88,52 +103,59 @@ function getFreePositions(cells) {
   return positions;
 }
 
-function placeParty(cells) {
-  [[1, 9], [2, 9], [1, 10], [2, 10]].forEach(([x, y]) => {
-    cells[y][x] = "party";
+function placeParty(cells, size) {
+  const partyY = Math.max(1, size.height - 3);
+
+  [[1, partyY], [2, partyY], [1, partyY + 1], [2, partyY + 1]].forEach(([x, y]) => {
+    if (inBounds(x, y, size)) cells[y][x] = "party";
   });
 }
 
-function placeObjective(cells, mission, rng) {
+function placeObjective(cells, mission, rng, size) {
   const objectiveCount = mission.objective?.progressMode === "aggregate"
     ? Math.min(Math.max(mission.objective.quantity || 1, 2), 4)
     : 1;
+  const right = size.width - 3;
+  const upper = 2;
+  const middle = Math.max(upper + 1, Math.floor(size.height * 0.42));
   const candidates = shuffle(
     [
-      [12, 2],
-      [13, 3],
-      [11, 4],
-      [10, 2],
-      [13, 5],
-      [9, 3]
-    ],
+      [right, upper],
+      [right - 1, upper + 1],
+      [right - 2, middle],
+      [right - 3, upper],
+      [right, middle + 1],
+      [right - 4, upper + 1]
+    ].filter(([x, y]) => inBounds(x, y, size)),
     rng
   );
 
   candidates.slice(0, objectiveCount).forEach(([x, y]) => {
-    setCell(cells, x, y, "objective", ["floor", "difficult", "foliage", "concealment"]);
+    setCell(cells, x, y, "objective", ["floor", "difficult", "foliage", "concealment"], size);
   });
 
   return objectiveCount;
 }
 
-function placeEnemies(cells, mission, rng) {
+function placeEnemies(cells, mission, rng, size) {
   if (!COMBAT_KINDS.has(mission.objective?.kind)) return 0;
 
   const count = Math.min(Math.max(mission.objective?.quantity || 1, 1), 8);
+  const enemyXMin = Math.max(3, Math.floor(size.width * 0.52));
+  const enemyYMax = Math.max(2, size.height - 3);
   const candidates = shuffle(
-    getFreePositions(cells).filter(([x, y]) => x >= 8 && y <= 8),
+    getFreePositions(cells, size).filter(([x, y]) => x >= enemyXMin && y <= enemyYMax),
     rng
   );
 
   candidates.slice(0, count).forEach(([x, y]) => {
-    cells[y][x] = count === 1 && mission.category === "specialHunt" ? "boss" : "enemy";
+    cells[y][x] = "enemy";
   });
 
   return count;
 }
 
-function placeRisk(cells, mission, rng) {
+function placeRisk(cells, mission, rng, size) {
   const difficultyRisk = {
     simple: 1,
     standard: 2,
@@ -145,8 +167,8 @@ function placeRisk(cells, mission, rng) {
     ? Math.max(1, Math.floor(difficultyRisk / 2))
     : difficultyRisk;
   const marker = mission.objective?.kind === "stabilize" ? "mechanism" : "trap";
-  const candidates = shuffle(getFreePositions(cells), rng)
-    .filter(([x, y]) => x >= 4 && y >= 2 && y <= 9);
+  const candidates = shuffle(getFreePositions(cells, size), rng)
+    .filter(([x, y]) => x >= 4 && y >= 2 && y <= size.height - 3);
 
   candidates.slice(0, trapCount).forEach(([x, y]) => {
     cells[y][x] = marker;
@@ -158,7 +180,7 @@ function placeRisk(cells, mission, rng) {
   };
 }
 
-function placeTerrain(cells, mission, rng) {
+function placeTerrain(cells, mission, rng, size) {
   const kind = mission.objective?.kind;
   const terrainMarkers = kind === "explore"
     ? ["difficult", "obstacle", "concealment"]
@@ -167,11 +189,11 @@ function placeTerrain(cells, mission, rng) {
       : kind === "stabilize"
         ? ["mechanism", "difficult", "concealment"]
         : ["obstacle", "difficult", "concealment"];
-  const candidates = shuffle(getFreePositions(cells), rng);
+  const candidates = shuffle(getFreePositions(cells, size), rng);
 
   candidates.slice(0, 14).forEach(([x, y], index) => {
     const marker = terrainMarkers[index % terrainMarkers.length];
-    setCell(cells, x, y, marker, ["floor"]);
+    setCell(cells, x, y, marker, ["floor"], size);
   });
 }
 
@@ -279,16 +301,17 @@ function formatResolutionCheck(check) {
   return `${check.skill} CD ${check.dc} (${check.action})`;
 }
 
-export function createMissionTacticalMap(mission) {
+export function createMissionTacticalMap(mission, { profile = null } = {}) {
   const rng = createRng(`${mission.id}:mission-tactical-map`);
   const detailRng = createRng(`${mission.id}:mission-tactical-details`);
-  const cells = createEmptyCells();
+  const size = getMissionMapSize(mission, profile);
+  const cells = createEmptyCells(size);
 
-  placeTerrain(cells, mission, rng);
-  placeParty(cells);
-  const objectiveCount = placeObjective(cells, mission, rng);
-  const enemyCount = placeEnemies(cells, mission, rng);
-  const risk = placeRisk(cells, mission, rng);
+  placeTerrain(cells, mission, rng, size);
+  placeParty(cells, size);
+  const objectiveCount = placeObjective(cells, mission, rng, size);
+  const enemyCount = placeEnemies(cells, mission, rng, size);
+  const risk = placeRisk(cells, mission, rng, size);
   const missionDc = getMissionDc(mission);
   const resolutionCheck = getMissionResolutionCheck(mission, detailRng, missionDc);
   const riskDetails = getRiskDetails(mission, risk, detailRng, missionDc);
@@ -300,7 +323,7 @@ export function createMissionTacticalMap(mission) {
     cells: cells.flat(),
     climate: [],
     enemyCount,
-    height: HEIGHT,
+    height: size.height,
     missionDc,
     objectiveCount,
     resolutionCheck,
@@ -311,7 +334,9 @@ export function createMissionTacticalMap(mission) {
       features: [
         {
           name: mission.categoryLabel,
-          effect: mission.complication || "Sem complicação adicional definida."
+          effect: mission.objective?.condition
+            ? `${mission.objective.condition} ${mission.objective.targetName || "o objetivo"}.`
+            : "Objetivo definido pela missão."
         },
         {
           name: "Riscos",
@@ -320,13 +345,13 @@ export function createMissionTacticalMap(mission) {
             : "Sem risco adicional no mapa."
         },
         {
-          name: "Prova",
+          name: "Objetivo",
           effect: mission.proofType || "Confirmação do mestre."
         }
       ]
     },
     template: mission.category,
     trapCount: risk.count,
-    width: WIDTH
+    width: size.width
   };
 }

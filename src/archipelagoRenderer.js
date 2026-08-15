@@ -35,6 +35,17 @@ function getIslandModalCopy(island) {
   return "A identidade desta ilha será revelada quando o grupo iniciar a exploração.";
 }
 
+function getMissionsForObjective(missions, objective) {
+  return missions.filter((mission) => {
+    const objectiveBindings = (mission.integration?.bindings || [])
+      .filter((binding) => binding.kind === "objective");
+
+    if (!objectiveBindings.length) return true;
+
+    return objectiveBindings.some((binding) => binding.objectiveId === objective.id);
+  });
+}
+
 function createButton({ className, disabled = false, label, onClick }) {
   const button = document.createElement("button");
   button.className = className;
@@ -175,6 +186,7 @@ export function createArchipelagoRenderer({
     }
 
     island.objectives.forEach((objective) => {
+      const objectiveMissions = getMissionsForObjective(missions, objective);
       const item = document.createElement("div");
       item.className = `archipelago-objective ${objective.resolved ? "is-resolved" : ""}`;
       const canResolve = snapshot.activeExploration?.floor === island.floor && !objective.resolved;
@@ -186,10 +198,10 @@ export function createArchipelagoRenderer({
         </div>
         <p>${objective.description}</p>
       `;
-      if (missions.length) {
+      if (objectiveMissions.length) {
         const indicator = document.createElement("div");
         indicator.className = "mission-inline-indicator";
-        indicator.innerHTML = `<strong>Missão</strong><span>${missions.map((mission) => mission.title).join(", ")}</span>`;
+        indicator.innerHTML = `<strong>Missão</strong><span>${objectiveMissions.map((mission) => mission.title).join(", ")}</span>`;
         item.appendChild(indicator);
       }
       item.appendChild(createButton({

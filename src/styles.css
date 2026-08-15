@@ -276,6 +276,25 @@ main {
   background: color-mix(in srgb, var(--scrollbar-thumb) 80%, white 20%);
 }
 
+.node-map-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  justify-content: center;
+  padding: 12px 16px 4px;
+  pointer-events: none;
+}
+
+.node-advance-button {
+  min-width: min(280px, calc(100vw - 56px));
+  pointer-events: auto;
+}
+
+.node-advance-button:disabled {
+  opacity: 0.58;
+}
+
 svg {
   display: block;
   margin: 0 auto;
@@ -2293,7 +2312,6 @@ svg {
 }
 
 .mission-proof,
-.mission-complication,
 .mission-reward,
 .mission-map-note {
   margin: 0;
@@ -2304,9 +2322,35 @@ svg {
 }
 
 .mission-proof strong,
-.mission-complication strong,
 .mission-reward strong {
   color: #fff7e8;
+}
+
+.mission-availability {
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background: rgba(8, 8, 8, 0.2);
+  color: #d8c8b7;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.mission-availability.is-available {
+  border-color: color-mix(in srgb, var(--action) 52%, white 48%);
+  background: color-mix(in srgb, var(--action) 22%, var(--surface) 78%);
+}
+
+.mission-availability strong {
+  color: #fff7e8;
+}
+
+.mission-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .mission-dialog-actions {

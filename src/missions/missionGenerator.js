@@ -1,7 +1,7 @@
 import { formatChallengeRating } from "../challenge.js";
 import { getCreatureById } from "../creatureCatalog/index.js";
 import { createRng, pick, pickWeighted, randomInt } from "../random.js";
-import { DEFAULT_CATEGORY_WEIGHTS, DEFAULT_COMPLICATIONS, DEFAULT_ISSUER_WEIGHTS, DIFFICULTY_MULTIPLIERS, MISSION_CATEGORIES } from "./missionTables.js";
+import { DEFAULT_CATEGORY_WEIGHTS, DEFAULT_ISSUER_WEIGHTS, DIFFICULTY_MULTIPLIERS, MISSION_CATEGORIES } from "./missionTables.js";
 import { calculateMissionReward } from "./missionRewards.js";
 import { getMissionFloors, validateMission } from "./missionValidator.js";
 
@@ -113,13 +113,31 @@ function getDestination(profile, floor, worldDraft = null) {
   };
 }
 
+function getProgressDestination(profile) {
+  const missionFloors = getMissionFloors(profile);
+  const firstFloor = missionFloors[0] || profile.floors?.[0] || null;
+  const lastFloor = missionFloors[missionFloors.length - 1] || profile.floors?.[profile.floors.length - 1] || null;
+  const rangeText = firstFloor && lastFloor
+    ? `Andares ${firstFloor}-${lastFloor}`
+    : profile.label || "Faixa atual";
+
+  return {
+    kind: "progress",
+    floor: null,
+    floorMin: firstFloor,
+    floorMax: lastFloor,
+    targetId: profile.id,
+    label: `${rangeText} | progresso`
+  };
+}
+
 function createObjective({ categoryId, floor, profile, rng }) {
   const category = MISSION_CATEGORIES[categoryId];
   const challenge = getRewardChallengeByFloor(profile, floor);
 
   if (category.targetTypes.includes("creature")) {
     const target = getCreatureTarget(profile, floor, rng);
-    const quantity = categoryId === "specialHunt" ? 1 : randomInt(rng, 1, 4);
+    const quantity = categoryId === "specialHunt" ? 1 : categoryId === "extermination" ? randomInt(rng, 4, 8) : randomInt(rng, 1, 4);
 
     if (target) {
       return {
@@ -242,11 +260,19 @@ function createObjective({ categoryId, floor, profile, rng }) {
 }
 
 function getObjectivePhrase(objective) {
+  if (objective.quantity > 1 && objective.targetType === "creature") {
+    return `${objective.quantity} inimigos do tipo ${objective.targetName}`;
+  }
+
   const quantityText = objective.quantity > 1 ? `${objective.quantity}x ` : "";
   return `${quantityText}${objective.targetName}`;
 }
 
-function createMissionText({ category, destination, difficulty, issuer, objective }) {
+function capitalizeFirst(value) {
+  return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : value;
+}
+
+function createMissionText({ destination, issuer, objective }) {
   const targetPhrase = getObjectivePhrase(objective);
   const ndText = objective.challenge ? `ND ${formatChallengeRating(objective.challenge)}` : "ND por contexto";
   const verbByKind = {
@@ -264,21 +290,28 @@ function createMissionText({ category, destination, difficulty, issuer, objectiv
     stabilize: "estabilize ou registre"
   };
   const verb = verbByKind[objective.kind] || "resolva";
+  const destinationText = destination.kind === "progress"
+    ? "ao longo da faixa"
+    : `em ${destination.label}`;
+  const progressText = destination.kind === "progress" && objective.targetType === "creature"
+    ? " Qualquer inimigo desse tipo encontrado durante o progresso conta para esse objetivo."
+    : "";
 
-  return `${issuer} solicita que o grupo ${verb} ${targetPhrase} em ${destination.label}. A tarefa é ${difficulty.label} e usa ${ndText} como referência de recompensa.`;
+  return capitalizeFirst(`${issuer} solicita que o grupo ${verb} ${targetPhrase} ${destinationText}. A tarefa usa ${ndText} como referência de recompensa.${progressText}`);
 }
 
 function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
   const { missionFloors, profile } = context;
   const category = MISSION_CATEGORIES[categoryId];
   const floor = pick(rng, missionFloors);
-  const destination = getDestination(profile, floor, context.worldDraft);
+  const destination = categoryId === "extermination"
+    ? getProgressDestination(profile)
+    : getDestination(profile, floor, context.worldDraft);
   const objective = createObjective({ categoryId, floor, profile, rng });
   const issuer = pickWeighted(rng, profile.missionRules?.issuerWeights || DEFAULT_ISSUER_WEIGHTS).label;
   const difficulty = pickWeighted(rng, DIFFICULTY_MULTIPLIERS);
   const title = pick(rng, category.titleTemplates);
   const proofType = pick(rng, category.proofTemplates);
-  const complication = pick(rng, profile.missionRules?.complications || DEFAULT_COMPLICATIONS);
   const turnInValue = objective.targetType === "creature"
     ? objective.quantity * (calculateMissionReward({
       challenge: objective.challenge,
@@ -307,7 +340,7 @@ function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
     categoryLabel: category.label,
     issuer,
     title,
-    description: createMissionText({ category, destination, difficulty, issuer, objective }),
+    description: createMissionText({ destination, issuer, objective }),
     destination,
     objective: {
       kind: objective.kind,
@@ -318,16 +351,15 @@ function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
       condition: objective.condition,
       progressMode: objective.progressMode
     },
-    complication,
     difficulty: difficulty.id,
     difficultyLabel: difficulty.label,
     proofType,
     reward,
     integration: {
-      capability: "floor-indicator",
+      capability: destination.kind === "progress" ? "progress-counter" : "floor-indicator",
       eventType: objective.kind,
       eventPayload: {
-        floor,
+        floor: destination.floor,
         targetId: objective.targetId,
         targetName: objective.targetName
       },

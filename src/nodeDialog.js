@@ -11,8 +11,9 @@ const COMBAT_ICON = assetUrl("/assets/icons/winged-sword.svg");
 const ENVIRONMENT_ICON = assetUrl("/assets/icons/earth-arrow-left.svg");
 const TACTICAL_MAP_ICON = assetUrl("/assets/icons/game-icons--treasure-map.svg");
 
-function createNodeMissionNotice(node, onOpenMission) {
+function createNodeMissionNotice(node, onOpenMission, state) {
   if (!node.missionBindings?.length) return null;
+  if (!state.isNodeChosen(node)) return null;
 
   const notice = document.createElement("div");
   const title = document.createElement("strong");
@@ -22,7 +23,9 @@ function createNodeMissionNotice(node, onOpenMission) {
   notice.className = "mission-inline-indicator";
   actions.className = "mission-context-actions";
   title.textContent = "Missão";
-  text.textContent = node.missionBindings.map((mission) => mission.title).join(", ");
+  text.textContent = node.missionBindings
+    .map((mission) => mission.context ? `${mission.title} (${mission.context})` : mission.title)
+    .join(", ");
   node.missionBindings.forEach((mission) => {
     const button = document.createElement("button");
     button.className = "extended-action is-compact mission-context-action";
@@ -813,7 +816,7 @@ export function createNodeDialogController({
     setNodeDialogMeta(metaElement, checkText, explorationText, challengeText);
     contentElement.innerHTML = "";
     contentElement.appendChild(createModalActions(node));
-    const missionNotice = createNodeMissionNotice(node, onOpenMission);
+    const missionNotice = createNodeMissionNotice(node, onOpenMission, state);
     if (missionNotice) contentElement.appendChild(missionNotice);
 
     if (viewMode === "combat") {

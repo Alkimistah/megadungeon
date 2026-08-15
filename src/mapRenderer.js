@@ -142,7 +142,7 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
       group.setAttribute("tabindex", "0");
       group.setAttribute(
         "aria-label",
-        `${node.label}, encontro ${node.level}, coluna ${node.column + 1}${node.missionBindings?.length ? ", missão vinculada" : ""}`
+        `${node.label}, encontro ${node.level}, coluna ${node.column + 1}`
       );
       group.addEventListener("click", () => onNodeOpen(node));
       group.addEventListener("keydown", (event) => {
@@ -176,7 +176,6 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
 
       const nodeState = state.getNodeViewState(node);
       const icon = element.querySelector(".node-icon");
-
       element.classList.toggle("is-chosen", nodeState.chosen);
       element.classList.toggle("is-active", nodeState.active && !nodeState.chosen);
       element.classList.toggle("is-explored", nodeState.explored);
@@ -190,6 +189,10 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
       }
 
       element.setAttribute("aria-disabled", String(!nodeState.canOpen));
+      element.setAttribute(
+        "aria-label",
+        `${node.label}, encontro ${node.level}, coluna ${node.column + 1}${node.missionBindings?.length ? ", missão vinculada" : ""}`
+      );
       element.setAttribute("tabindex", nodeState.canOpen ? "0" : "-1");
     });
 
