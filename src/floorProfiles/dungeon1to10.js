@@ -380,6 +380,15 @@ export const dungeon1to10Profile = {
       trial: 9,
       anomalous: 10
     },
+    issuerWeights: [
+      { id: "responsavel-posto-dungeon", label: "um responsável pelo posto da guilda", kind: "request", weight: 24 },
+      { id: "pesquisador-dungeon", label: "um pesquisador da guilda", kind: "request", weight: 16, categories: ["collection", "exploration", "investigation", "anomalous"] },
+      { id: "equipe-contencao-dungeon", label: "a equipe de contenção da masmorra", kind: "request", weight: 18, categories: ["extermination", "specialHunt", "trial", "anomalous"] },
+      { id: "patrono-anonimo-dungeon", label: "um patrono anônimo", kind: "request", weight: 10 },
+      { id: "pedido-mural-dungeon", label: "um pedido deixado no mural do posto", kind: "writtenRequest", weight: 12, categories: ["recovery", "rescue", "escort"] },
+      { id: "registro-recuperado-dungeon", label: "um registro recuperado da masmorra", kind: "record", weight: 10, categories: ["exploration", "investigation", "recovery", "rescue"] },
+      { id: "sinal-pulseira-dungeon", label: "missão sem fornecedor", kind: "signal", weight: 8, categories: ["anomalous", "exploration", "specialHunt", "trial"] }
+    ],
     rewardChallengeByFloor: {
       1: 0.25,
       2: 0.5,

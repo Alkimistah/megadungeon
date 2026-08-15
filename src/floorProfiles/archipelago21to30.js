@@ -139,6 +139,15 @@ export const archipelago21to30Profile = {
       trial: 11,
       anomalous: 14
     },
+    issuerWeights: [
+      { id: "imediato-barco", label: "o imediato do barco", kind: "request", weight: 22 },
+      { id: "cartografo-expedicao", label: "um cartógrafo da expedição", kind: "request", weight: 17, categories: ["collection", "exploration", "investigation", "anomalous"] },
+      { id: "vigia-conves", label: "a vigia do convés", kind: "request", weight: 12, categories: ["exploration", "investigation", "specialHunt", "anomalous"] },
+      { id: "patrono-anonimo-arquipelago", label: "um patrono anônimo", kind: "request", weight: 8 },
+      { id: "pedido-quadro-navio", label: "um pedido preso ao quadro do navio", kind: "writtenRequest", weight: 12, categories: ["recovery", "rescue", "escort"] },
+      { id: "diario-bordo-recuperado", label: "um diário de bordo recuperado", kind: "record", weight: 11, categories: ["exploration", "investigation", "recovery", "rescue"] },
+      { id: "sinal-pulseira-arquipelago", label: "missão sem fornecedor", kind: "signal", weight: 8, categories: ["anomalous", "exploration", "trial"] }
+    ],
     rewardChallengeByFloor: {
       21: 8,
       22: 8,

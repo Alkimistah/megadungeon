@@ -1,5 +1,5 @@
 import { formatChallengeRating } from "../challenge.js";
-import { getCreatureById } from "../creatureCatalog/index.js";
+import { creatureCatalog, getCreatureById } from "../creatureCatalog/index.js";
 import { createRng, pick, pickWeighted, randomInt } from "../random.js";
 import { DEFAULT_CATEGORY_WEIGHTS, DEFAULT_ISSUER_WEIGHTS, DIFFICULTY_MULTIPLIERS, MISSION_CATEGORIES } from "./missionTables.js";
 import { calculateMissionReward } from "./missionRewards.js";
@@ -60,17 +60,71 @@ function getRewardMultiplier(categoryId, multiplier) {
     : baseMultiplier * CATEGORY_REWARD_BONUS;
 }
 
-function getCreatureTarget(profile, floor, rng) {
-  const allowedIds = profile.creatureRules?.allowedCreatureIdsByFloor?.[floor]
-    || profile.creatureRules?.allowedCreatureIds
-    || [];
-  const candidates = allowedIds
-    .map((id) => getCreatureById(id))
-    .filter((creature) => creature && typeof creature.challengeRating === "number" && creature.challengeRating <= 10);
+function getFallbackCreatureCandidates(profile, floor) {
+  const targetChallenge = getRewardChallengeByFloor(profile, floor);
+  const minimumChallenge = Math.max(0.25, targetChallenge - 2);
+  const maximumChallenge = Math.min(10, Math.max(targetChallenge, minimumChallenge));
+  const typeWeights = profile.creatureRules?.defaultTypeWeights || [];
+  const allowedTypes = new Set(typeWeights.map((entry) => entry.type));
+
+  return creatureCatalog.filter((creature) => (
+    typeof creature.challengeRating === "number"
+      && creature.challengeRating >= minimumChallenge
+      && creature.challengeRating <= maximumChallenge
+      && (!allowedTypes.size || allowedTypes.has(creature.type))
+  ));
+}
+
+function pickFallbackCreature(profile, floor, rng) {
+  const candidates = getFallbackCreatureCandidates(profile, floor);
 
   if (!candidates.length) return null;
 
-  const creature = pick(rng, candidates);
+  const typeWeights = profile.creatureRules?.defaultTypeWeights || [];
+  const availableTypes = new Set(candidates.map((creature) => creature.type));
+  const weightedTypes = typeWeights.filter((entry) => availableTypes.has(entry.type));
+  const type = weightedTypes.length ? pickWeighted(rng, weightedTypes).type : null;
+  const typedCandidates = type ? candidates.filter((creature) => creature.type === type) : candidates;
+
+  return pick(rng, typedCandidates.length ? typedCandidates : candidates);
+}
+
+function getCreatureTarget(profile, floor, rng, categoryId) {
+  const creatureRuleIds = profile.creatureRules?.allowedCreatureIdsByFloor?.[floor]
+    || profile.creatureRules?.allowedCreatureIds
+    || [];
+  const profileTargetIds = profile.missionRules?.creatureTargetIds || [];
+  const categoryTargetIds = categoryId === "extermination"
+    ? profile.missionRules?.exterminationTargetIds
+    : categoryId === "specialHunt"
+      ? profile.missionRules?.specialHuntTargetIds
+      : null;
+  const missionTargetIds = profile.missionRules?.creatureTargetIdsByFloor?.[floor]
+    || categoryTargetIds
+    || profileTargetIds
+    || [];
+  const allowedIds = creatureRuleIds.length ? creatureRuleIds : missionTargetIds;
+  const maximumChallenge = missionTargetIds.length && !creatureRuleIds.length
+    ? Math.max(1, getRewardChallengeByFloor(profile, floor) + (categoryId === "specialHunt" ? 1 : 0))
+    : 10;
+  let candidates = allowedIds
+    .map((id) => getCreatureById(id))
+    .filter((creature) => creature && typeof creature.challengeRating === "number" && creature.challengeRating <= maximumChallenge);
+
+  if (!candidates.length && categoryTargetIds?.length && profileTargetIds.length) {
+    candidates = profileTargetIds
+      .map((id) => getCreatureById(id))
+      .filter((creature) => creature && typeof creature.challengeRating === "number" && creature.challengeRating <= maximumChallenge);
+  }
+
+  const canUseCatalogFallback = !creatureRuleIds.length && !missionTargetIds.length && !profileTargetIds.length;
+  const creature = candidates.length
+    ? pick(rng, candidates)
+    : canUseCatalogFallback
+      ? pickFallbackCreature(profile, floor, rng)
+      : null;
+
+  if (!creature) return null;
 
   return {
     id: creature.id,
@@ -156,7 +210,7 @@ function createObjective({ categoryId, floor, profile, rng }) {
   const challenge = getRewardChallengeByFloor(profile, floor);
 
   if (category.targetTypes.includes("creature")) {
-    const target = getCreatureTarget(profile, floor, rng);
+    const target = getCreatureTarget(profile, floor, rng, categoryId);
     const quantity = categoryId === "specialHunt" ? 1 : categoryId === "extermination" ? randomInt(rng, 4, 8) : randomInt(rng, 1, 4);
 
     if (target) {
@@ -280,6 +334,19 @@ function createObjective({ categoryId, floor, profile, rng }) {
 }
 
 function getObjectivePhrase(objective) {
+  if (objective.targetType === "material" && objective.quantity > 1) {
+    const material = objective.targetName.replace(/^amostras de\s+/i, "");
+    const unit = /^fragmentos|^lascas/i.test(material)
+      ? "conjuntos de"
+      : /^sementes/i.test(material)
+        ? "punhados de"
+        : /^água|^areia|^poeira|^resíduo|^sal/i.test(material)
+          ? "porções de"
+          : "amostras de";
+
+    return `${objective.quantity} ${unit} ${material}`;
+  }
+
   if (objective.quantity > 1 && objective.targetType === "creature") {
     return `${objective.quantity} inimigos do tipo ${objective.targetName}`;
   }
@@ -304,79 +371,114 @@ function getSourceKind(source) {
   return source?.kind || "request";
 }
 
-function createRequestSentence(source, actionText, destinationText) {
-  if (getSourceKind(source) === "writtenRequest") {
-    return `${source.label} traz uma instrução direta: ${actionText} ${destinationText}.`;
-  }
-
-  return `${source.label} pede que o grupo ${actionText} ${destinationText}.`;
+function getDefiniteLabel(label) {
+  return String(label || "")
+    .replace(/^um\s+/i, "o ")
+    .replace(/^uma\s+/i, "a ");
 }
 
-function createRecordSentence(source, objective, targetPhrase, destinationText) {
-  if (objective.kind === "investigate") {
-    return `${source.label} indica ${targetPhrase} ${destinationText} como pista a investigar.`;
-  }
-
-  if (objective.kind === "deliverMemento") {
-    return `${source.label} aponta ${targetPhrase} ${destinationText} como item a entregar.`;
-  }
-
-  if (["recover", "recoverMemento"].includes(objective.kind)) {
-    return `${source.label} aponta ${targetPhrase} ${destinationText} como item a recuperar.`;
-  }
-
-  return `${source.label} aponta ${targetPhrase} ${destinationText} como prioridade da exploração.`;
-}
-
-function createSignalSentence(objective, targetPhrase, destinationText) {
-  if (objective.kind === "stabilize") {
-    return `Uma missão sem fornecedor aparece destacada no mural: estabilize ou registre ${targetPhrase} ${destinationText}.`;
-  }
-
-  if (objective.kind === "hunt") {
-    return `Uma missão sem fornecedor aparece destacada no mural: siga o rastro de ${targetPhrase} ${destinationText}.`;
-  }
-
-  if (objective.kind === "completeTrial") {
-    return `Uma missão sem fornecedor aparece destacada no mural: supere o desafio: ${targetPhrase} ${destinationText}.`;
-  }
-
-  return `Uma missão sem fornecedor aparece destacada no mural: investigue ${targetPhrase} ${destinationText}.`;
-}
-
-function createMissionText({ destination, objective, source }) {
-  const targetPhrase = getObjectivePhrase(objective);
+function createReferenceSentence(objective) {
   const ndText = objective.challenge ? `ND ${formatChallengeRating(objective.challenge)}` : "ND por contexto";
-  const verbByKind = {
-    collect: "colete",
-    completeTrial: "supere",
-    defeat: "elimine",
-    deliverMemento: "entregue",
-    escort: "proteja",
-    explore: "explore",
-    hunt: "rastreie e elimine",
-    investigate: "investigue",
-    recover: "recupere",
-    recoverMemento: "recupere",
-    rescue: "resgate",
-    stabilize: "estabilize ou registre"
-  };
-  const verb = verbByKind[objective.kind] || "resolva";
-  const actionText = objective.kind === "completeTrial"
-    ? `supere o desafio: ${targetPhrase}`
-    : `${verb} ${targetPhrase}`;
-  const destinationText = getDestinationPhrase(destination);
-  const progressText = destination.kind === "progress" && objective.targetType === "creature"
-    ? " Qualquer inimigo desse tipo encontrado durante o progresso conta para esse objetivo."
-    : "";
-  const sourceKind = getSourceKind(source);
-  const mainText = sourceKind === "record"
-    ? createRecordSentence(source, objective, targetPhrase, destinationText)
-    : sourceKind === "signal"
-      ? createSignalSentence(objective, targetPhrase, destinationText)
-      : createRequestSentence(source, actionText, destinationText);
 
-  return capitalizeFirst(`${mainText} A tarefa usa ${ndText} como referência de recompensa.${progressText}`);
+  return `A tarefa usa ${ndText} como referência de recompensa.`;
+}
+
+function createProgressSentence(destination, objective) {
+  return destination.kind === "progress" && objective.targetType === "creature"
+    ? "Qualquer inimigo desse tipo encontrado durante o progresso conta para esse objetivo."
+    : "";
+}
+
+function createMissionLead(source, fallback = "O quadro de missões") {
+  const sourceKind = getSourceKind(source);
+
+  if (sourceKind === "signal") return "A pulseira destaca no mural uma missão sem fornecedor";
+  if (sourceKind === "record" || sourceKind === "writtenRequest") return capitalizeFirst(getDefiniteLabel(source.label));
+
+  return source?.label ? capitalizeFirst(source.label) : fallback;
+}
+
+function createCategorySentence({ categoryId, destinationText, objective, source, targetPhrase }) {
+  const lead = createMissionLead(source);
+  const sourceKind = getSourceKind(source);
+
+  if (categoryId === "extermination") {
+    return sourceKind === "signal"
+      ? `${lead}: reduza a população de ${objective.targetName} ao longo da faixa.`
+      : `${lead} abre uma ordem de contenção: elimine ${targetPhrase} ao longo da faixa.`;
+  }
+
+  if (categoryId === "specialHunt") {
+    return sourceKind === "signal"
+      ? `${lead}: o rastro de ${targetPhrase} foi marcado ${destinationText}.`
+      : `${lead} marcou ${targetPhrase} como alvo prioritário ${destinationText}.`;
+  }
+
+  if (categoryId === "collection") {
+    return sourceKind === "record"
+      ? `${lead} descreve onde coletar ${targetPhrase} ${destinationText}.`
+      : `${lead} solicita ${targetPhrase} ${destinationText}; o material deve voltar preservado.`;
+  }
+
+  if (categoryId === "exploration") {
+    return sourceKind === "signal"
+      ? `${lead}: confirme ${targetPhrase} ${destinationText}.`
+      : `${lead} quer confirmação de ${targetPhrase} ${destinationText}.`;
+  }
+
+  if (categoryId === "investigation") {
+    return sourceKind === "record"
+      ? `${lead} indica ${targetPhrase} ${destinationText} como pista ainda sem explicação.`
+      : `${lead} precisa que o grupo investigue ${targetPhrase} ${destinationText}.`;
+  }
+
+  if (categoryId === "recovery") {
+    return sourceKind === "record"
+      ? `${lead} aponta ${targetPhrase} ${destinationText} como item extraviado.`
+      : sourceKind === "writtenRequest"
+        ? `${lead} descreve onde recuperar ${targetPhrase} ${destinationText}.`
+        : `${lead} solicita a recuperação de ${targetPhrase} ${destinationText}.`;
+  }
+
+  if (categoryId === "rescue") {
+    return sourceKind === "record"
+      ? `${lead} vincula ${targetPhrase} ${destinationText} a alguém que ficou para trás.`
+      : sourceKind === "writtenRequest"
+        ? `${lead} descreve ${targetPhrase} ${destinationText} como lembrança deixada para trás.`
+        : `${lead} pede que o grupo recupere ${targetPhrase} ${destinationText} como lembrança de quem não voltou.`;
+  }
+
+  if (categoryId === "escort") {
+    return sourceKind === "writtenRequest"
+      ? `${lead} traz instruções para entregar ${targetPhrase} ${destinationText} sem expor o pertence.`
+      : `${lead} solicita a entrega protegida de ${targetPhrase} ${destinationText}.`;
+  }
+
+  if (categoryId === "trial") {
+    return sourceKind === "signal"
+      ? `${lead}: supere ${targetPhrase} ${destinationText}.`
+      : `${lead} separou um desafio de campo: ${targetPhrase} ${destinationText}.`;
+  }
+
+  if (categoryId === "anomalous") {
+    return sourceKind === "signal"
+      ? `${lead}: registre ou estabilize ${targetPhrase} ${destinationText}.`
+      : `${lead} quer um registro confiável de ${targetPhrase} ${destinationText}.`;
+  }
+
+  return `${lead} solicita que o grupo resolva ${targetPhrase} ${destinationText}.`;
+}
+
+function createMissionText({ categoryId, destination, objective, source }) {
+  const targetPhrase = getObjectivePhrase(objective);
+  const destinationText = getDestinationPhrase(destination);
+  const pieces = [
+    createCategorySentence({ categoryId, destinationText, objective, source, targetPhrase }),
+    createReferenceSentence(objective),
+    createProgressSentence(destination, objective)
+  ].filter(Boolean);
+
+  return capitalizeFirst(pieces.join(" "));
 }
 
 function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
@@ -422,7 +524,7 @@ function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
     sourceId: source.id || slugify(source.label),
     sourceKind: getSourceKind(source),
     title,
-    description: createMissionText({ destination, objective, source }),
+    description: createMissionText({ categoryId, destination, objective, source }),
     destination,
     objective: {
       kind: objective.kind,

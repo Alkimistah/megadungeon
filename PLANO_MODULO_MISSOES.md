@@ -2,7 +2,7 @@
 
 ## Status deste documento
 
-Este arquivo descreve o plano funcional e técnico do módulo de missões. Ele não representa uma implementação já existente.
+Este arquivo descreve o plano funcional e técnico do módulo de missões e deve ser lido como um documento vivo. Parte do módulo já foi implementada; as seções de etapas e critérios de aceite separam o que existe hoje do que ainda precisa ser validado ou evoluído.
 
 O arquivo `gerador_missoes_praxis.txt` foi tratado como fonte de categorias, tabelas e exemplos. As decisões de produto descritas pelo usuário e a coerência com os perfis atuais do app têm prioridade sobre qualquer sugestão presente no TXT.
 
@@ -13,9 +13,9 @@ Adicionar um módulo global de missões que:
 - esteja disponível em qualquer perfil de andares;
 - seja aberto por um botão ao lado do gerador manual de encontros;
 - use uma modal com o título `Missões`;
-- gere um quadro com sete ofertas coerentes com a faixa ativa;
+- gere um quadro variável com uma a oito ofertas coerentes com a faixa ativa;
 - permita selecionar de zero a três dessas ofertas antes de iniciar a faixa;
-- apresente, no mínimo, categoria, título, descrição e recompensa;
+- apresente, no mínimo, categoria, título, descrição, objetivo e recompensa;
 - descarte as ofertas não selecionadas quando a escolha for confirmada;
 - faça as missões selecionadas influenciarem o conteúdo gerado pelo perfil;
 - mantenha as missões selecionadas consultáveis e validáveis durante a exploração.
@@ -32,9 +32,9 @@ O app possui três modos com estruturas diferentes:
 | Andares 11 a 20 | `node-map` | andar selecionado, ND por faixa, terreno, clima, criaturas, armadilhas e nodos ainda não explorados |
 | Andares 21 a 30 | `archipelago` | ilhas geradas, tema de cada ilha, dificuldade, disponibilidade, objetivos e progresso dos fragmentos |
 
-Todos os perfis expõem a lista de andares e recomendações, mas ainda não existe um contrato comum para missões. O código de sessão também não armazena missões atualmente.
+Todos os perfis expõem a lista de andares e recomendações. O contrato comum de missões já existe em `missionRules`, estado próprio de missões e payload de sessão, mas ainda precisa de testes automáticos e revisão ampla de conteúdo.
 
-O controlador do gerador manual já recebe o perfil ativo e serve como referência de integração para um controlador de modal independente.
+O controlador do gerador manual já recebe o perfil ativo e divide espaço com o botão global de missões.
 
 ## Escopo funcional recomendado
 
@@ -44,8 +44,8 @@ A seleção de missões faz parte do carregamento da faixa:
 
 1. O mestre escolhe a faixa de andares na configuração inicial.
 2. O app define a seed e prepara o contexto necessário do perfil.
-3. Antes de mostrar o mapa ou iniciar o andar, abre a etapa `Missões` com sete ofertas.
-4. Cada oferta mostra categoria, título, descrição, andar ou destino, prova de conclusão e recompensa.
+3. Antes de mostrar o mapa ou iniciar o andar, abre a etapa `Missões` com uma a oito ofertas.
+4. Cada oferta mostra categoria, título, descrição, andar ou destino, objetivo e recompensa.
 5. O mestre seleciona de zero a três ofertas.
 6. O mestre confirma qualquer escolha entre zero e três missões.
 7. As ofertas não selecionadas são descartadas.
@@ -65,8 +65,8 @@ Não é necessário persistir as ofertas descartadas. As missões selecionadas e
 Uma missão selecionada deve influenciar o perfil de forma compatível com sua categoria e seu escopo:
 
 - 1 a 10: influenciar ou substituir uma cena d100 ou um encontro final compatível do andar indicado;
-- 11 a 20: influenciar ou substituir o conteúdo de um nodo compatível, preservando o grafo;
-- 21 a 30: influenciar ou substituir um objetivo da ilha correspondente, preservando a progressão global.
+- 11 a 20: integrar-se ao conteúdo de um nodo compatível, preservando o grafo e usando o encontro do próprio nodo;
+- 21 a 30: pendente de adaptação definitiva; quando a faixa amadurecer, influenciar ou substituir um objetivo da ilha correspondente, preservando a progressão global.
 
 Nem toda missão possui um único andar. Extermínio, coleta e teste ou desafio podem valer para toda a faixa, exigir progresso em vários andares ou marcar vários conteúdos compatíveis. Nesses casos, a missão pode ter múltiplos vínculos e não precisa substituir uma única cena.
 
@@ -74,13 +74,15 @@ O gerador só deve permitir confirmar um conjunto de missões que possa ser mate
 
 ### Decisão de fluxo atual
 
-Para reduzir impacto sobre os mapas e encontros existentes, a primeira materialização prática deve ser contextual, não destrutiva:
+Para reduzir impacto sobre os mapas e encontros existentes, a primeira materialização prática deve ser contextual e conservadora:
 
 - ao chegar no andar, nodo ou ilha vinculada, a tela mostra um botão `Realizar missão`;
-- esse botão abre a missão selecionada como um encontro próprio, sem marcar conclusão automaticamente;
+- em 1 a 10, esse botão pode abrir a missão como conteúdo adicional do andar, sem marcar conclusão automaticamente;
+- em 11 a 20, a missão deve aparecer somente quando o nodo vinculado for marcado como rota escolhida;
+- em 11 a 20, a missão deve usar o mapa tático e o encontro do próprio nodo, acrescentando o objetivo ou ponto de interesse da missão à cena existente;
 - o encontro de missão oferece um mapa tático opcional com grupo, inimigos quando a categoria envolver combate, pontos de interesse, zonas de risco e CD de referência;
 - o mestre continua decidindo se a missão foi resolvida na modal `Missões`;
-- uma versão futura ainda pode substituir ou alterar nodos, cenas finais e objetivos obrigatórios, mas isso deve ser feito por categoria e por perfil, quando houver regras suficientes para evitar conflito estrutural.
+- uma versão futura ainda pode substituir ou alterar cenas finais e objetivos obrigatórios, mas isso deve ser feito por categoria e por perfil, quando houver regras suficientes para evitar conflito estrutural.
 
 ## Experiência da modal
 
@@ -91,6 +93,7 @@ Para reduzir impacto sobre os mapas e encontros existentes, a primeira materiali
 - Manter o botão disponível nos três modos.
 - Agrupar visualmente os botões flutuantes para que não dependam de posições absolutas individuais conforme novas ferramentas forem adicionadas.
 - Usar a etapa inicial para escolher missões; o botão flutuante não gera nem troca ofertas durante uma faixa carregada.
+- Durante a etapa inicial de seleção, impedir fechamento acidental por `Esc` ou clique fora da modal; a saída deve acontecer pelo comando de confirmação ou pelo botão de fechar quando aplicável ao estado.
 
 ### Conteúdo
 
@@ -98,17 +101,21 @@ A etapa inicial de seleção deve ter:
 
 - cabeçalho `Missões`;
 - identificação da faixa ativa;
-- seção `Quadro de missões`, com sete ofertas;
+- seção `Quadro de missões`, com uma a oito ofertas;
 - contador `0/3`, `1/3`, `2/3` ou `3/3`;
 - um único comando de confirmação, habilitado também com zero selecionadas;
 - texto `Continuar sem missões` quando o contador estiver em `0/3`;
 - texto `Confirmar 1 missão`, `Confirmar 2 missões` ou `Confirmar 3 missões` nos demais estados.
+- grid com no máximo quatro missões por linha, centralizada quando houver menos de quatro cards.
+- card inteiro selecionável, com checkbox à esquerda.
 
 A modal aberta pelo botão flutuante deve ter:
 
 - somente as missões selecionadas;
 - estado e destino de cada missão;
 - ação manual `Marcar como concluída` em cada missão pendente;
+- contador de progresso para missões de extermínio;
+- recompensa resumida, com detalhes expansíveis sob demanda;
 - estado vazio `Nenhuma missão selecionada` quando a faixa tiver sido iniciada sem missões.
 
 Cada missão deve exibir:
@@ -117,11 +124,10 @@ Cada missão deve exibir:
 - título;
 - destino, andar ou faixa;
 - texto completo da missão;
-- complicação, quando houver;
-- prova de conclusão;
+- objetivo;
 - recompensa;
 - controle de seleção na etapa inicial;
-- estado `Pendente` ou `Concluída` durante a exploração.
+- estado de acompanhamento, como `Aceita`, `Vinculada`, `Aguardando nodo`, `Disponível`, `Em progresso`, `Pronta` ou `Concluída`, conforme o contexto.
 
 Cenas, nodos e objetivos vinculados devem mostrar um indicador de missão, com acesso ao título relacionado. Esse indicador informa onde a missão pode avançar, mas nunca a conclui automaticamente.
 
@@ -172,7 +178,8 @@ Cada perfil deve receber uma seção `missionRules`, seguindo o padrão já usad
 ```js
 missionRules: {
   enabled: true,
-  offerCount: 7,
+  offerCountMin: 1,
+  offerCountMax: 8,
   missionFloors,
   allowedScopeKinds: [],
   allowedCategories: [],
@@ -180,10 +187,8 @@ missionRules: {
   targetPools: {},
   locationPools: {},
   issuerWeights: {},
-  rewardBands: [],
   rewardChallengeByFloor: {},
   proofTypes: [],
-  complications: [],
   materializationCapabilities: []
 }
 ```
@@ -207,10 +212,12 @@ Dados de conteúdo devem permanecer declarativos sempre que possível. Regras de
   status: "offered" | "selected" | "materialized" | "completed",
   category,
   issuer,
+  sourceId,
+  sourceKind,
   title,
   description,
   destination: {
-    kind: "floor" | "node" | "island" | "range" | "profile",
+    kind: "floor" | "node" | "island" | "range" | "profile" | "progress",
     floorMin,
     floorMax,
     floor,
@@ -226,13 +233,14 @@ Dados de conteúdo devem permanecer declarativos sempre que possível. Regras de
     condition,
     progressMode: "single" | "aggregate" | "manual"
   },
-  complication,
   difficulty,
+  difficultyLabel,
   proofType,
   reward: {
     basis,
     challenge,
     multiplier,
+    effectiveMultiplier,
     unitValue,
     quantityFactor,
     turnInValue,
@@ -246,7 +254,11 @@ Dados de conteúdo devem permanecer declarativos sempre que possível. Regras de
     eventType,
     eventPayload,
     bindings: [],
-    state: "pending" | "materialized" | "resolved"
+    state: "pending" | "materialized" | "ready" | "resolved"
+  },
+  progress: {
+    current,
+    required
   }
 }
 ```
@@ -257,9 +269,9 @@ Dados de conteúdo devem permanecer declarativos sempre que possível. Regras de
 
 1. Ler o perfil, a seed e o rascunho do mundo quando houver.
 2. Obter as categorias válidas e os pontos de materialização disponíveis.
-3. Sortear sete ofertas, variando categorias, valores e tipos de tarefa.
+3. Sortear de uma a oito ofertas, variando categorias, valores e tipos de tarefa.
 4. Sortear um escopo: andar, conjunto de andares ou toda a faixa.
-5. Montar alvo, condição, escala, origem, complicação e prova compatíveis com a categoria.
+5. Montar alvo, condição, escala, origem e objetivo compatíveis com a categoria.
 6. Resolver dificuldade e recompensa com a banda do perfil.
 7. Gerar título e descrição a partir dos dados estruturados.
 8. Validar a missão completa.
@@ -279,8 +291,8 @@ O validador deve garantir que:
 - destinos específicos pertencem aos andares permitidos da faixa;
 - uma criatura nomeada existe e é adequada ao andar ou ND;
 - quantidades fazem sentido para o alvo;
-- recuperação usa um objeto, resgate usa uma pessoa ou grupo e exploração usa um local ou fenômeno;
-- a prova de conclusão pode ser obtida na própria missão;
+- recuperação usa um objeto, resgate usa um pertence ou lembrança de alguém que ficou para trás e exploração usa um local ou fenômeno;
+- o objetivo de conclusão pode ser obtido na própria missão;
 - a recompensa tem uma base definida pelo perfil;
 - existe ao menos um ponto ou regra de geração compatível para materializar a missão selecionada;
 - a combinação de até três missões não disputa o mesmo ponto estrutural sem uma regra de composição;
@@ -301,12 +313,13 @@ Este será o pacote inicial mais completo, pois o TXT e os dados atuais já favo
 - Usar tiers, anomalias, eventos, armadilhas e tesouros existentes para alvos e dificuldade.
 - Permitir qualquer destino entre os andares 1 e 9, independentemente do andar atual.
 - Excluir o andar 10, pois ele é reservado à Matriarca e não funciona como andar explorável.
-- Usar cristais, partes de criaturas, objetos, registros e pulseira como provas quando forem coerentes.
+- Usar cristais, partes de criaturas, objetos, registros e pulseira como objetivos ou comprovações quando forem coerentes.
 - Reservar antecipadamente um gatilho no andar da missão.
 - Permitir que a missão influencie ou substitua uma cena d100 ou o encontro final daquele andar, conforme a categoria.
 - Garantir que a missão continue aparecendo mesmo se nenhuma falha aleatória produzir naturalmente a categoria esperada.
 - Para missões de faixa, favorecer ou marcar encontros compatíveis ao longo dos andares 1 a 9.
 - Mostrar o indicador de missão na cena, deixando a conclusão para o mestre.
+- Missões de extermínio não possuem andar específico, exigem pelo menos quatro inimigos e avançam com qualquer inimigo compatível encontrado durante a faixa.
 
 ### Andares 11 a 20
 
@@ -317,20 +330,23 @@ O texto precisa assumir floresta, pântano, regiões aquáticas, colinas e plan�
 - Incluir coleta de flora, fungos, minerais, venenos e amostras de fenômenos climáticos.
 - Adaptar exploração para trilhas, clareiras, ruínas, cursos d'água, acampamentos e rotas.
 - Durante a geração do mapa, vincular a missão a um nodo que tenha tipo, ND e ambiente compatíveis.
-- A missão pode substituir o conteúdo do nodo, mas não suas conexões nem sua posição no grafo.
+- A missão deve se integrar ao conteúdo do nodo e refletir o encontro já presente ali. Exemplo: se o nodo possui quatro zumbis e a missão pede recuperar um item, o encontro continua tendo os quatro zumbis e adiciona o item como ponto de interesse.
+- A missão não deve aparecer como realizável antes de o nodo vinculado ser marcado como rota escolhida.
 - Missões agregadas podem marcar vários nodos compatíveis sem alterar a rota.
 - Mostrar o indicador de missão nos nodos vinculados, deixando a conclusão para o mestre.
 - Acampamentos e o andar 20 continuam protegidos.
 
 ### Andares 21 a 30
 
-As missões devem usar as ilhas realmente geradas na sessão, não uma lista genérica de corredores da dungeon.
+Esta faixa ainda não deve ser usada como critério final do módulo. A adaptação definitiva fica pendente até o modo `archipelago` amadurecer em objetivos, encontros, recompensas e mapas táticos por ilha.
+
+Quando essa etapa for retomada, as missões devem usar as ilhas realmente geradas na sessão, não uma lista genérica de corredores da dungeon.
 
 - Preparar os temas de ilha pela seed antes do quadro e permitir destinos nas ilhas autorizadas da faixa.
 - Usar `themeId`, narrativa, dificuldade e objetivo sorteados para montar o texto.
 - Favorecer exploração, recuperação, investigação, resgate, escolta e coleta.
 - Evitar caçadas com criatura nomeada enquanto o perfil não tiver um catálogo de criaturas por ilha.
-- Adaptar provas para mapas náuticos, registros, amostras, objetos recuperados e confirmação da pulseira.
+- Adaptar objetivos e comprovações para mapas náuticos, registros, amostras, objetos recuperados e confirmação da pulseira.
 - Substituir um objetivo compatível da ilha sem alterar a quantidade total de objetivos exigidos.
 - Um objetivo materializado continua contando normalmente para a conclusão da ilha.
 - Mostrar o indicador de missão no objetivo, deixando a conclusão para o mestre.
@@ -338,7 +354,7 @@ As missões devem usar as ilhas realmente geradas na sessão, não uma lista gen
 
 ## Recompensas
 
-O valor da missão deve partir do valor econômico dos itens que o grupo precisa entregar, especialmente cristais de criaturas. Completar a missão e entregar a prova sempre deve pagar mais do que simplesmente vender esses itens.
+O valor da missão deve partir do valor econômico dos itens que o grupo precisa entregar, especialmente cristais de criaturas. Completar a missão e entregar o objetivo sempre deve pagar mais do que simplesmente vender esses itens.
 
 ### Valores de cristais fornecidos
 
@@ -357,7 +373,7 @@ O valor da missão deve partir do valor econômico dos itens que o grupo precisa
 | 9 | 900 |
 | 10 | 1.200 |
 
-A busca atual no repositório não localizou essa tabela em um arquivo de dados. Na implementação, ela deve ser criada ou conectada a uma fonte econômica já existente, sem manter cópias divergentes dentro do gerador de missões.
+A tabela deve permanecer em uma única fonte econômica, atualmente `src/economy/crystalValues.js`, sem cópias divergentes dentro do gerador de missões.
 
 ### Base econômica
 
@@ -365,13 +381,16 @@ A busca atual no repositório não localizou essa tabela em um arquivo de dados.
 valorDeEntrega = soma dos cristais + materiais + objetos exigidos
 valorUnitário = valor do cristal do ND representativo da missão
 fatorDeQuantidade = max(1, log2(quantidade + 1) / 2)
-bônusDeMissão = valorUnitário x fatorDeQuantidade x multiplicador de dificuldade
+multiplicadorEfetivo = max(1, multiplicador de dificuldade ajustado por categoria)
+bônusDeMissão = valorUnitário x fatorDeQuantidade x multiplicadorEfetivo
 pagamentoTotal = valorDeEntrega + bônusDeMissão + benefício especial
 ```
 
 Essa curva usa o valor integral das entregas em `valorDeEntrega`, mas aplica o multiplicador apenas a uma base unitária com crescimento logarítmico. A quantidade aumenta a recompensa com retorno decrescente, evitando que missões contra muitos inimigos cresçam linear ou exponencialmente.
 
-Os multiplicadores `0,75`, `1`, `1,25`, `1,5` e `2` do TXT continuam sendo multiplicadores do bônus. O pagamento total permanece superior à venda direta porque devolve o valor econômico das entregas e acrescenta o bônus calculado.
+Os multiplicadores `0,75`, `1`, `1,25`, `1,5` e `2` do TXT continuam sendo a base do bônus. No cálculo final, qualquer multiplicador abaixo de `1` é tratado como `1`. Missões que não sejam `Extermínio` ou `Caçada especial` recebem mais 15% no multiplicador antes desse travamento, para compensar objetivos menos diretos que apenas caçar ou eliminar criaturas.
+
+Caçada especial e extermínio devem ser mais comuns que no peso base das demais categorias, mas não recebem esse bônus adicional de 15%.
 
 Exemplo de referência para validar a curva:
 
@@ -389,7 +408,7 @@ Bônus de missão: 5 x 1 x 2 = 10
 Pagamento total: 15 + 10 = 25
 ```
 
-Para missões sem item vendável, cada perfil deve declarar `rewardChallengeByFloor`. O andar ou a faixa da tarefa determina um ND representativo, e o valor do cristal desse ND funciona como `valorUnitário`. Categoria, complicação e dificuldade alteram o multiplicador; a quantidade ou escala continua usando a curva logarítmica.
+Para missões sem item vendável, cada perfil deve declarar `rewardChallengeByFloor`. O andar ou a faixa da tarefa determina um ND representativo, e o valor do cristal desse ND funciona como `valorUnitário`. Categoria e dificuldade alteram o multiplicador; a quantidade ou escala continua usando a curva logarítmica.
 
 Quando a missão possui um alvo concreto, o ND do alvo prevalece. Quando envolve vários alvos diferentes ou uma tarefa abstrata, o gerador usa o ND representativo definido pelo perfil para o andar ou faixa.
 
@@ -402,6 +421,7 @@ reward: {
   basis: "turn-in-value",
   challenge: 0.25,
   multiplier: 1,
+  effectiveMultiplier: 1,
   unitValue: 5,
   quantityFactor: 1,
   turnInValue: 15,
@@ -468,6 +488,8 @@ src/
 │   ├── missionValidator.js
 │   ├── missionState.js
 │   ├── missionDialog.js
+│   ├── missionEncounterIntegration.js
+│   ├── missionTacticalMap.js
 │   └── missionProfileAdapters.js
 ├── floorProfiles/
 │   ├── dungeon1to10.js
@@ -484,34 +506,46 @@ Não é necessário criar um arquivo por categoria no início. A divisão deve o
 
 ### Etapa 1 — Fundação compartilhada
 
-- Transcrever as tabelas globais do TXT para dados estruturados.
-- Registrar a tabela de valor dos cristais em uma única fonte econômica.
-- Implementar modelo, RNG, geração e validação.
-- Adicionar `missionRules` mínimos aos três perfis.
-- Criar estado de seleção, missões ativas e histórico.
-- Incluir missões na sessão com restauração retrocompatível.
+- Implementado: tabelas globais iniciais em dados estruturados.
+- Implementado: tabela de valor dos cristais em fonte econômica única.
+- Implementado: modelo, RNG, geração e validação básica.
+- Implementado: `missionRules` mínimos nos três perfis.
+- Implementado: estado de seleção, missões ativas, conclusão manual e progresso de extermínio.
+- Implementado: inclusão de missões na sessão com restauração retrocompatível.
+- Implementado: amostragem automática de geração via `npm run test:missions`, cobrindo determinismo, destinos, limites de seleção, recompensa, extermínio, materialização básica em nodo, restauração de progresso e round-trip por código `MD1`.
+- Implementado: teste de compatibilidade com sessão antiga sem o campo `missions`.
+- Pendente: ampliar os testes para cenários de sessão completos de cada modo e regressões específicas de UI.
 
 ### Etapa 2 — Interface
 
-- Inserir a seleção de missões entre a escolha da faixa e o carregamento do perfil.
-- Criar botão ao lado do gerador manual para consultar as selecionadas.
-- Criar a modal `Missões` nos estados de seleção e consulta.
-- Implementar seleção de zero a três, confirmação e validação.
-- Revisar comportamento em tablet e telas pequenas.
+- Implementado: seleção de missões entre a escolha da faixa e o carregamento do perfil.
+- Implementado: botão ao lado do gerador manual para consultar as selecionadas.
+- Implementado: modal `Missões` nos estados de seleção e consulta.
+- Implementado: seleção de zero a três, confirmação e validação.
+- Implementado: seleção pelo card inteiro, checkbox à esquerda, grid com até quatro cards por linha e confirmação destacada.
+- Implementado: modal de acompanhamento maior, recompensa expansível e contador de extermínio.
+- Implementado: QA visual/manual automatizado dos fluxos principais via CDP em `scripts/qaMissionFlows.mjs`, com screenshots em `tmp/mission-qa`.
+- Pendente: repetir QA visual em sessão real de mesa/tablet quando houver novos ajustes de layout.
 
 ### Etapa 3 — Conteúdo por perfil
 
-- Completar primeiro o pacote 1 a 10.
-- Criar vocabulário de floresta e ambiente aberto para 11 a 20.
-- Criar modelos orientados pelos temas reais das ilhas para 21 a 30.
-- Adicionar testes de amostragem para evitar textos repetitivos ou incompatíveis.
+- Em andamento: pacote 1 a 10 com destinos, mapas táticos próprios e indicadores por andar.
+- Em andamento: vocabulário e integração de ambiente aberto para 11 a 20.
+- Implementado parcialmente: amostragem de geração cobre placeholders, categorias, destinos e compatibilidade estrutural.
+- Pendente: ampliar amostragem semântica de textos por categoria para evitar frases genéricas, fornecedores incoerentes e objetivos pouco naturais.
+- Pendente futura: criar modelos orientados pelos temas reais das ilhas para 21 a 30.
+- Pendente: métricas de repetição textual e relatórios de variedade por categoria.
 
 ### Etapa 4 — Materialização
 
-- Implementar influência ou substituição de cenas em 1 a 10.
-- Implementar substituição segura de conteúdo de nodos em 11 a 20.
-- Implementar substituição de objetivos de ilha em 21 a 30.
-- Persistir os vínculos e resoluções.
+- Implementado parcialmente: materialização por andar em 1 a 10, com indicador e mapa tático de missão no tamanho do perfil.
+- Implementado parcialmente: materialização em nodos de 11 a 20, visível apenas no nodo escolhido e usando o encontro/mapa do próprio nodo.
+- Implementado: integração de extermínio com encontros compatíveis e contador manual.
+- Implementado: persistência dos vínculos, estados e progresso selecionado.
+- Pendente: regras mais fortes para influência/substituição de cenas finais em 1 a 10.
+- Implementado parcialmente: amostragem garante que missões 11 a 20 vinculam em nodos existentes e não usam boss/acampamento.
+- Pendente: testes de invariantes mais amplos para nodos 11 a 20.
+- Pendente futura: substituição de objetivos de ilha em 21 a 30.
 
 ## Testes e critérios de aceite
 
@@ -519,7 +553,7 @@ Não é necessário criar um arquivo por categoria no início. A divisão deve o
 
 - Cobertura integral das faixas d100/d20/d12/d10 transcritas.
 - Geração determinística para a mesma seed e contexto.
-- Sete ofertas válidas por quadro e no máximo três selecionadas.
+- Uma a oito ofertas válidas por quadro e no máximo três selecionadas.
 - Nenhum destino fora dos andares permitidos da faixa.
 - Nenhuma criatura fora das restrições do andar quando houver whitelist.
 - Nenhuma categoria com alvo ou condição incompatível.
@@ -532,11 +566,13 @@ Não é necessário criar um arquivo por categoria no início. A divisão deve o
 - Persistência e restauração das selecionadas, estados e vínculos.
 - Compatibilidade com sessões antigas sem o campo `missions`.
 - Testes de propriedade com milhares de gerações para cada perfil.
+- Extermínio sempre exige pelo menos quatro inimigos, não usa andar específico e pode avançar com qualquer encontro compatível.
+- Categorias que não sejam caça especial ou extermínio recebem 15% de bônus no multiplicador, mantendo mínimo efetivo de 1.
 
 ### Verificação de interface
 
 - Botão disponível e sem sobreposição nos três modos.
-- Modal utilizável por teclado e fechável pelo botão, `Esc` e clique no backdrop.
+- Modal utilizável por teclado; na seleção inicial, não deve fechar por `Esc` ou clique no backdrop.
 - Textos longos sem estourar cards ou botões.
 - Fluxo confortável em tablet e celular.
 - Contador de seleção nunca ultrapassa três.
@@ -544,10 +580,13 @@ Não é necessário criar um arquivo por categoria no início. A divisão deve o
 - Ofertas não selecionadas só somem após confirmação.
 - Cenas, nodos e objetivos vinculados exibem indicador de missão.
 - Somente a ação do mestre na modal marca uma missão como concluída.
+- Fluxos principais cobertos por QA automatizado: iniciar com zero missões, iniciar com uma missão, iniciar com três missões, acompanhar missão, abrir missão em nodo escolhido, avançar andar e salvar/carregar por código `MD1`.
 
 ### Critério mínimo para o MVP
 
-O MVP está pronto quando, ao carregar qualquer faixa, o mestre recebe sete ofertas variadas, seleciona de zero a três missões, inicia o perfil com essas missões materializadas, identifica seus vínculos nas cenas, nodos ou objetivos, consulta e conclui as missões manualmente pelo botão global e recupera tudo por um código de sessão. Sem missões selecionadas, o perfil deve permanecer funcionalmente idêntico ao atual.
+O MVP está pronto quando, ao carregar uma faixa suportada, o mestre recebe uma a oito ofertas variadas, seleciona de zero a três missões, inicia o perfil com essas missões materializadas, identifica seus vínculos nas cenas ou nodos, consulta e conclui as missões manualmente pelo botão global e recupera tudo por um código de sessão. Sem missões selecionadas, o perfil deve permanecer funcionalmente idêntico ao atual.
+
+Para o MVP atual, os andares 21 a 30 não entram como critério final de qualidade do módulo. Eles devem continuar compatíveis o bastante para não quebrar o app, mas textos, vínculos, balanceamento e materialização definitiva dessa faixa ficam para uma etapa posterior do `archipelago`.
 
 ## Decisões fechadas
 
@@ -556,16 +595,22 @@ O MVP está pronto quando, ao carregar qualquer faixa, o mestre recebe sete ofer
 3. **Economia:** os valores de cristal são expressos em T$. O pagamento devolve o valor concreto das entregas e acrescenta um bônus com multiplicador de dificuldade.
 4. **Escala econômica:** quantidades usam crescimento logarítmico, baseado no valor unitário do ND representativo, para evitar crescimento linear ou exponencial.
 5. **ND de recompensa:** alvos concretos usam seu ND; tarefas abstratas usam um ND relacionado ao andar ou faixa, declarado pelo perfil.
-6. **Quadro:** gerar sete ofertas variadas e permitir selecionar de zero a três. Ao confirmar, as não selecionadas são perdidas.
+6. **Quadro:** gerar de uma a oito ofertas variadas e permitir selecionar de zero a três. Ao confirmar, as não selecionadas são perdidas.
 7. **Confirmação:** o mesmo comando confirma qualquer quantidade entre zero e três; com zero, funciona como `Continuar sem missões`.
 8. **Renovação:** gerar o quadro ao carregar uma faixa. `Iniciar andar` e ações equivalentes não renovam as ofertas nem limpam as selecionadas. Um quadro novo exige retorno à configuração inicial.
-9. **Materialização:** missões selecionadas podem influenciar ou substituir cenas, encontros finais, conteúdo de nodos e objetivos, conforme o perfil. Selecionar zero mantém o comportamento atual.
+9. **Materialização:** missões selecionadas podem influenciar cenas, encontros finais, conteúdo de nodos e objetivos, conforme o perfil. Em 11 a 20, a missão deve se integrar ao nodo escolhido em vez de criar um encontro extra separado. Selecionar zero mantém o comportamento atual.
 10. **Escopo:** uma missão pode indicar um andar, vários andares ou toda a faixa. Mais de uma missão pode usar o mesmo andar quando não houver conflito estrutural.
 11. **Conclusão:** conteúdos vinculados exibem um indicador de missão, mas somente o mestre marca a missão como concluída pela modal.
 12. **Botão global:** a seleção ocorre durante o carregamento da faixa; depois disso, o botão ao lado do gerador manual serve para consultar e concluir as missões selecionadas.
+13. **Extermínio:** missões de extermínio são missões de progresso da faixa, não de um andar específico, e exigem no mínimo quatro inimigos.
+14. **Recompensa:** multiplicadores abaixo de 1 são tratados como 1 no cálculo efetivo. Categorias que não sejam caça especial ou extermínio recebem bônus de 15% no multiplicador.
+15. **21 a 30:** a adaptação definitiva de missões para o arquipélago fica pendente até o modo estar mais maduro.
 
 ## Pontos a validar na implementação
 
 - Definir `rewardChallengeByFloor` de cada perfil usando as bandas de ND já existentes como base.
 - Amostrar recompensas de várias quantidades e NDs para ajustar a curva logarítmica sem quebrar o exemplo dos três glops.
-- Definir como cada categoria de missão agrega vários vínculos sem transformar o app em contador automático de progresso.
+- Amostrar textos por categoria e perfil, principalmente fornecedores, sujeitos das frases e objetivos de resgate/recuperação.
+- Expandir persistência por código de sessão para cobrir fluxos completos de cada modo no app, além do round-trip estrutural já coberto por `npm run test:missions`.
+- Criar testes de propriedade para geração e materialização em 1 a 10 e 11 a 20.
+- Definir como categorias além de extermínio podem agregar vários vínculos sem transformar o app em contador automático de progresso.

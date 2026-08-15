@@ -200,6 +200,53 @@ export const forest11to20Profile = {
       trial: 8,
       anomalous: 9
     },
+    issuerWeights: [
+      { id: "batedor-floresta", label: "um batedor do acampamento", kind: "request", weight: 22 },
+      { id: "pesquisador-campo-floresta", label: "um pesquisador de campo", kind: "request", weight: 16, categories: ["collection", "exploration", "investigation", "anomalous"] },
+      { id: "contencao-floresta", label: "a equipe de contenção da mata", kind: "request", weight: 18, categories: ["extermination", "specialHunt", "trial", "anomalous"] },
+      { id: "patrono-anonimo-floresta", label: "um patrono anônimo", kind: "request", weight: 9 },
+      { id: "pedido-acampamento-floresta", label: "um pedido deixado no acampamento", kind: "writtenRequest", weight: 12, categories: ["recovery", "rescue", "escort"] },
+      { id: "diario-recuperado-floresta", label: "um diário recuperado da mata", kind: "record", weight: 10, categories: ["exploration", "investigation", "recovery", "rescue"] },
+      { id: "sinal-pulseira-floresta", label: "missão sem fornecedor", kind: "signal", weight: 8, categories: ["anomalous", "exploration", "specialHunt", "trial"] }
+    ],
+    creatureTargetIds: [
+      "jiboia",
+      "naja",
+      "carnical",
+      "lobo-das-cavernas",
+      "aranha-gigante",
+      "glooop",
+      "hiena-rainha",
+      "soterrado-vagante",
+      "sucuri",
+      "grifo",
+      "cao-do-inferno",
+      "stagh",
+      "infecto",
+      "basilisco",
+      "urso-coruja",
+      "serpe"
+    ],
+    exterminationTargetIds: [
+      "jiboia",
+      "naja",
+      "carnical",
+      "lobo-das-cavernas",
+      "aranha-gigante",
+      "glooop",
+      "hiena-rainha",
+      "soterrado-vagante",
+      "infecto"
+    ],
+    specialHuntTargetIds: [
+      "sucuri",
+      "grifo",
+      "cao-do-inferno",
+      "stagh",
+      "basilisco",
+      "urso-coruja",
+      "serpe"
+    ],
     rewardChallengeByFloor: {
       11: 1,
       12: 1,
