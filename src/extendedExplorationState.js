@@ -1434,8 +1434,46 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     return scene.variants.filter((variant) => !variant.floors || variant.floors.includes(floor));
   }
 
-  function countCompositionCreatures(variant) {
-    return (variant.creatures || []).reduce((total, entry) => total + (entry.quantity || 1), 0);
+  function countCompositionCreatures(variant, creatureTypes = null) {
+    const allowedTypes = creatureTypes?.length ? new Set(creatureTypes) : null;
+
+    return (variant.creatures || []).reduce((total, entry) => {
+      const creature = getCreatureById(entry.id);
+
+      if (allowedTypes && !allowedTypes.has(creature?.type)) return total;
+      return total + (entry.quantity || 1);
+    }, 0);
+  }
+
+  function finalGimmickApplies(gimmick, scene, variant) {
+    const applicability = gimmick?.applicability;
+
+    if (!applicability?.length) return true;
+
+    return applicability.some((rule) => {
+      if (
+        rule.creatureCountAtLeast !== undefined &&
+        countCompositionCreatures(variant) < rule.creatureCountAtLeast
+      ) {
+        return false;
+      }
+      if (
+        rule.matchingCreatureCountAtLeast !== undefined &&
+        countCompositionCreatures(variant, rule.creatureTypes) < rule.matchingCreatureCountAtLeast
+      ) {
+        return false;
+      }
+      if (rule.sceneTypeIncludes?.length) {
+        const sceneType = String(scene.typeLabel || "").toLowerCase();
+        const matchesType = rule.sceneTypeIncludes.some((term) =>
+          sceneType.includes(String(term).toLowerCase())
+        );
+
+        if (!matchesType) return false;
+      }
+
+      return true;
+    });
   }
 
   function createCuratedFinalEncounter(excludeSceneId = null) {
@@ -1445,7 +1483,8 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     const pool = scenes.filter((scene) => scene.id !== excludeSceneId);
     const scene = pick(activeRng, pool.length ? pool : scenes);
     const variant = pick(activeRng, getSceneVariantsForFloor(scene));
-    const gimmick = activeProfile.extendedExploration.finalEncounters?.gimmicksByFloor?.[floor] || null;
+    const configuredGimmick = activeProfile.extendedExploration.finalEncounters?.gimmicksByFloor?.[floor] || null;
+    const gimmick = finalGimmickApplies(configuredGimmick, scene, variant) ? configuredGimmick : null;
     const seedSuffix = `final-${Date.now()}-${randomInt(activeRng, 1, 9999)}`;
 
     const encounterNode = {

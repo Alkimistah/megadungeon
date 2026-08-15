@@ -5,7 +5,7 @@ import { createRng, pickWeighted } from "./random.js";
 import { createModificationPlan, getThreatParameters, THREAT_CHALLENGE_ORDER } from "./threatCreationRules.js";
 import { getTrapById } from "./traps.js";
 
-const ENCOUNTER_RESOLUTION_VERSION = 8;
+const ENCOUNTER_RESOLUTION_VERSION = 9;
 
 const CREATURE_TYPE_LABELS = {
   animal: "Animal",
@@ -144,6 +144,25 @@ function getCandidates(type, maximumChallenge, excludedIds = new Set(), minimumC
 function pickCreatureForChallenge({ type, targetChallenge, terrainName, rng, excludedIds, preferredIds = [], preferredSubtype = null, allowedIds = null }) {
   const minimumChallenge = Math.max(0.25, targetChallenge - 2);
   const candidates = getCandidates(type, targetChallenge, excludedIds, minimumChallenge, allowedIds);
+  const options = candidates.map((creature) => ({
+    creature,
+    weight: getCandidateWeight(creature, targetChallenge, terrainName, preferredIds, preferredSubtype)
+  }));
+
+  return options.length > 0 ? pickWeighted(rng, options).creature : null;
+}
+
+function getExactChallengeCandidates(type, targetChallenge, excludedIds = new Set(), allowedIds = null) {
+  const candidates = getAllowedCatalog(allowedIds).filter((creature) =>
+    creature.challengeRating === targetChallenge && !excludedIds.has(creature.id)
+  );
+  const typed = type === null ? candidates : candidates.filter((creature) => creature.type === type);
+
+  return typed.length > 0 ? typed : candidates;
+}
+
+function pickExactCreatureForChallenge({ type, targetChallenge, terrainName, rng, excludedIds, preferredIds = [], preferredSubtype = null, allowedIds = null }) {
+  const candidates = getExactChallengeCandidates(type, targetChallenge, excludedIds, allowedIds);
   const options = candidates.map((creature) => ({
     creature,
     weight: getCandidateWeight(creature, targetChallenge, terrainName, preferredIds, preferredSubtype)
@@ -329,6 +348,15 @@ function getRequiredCreatureCR(targetChallenge, totalCount) {
   return Math.max(0.25, roundToQuarter(targetChallenge / totalCount));
 }
 
+function homogeneousGroupMatchesTarget(targetChallenge, totalCount, creatureChallenge) {
+  const actualChallenge = calculateCombatND([{
+    challengeRating: creatureChallenge,
+    quantity: totalCount
+  }]);
+
+  return roundToQuarter(actualChallenge) === roundToQuarter(targetChallenge);
+}
+
 // Returns what CR a single added creature must have to bring the group's T20 ND
 // to exactly targetChallenge. Returns null if the math yields no valid CR.
 // Note: all-sub-1 groups with targetChallenge >= 1 use bulk-add in refineEncounterGroup instead.
@@ -489,12 +517,40 @@ function resolveCreatureGroup(node, rng) {
     { totalCount: 3, weight: 6 },
     { totalCount: 4, weight: 5 },
     { totalCount: 6, weight: 3 },
-  ].filter(opt => getRequiredCreatureCR(targetChallenge, opt.totalCount) >= 0.25);
+  ].map((option) => ({
+    ...option,
+    requiredChallenge: getRequiredCreatureCR(targetChallenge, option.totalCount)
+  })).filter((option) =>
+    option.requiredChallenge >= 0.25 &&
+    homogeneousGroupMatchesTarget(targetChallenge, option.totalCount, option.requiredChallenge) &&
+    getExactChallengeCandidates(type, option.requiredChallenge, new Set(), allowedIds).length > 0
+  );
 
-  const { totalCount } = pickWeighted(rng, sizeOptions);
-  const requiredCR = getRequiredCreatureCR(targetChallenge, totalCount);
+  if (sizeOptions.length === 0) {
+    const fallback = pickCreatureForChallenge({
+      type,
+      targetChallenge,
+      terrainName,
+      rng,
+      excludedIds: new Set(),
+      allowedIds
+    });
 
-  const lead = pickCreatureForChallenge({ type, targetChallenge: requiredCR, terrainName, rng, excludedIds: new Set(), allowedIds });
+    return fallback
+      ? refineEncounterGroup([getCreatureSummary(fallback, 1, rng)], targetChallenge, type, terrainName, rng, allowedIds)
+      : [];
+  }
+
+  const { totalCount, requiredChallenge } = pickWeighted(rng, sizeOptions);
+
+  const lead = pickExactCreatureForChallenge({
+    type,
+    targetChallenge: requiredChallenge,
+    terrainName,
+    rng,
+    excludedIds: new Set(),
+    allowedIds
+  });
   if (!lead) return [];
 
   let rawItems;
@@ -519,12 +575,12 @@ function resolveCreatureGroup(node, rng) {
         { crossType: true,  weight: 2 },
       ]);
 
-      const support = pickCreatureForChallenge({
+      const support = pickExactCreatureForChallenge({
         excludedIds: new Set([lead.id]),
         preferredIds: SUPPORT_CREATURE_IDS_BY_TYPE[type] || [],
         preferredSubtype: crossType ? null : lead.subtype,
         rng,
-        targetChallenge: requiredCR,
+        targetChallenge: requiredChallenge,
         terrainName,
         type: crossType ? null : type,
         allowedIds,
@@ -553,10 +609,14 @@ function resolveFixedComposition(fixedComposition, rng) {
       return creature ? getCreatureSummary(creature, quantity || 1, rng) : null;
     })
     .filter(Boolean);
-  const trapItems = (fixedComposition.traps || [])
-    .map((trapId) => {
+  const trapQuantities = (fixedComposition.traps || []).reduce((quantities, trapId) => {
+    quantities.set(trapId, (quantities.get(trapId) || 0) + 1);
+    return quantities;
+  }, new Map());
+  const trapItems = [...trapQuantities.entries()]
+    .map(([trapId, quantity]) => {
       const trap = getTrapById(trapId);
-      return trap ? getTrapSummary(trap) : null;
+      return trap ? { ...getTrapSummary(trap), quantity } : null;
     })
     .filter(Boolean);
 
@@ -585,7 +645,7 @@ export function resolveNodeEncounter(node, { mapSeed } = {}) {
   const trapBudget = node.fixedComposition
     ? roundToQuarter(items
       .filter((item) => item.kind === "trap")
-      .reduce((total, item) => total + (item.challengeRating || 0), 0))
+      .reduce((total, item) => total + (item.challengeRating || 0) * (item.quantity || 1), 0))
     : node.challenge?.trap || 0;
 
   node.resolvedEncounter = {

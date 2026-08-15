@@ -12,11 +12,13 @@ export const dungeon1to10FinalEncounters = {
   gimmicksByFloor: {
     1: {
       name: "Primeiros passos",
-      detail: "Inimigos começam a 6+ células e o grupo se posiciona livremente no seu lado do mapa antes da iniciativa."
+      detail: "Inimigos começam a 6+ células e o grupo se posiciona livremente no seu lado do mapa antes da iniciativa.",
+      applicability: [{ creatureCountAtLeast: 1 }]
     },
     2: {
       name: "Alarme",
-      detail: "Há um sino/corda de alarme na cena. Furtividade CD 13 (um teste do grupo) evita o disparo. Se disparar: inimigos alertas (sem surpresa contra eles, +2 em iniciativa) e o eco aumenta em +1 a CD do próximo teste de exploração. Sem reforços."
+      detail: "Há um sino/corda de alarme na cena. Furtividade CD 13 (um teste do grupo) evita o disparo. Se disparar: inimigos alertas (sem surpresa contra eles, +2 em iniciativa) e o eco aumenta em +1 a CD do próximo teste de exploração. Sem reforços.",
+      applicability: [{ creatureCountAtLeast: 1 }]
     },
     3: {
       name: "Mecanismos",
@@ -24,11 +26,16 @@ export const dungeon1to10FinalEncounters = {
     },
     4: {
       name: "Território orc",
-      detail: "Humanoides lutam até 0 PV (sem moral, sem fuga). Cenas de negociação ganham a opção de duelo 1x1."
+      detail: "Humanoides lutam até 0 PV (sem moral, sem fuga). Cenas de negociação ganham a opção de duelo 1x1.",
+      applicability: [
+        { creatureTypes: ["humanoid"], matchingCreatureCountAtLeast: 1 },
+        { sceneTypeIncludes: ["negociação"] }
+      ]
     },
     5: {
       name: "Bandos rivais",
-      detail: "Com 2+ humanoides na cena, divida-os em dois bandos rivais: Diplomacia ou Enganação CD 16 (ação padrão, 1 tentativa) faz os bandos se atacarem por 1 rodada antes de mirarem o grupo."
+      detail: "Com 2+ humanoides na cena, divida-os em dois bandos rivais: Diplomacia ou Enganação CD 16 (ação padrão, 1 tentativa) faz os bandos se atacarem por 1 rodada antes de mirarem o grupo.",
+      applicability: [{ creatureTypes: ["humanoid"], matchingCreatureCountAtLeast: 2 }]
     },
     6: {
       name: "Gosma viva",
@@ -40,7 +47,8 @@ export const dungeon1to10FinalEncounters = {
     },
     8: {
       name: "Caçada silenciosa",
-      detail: "Inimigos começam escondidos (Furtividade deles contra Percepção do grupo; surpresa se não detectados); teias cobrem as rotas laterais como terreno difícil."
+      detail: "Inimigos começam escondidos (Furtividade deles contra Percepção do grupo; surpresa se não detectados); teias cobrem as rotas laterais como terreno difícil.",
+      applicability: [{ creatureCountAtLeast: 1 }]
     },
     9: {
       name: "Véspera do covil",
@@ -455,14 +463,14 @@ export const dungeon1to10FinalEncounters = {
         id: "ponte-estreita",
         title: "Ponte Estreita",
         typeLabel: "Obstáculo",
-        detail: "O vão corta a sala inteira; a única travessia é a ponte de 1 célula com Pêndulo de Teto no centro (1d12+10, Reflexos CD 25; Ladinagem CD 20 trava). Acrobacia CD 15 por rodada na ponte; falha por 5+ derruba no vão (queda de 6m, 4d6; Atletismo CD 20 para voltar).",
+        detail: "O vão corta a sala inteira; a única travessia é a ponte de 1 célula com dois Pêndulos de Teto cruzando pontos diferentes do caminho (1d12+10 cada, Reflexos CD 25; Investigação CD 25; Ladinagem CD 20 trava um pêndulo). Acrobacia CD 15 por rodada na ponte; falha por 5+ derruba no vão (queda de 6m, 4d6; Atletismo CD 20 para voltar).",
         treasureNote: "Tesouro padrão apenas com sucesso — corpo de um explorador pendurado sob a ponte (Atletismo CD 20 para alcançar).",
         map: [
           "##############",
           "#.....XXX....#",
           "#.....XXX....#",
           "dPP...XXX....d",
-          "dPP....T.....d",
+          "dPP...T.T....d",
           "#.....XXX....#",
           "#.....XXX....#",
           "#.....XXX....#",
@@ -470,21 +478,21 @@ export const dungeon1to10FinalEncounters = {
           "##############"
         ],
         variants: [
-          { floors: [5, 6], challenge: 2, creatures: [], traps: ["pendulo-de-teto"] }
+          { floors: [5, 6], challenge: 2, creatures: [], traps: ["pendulo-de-teto", "pendulo-de-teto"] }
         ]
       },
       {
         id: "preco-dos-saqueadores",
         title: "Preço dos Saqueadores",
-        typeLabel: "Negociação",
-        detail: "Os gnolls vendem a passagem por 100 PO ou 1 item de qualidade, diante da pilha de saque. Diplomacia CD 18 reduz à metade; Enganação CD 20 passa sem pagar; Intimidação CD 18 força recuo, mas eles ficam hostis (se gnolls saírem no d100 ainda neste andar, começam em combate). Recusa: combate.",
+        typeLabel: "Negociação + armadilha",
+        detail: "Um Gnoll Saqueador, porta-voz de um bando, vende a passagem por 100 PO ou 1 item de qualidade diante da pilha de saque. Ele mantém um Pêndulo de Teto armado sobre a rota (1d12+10, Reflexos CD 25; Investigação CD 25; Ladinagem CD 20). Diplomacia CD 18 reduz o preço à metade; Enganação CD 20 permite passar sem pagar; Intimidação CD 18 força o recuo, mas deixa o bando hostil. Recusa: o gnoll dispara o pêndulo e entra em combate.",
         treasureNote: "Tesouro padrão apenas sem pagamento (combate ou enganação).",
         map: [
           "##############",
           "#............#",
           "#.......C....#",
-          "dPP....H.....d",
-          "dPP......H..Od",
+          "dPP....E.....d",
+          "dPP......T..Od",
           "#.......C....#",
           "#............#",
           "#............#",
@@ -492,7 +500,7 @@ export const dungeon1to10FinalEncounters = {
           "##############"
         ],
         variants: [
-          { floors: [5, 6], challenge: 2, creatures: [{ id: "gnoll-saqueador", quantity: 2 }], traps: [] }
+          { floors: [5, 6], challenge: 2, creatures: [{ id: "gnoll-saqueador", quantity: 1 }], traps: ["pendulo-de-teto"] }
         ]
       }
     ],
@@ -501,7 +509,7 @@ export const dungeon1to10FinalEncounters = {
         id: "teias-na-porta",
         title: "Teias na Porta",
         typeLabel: "Combate + armadilha",
-        detail: "Uma barreira contínua de teia atravessa a sala e fecha todas as rotas até a saída (regras da Rede: Reflexos CD 20 ou agarrado; escapar com Acrobacia CD 20, ação completa; fogo destrói um trecho com 5 PV). O enxame fica atrás da barreira e ataca quem ficar agarrado. No andar 8 a barreira é mais espessa (3 zonas).",
+        detail: "Uma barreira contínua de teia atravessa a sala e fecha todas as rotas até a saída. Duas zonas usam as regras da Rede (Reflexos CD 20 ou agarrado; escapar com Acrobacia CD 20, ação completa); o restante é terreno difícil, e fogo destrói um trecho com 5 PV. O enxame fica atrás da barreira e ataca quem ficar agarrado. No andar 8 a barreira ocupa mais células, mas mantém duas zonas de disparo.",
         treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
@@ -516,7 +524,7 @@ export const dungeon1to10FinalEncounters = {
           "##############"
         ],
         variants: [
-          { floors: [7, 8], challenge: 1.5, creatures: [{ id: "aranhas-filhotes", quantity: 1 }], traps: [] }
+          { floors: [7, 8], challenge: 1.5, creatures: [{ id: "aranhas-filhotes", quantity: 1 }], traps: ["rede", "rede"] }
         ]
       },
       {
@@ -613,8 +621,8 @@ export const dungeon1to10FinalEncounters = {
       {
         id: "guardia-do-covil",
         title: "Guardiã do Covil",
-        typeLabel: "Combate com gimmick",
-        detail: "A cortina de teia fecha todas as rotas até a descida (terreno difícil só para o grupo). A Guardiã (2x2) defende a descida e não a abandona; o enxame de filhotes assedia quem ficar preso nas teias.",
+        typeLabel: "Combate + armadilha",
+        detail: "A cortina de teia fecha todas as rotas até a descida. Quatro trechos funcionam como Redes (Reflexos CD 20 ou agarrado; escapar com Acrobacia CD 20, ação completa) e o restante é terreno difícil apenas para o grupo. A Guardiã (2x2) defende a descida, ataca quem ficar preso e não abandona a posição.",
         treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
@@ -622,14 +630,14 @@ export const dungeon1to10FinalEncounters = {
           "#......W.....#",
           "dPP....W.EE..d",
           "dPP....W.EE..d",
-          "#......WW.E..#",
+          "#......WW....#",
           "#.......W....#",
           "#......W.....#",
           "#......W.....#",
           "##############"
         ],
         variants: [
-          { floors: [9], challenge: 3, creatures: [{ id: "aranha-gigante", quantity: 1 }, { id: "aranhas-filhotes", quantity: 1 }], traps: [] }
+          { floors: [9], challenge: 3, creatures: [{ id: "aranha-gigante", quantity: 1 }], traps: ["rede", "rede", "rede", "rede"] }
         ]
       },
       {
@@ -701,12 +709,12 @@ export const dungeon1to10FinalEncounters = {
       {
         id: "sentinela-da-dungeon",
         title: "Sentinela da Dungeon",
-        typeLabel: "Combate com gimmick",
-        detail: "A dungeon testa o grupo uma última vez: o Mímico Menor está plantado como baú diante da descida, parecendo o tesouro do andar. Investigação CD 20 revela; caso contrário, surpresa + adesivo. Os filhotes à espreita entram na 2ª rodada pelo ponto de reforço (única entrada da cena).",
+        typeLabel: "Combate + armadilha",
+        detail: "A dungeon testa o grupo uma última vez: o Mímico Menor está plantado como baú diante da descida, parecendo o tesouro do andar. Investigação CD 20 revela o disfarce; caso contrário, ele ataca com surpresa e adesivo. Uma Runa de Aceleração diante do falso baú arremessa 9m quem se aproxima (Fortitude CD 20 reduz à metade; Investigação CD 20; Ladinagem CD 20), lançando a vítima na direção do Mímico.",
         treasureNote: "Tesouro padrão pelo ND da cena, adicional aos cristais e equipamentos/tesouros das criaturas.",
         map: [
           "##############",
-          "#.........R..#",
+          "#.........M..#",
           "#.........C..#",
           "dPP........H.d",
           "dPP..........d",
@@ -717,7 +725,7 @@ export const dungeon1to10FinalEncounters = {
           "##############"
         ],
         variants: [
-          { floors: [9], challenge: 3, creatures: [{ id: "mimico-menor", quantity: 1 }, { id: "aranhas-filhotes", quantity: 1 }], traps: [] }
+          { floors: [9], challenge: 3, creatures: [{ id: "mimico-menor", quantity: 1 }], traps: ["runa-de-aceleracao"] }
         ]
       }
     ]

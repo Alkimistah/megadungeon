@@ -1,6 +1,32 @@
 import { assetUrl } from "../assetUrl.js";
 import { dungeon1to10FinalEncounters } from "./dungeon1to10FinalEncounters.js";
 
+const CREATURE_INTRODUCTIONS_BY_FLOOR = {
+  1: ["rato-gigante", "glop", "goblin-salteador", "orc-enfraquecido", "cascavel", "capanga", "jiboia"],
+  2: ["bandido", "lobo", "bandido-ligeiro", "kobold-patrulheiro"],
+  3: ["hobgoblin-soldado", "goblin-engenhoqueiro", "orc-combatente", "gatuno", "naja", "trog", "asa-assassina"],
+  4: ["orc-chefe", "gorlogg", "meio-orc-capanga", "meio-orc-bandoleiro"],
+  5: ["gnoll-saqueador", "glooop", "estirge", "kobold-veterano", "trog-combatente", "trog-cacador", "esqueleto", "turba-zumbi"],
+  6: ["mamae-glop", "kobold-explosivo", "gargula"],
+  7: ["aranhas-filhotes", "mimico-menor"],
+  8: ["aranha-gigante", "cocatriz", "ogro-esqueleto", "sucuri"],
+  9: []
+};
+
+function buildCumulativeCreatureIdsByFloor() {
+  const availableIds = new Set();
+
+  return Object.fromEntries(Object.keys(CREATURE_INTRODUCTIONS_BY_FLOOR)
+    .map(Number)
+    .sort((left, right) => left - right)
+    .map((floor) => {
+      CREATURE_INTRODUCTIONS_BY_FLOOR[floor].forEach((creatureId) => availableIds.add(creatureId));
+      return [floor, [...availableIds]];
+    }));
+}
+
+const ALLOWED_CREATURE_IDS_BY_FLOOR = buildCumulativeCreatureIdsByFloor();
+
 export const dungeon1to10Profile = {
   id: "dungeon-1-10",
   label: "Andares de 1 a 10",
@@ -301,17 +327,7 @@ export const dungeon1to10Profile = {
   creatureRules: {
     defaultPartySize: 4,
     challengeSource: "encounter",
-    allowedCreatureIdsByFloor: {
-      1: ["rato-gigante", "glop", "goblin-salteador", "orc-enfraquecido", "cascavel", "capanga","jiboia"],
-      2: ["goblin-salteador", "bandido", "rato-gigante", "glop", "orc-enfraquecido", "lobo", "capanga", "bandido-ligeiro", "kobold-patrulheiro", "jiboia"],
-      3: ["goblin-salteador", "hobgoblin-soldado", "goblin-engenhoqueiro", "orc-combatente", "glop", "bandido-ligeiro", "kobold-patrulheiro", "gatuno", "naja", "jiboia", "trog", "asa-assassina"],
-      4: ["orc-combatente", "orc-enfraquecido", "orc-chefe", "lobo", "gorlogg", "goblin-salteador", "gatuno", "naja", "trog", "meio-orc-capanga", "meio-orc-bandoleiro", "asa-assassina"],
-      5: ["orc-combatente", "orc-chefe", "hobgoblin-soldado", "goblin-engenhoqueiro", "gnoll-saqueador", "glop", "glooop", "meio-orc-capanga", "meio-orc-bandoleiro", "trog", "estirge", "asa-assassina", "kobold-veterano", "trog-combatente", "trog-cacador", "esqueleto", "turba-zumbi"],
-      6: ["glop", "glooop", "mamae-glop", "orc-enfraquecido", "orc-combatente", "goblin-engenhoqueiro", "estirge", "asa-assassina", "kobold-explosivo", "kobold-veterano", "gargula", "trog-combatente", "trog-cacador", "esqueleto", "turba-zumbi"],
-      7: ["aranhas-filhotes", "rato-gigante", "goblin-salteador", "orc-enfraquecido", "glop", "hobgoblin-soldado", "mimico-menor", "estirge", "kobold-explosivo", "kobold-veterano", "gargula"],
-      8: ["aranhas-filhotes", "aranha-gigante", "orc-combatente", "orc-chefe", "hobgoblin-soldado", "glooop", "mimico-menor", "kobold-explosivo", "gargula", "cocatriz", "ogro-esqueleto", "sucuri"],
-      9: ["aranhas-filhotes", "aranha-gigante", "orc-chefe", "hobgoblin-soldado", "goblin-engenhoqueiro", "glooop", "mamae-glop", "mimico-menor", "cocatriz", "ogro-esqueleto", "sucuri"]
-    },
+    allowedCreatureIdsByFloor: ALLOWED_CREATURE_IDS_BY_FLOOR,
     defaultTypeWeights: [
       { type: "animal", weight: 22 },
       { type: "construct", weight: 6 },

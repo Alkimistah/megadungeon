@@ -417,6 +417,7 @@ Criar ou separar:
 - Seleção da faixa "Andares de 1 a 10" com modo próprio de exploração estendida.
 - Labirinto abstrato separado do mapa de nodos dos andares 11 a 20.
 - Controle de sucessos, falhas, reset de andar e avanço apenas para frente.
+- O andar inicial pode ser escolhido enquanto a exploração ainda está intacta; após qualquer ação, tempo consumido, cena ou avanço, o seletor de andar e o botão de reinicialização ficam bloqueados. O retorno à configuração inicial continua disponível pelo botão global de recarregar.
 - Consumo de tempo por teste com base no andar e multiplicador da abordagem.
 - Rolagem d100 automática e manual, com indicação da origem da rolagem.
 - Falha crítica ou margem 5+ gera duas rolagens d100 e exibe ambas na cena atual.
@@ -439,8 +440,9 @@ Criar ou separar:
 - Aranha Matriarca e filhotes adicionados ao catálogo de criaturas.
 - Encontros podem sortear armas compatíveis para criaturas armadas Pequenas ou Médias, preservando bônus de ataque e modificadores de dano da ficha base.
 - Mímico Menor ND 2 adicionado como adaptação do Mímico para aparecer nos andares avançados de 1 a 10.
-- Subconjunto de inimigos permitido por andar implementado nos andares 1 a 9 via lista de permissão no perfil; a seleção de criaturas usa apenas essas listas, impedindo criaturas de tiers posteriores ou tematicamente inadequadas.
-- Encontros finais curados implementados: 25 cenas por tier com gimmick por andar (dungeon1to10FinalEncounters.js), composição fixa de criaturas/armadilhas do catálogo, ND por variante de andar, mapa preset 14x10 fixo por cena, gimmick e recompensa exibidos no painel, e botão de sortear outra cena do tier.
+- Subconjunto cumulativo de inimigos permitido por andar implementado nos andares 1 a 9 via lista de permissão no perfil: cada andar mantém as criaturas introduzidas anteriormente e acrescenta novas ameaças, sem liberar criaturas de tiers posteriores.
+- O resolvedor valida a quantidade sorteada contra o cálculo real de ND antes de montar o grupo. A amostragem automatizada cobre encontros fáceis, médios e difíceis de todos os andares 1 a 9 e exige zero encontros vazios e zero divergências entre ND gerado e ND alvo.
+- Encontros finais curados implementados: 25 cenas no total, distribuídas por tier, com gimmick por andar (`dungeon1to10FinalEncounters.js`), composição fixa de criaturas/armadilhas do catálogo conferida contra o ND declarado, mapa preset 14x10 fixo por cena, gimmick e recompensa exibidos no painel, e botão de sortear outra cena do tier. Gimmicks condicionais só aparecem quando a composição satisfaz seus requisitos, como presença de inimigos, humanoides ou dois bandos possíveis.
 - Mapa tático com legenda expandida: inimigo oculto/em potencial, fosso/vão, teia/casulo, terreno difícil, mecanismo, objetivo/achado, entrada de reforço e porta como entrada/saída; legenda exibe apenas os tipos presentes no mapa e as cores são configuráveis por perfil via tema (tacticalColors).
 - Sala do chefe do andar 10 implementada: encontro ND 4 com ficha da Aranha Matriarca e Aranhas Filhotes, mapa fixo 20x14 com portas laterais de 2 quadrados na entrada e saída, grupo em 4 quadrados alinhado ao centro da entrada, Matriarca Grande ocupando 2x2 perto da saída, área 4x4 de teia ao redor dela, quatro zonas de teia 3x3 nos cantos internos com ovo/casulo no centro, teias 2x2 adicionais no centro, frente da saída e rotas laterais, oito pilares, recompensa do cristal verde e tela de conclusão da etapa.
 - Persistência mínima da exploração implementada: código de sessão preserva andar, fase, sucessos, falhas, ações usadas, tempo, estados de reset/descida e log recente; cenas, mapas e encontros podem ser regenerados nesta versão.

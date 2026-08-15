@@ -6,6 +6,7 @@ import { formatElapsedTime } from "./format.js";
 import { generateMapData } from "./generator.js";
 import { createArchipelagoRenderer } from "./archipelagoRenderer.js";
 import { createArchipelagoState } from "./archipelagoState.js";
+import { canConfigureExtendedExplorationFloor } from "./extendedExplorationControls.js";
 import { createExtendedExplorationRenderer } from "./extendedExplorationRenderer.js";
 import { createExtendedExplorationState } from "./extendedExplorationState.js";
 import { createRandomSeed, createRng } from "./random.js";
@@ -343,6 +344,20 @@ function isNodeMapMode() {
   return activeFloorRange.mode === "node-map" || activeFloorRange.mode === undefined;
 }
 
+function canConfigureCurrentExtendedFloor() {
+  return canConfigureExtendedExplorationFloor(activeFloorRange, extendedState.getSnapshot());
+}
+
+function syncExtendedFloorControls() {
+  const locked = isExtendedExplorationMode() && !canConfigureCurrentExtendedFloor();
+
+  if (locked) {
+    elements.floorInput.value = String(extendedState.getSnapshot().floor);
+  }
+  elements.floorInput.disabled = locked;
+  elements.generateButton.disabled = locked;
+}
+
 function updateTimeTracker() {
   const elapsedMinutes = isArchipelagoMode()
     ? archipelagoState.getElapsedMinutes()
@@ -567,6 +582,8 @@ function restoreSession(session) {
 }
 
 function refreshExplorationDisplay() {
+  syncExtendedFloorControls();
+
   if (isArchipelagoMode()) {
     elements.svg.hidden = true;
     elements.extendedExploration.hidden = false;
@@ -641,6 +658,7 @@ function applyFloorRange(floorRangeId) {
     : isExtendedExplorationMode()
     ? "Iniciar andar"
     : "Gerar mapa";
+  syncExtendedFloorControls();
   manualEncounterDialogController.syncProfileOptions();
 }
 
@@ -687,6 +705,10 @@ function generateMap({ reuseSeed = false } = {}) {
   }
 
   if (isExtendedExplorationMode()) {
+    if (!canConfigureCurrentExtendedFloor()) {
+      syncExtendedFloorControls();
+      return;
+    }
     if (!reuseSeed) currentMapSeed = createRandomSeed();
     renderedNodeMapFloor = null;
     extendedState.initialize(
@@ -777,6 +799,10 @@ function registerServiceWorker() {
 
 function bindEvents() {
   elements.floorInput.addEventListener("change", () => {
+    if (isExtendedExplorationMode() && !canConfigureCurrentExtendedFloor()) {
+      syncExtendedFloorControls();
+      return;
+    }
     syncRecommendationsWithFloor();
     syncNodeFloorAdvanceControl();
   });

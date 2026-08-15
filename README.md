@@ -87,3 +87,14 @@ Para adicionar uma nova faixa de andares:
 
 - Adicionar mapas táticos aos encontros dos andares 11 a 20, mantendo o mapa em nodos como representação principal dessa faixa.
 - Evoluir os andares 21 a 30 como arquipélago aberto com 10 ilhas e ilha final de boss bloqueada por progresso.
+
+### Desempenho do bundle
+
+O build de produção atual gera um alerta por possuir um chunk JavaScript acima de 500 kB: aproximadamente 1.008 kB minificado e 240 kB após gzip. Isso não é um bloqueio funcional, mas deve ser reavaliado se o primeiro carregamento ficar perceptivelmente lento nos tablets usados nas sessões, se o app passar a depender de conexões lentas ou se o bundle continuar crescendo.
+
+Soluções possíveis, a aplicar somente após medir o impacto no dispositivo-alvo:
+
+- carregar sob demanda, com `import()`, módulos que não são necessários na tela inicial, como perfis de andares superiores, missões e partes dos mapas táticos;
+- configurar `build.rollupOptions.output.manualChunks` para separar módulos estáveis e áreas independentes da aplicação;
+- inspecionar a composição do bundle com um visualizador antes de escolher os pontos de divisão;
+- estabelecer um orçamento de desempenho e acompanhar tamanho transferido, tempo de carregamento e tempo de execução do JavaScript em um tablet representativo.

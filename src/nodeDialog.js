@@ -620,6 +620,7 @@ function createTrapDetail(node, item) {
   const damageTypes = formatTrapDamageTypes(trap);
   const additionalTests = formatAdditionalTrapTests(trap.additionalTests);
 
+  if (item.quantity > 1) section.appendChild(createDetailLine("Quantidade", String(item.quantity)));
   section.appendChild(createDetailLine("ND", `ND ${item.challengeLabel}`));
   section.appendChild(createDetailLine("Papel", `${trap.roleLabel || item.roleLabel} - ${trap.roleDescription || "Armadilha do encontro"}`));
   section.appendChild(createDetailLine("Efeito", trap.effect));
