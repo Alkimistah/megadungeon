@@ -2651,6 +2651,23 @@ button.mission-reward-summary:focus-visible {
   padding: 0 0 0 18px;
 }
 
+.mission-creature-details {
+  display: grid;
+  gap: 8px;
+}
+
+.mission-creature-details > h3 {
+  margin: 0;
+  color: #fff7e8;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+.mission-creature-details .encounter-detail-card {
+  min-height: 0;
+  max-height: 420px;
+}
+
 .mission-tactical-map .tactical-grid {
   justify-self: center;
 }

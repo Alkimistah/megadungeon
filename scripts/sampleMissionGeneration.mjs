@@ -6,6 +6,7 @@ import { archipelago21to30Profile } from "../src/floorProfiles/archipelago21to30
 import { dungeon1to10Profile } from "../src/floorProfiles/dungeon1to10.js";
 import { forest11to20Profile } from "../src/floorProfiles/forest11to20.js";
 import { decodeSessionCode, encodeSessionCode, isSessionCode } from "../src/sessionCode.js";
+import { getCreatureById } from "../src/creatureCatalog/index.js";
 import { DIFFICULTY_MULTIPLIERS } from "../src/missions/missionTables.js";
 import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
 import { materializeMissionsForCurrentContent } from "../src/missions/missionProfileAdapters.js";
@@ -226,6 +227,34 @@ function assertMissionStateProgress() {
   assert.deepEqual(restored.getSelected(), state.getSelected(), "Estado: progresso não restaurou de forma estável");
 }
 
+function assertLateDungeonCombatTargetsRespectFloorChallenge() {
+  const profile = {
+    ...dungeon1to10Profile,
+    missionRules: {
+      ...dungeon1to10Profile.missionRules,
+      allowedCategories: ["specialHunt"],
+      missionFloors: [9],
+      offerCountMin: 1,
+      offerCountMax: 1
+    }
+  };
+
+  for (let index = 0; index < 100; index += 1) {
+    const context = createMissionGenerationContext({
+      currentSeed: `mission-floor-9-hunt-${index}`,
+      profile
+    });
+    const [mission] = generateMissionOffers(context);
+    const creature = getCreatureById(mission.objective.targetId);
+
+    assert.ok(creature, "Andar 9: caçada especial sem criatura do catálogo");
+    assert.ok(
+      creature.challengeRating >= 2,
+      `Andar 9: caçada especial escolheu alvo abaixo do patamar do andar: ${creature.name} ND ${creature.challengeRating}`
+    );
+  }
+}
+
 function roundTripSession(session) {
   const code = encodeSessionCode(session);
 
@@ -355,6 +384,7 @@ PROFILES.forEach(assertCombatWeights);
 PROFILES.forEach(assertGenerationForProfile);
 assertForestNodeMaterialization();
 assertMissionStateProgress();
+assertLateDungeonCombatTargetsRespectFloorChallenge();
 assertSessionCodePersistence();
 
 console.log(`Mission generation and session-code sampling passed for ${PROFILES.length} profiles x ${SAMPLE_COUNT} seeds.`);

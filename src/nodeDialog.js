@@ -494,7 +494,7 @@ function appendCreatureSheetAbilities(section, entries, { preferEntryName = fals
   });
 }
 
-function createCreatureDetail(item, missions = [], onAdjustMissionProgress = null) {
+export function createCreatureDetail(item, missions = [], onAdjustMissionProgress = null) {
   const creature = item.creatureData ?? getCreatureById(item.creatureId);
   const section = document.createElement("section");
   const missionPanel = createEncounterMissionPanel(getEncounterMissionMatches(item, missions), onAdjustMissionProgress);

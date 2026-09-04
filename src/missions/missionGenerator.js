@@ -75,6 +75,20 @@ function getFallbackCreatureCandidates(profile, floor) {
   ));
 }
 
+function getPreferredCreatureCandidates(candidates, profile, floor, categoryId) {
+  if (!candidates.length) return candidates;
+
+  const targetChallenge = getRewardChallengeByFloor(profile, floor);
+  const minimumChallenge = Math.max(0.25, targetChallenge - (categoryId === "specialHunt" ? 0.5 : 1));
+  const maximumChallenge = Math.max(targetChallenge, targetChallenge + (categoryId === "specialHunt" ? 1 : 0.5));
+  const preferred = candidates.filter((creature) =>
+    creature.challengeRating >= minimumChallenge
+    && creature.challengeRating <= maximumChallenge
+  );
+
+  return preferred.length ? preferred : candidates;
+}
+
 function pickFallbackCreature(profile, floor, rng) {
   const candidates = getFallbackCreatureCandidates(profile, floor);
 
@@ -111,10 +125,13 @@ function getCreatureTarget(profile, floor, rng, categoryId) {
     .map((id) => getCreatureById(id))
     .filter((creature) => creature && typeof creature.challengeRating === "number" && creature.challengeRating <= maximumChallenge);
 
+  candidates = getPreferredCreatureCandidates(candidates, profile, floor, categoryId);
+
   if (!candidates.length && categoryTargetIds?.length && profileTargetIds.length) {
     candidates = profileTargetIds
       .map((id) => getCreatureById(id))
       .filter((creature) => creature && typeof creature.challengeRating === "number" && creature.challengeRating <= maximumChallenge);
+    candidates = getPreferredCreatureCandidates(candidates, profile, floor, categoryId);
   }
 
   const canUseCatalogFallback = !creatureRuleIds.length && !missionTargetIds.length && !profileTargetIds.length;
@@ -528,6 +545,7 @@ function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
     destination,
     objective: {
       kind: objective.kind,
+      challenge: objective.challenge,
       targetType: objective.targetType,
       targetId: objective.targetId,
       targetName: objective.targetName,

@@ -1,5 +1,9 @@
 import { createTacticalMapPanel } from "../tacticalMapRenderer.js";
 import { createNodeTacticalMap } from "../nodeTacticalMap.js";
+import { formatChallengeRating } from "../challenge.js";
+import { getCreatureById } from "../creatureCatalog/index.js";
+import { CREATURE_TYPES } from "../creatures.js";
+import { createCreatureDetail } from "../nodeDialog.js";
 import { createMissionTacticalMap } from "./missionTacticalMap.js";
 
 function createElement(tagName, className = null, text = null) {
@@ -143,13 +147,14 @@ function getMissionAvailability(mission, context = null) {
 
   if (mission.destination?.kind === "progress") {
     const progress = getMissionProgress(mission);
+    const hasCreatureTarget = mission.objective?.targetType === "creature" && mission.objective?.targetId;
 
     return {
       label: progress?.ready ? "Pronta para entregar" : "Progresso",
       text: progress
         ? `${mission.destination.label}. Progresso: ${progress.current}/${progress.required}.`
         : `${mission.destination.label}. Conte qualquer alvo compatível encontrado durante a exploração.`,
-      canOpen: false
+      canOpen: Boolean(hasCreatureTarget)
     };
   }
 
@@ -262,6 +267,39 @@ function renderMissionRiskDetails(tacticalMap) {
   });
 
   return list;
+}
+
+function createMissionCreatureItem(mission, tacticalMap = null) {
+  const objective = mission.objective || {};
+  if (objective.targetType !== "creature" || !objective.targetId) return null;
+
+  const creature = getCreatureById(objective.targetId);
+  const challenge = objective.challenge || creature?.challengeRating || mission.reward?.challenge;
+  const challengeLabel = formatChallengeRating(challenge);
+
+  return {
+    kind: "creature",
+    creatureId: objective.targetId,
+    creatureData: creature || null,
+    name: objective.targetName || creature?.name || "Criatura da missão",
+    quantity: Math.max(1, Math.min(Number(objective.quantity || tacticalMap?.enemyCount || 1), Number(tacticalMap?.enemyCount || objective.quantity || 1))),
+    challengeLabel,
+    typeLabel: CREATURE_TYPES[creature?.type]?.label || creature?.type || "Criatura",
+    roleLabel: creature?.roleMetadata?.label || creature?.role || "alvo de missão"
+  };
+}
+
+function renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress = null) {
+  const item = createMissionCreatureItem(mission, tacticalMap);
+
+  if (!item) return null;
+
+  const wrapper = createElement("section", "mission-creature-details");
+  const title = createElement("h3", null, "Ficha do alvo");
+  const detail = createCreatureDetail(item, [mission], onAdjustProgress);
+
+  wrapper.append(title, detail);
+  return wrapper;
 }
 
 function getEncounterItemsText(node) {
@@ -429,6 +467,8 @@ function renderMissionRunContent(mission, onComplete, context = null, profile = 
     if (!node && tacticalMap.riskDetails?.length) {
       container.appendChild(renderMissionRiskDetails(tacticalMap));
     }
+    const creatureDetails = renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress);
+    if (creatureDetails) container.appendChild(creatureDetails);
     container.appendChild(tacticalPanel);
   }
 
