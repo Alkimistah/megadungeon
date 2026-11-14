@@ -2,6 +2,7 @@ import { assignChallengeRating } from "./challenge.js";
 import { assignCreatureProfile } from "./creatures.js";
 import { assignTrapProfile } from "./traps.js";
 import { generateEnvironmentContext } from "./environment.js";
+import { createForestBossEncounter } from "./forestBossEncounter.js";
 import { pick, pickWeighted, randomInt } from "./random.js";
 import {
   bossRoom,
@@ -449,7 +450,7 @@ function convertMergedPathsToUnknown(levels) {
   }
 }
 
-export function generateMapData(depth, baseDC, profile, floor, rng = Math.random) {
+export function generateMapData(depth, baseDC, profile, floor, rng = Math.random, { version = 1 } = {}) {
   nodeId = 0;
   const levels = createSlayLikeMap(depth, profile, rng);
 
@@ -458,12 +459,40 @@ export function generateMapData(depth, baseDC, profile, floor, rng = Math.random
   addCampsIfEligible(levels, profile, rng);
   guaranteeAtLeastOneTreasure(levels, rng);
   assignUnknownReveals(levels, rng);
+  // A versão 1 mantém a ordem e as regras usadas por códigos de sessão antigos.
+  // Na versão 2 o conteúdo real dirige toda a mecânica; o tipo visível continua ?.
+  const visibleTypes = new Map();
+  if (version >= 2) {
+    const contentTypes = {
+      "Encontro normal": "normal", "Encontro elite": "elite", "Armadilha": "trap",
+      "Tesouro": "treasure", "Acampamento": "camp"
+    };
+    levels.flat().forEach((node) => {
+      visibleTypes.set(node.id, node.type);
+      node.contentType = node.type === "unknown" ? contentTypes[node.revealedLabel] : node.type;
+      node.type = node.contentType;
+      node.requiresCompletion = true;
+    });
+  }
   assignEnvironments(levels, profile, rng);
   assignChallengeRatings(levels, profile, floor);
   assignTrapProfiles(levels, profile, rng);
   assignCreatureProfiles(levels, profile, rng);
   assignDiscoveryChecks(levels, baseDC, rng);
   assignInvestigationTimes(levels, profile);
+
+  if (version >= 2) {
+    levels.flat().forEach((node) => {
+      node.type = visibleTypes.get(node.id);
+      if (node.contentType === "camp") {
+        node.safeRest = {
+          protectedFrom: ["climate", "terrain"],
+          description: "Descanso verdadeiro: abrigo firme e protegido, fora da correnteza, de quedas e de outros riscos do terreno. Os efeitos de clima e terreno descritos ao redor não atingem o grupo durante o descanso neste acampamento."
+        };
+      }
+      if (profile.id === "forest-11-20" && node.type === "boss") createForestBossEncounter(node);
+    });
+  }
 
   return levels;
 }

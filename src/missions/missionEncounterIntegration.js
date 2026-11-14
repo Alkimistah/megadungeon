@@ -12,10 +12,14 @@ export function getEncounterMissionMatches(item, missions = []) {
       const required = Math.max(1, Number(mission.progress?.required || mission.objective?.quantity || 1));
       const current = Math.min(required, Math.max(0, Number(mission.progress?.current || 0)));
       const remaining = Math.max(0, required - current);
-      const count = remaining > 0 ? Math.min(remaining, item.quantity || 1) : 0;
+      const eventKey = item.encounterKey ? `${item.encounterKey}:${item.creatureId}` : null;
+      const recorded = Boolean(eventKey && mission.progress?.recordedEncounters?.includes(eventKey));
+      const count = remaining > 0 && !recorded ? Math.min(remaining, item.quantity || 1) : 0;
 
       return {
         count,
+        eventKey,
+        recorded,
         mission,
         remaining,
         required,

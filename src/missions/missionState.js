@@ -22,6 +22,7 @@ export function createMissionState() {
     return {
       ...mission,
       progress: {
+        ...mission.progress,
         current,
         required
       }
@@ -76,6 +77,7 @@ export function createMissionState() {
       return {
         ...withProgress,
         progress: {
+          ...withProgress.progress,
           current,
           required
         },
@@ -85,6 +87,17 @@ export function createMissionState() {
         }
       };
     });
+  }
+
+  function recordEncounterProgress(missionId, eventKey, quantity) {
+    const mission = selected.find(m => m.id === missionId);
+    if (!mission || !shouldTrackProgress(mission) || mission.status === "completed" || !eventKey || quantity <= 0) return false;
+    if (mission.progress?.recordedEncounters?.includes(eventKey)) return false;
+    adjustProgress(missionId, quantity);
+    selected = selected.map(m => m.id !== missionId ? m : {
+      ...m, progress: { ...m.progress, recordedEncounters: [...(m.progress.recordedEncounters || []), eventKey] }
+    });
+    return true;
   }
 
   function getOffers() {
@@ -139,6 +152,7 @@ export function createMissionState() {
     importSessionState,
     markCompleted,
     replaceSelected,
+    recordEncounterProgress,
     reset,
     startBoard
   };

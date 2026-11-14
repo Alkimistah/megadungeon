@@ -1,0 +1,333 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { generateMapData } from "../src/generator.js";
+import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
+import { createRng } from "../src/random.js";
+import { resolveNodeEncounter } from "../src/encounterResolver.js";
+import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
+import { calculateCombatND } from "../src/challenge.js";
+import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
+import { createExplorationState } from "../src/appState.js";
+import { createMissionState } from "../src/missions/missionState.js";
+
+const integration = await import("../src/missions/forestMissionIntegration.js").catch(() => ({}));
+const expeditionModule = await import("../src/forestExpedition.js").catch(() => ({}));
+
+function mission(category, { floor = 15, targetId = "sucuri", targetName = "Sucuri", quantity = 1, ...extra } = {}) {
+  return {
+    id: `m-${category}`, profileId: profile.id, category, categoryLabel: category, title: category,
+    status: "selected", description: targetName,
+    destination: category === "extermination" ? { kind: "progress", floor: null, floorMin: 11, floorMax: 19 } : { kind: "floor", floor },
+    objective: { targetId, targetName, targetType: ["specialHunt", "extermination"].includes(category) ? "creature" : "material", quantity, condition: "cumprir objetivo" },
+    integration: { bindings: [], state: "pending" }, ...extra
+  };
+}
+
+function chain(budgets = [3, 3, 3]) {
+  const nodes = budgets.map((budget, i) => ({
+    id: i, level: i + 1, column: 3, type: "normal", contentType: "normal", label: "Encontro normal", links: [],
+    skill: "Sobrevivência", dc: 21, investigationMinutes: 15, encounterSeed: `fixture-${i}`,
+    challenge: { encounter: budget, creatures: budget, total: budget + 0.25, terrain: 0.25, climate: 0, trap: 0 },
+    environment: { climate: [{ name: "Clima normal" }], terrain: { name: "Floresta", features: [] } },
+    creature: { type: "animal", targetChallenge: budget }, trap: null
+  }));
+  nodes.forEach((node, i) => { node.links = nodes[i + 1] ? [nodes[i + 1]] : []; });
+  return nodes.map(n => [n]);
+}
+
+function materialize(args) {
+  assert.equal(typeof integration.materializeForestFloorMissions, "function", "forest mission materializer must exist");
+  return integration.materializeForestFloorMissions(args);
+}
+
+function map(floor, seed = "forest-mvp", depth = 8) {
+  return generateMapData(depth, profile.recommendations.baseDcByFloor[floor], profile, floor, createRng(seed), { version: 2 });
+}
+
+test("unknown elite receives elite budget and discovery check", () => {
+  let checked = 0;
+  for (let i = 0; i < 30; i++) {
+    for (const node of map(11, `unknown-${i}`).flat()) {
+      if (node.type !== "unknown" || node.revealedLabel !== "Encontro elite") continue;
+      assert.equal(node.challenge.encounter, 3);
+      assert.ok(node.skill && node.dc >= 22 && node.dc <= 25);
+      checked++;
+    }
+  }
+  assert.ok(checked > 0);
+});
+
+test("unknown true camps do not receive damaging climate", () => {
+  let checked = 0;
+  for (let i = 0; i < 50; i++) {
+    for (const node of map(15, `camp-${i}`).flat()) {
+      if (node.type !== "unknown" || node.revealedLabel !== "Acampamento") continue;
+      assert.equal(node.creature, null);
+      assert.equal(node.trap, null);
+      assert.equal(node.dc, null);
+      assert.ok(node.environment.climate.every(c => !profile.environmentRules.climate.damagingClimateNames.includes(c.name)));
+      checked++;
+    }
+  }
+  assert.ok(checked > 0);
+});
+
+test("Quimera is alone in the same simple arena for every seed", () => {
+  let first;
+  for (let i = 0; i < 30; i++) {
+    const boss = map(20, `boss-${i}`).at(-1)[0];
+    const encounter = resolveNodeEncounter(boss, { mapSeed: `boss-${i}` });
+    assert.deepEqual(encounter.items.map(({ creatureId, quantity, kind }) => ({ creatureId, quantity, kind })), [
+      { creatureId: "quimera", quantity: 1, kind: "creature" }
+    ]);
+    assert.equal(boss.trap, null);
+    assert.equal(boss.challenge.total, 8);
+    const tactical = createNodeTacticalMap(boss);
+    assert.equal(tactical.cells.filter(c => c === "party").length, 4);
+    assert.equal(tactical.cells.filter(c => c === "boss").length, 4);
+    assert.ok(tactical.cells.every(c => ["floor", "party", "boss"].includes(c)));
+    if (first) assert.deepEqual({ environment: boss.environment, tactical }, first);
+    first = { environment: boss.environment, tactical };
+  }
+});
+
+test("opening a mission preserves the tactical scene of its node", () => {
+  const node = map(15).flat().find(n => n.type === "normal");
+  resolveNodeEncounter(node, { mapSeed: "same-scene" });
+  const base = createNodeTacticalMap(node);
+  const withMission = createNodeTacticalMap(node, { mission: { id: "test-mission" } });
+  assert.equal(withMission.objectiveCount, 1);
+  assert.deepEqual(withMission.cells.map((c, i) => c === "objective" ? base.cells[i] : c), base.cells);
+});
+
+test("special hunt places the promised creature inside the node encounter budget", () => {
+  const levels = chain();
+  const [out] = materialize({ floor: 15, levels, missions: [mission("specialHunt")] });
+  const binding = out.integration.bindings[0];
+  const node = levels.flat().find(n => n.id === binding.nodeId);
+  const encounter = resolveNodeEncounter(node, { mapSeed: "hunt" });
+  assert.equal(binding.floor, 15);
+  assert.deepEqual(encounter.items.map(i => [i.creatureId, i.quantity]), [["sucuri", 1]]);
+  assert.equal(encounter.budget.creatures, 3);
+  assert.ok(calculateCombatND(encounter.items) <= 3);
+});
+
+test("extermination reserves eight real enemies across nodes without exceeding ND 3", () => {
+  const levels = chain();
+  const [out] = materialize({ floor: 15, levels, missions: [mission("extermination", { targetId: "naja", targetName: "Naja", quantity: 8 })] });
+  const bindings = out.integration.bindings;
+  assert.equal(bindings.reduce((sum, b) => sum + b.quantity, 0), 8);
+  for (const binding of bindings) {
+    const node = levels.flat().find(n => n.id === binding.nodeId);
+    const encounter = resolveNodeEncounter(node, { mapSeed: "extermination" });
+    assert.equal(encounter.items[0].creatureId, "naja");
+    assert.ok(calculateCombatND(encounter.items) <= 3);
+  }
+});
+
+test("mission allocation rejects incompatible branches instead of reporting false success", () => {
+  const left = chain([3])[0][0];
+  const right = { ...structuredClone(left), id: 1, column: 5 };
+  right.environment = { climate: [{ name: "Neblina" }], terrain: { name: "Aquático", features: [{ name: "Água corrente" }] } };
+  const levels = [[left, right]];
+  const missions = [
+    mission("collection", { targetName: "sementes de vegetação agressiva" }),
+    mission("anomalous", { targetName: "neblina que apaga sons próximos" })
+  ];
+  assert.throws(() => materialize({ floor: 15, levels, missions }), /rota|compatível/i);
+  assert.ok(levels.flat().every(n => !n.missionBindings));
+});
+
+test("noncombat mission adds the exact objective to a compatible scene", () => {
+  const levels = chain();
+  const [out] = materialize({ floor: 15, levels, missions: [mission("collection", { targetName: "sementes de vegetação agressiva", quantity: 4 })] });
+  const node = levels.flat().find(n => n.id === out.integration.bindings[0].nodeId);
+  assert.equal(node.missionObjectives[0].targetName, "sementes de vegetação agressiva");
+  assert.equal(node.missionObjectives[0].quantity, 4);
+  assert.ok(node.missionObjectives[0].description.includes("sementes de vegetação agressiva"));
+  assert.equal(node.environment.terrain.name, "Floresta");
+});
+
+test("a prepared expedition has actual mission content and enough extermination targets", () => {
+  assert.equal(typeof expeditionModule.prepareForestExpedition, "function");
+  const seen = new Set();
+  for (let i = 0; i < 80; i++) {
+    const seed = `expedition-${i}`;
+    const offers = generateMissionOffers(createMissionGenerationContext({ currentSeed: seed, profile }));
+    const expedition = expeditionModule.prepareForestExpedition({ seed, profile, missions: offers.slice(0, 3) });
+    for (const entry of expedition.floors) {
+      assert.ok(entry.levels.flat().every(n => (n.missionBindings?.length || 0) <= 1), `${seed}: missions sharing a node`);
+    }
+    for (const m of expedition.missions) {
+      seen.add(m.category);
+      const bindings = m.integration.bindings;
+      assert.ok(bindings.length > 0, `${seed}: ${m.category} without nodes`);
+      if (m.category === "extermination") assert.equal(bindings.reduce((n, b) => n + b.quantity, 0), m.objective.quantity);
+      for (const b of bindings) {
+        const entry = expedition.floors.find(f => f.floor === b.floor);
+        const node = entry.levels.flat().find(n => n.id === b.nodeId);
+        assert.ok(node.missionObjectives.some(o => o.missionId === m.id));
+        assert.ok(!["camp", "boss"].includes(node.contentType));
+        if (m.objective.targetType === "creature") {
+          const encounter = resolveNodeEncounter(node, { mapSeed: entry.mapSeed });
+          assert.ok(encounter.items.some(item => item.creatureId === m.objective.targetId && item.quantity === b.quantity));
+        }
+      }
+    }
+  }
+  assert.equal(seen.size, 10);
+});
+
+test("expedition snapshot restores graph links, fixed encounters and mission bindings", () => {
+  assert.equal(typeof expeditionModule.prepareForestExpedition, "function");
+  const original = expeditionModule.prepareForestExpedition({ seed: "snapshot", profile, missions: [mission("specialHunt")] });
+  const entry = original.floors.find(f => f.floor === 15);
+  const binding = original.missions[0].integration.bindings[0];
+  const node = entry.levels.flat().find(n => n.id === binding.nodeId);
+  resolveNodeEncounter(node, { mapSeed: entry.mapSeed });
+  const saved = JSON.parse(JSON.stringify(expeditionModule.serializeForestExpedition(original)));
+  const restored = expeditionModule.restoreForestExpedition(saved);
+  const restoredNode = restored.floors.find(f => f.floor === 15).levels.flat().find(n => n.id === binding.nodeId);
+  assert.deepEqual(restoredNode.resolvedEncounter, JSON.parse(JSON.stringify(node.resolvedEncounter)));
+  assert.deepEqual(restoredNode.missionObjectives, node.missionObjectives);
+  assert.deepEqual(expeditionModule.serializeForestExpedition(restored), saved);
+  for (const f of restored.floors) {
+    const all = new Set(f.levels.flat());
+    assert.ok(f.levels.flat().every(n => n.links.every(next => all.has(next) && next.level === n.level + 1)));
+  }
+});
+
+test("choosing a new scene does not unlock the next node before completion", () => {
+  const levels = chain();
+  levels.flat().forEach(n => { n.requiresCompletion = true; });
+  const state = createExplorationState();
+  state.setLevels(levels);
+  assert.equal(state.chooseRoute(levels[0][0]), true);
+  assert.equal(state.getNodeViewState(levels[1][0]).active, false);
+  assert.equal(state.completeNode(levels[0][0]), true);
+  assert.equal(state.getNodeViewState(levels[1][0]).active, true);
+  const saved = state.exportSessionState();
+  const restored = createExplorationState();
+  restored.setLevels(levels);
+  restored.importSessionState(saved);
+  assert.equal(restored.isNodeCompleted(levels[0][0]), true);
+  assert.equal(restored.getNodeViewState(levels[1][0]).active, true);
+});
+
+test("true rest requires the chosen camp and cannot be used from an old camp", () => {
+  const levels = chain();
+  levels[0][0].type = "camp";
+  levels[0][0].contentType = "camp";
+  levels.flat().forEach(n => { n.requiresCompletion = true; });
+  const state = createExplorationState();
+  state.setLevels(levels);
+  assert.equal(state.restAtNode(levels[0][0]), false);
+  state.chooseRoute(levels[0][0]);
+  assert.equal(state.restAtNode(levels[0][0]), true);
+  assert.equal(state.restAtNode(levels[0][0]), false);
+  assert.equal(state.restAtNode(levels[1][0]), false);
+});
+
+test("the same defeated enemies cannot be credited twice, including after restoring", () => {
+  const state = createMissionState();
+  state.startBoard(profile.id, [mission("extermination", { quantity: 8 })]);
+  state.confirmSelection(["m-extermination"]);
+  assert.equal(typeof state.recordEncounterProgress, "function");
+  assert.equal(state.recordEncounterProgress("m-extermination", "floor-15:node-2:sucuri", 2), true);
+  assert.equal(state.recordEncounterProgress("m-extermination", "floor-15:node-2:sucuri", 2), false);
+  assert.equal(state.getSelected()[0].progress.current, 2);
+  const restored = createMissionState();
+  restored.importSessionState(JSON.parse(JSON.stringify(state.exportSessionState())));
+  assert.equal(restored.recordEncounterProgress("m-extermination", "floor-15:node-2:sucuri", 2), false);
+  assert.equal(restored.recordEncounterProgress("m-extermination", "floor-16:node-2:sucuri", 2), true);
+  assert.equal(restored.getSelected()[0].progress.current, 4);
+});
+
+test("unknown contents stay concealed until that route is chosen", () => {
+  const node = chain([3])[0][0];
+  Object.assign(node, { type: "unknown", contentType: "elite", revealedLabel: "Encontro elite", requiresCompletion: true });
+  const state = createExplorationState();
+  state.setLevels([[node]]);
+  assert.equal(state.isNodeRevealed(node), false);
+  state.chooseRoute(node);
+  assert.equal(state.isNodeRevealed(node), true);
+});
+
+test("legacy generation retains the original route and unknown semantics", () => {
+  const legacy = generateMapData(8, 15, profile, 11, createRng("unknown-0"));
+  assert.ok(legacy.flat().every(n => !n.requiresCompletion && !n.contentType));
+  const state = createExplorationState();
+  state.setLevels(legacy);
+  state.chooseRoute(legacy[0][0]);
+  assert.ok(legacy[0][0].links.every(n => state.getNodeViewState(n).active));
+});
+
+test("investigation contains evidence and an answer, rather than only a mission label", () => {
+  const levels = chain();
+  materialize({ floor: 15, levels, missions: [mission("investigation", {
+    targetName: "ossos marcados por ferramenta", targetId: "ossos", quantity: 1
+  })] });
+  const objective = levels.flat().find(n => n.missionObjectives)?.missionObjectives[0];
+  assert.ok(objective.question?.includes("marcas"));
+  assert.ok(objective.evidence?.length >= 2);
+  assert.ok(objective.answer?.includes("ferramenta"));
+  assert.ok(objective.onSuccess && objective.onFailure);
+});
+
+test("a mission trial defines approaches and success/failure using the existing terrain rules", () => {
+  const levels = chain();
+  levels.flat().forEach(n => { n.environment.terrain = { name: "Aquático", features: [{ name: "Água corrente", effect: "Atletismo CD 15 para nadar contra a corrente." }] }; });
+  materialize({ floor: 15, levels, missions: [mission("trial", { targetName: "cruzar terreno inundado", targetId: "travessia" })] });
+  const objective = levels.flat().find(n => n.missionObjectives)?.missionObjectives[0];
+  assert.ok(objective.approaches?.some(a => a.includes("Atletismo")));
+  assert.ok(objective.onSuccess?.includes("margem"));
+  assert.ok(objective.onFailure?.includes("regra"));
+});
+
+test("a true camp explicitly shelters the group from surrounding water and terrain hazards", () => {
+  const aquatic = profile.environmentRules.terrain.terrainOptions.find(option => option.value.name === "Aquático");
+  const forced = { ...profile, environmentRules: { ...profile.environmentRules, terrain: {
+    ...profile.environmentRules.terrain, terrainOptions: [aquatic]
+  } } };
+  const levels = generateMapData(4, 20, forced, 11, createRng("safe-riverside"), { version: 2 });
+  for (const node of levels[3]) {
+    assert.equal(node.contentType, "camp");
+    assert.equal(node.environment.terrain.name, "Aquático");
+    assert.ok(node.safeRest?.protectedFrom.includes("terrain"));
+    assert.ok(node.safeRest?.description.includes("abrigo"));
+  }
+});
+
+test("two missions for floor 15 occupy different nodes of the same route", () => {
+  const levels = chain();
+  const selected = [
+    mission("collection", { id: "coleta-15", targetName: "sementes de vegetação agressiva" }),
+    mission("recovery", { id: "recuperacao-15", targetName: "uma bússola desregulada" })
+  ];
+  const results = materialize({ floor: 15, levels, missions: selected });
+  const ids = results.map(m => m.integration.bindings[0].nodeId);
+  assert.equal(new Set(ids).size, 2);
+  assert.ok(levels.flat().every(n => (n.missionBindings?.length || 0) <= 1));
+});
+
+test("combat and noncombat missions do not share a node with extermination", () => {
+  const levels = chain([3, 3, 3, 3]);
+  const results = materialize({ floor: 15, levels, missions: [
+    mission("specialHunt"),
+    mission("collection", { targetName: "sementes de vegetação agressiva" }),
+    mission("extermination", { targetId: "naja", targetName: "Naja", quantity: 4 })
+  ] });
+  assert.equal(results.length, 3);
+  assert.ok(levels.flat().every(n => (n.missionBindings?.length || 0) <= 1));
+  assert.equal(results.find(m => m.category === "extermination").integration.bindings.reduce((n, b) => n + b.quantity, 0), 4);
+});
+
+test("a route with only one eligible node cannot accept two similar missions", () => {
+  const levels = chain([3]);
+  const selected = [
+    mission("collection", { id: "coleta-a", targetName: "sementes de vegetação agressiva" }),
+    mission("collection", { id: "coleta-b", targetName: "fungos luminescentes" })
+  ];
+  assert.throws(() => materialize({ floor: 15, levels, missions: selected }), /rota compatível/i);
+  assert.ok(levels.flat().every(n => !n.missionBindings && !n.missionObjectives));
+});

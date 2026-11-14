@@ -126,7 +126,7 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
       icon.setAttribute("width", "32");
       icon.setAttribute("height", "32");
       icon.setAttribute("class", "node-icon");
-      icon.dataset.revealedIcon = ICONS_BY_ROOM_TYPE[node.type];
+      icon.dataset.revealedIcon = ICONS_BY_ROOM_TYPE[node.contentType || node.type];
 
       group.appendChild(circle);
       group.appendChild(icon);
@@ -186,6 +186,9 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
 
       if (icon) {
         icon.setAttribute("href", nodeState.revealed ? icon.dataset.revealedIcon : activeHiddenNodeIcon);
+      }
+      if (node.requiresCompletion && node.type === "unknown") {
+        element.querySelector(".check-label")?.setAttribute("visibility", nodeState.chosen ? "visible" : "hidden");
       }
 
       element.setAttribute("aria-disabled", String(!nodeState.canOpen));

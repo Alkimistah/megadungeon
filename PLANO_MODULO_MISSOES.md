@@ -2,6 +2,8 @@
 
 ## Status deste documento
 
+> MVP de 14/11/2026: para os andares 11–20, consultar o [planejamento, a auditoria e a entrega de integração](PLANEJAMENTO_ANDARES_11_A_20.md). Novas expedições já materializam conteúdo temático real nos nodos, inclusive caçadas e extermínio, e preservam seus mapas e vínculos ao salvar. Sessões legadas mantêm o caminho anterior. Esse planejamento prevalece sobre orientações anteriores incompatíveis para essa faixa.
+
 Este arquivo descreve o plano funcional e técnico do módulo de missões e deve ser lido como um documento vivo. Parte do módulo já foi implementada; as seções de etapas e critérios de aceite separam o que existe hoje do que ainda precisa ser validado ou evoluído.
 
 O arquivo `gerador_missoes_praxis.txt` foi tratado como fonte de categorias, tabelas e exemplos. As decisões de produto descritas pelo usuário e a coerência com os perfis atuais do app têm prioridade sobre qualquer sugestão presente no TXT.

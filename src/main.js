@@ -4,6 +4,7 @@ import { createExplorationState } from "./appState.js";
 import { FLOOR_RANGES, applyTheme, getFloorRange } from "./floorRanges.js";
 import { formatElapsedTime } from "./format.js";
 import { generateMapData } from "./generator.js";
+import { prepareForestExpedition, serializeForestExpedition, restoreForestExpedition } from "./forestExpedition.js";
 import { createArchipelagoRenderer } from "./archipelagoRenderer.js";
 import { createArchipelagoState } from "./archipelagoState.js";
 import { canConfigureExtendedExplorationFloor } from "./extendedExplorationControls.js";
@@ -75,19 +76,41 @@ const archipelagoState = createArchipelagoState(activeFloorRange, createRng(curr
 const missionState = createMissionState();
 let missionDialogController = null;
 let renderedNodeMapFloor = null;
+let forestExpedition = null;
 
-function openMissionById(missionId) {
-  missionDialogController?.openMission(missionId);
+function adjustMissionProgress(missionId, delta, eventKey = null) {
+  if (eventKey) missionState.recordEncounterProgress(missionId, eventKey, delta);
+  else missionState.adjustProgress(missionId, delta);
+  refreshExplorationDisplay();
+  nodeDialogController.rerenderCurrent();
+  updateInfo();
+}
+
+function openMissionById(missionId, node = null) {
+  missionDialogController?.openMission(missionId, node ? { kind: "node", node } : null);
 }
 
 function getMissionContext(mission) {
-  const nodeBinding = (mission.integration?.bindings || [])
-    .find((binding) => binding.kind === "node" && binding.nodeId !== undefined);
+  if (!isNodeMapMode()) return null;
+  const bindings = (mission.integration?.bindings || []).filter(b => b.kind === "node");
+  const currentBindings = bindings.filter(b => b.floor === renderedNodeMapFloor).sort((a, b) => {
+    const nodes = state.getLevels().flat();
+    return (nodes.find(n => n.id === b.nodeId)?.level || 0) - (nodes.find(n => n.id === a.nodeId)?.level || 0);
+  });
+  const currentNodes = currentBindings.map(b => state.getLevels().flat().find(n => n.id === b.nodeId)).filter(Boolean);
+  const nodeBinding = currentBindings.find(b => {
+    const candidate = currentNodes.find(n => n.id === b.nodeId);
+    return candidate && state.isNodeChosen(candidate);
+  }) || currentBindings[0];
 
   if (!nodeBinding) {
-    return isNodeMapMode()
-      ? { kind: "pending-node" }
-      : null;
+    const future = bindings.some(b => b.floor > renderedNodeMapFloor);
+    return {
+      kind: future || !bindings.length ? "pending-node" : "past-node",
+      message: future ? "Os objetivos desta missão estão em andares seguintes."
+        : bindings.length ? "Os objetivos desta missão ficaram em andares já percorridos. O mestre pode confirmar a entrega de algo já obtido."
+        : "Aguardando o andar e o nodo da missão."
+    };
   }
 
   const node = state.getLevels()
@@ -101,7 +124,19 @@ function getMissionContext(mission) {
   }
 
   if (!state.isNodeChosen(node)) {
-    return { kind: "pending-node" };
+    const reachable = new Set();
+    const pending = state.getLevels().flat().filter(n => state.getNodeViewState(n).active);
+    // Uma cena escolhida ainda não concluída também possui saídas futuras.
+    pending.push(...state.getLevels().flat().filter(n => state.isNodeChosen(n) && !state.isNodeCompleted(n)));
+    while (pending.length) {
+      const candidate = pending.pop();
+      if (reachable.has(candidate.id)) continue;
+      reachable.add(candidate.id);
+      pending.push(...candidate.links);
+    }
+    return currentNodes.some(n => reachable.has(n.id))
+      ? { kind: "pending-node", message: "Escolha e alcance um dos nodos vinculados para realizar esta missão." }
+      : { kind: "past-node", message: "A rota escolhida deixou este objetivo para trás." };
   }
 
   resolveNodeEncounter(node, { mapSeed: currentMapSeed });
@@ -128,7 +163,7 @@ function isTopLevelRouteChosen() {
   const levels = state.getLevels();
   const topLevel = levels[levels.length - 1] || [];
 
-  return topLevel.some((node) => state.isNodeChosen(node));
+  return topLevel.some((node) => state.isNodeChosen(node) && (!node.requiresCompletion || state.isNodeCompleted(node)));
 }
 
 function syncNodeFloorAdvanceControl() {
@@ -139,7 +174,7 @@ function syncNodeFloorAdvanceControl() {
   elements.advanceNodeFloorButton.disabled = !canAdvance;
   elements.advanceNodeFloorButton.textContent = hasNextNodeMapFloor()
     ? "Avançar andar"
-    : "Último andar";
+    : isTopLevelRouteChosen() ? "Faixa concluída" : "Último andar";
 }
 
 function advanceNodeMapFloor() {
@@ -149,9 +184,14 @@ function advanceNodeMapFloor() {
 
   if (!nextFloor) return;
 
+  if (forestExpedition) {
+    const current = forestExpedition.floors.find(entry => entry.floor === renderedNodeMapFloor);
+    current.state = state.exportSessionState();
+  }
+
   elements.floorInput.value = String(nextFloor);
   syncRecommendationsWithFloor();
-  generateMap();
+  generateMap({ reuseSeed: Boolean(forestExpedition) });
 }
 
 const nodeDialogController = createNodeDialogController({
@@ -174,11 +214,12 @@ const nodeDialogController = createNodeDialogController({
     refreshExplorationDisplay();
     nodeDialogController.open(node);
   },
-  onAdjustMissionProgress: (missionId, delta) => {
-    missionState.adjustProgress(missionId, delta);
+  onComplete: (node) => {
+    state.completeNode(node);
     refreshExplorationDisplay();
-    updateInfo();
+    nodeDialogController.open(node);
   },
+  onAdjustMissionProgress: adjustMissionProgress,
   onExplore: (node) => {
     state.markExplored(node);
     refreshExplorationDisplay();
@@ -229,14 +270,23 @@ missionDialogController = createMissionDialogController({
   getProfile: () => activeFloorRange,
   getSelected: () => missionState.getSelected(),
   onConfirmSelection: (selectedMissionIds) => {
+    if (activeFloorRange.id === "forest-11-20") {
+      const selected = missionState.getOffers().filter(m => selectedMissionIds.includes(m.id));
+      const prepared = prepareForestExpedition({
+        seed: currentMapSeed, profile: activeFloorRange, missions: selected,
+        startFloor: Number(elements.floorInput.value),
+        depth: Number(elements.depthInput.value), baseDc: Number(elements.baseDcInput.value)
+      });
+      missionState.confirmSelection(selectedMissionIds);
+      missionState.replaceSelected(prepared.missions);
+      forestExpedition = prepared;
+      generateMap({ reuseSeed: true });
+      return;
+    }
     missionState.confirmSelection(selectedMissionIds);
     generateMap({ reuseSeed: true });
   },
-  onAdjustProgress: (missionId, delta) => {
-    missionState.adjustProgress(missionId, delta);
-    refreshExplorationDisplay();
-    updateInfo();
-  },
+  onAdjustProgress: adjustMissionProgress,
   onMarkCompleted: (missionId) => {
     missionState.markCompleted(missionId);
     refreshExplorationDisplay();
@@ -354,8 +404,15 @@ function syncExtendedFloorControls() {
   if (locked) {
     elements.floorInput.value = String(extendedState.getSnapshot().floor);
   }
-  elements.floorInput.disabled = locked;
-  elements.generateButton.disabled = locked;
+  const forestLocked = isNodeMapMode() && forestExpedition;
+  const hasForestProgress = forestLocked && (
+    forestExpedition.floors.some(entry => entry.state?.chosenByLevel?.length)
+    || state.getLevels().flat().some(n => state.isNodeChosen(n) || state.isNodeAttempted(n) || state.isNodeExplored(n))
+  );
+  elements.floorInput.disabled = Boolean(locked || forestLocked);
+  elements.generateButton.disabled = Boolean(locked || hasForestProgress);
+  elements.depthInput.disabled = Boolean(hasForestProgress);
+  elements.baseDcInput.disabled = Boolean(hasForestProgress);
 }
 
 function updateTimeTracker() {
@@ -407,7 +464,8 @@ function getCurrentSession() {
     unknownPaths: state.isUnknownPathsEnabled(),
     mapSeed: currentMapSeed,
     missions: missionState.exportSessionState(),
-    state: state.exportSessionState()
+    state: state.exportSessionState(),
+    ...(forestExpedition ? { forestExpedition: serializeForestExpedition(forestExpedition) } : {})
   };
 }
 
@@ -480,6 +538,7 @@ function resolveChosenRouteEncounters(levels, sessionState = {}) {
 }
 
 function materializeActiveMissions({ floor = Number(elements.floorInput.value), levels = null } = {}) {
+  if (forestExpedition && isNodeMapMode()) return;
   const selectedMissions = missionState.getSelected();
 
   if (!selectedMissions.length) return;
@@ -563,6 +622,19 @@ function restoreSession(session) {
   elements.baseDcInput.value = session.baseDc;
   setUnknownPathsMode(Boolean(session.unknownPaths));
 
+  if (session.forestExpedition) {
+    forestExpedition = restoreForestExpedition(session.forestExpedition);
+    const entry = forestExpedition.floors.find(f => f.floor === session.floor);
+    if (!entry) throw new Error("Andar não encontrado na expedição salva.");
+    state.setLevels(entry.levels);
+    renderedNodeMapFloor = entry.floor;
+    state.importSessionState(session.state);
+    mapRenderer.drawMap(entry.levels, activeFloorRange.theme.columnColors);
+    refreshExplorationDisplay();
+    updateInfo(entry.levels);
+    return;
+  }
+
   const levels = generateMapData(
     session.depth,
     session.baseDc,
@@ -641,6 +713,7 @@ function syncRecommendationsWithFloor() {
 }
 
 function applyFloorRange(floorRangeId) {
+  forestExpedition = null;
   activeFloorRange = getFloorRange(floorRangeId);
   elements.floorRangeTitle.textContent = activeFloorRange.label;
   populateFloorSelect(activeFloorRange);
@@ -720,6 +793,33 @@ function generateMap({ reuseSeed = false } = {}) {
     refreshExplorationDisplay();
     updateInfo();
     return;
+  }
+
+  if (activeFloorRange.id === "forest-11-20") {
+    if (!reuseSeed) {
+      if (elements.generateButton.disabled) return;
+      const nextSeed = createRandomSeed();
+      const selected = missionState.getSelected().map(m => ({
+        ...m, integration: { ...m.integration, bindings: [] }
+      }));
+      const prepared = prepareForestExpedition({
+        seed: nextSeed, profile: activeFloorRange, missions: selected,
+        startFloor: Number(elements.floorInput.value),
+        depth: Math.max(3, Math.min(20, Number(elements.depthInput.value))),
+        baseDc: Math.max(5, Math.min(40, Number(elements.baseDcInput.value)))
+      });
+      forestExpedition = prepared;
+      currentMapSeed = nextSeed;
+      missionState.replaceSelected(prepared.missions);
+    }
+    if (forestExpedition) {
+      const entry = forestExpedition.floors.find(f => f.floor === Number(elements.floorInput.value));
+      if (!entry) throw new Error("Andar não encontrado nesta expedição.");
+      elements.depthInput.value = entry.depth;
+      elements.baseDcInput.value = entry.baseDc;
+      drawGeneratedLevels(entry.levels);
+      return;
+    }
   }
 
   let depth = Number(elements.depthInput.value);
@@ -808,7 +908,17 @@ function bindEvents() {
   });
 
   elements.generateButton.addEventListener("click", () => {
-    generateMap();
+    try {
+      generateMap();
+    } catch (error) {
+      const current = forestExpedition?.floors.find(entry => entry.floor === renderedNodeMapFloor);
+      if (current) {
+        elements.floorInput.value = String(current.floor);
+        elements.depthInput.value = current.depth;
+        elements.baseDcInput.value = current.baseDc;
+      }
+      showInfoMessage(error.message);
+    }
   });
 
   elements.advanceNodeFloorButton.addEventListener("click", advanceNodeMapFloor);

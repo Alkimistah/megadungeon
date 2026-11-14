@@ -66,6 +66,9 @@ Toda a documentação técnica detalhada — arquitetura, sistemas, estrutura de
 
 Documentos de requisitos por etapa:
 
+- [Planejamento e prioridades dos andares 11–20](PLANEJAMENTO_ANDARES_11_A_20.md) — revisão de missões e corte de escopo para o próximo uso.
+- [Progressão de níveis do grupo](PROGRESSAO_NIVEIS_GRUPO.md) — referência oficial de campanha por faixa de andares.
+
 - [`REQUISITOS_ANDARES_1_A_10.md`](REQUISITOS_ANDARES_1_A_10.md)
 - [`REQUISITOS_ANDARES_11_A_20.md`](REQUISITOS_ANDARES_11_A_20.md)
 - [`REQUISITOS_ANDARES_21_A_30.md`](REQUISITOS_ANDARES_21_A_30.md)
@@ -85,8 +88,26 @@ Para adicionar uma nova faixa de andares:
 
 ## Melhorias possíveis
 
-- Adicionar mapas táticos aos encontros dos andares 11 a 20, mantendo o mapa em nodos como representação principal dessa faixa.
+- Criar uma mecânica especial para a Quimera; o MVP usa o chefe sozinho em arena fixa simples.
+- Ampliar os desconhecidos e evoluir a continuidade de clima/terreno e as pistas de rota dos andares 11–20.
 - Evoluir os andares 21 a 30 como arquipélago aberto com 10 ilhas e ilha final de boss bloqueada por progresso.
+
+## MVP dos andares 11–20
+
+Novas expedições incluem missões efetivamente presentes nos nodos, extermínio distribuído com contador, objetivos temáticos sem combate, CDs de 20 a 23 e conclusão de cada cena antes de avançar. A Quimera tem composição e mapa fixos. O código de sessão salva os mapas preparados e o progresso; códigos anteriores continuam restauráveis pelo fluxo legado.
+
+Verificações locais:
+
+```bash
+npm run test:floors-11-20
+npm run test:missions
+npm run test:floors-1-10
+npm run build
+```
+
+Com o servidor local ativo, `npm run qa:floors-11-20` e `npm run qa:floors-1-10` executam os fluxos no Chrome. Defina `QA_CHROME` se o executável não estiver em `/usr/bin/google-chrome`. Para testar o build e o cache offline, execute `npm run preview -- --port 4173` e `node scripts/qaForestMvp.mjs --production`.
+
+Detalhes de entrega, evidências e pendências estão no [planejamento](PLANEJAMENTO_ANDARES_11_A_20.md).
 
 ### Desempenho do bundle
 

@@ -32,10 +32,15 @@ function createNodeMissionNotice(node, onOpenMission, state) {
     button.className = "extended-action is-compact mission-context-action";
     button.type = "button";
     button.textContent = "Realizar missão";
-    button.addEventListener("click", () => onOpenMission(mission.id));
+    button.addEventListener("click", () => onOpenMission(mission.id, node));
     actions.appendChild(button);
   });
   notice.append(title, text, actions);
+  for (const objective of node.missionObjectives || []) {
+    const detail = document.createElement("p");
+    detail.textContent = `${objective.description} ${objective.approach}`;
+    notice.appendChild(detail);
+  }
 
   return notice;
 }
@@ -266,7 +271,7 @@ function createDivider() {
 }
 
 function canShowEnvironmentDetails(node, state) {
-  return !state.isUnknownPathsEnabled() || state.isNodeExplored(node) || state.isNodeChosen(node);
+  return state.isNodeRevealed(node);
 }
 
 function createHiddenEnvironmentNotice() {
@@ -330,6 +335,7 @@ function createEncounterBudget(node) {
 }
 
 function formatMissionMatchText(match) {
+  if (match.recorded) return `${match.mission.title}: alvos deste encontro já registrados`;
   if (match.count <= 0) return `${match.mission.title}: meta atingida`;
 
   const countText = match.count === 1 ? "1 alvo" : `${match.count} alvos`;
@@ -369,7 +375,7 @@ function createEncounterMissionPanel(matches, onAdjustMissionProgress = null) {
       button.type = "button";
       button.className = "extended-action is-compact encounter-mission-action";
       button.textContent = `Somar ${match.count}`;
-      button.addEventListener("click", () => onAdjustMissionProgress(match.mission.id, match.count));
+      button.addEventListener("click", () => onAdjustMissionProgress(match.mission.id, match.count, match.eventKey));
       row.appendChild(button);
     }
 
@@ -402,7 +408,7 @@ function createEncounterList(node, selectedKey, onSelect, missions = []) {
       ? `${item.quantity} x ${item.name}`
       : `${item.quantity} x ${item.name}`;
     button.appendChild(name);
-    getEncounterMissionMatches(item, missions).forEach((match) => {
+    getEncounterMissionMatches({ ...item, encounterKey: node.resolvedEncounter.seed }, missions).forEach((match) => {
       button.appendChild(createEncounterMissionBadge(match));
     });
     button.addEventListener("click", () => onSelect(key));
@@ -651,7 +657,7 @@ function createEncounterDetail(node, selectedKey, missions = [], onAdjustMission
   panel.appendChild(
     selectedItem.kind === "trap"
       ? createTrapDetail(node, selectedItem)
-      : createCreatureDetail(selectedItem, missions, onAdjustMissionProgress)
+      : createCreatureDetail({ ...selectedItem, encounterKey: node.resolvedEncounter.seed }, missions, onAdjustMissionProgress)
   );
 
   return panel;
@@ -697,6 +703,7 @@ export function createNodeDialogController({
   metaElement,
   onAttempt,
   onChooseRoute,
+  onComplete = () => {},
   onExplore,
   getActiveMissions = () => [],
   onAdjustMissionProgress = null,
@@ -798,7 +805,7 @@ export function createNodeDialogController({
 
     actions.className = "modal-actions";
 
-    if (node.skill && node.dc) {
+    if (node.skill && node.dc && !(node.requiresCompletion && node.type === "unknown" && !state.isNodeChosen(node))) {
       actions.appendChild(createAttemptControl(node));
       actions.appendChild(createExploredControl(node));
     }
@@ -808,6 +815,15 @@ export function createNodeDialogController({
     }
 
     actions.appendChild(createRouteChoiceControl(node));
+    if (node.requiresCompletion && state.isNodeChosen(node)) {
+      const completed = state.isNodeCompleted(node);
+      actions.appendChild(createModalCheckbox(
+        "modal-choice complete-choice", completed, completed,
+        node.type === "boss" ? (completed ? "Quimera derrotada" : "Confirmar derrota da Quimera")
+          : completed ? "Encontro concluído" : "Concluir encontro",
+        () => onComplete(node)
+      ));
+    }
 
     return actions;
   }
@@ -859,8 +875,8 @@ export function createNodeDialogController({
     contentElement.appendChild(createCombatPage(node, selectedKey, (nextSelectedKey) => {
       selectedEncounterItemByNode.set(node.id, nextSelectedKey);
       render(node);
-    }, getActiveMissions(), (missionId, delta) => {
-      onAdjustMissionProgress?.(missionId, delta);
+    }, getActiveMissions(), (missionId, delta, eventKey) => {
+      onAdjustMissionProgress?.(missionId, delta, eventKey);
       render(node);
     }));
   }
@@ -868,7 +884,9 @@ export function createNodeDialogController({
   function render(node) {
     if (!state.canOpenNode(node)) return;
 
-    const checkText = node.skill && node.dc ? `${node.skill} ${node.dc}` : "Sem teste de descoberta";
+    const checkText = node.requiresCompletion && node.type === "unknown" && !state.isNodeChosen(node)
+      ? "Revelado ao escolher a rota"
+      : node.skill && node.dc ? `${node.skill} ${node.dc}` : "Sem teste de descoberta";
     const explorationText = `${node.investigationMinutes} min`;
     const challengeText = getChallengeText(node, state);
     const viewMode = getViewMode(node);
@@ -881,6 +899,12 @@ export function createNodeDialogController({
     contentElement.appendChild(createModalActions(node));
     const missionNotice = createNodeMissionNotice(node, onOpenMission, state);
     if (missionNotice) contentElement.appendChild(missionNotice);
+    if (node.safeRest && state.isNodeChosen(node)) {
+      const safeRestNotice = document.createElement("p");
+      safeRestNotice.className = "safe-rest-notice";
+      safeRestNotice.textContent = node.safeRest.description;
+      contentElement.appendChild(safeRestNotice);
+    }
 
     if (viewMode === "combat") {
       renderCombatPage(node);

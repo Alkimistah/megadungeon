@@ -343,8 +343,10 @@ function protectMarkers(cells) {
 
 export function createNodeTacticalMap(node, { mission = null } = {}) {
   if (!node || (!node.resolvedEncounter?.items?.length && !mission)) return null;
+  if (node.fixedTacticalMap) return structuredClone(node.fixedTacticalMap);
 
-  const rng = createRng(`${node.resolvedEncounter?.seed || node.encounterSeed || node.id}:node-tactical-map${mission ? `:${mission.id}` : ""}`);
+  const sceneSeed = `${node.resolvedEncounter?.seed || node.encounterSeed || node.id}:node-tactical-map`;
+  const rng = createRng(sceneSeed);
   const cells = createEmptyMap();
 
   applyTerrain(cells, node, rng);
@@ -352,7 +354,7 @@ export function createNodeTacticalMap(node, { mission = null } = {}) {
   placeParty(cells);
   placeEnemies(cells, node, rng);
   placeTrapFeature(cells, node, rng);
-  const objectiveCount = placeMissionObjective(cells, mission, rng);
+  const objectiveCount = placeMissionObjective(cells, mission, createRng(`${sceneSeed}:objectives:${mission?.id || ""}`));
   protectMarkers(cells);
 
   return {

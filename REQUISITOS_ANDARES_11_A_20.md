@@ -2,6 +2,8 @@
 
 Documento de análise para manter e evoluir os andares 11 a 20 da Masmorra de Práxis no app Mega Dungeon.
 
+> Revisão de 14/11/2026: as decisões e prioridades de evolução estão em [Planejamento dos andares 11–20](PLANEJAMENTO_ANDARES_11_A_20.md). Em caso de conflito, esse planejamento prevalece sobre propostas antigas deste arquivo. A faixa assume personagens de níveis **4–7**, conforme a [progressão oficial](PROGRESSAO_NIVEIS_GRUPO.md). As tabelas abaixo descrevem a configuração atual; não comprovam balanceamento nem conclusão das melhorias planejadas.
+
 ## Contexto
 
 Os andares 11 a 20 representam uma etapa maior e mais aberta que os andares 1 a 10. A visualização principal deve continuar sendo o mapa em nodos, porque essa faixa funciona melhor como uma região ampla com rotas, bifurcações, escolhas de caminho, salas descobertas e progressão por nós.
@@ -48,16 +50,18 @@ Recomendações atuais por andar:
 
 | Andar | Encontros sugeridos | CD base |
 |---|---:|---:|
-| 11 | 3 | 15 |
-| 12 | 4 | 15 |
-| 13 | 4 | 20 |
-| 14 | 5 | 20 |
-| 15 | 5 | 20 |
-| 16 | 6 | 25 |
-| 17 | 6 | 25 |
-| 18 | 7 | 25 |
-| 19 | 8 | 30 |
-| 20 | 8 | 30 |
+| 11 | 3 | 20 |
+| 12 | 4 | 20 |
+| 13 | 4 | 21 |
+| 14 | 5 | 21 |
+| 15 | 5 | 21 |
+| 16 | 6 | 22 |
+| 17 | 6 | 22 |
+| 18 | 7 | 22 |
+| 19 | 8 | 23 |
+| 20 | 8 | 23 |
+
+No MVP, novas expedições possuem missões materializadas, confirmação de conclusão por nodo e Quimera em arena fixa simples. Escolher a rota abre a cena; concluí-la libera os próximos nodos. As seções procedurais anteriores à revisão devem ser lidas com essas atualizações e com o planejamento vinculado no início.
 
 ### 2. Geração do Mapa
 

@@ -176,7 +176,11 @@ export function openTacticalMapFullscreen(tacticalMap) {
   }
 
   function onKeyDown(event) {
-    if (event.key === "Escape") close();
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      close();
+    }
   }
 
   overlay.addEventListener("click", (event) => {

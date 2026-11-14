@@ -102,6 +102,7 @@ function getMissionStatusLabel(mission, context = null) {
   if (progress && progress.current > 0) return "Em progresso";
   if (context?.kind === "node") return "Disponível";
   if (context?.kind === "pending-node") return "Aguardando nodo";
+  if (context?.kind === "past-node") return "Objetivo deixado para trás";
   if (mission.integration?.bindings?.length) return "Vinculada";
 
   return "Aceita";
@@ -123,7 +124,7 @@ function getMissionAvailability(mission, context = null) {
   if (context?.kind === "node") {
     return {
       label: "Disponível",
-      text: `Integrada ao nodo escolhido: ${getPrimaryBinding(mission)?.context || context.node?.label || "nodo vinculado"}.`,
+      text: `Integrada ao nodo escolhido: ${context.node?.missionObjectives?.find(o => o.missionId === mission.id)?.description || context.node?.label || "nodo vinculado"}.`,
       canOpen: true
     };
   }
@@ -131,9 +132,13 @@ function getMissionAvailability(mission, context = null) {
   if (context?.kind === "pending-node") {
     return {
       label: "Aguardando nodo",
-      text: "Nos andares 11 a 20, a missão só pode ser realizada quando o nodo vinculado for marcado como rota escolhida.",
+      text: context.message || "Nos andares 11 a 20, a missão só pode ser realizada quando o nodo vinculado for marcado como rota escolhida.",
       canOpen: false
     };
+  }
+
+  if (context?.kind === "past-node") {
+    return { label: "Objetivo deixado para trás", text: context.message, canOpen: false };
   }
 
   const binding = getPrimaryBinding(mission);
@@ -289,8 +294,10 @@ function createMissionCreatureItem(mission, tacticalMap = null) {
   };
 }
 
-function renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress = null) {
-  const item = createMissionCreatureItem(mission, tacticalMap);
+function renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress = null, node = null) {
+  const actual = node?.resolvedEncounter?.items.find(i => i.creatureId === mission.objective?.targetId);
+  const item = actual ? { ...actual, encounterKey: node.resolvedEncounter.seed }
+    : node ? null : createMissionCreatureItem(mission, tacticalMap);
 
   if (!item) return null;
 
@@ -312,11 +319,14 @@ function getEncounterItemsText(node) {
 
 function renderIntegratedNodeDetails(mission, node, tacticalMap) {
   const list = createElement("ul", "mission-map-details");
-  const binding = (mission.integration?.bindings || []).find((candidate) => candidate.kind === "node");
+  const objective = node.missionObjectives?.find(o => o.missionId === mission.id);
   const entries = [
-    ["Nodo", binding?.context || node?.label || "Nodo vinculado"],
+    ["Nodo", objective?.description || node?.label || "Nodo vinculado"],
     ["Objetivo da missão", `${mission.objective?.condition || "resolver"} ${mission.objective?.targetName || "o objetivo"}`],
     ["Encontro do nodo", getEncounterItemsText(node)],
+    ...(objective ? [["Abordagem", objective.approach], ["Resolução", objective.resolution]] : []),
+    ...(objective?.question ? [["Pergunta", objective.question], ["Evidências", objective.evidence.join(" ")], ["Conclusão para o mestre", objective.answer]] : []),
+    ...(objective ? [["Sucesso", objective.onSuccess], ["Falha", objective.onFailure]] : []),
     ["Mapa", `${formatCountLabel(tacticalMap.objectiveCount || 0, "ponto de interesse", "pontos de interesse")}, ${formatCountLabel(tacticalMap.enemyCount, "inimigo", "inimigos")} e ${formatCountLabel(tacticalMap.trapCount, "zona de risco", "zonas de risco")}`]
   ];
 
@@ -467,7 +477,7 @@ function renderMissionRunContent(mission, onComplete, context = null, profile = 
     if (!node && tacticalMap.riskDetails?.length) {
       container.appendChild(renderMissionRiskDetails(tacticalMap));
     }
-    const creatureDetails = renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress);
+    const creatureDetails = renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress, node);
     if (creatureDetails) container.appendChild(creatureDetails);
     container.appendChild(tacticalPanel);
   }
@@ -488,6 +498,7 @@ export function createMissionDialogController({
   onMarkCompleted,
   openButton
 }) {
+  let runContext = null;
   const selectedOfferIds = new Set();
   const expandedRewardIds = new Set();
   let mode = "view";
@@ -542,10 +553,17 @@ export function createMissionDialogController({
     );
     confirm.type = "button";
     confirm.addEventListener("click", () => {
-      allowSelectionClose = true;
-      onConfirmSelection([...selectedOfferIds]);
-      selectedOfferIds.clear();
-      dialogElement.close();
+      try {
+        onConfirmSelection([...selectedOfferIds]);
+        allowSelectionClose = true;
+        selectedOfferIds.clear();
+        dialogElement.close();
+      } catch (error) {
+        contentElement.querySelector(".mission-selection-error")?.remove();
+        const message = createElement("p", "mission-selection-error", error.message);
+        message.setAttribute("role", "alert");
+        actions.prepend(message);
+      }
     });
 
     actions.appendChild(confirm);
@@ -599,13 +617,14 @@ export function createMissionDialogController({
     contentElement.appendChild(renderMissionRunContent(mission, (completedMissionId) => {
       onMarkCompleted(completedMissionId);
       renderMissionRun(completedMissionId);
-    }, getMissionContext(mission), getProfile(), (missionId, delta) => {
-      onAdjustProgress?.(missionId, delta);
+    }, runContext || getMissionContext(mission), getProfile(), (missionId, delta, eventKey) => {
+      onAdjustProgress?.(missionId, delta, eventKey);
       renderMissionRun(missionId);
     }, expandedRewardIds.has(mission.id), (missionId) => toggleReward(missionId, () => renderMissionRun(missionId))));
   }
 
   function openSelection() {
+    runContext = null;
     mode = "selection";
     allowSelectionClose = false;
     dialogElement.classList.add("is-selection-mode");
@@ -615,6 +634,7 @@ export function createMissionDialogController({
   }
 
   function openView() {
+    runContext = null;
     mode = "view";
     allowSelectionClose = true;
     dialogElement.classList.remove("is-selection-mode");
@@ -622,7 +642,8 @@ export function createMissionDialogController({
     dialogElement.showModal();
   }
 
-  function openMission(missionId) {
+  function openMission(missionId, context = null) {
+    runContext = context;
     mode = "mission";
     allowSelectionClose = true;
     dialogElement.classList.remove("is-selection-mode");

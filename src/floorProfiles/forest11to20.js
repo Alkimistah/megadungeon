@@ -3,6 +3,7 @@ import { assetUrl } from "../assetUrl.js";
 export const forest11to20Profile = {
   id: "forest-11-20",
   label: "Andares de 11 a 20",
+  partyLevels: { entry: 4, maximum: 7 },
   floors: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
   hiddenNodeIcon: assetUrl("/assets/icons/hidden-forest.svg"),
   recommendations: {
@@ -19,16 +20,16 @@ export const forest11to20Profile = {
       20: 8
     },
     baseDcByFloor: {
-      11: 15,
-      12: 15,
-      13: 20,
-      14: 20,
-      15: 20,
-      16: 25,
-      17: 25,
-      18: 25,
-      19: 30,
-      20: 30
+      11: 20,
+      12: 20,
+      13: 21,
+      14: 21,
+      15: 21,
+      16: 22,
+      17: 22,
+      18: 22,
+      19: 23,
+      20: 23
     }
   },
   encounterRules: {
