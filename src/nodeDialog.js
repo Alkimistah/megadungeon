@@ -7,6 +7,7 @@ import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { openTacticalMapFullscreen } from "./tacticalMapRenderer.js";
 import { getTrapById } from "./traps.js";
 import { assetUrl } from "./assetUrl.js";
+import { getNodeProgressPresentation } from "./nodeProgressPresentation.js";
 
 const COMBAT_ICON = assetUrl("/assets/icons/winged-sword.svg");
 const ENVIRONMENT_ICON = assetUrl("/assets/icons/earth-arrow-left.svg");
@@ -896,6 +897,13 @@ export function createNodeDialogController({
     typeElement.textContent = getNodeDialogTitle(node, state);
     setNodeDialogMeta(metaElement, checkText, explorationText, challengeText);
     contentElement.innerHTML = "";
+    const progress = getNodeProgressPresentation(node, state.getNodeViewState(node));
+    const progressNotice = document.createElement("p");
+    progressNotice.className = "node-progress-status";
+    progressNotice.dataset.progress = progress.kind;
+    progressNotice.setAttribute("role", "status");
+    progressNotice.textContent = progress.label;
+    contentElement.appendChild(progressNotice);
     contentElement.appendChild(createModalActions(node));
     const missionNotice = createNodeMissionNotice(node, onOpenMission, state);
     if (missionNotice) contentElement.appendChild(missionNotice);

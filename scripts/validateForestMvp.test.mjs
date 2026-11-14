@@ -12,6 +12,7 @@ import { createMissionState } from "../src/missions/missionState.js";
 
 const integration = await import("../src/missions/forestMissionIntegration.js").catch(() => ({}));
 const expeditionModule = await import("../src/forestExpedition.js").catch(() => ({}));
+const presentation = await import("../src/nodeProgressPresentation.js").catch(() => ({}));
 
 function mission(category, { floor = 15, targetId = "sucuri", targetName = "Sucuri", quantity = 1, ...extra } = {}) {
   return {
@@ -330,4 +331,55 @@ test("a route with only one eligible node cannot accept two similar missions", (
   ];
   assert.throws(() => materialize({ floor: 15, levels, missions: selected }), /rota compatível/i);
   assert.ok(levels.flat().every(n => !n.missionBindings && !n.missionObjectives));
+});
+
+test("visual progress distinguishes exploration, pending scene and completed scene after restore", () => {
+  const levels = chain();
+  levels.flat().forEach(n => { n.requiresCompletion = true; });
+  const state = createExplorationState();
+  state.setLevels(levels);
+  const node = levels[0][0];
+  assert.equal(state.getNodeViewState(node).completed, false);
+  assert.equal(typeof presentation.getNodeProgressPresentation, "function");
+  assert.equal(presentation.getNodeProgressPresentation(node, state.getNodeViewState(node)).kind, "available");
+  state.markExplored(node);
+  assert.equal(presentation.getNodeProgressPresentation(node, state.getNodeViewState(node)).kind, "explored");
+  state.chooseRoute(node);
+  assert.equal(presentation.getNodeProgressPresentation(node, state.getNodeViewState(node)).kind, "pending");
+  state.completeNode(node);
+  assert.equal(presentation.getNodeProgressPresentation(node, state.getNodeViewState(node)).marker, "✓");
+  const restored = createExplorationState();
+  restored.setLevels(levels);
+  restored.importSessionState(state.exportSessionState());
+  assert.equal(presentation.getNodeProgressPresentation(node, restored.getNodeViewState(node)).kind, "completed");
+  assert.equal(restored.canOpenNode(node), true);
+});
+
+test("a legacy chosen node is not presented as a pending or won encounter", () => {
+  const levels = chain();
+  const state = createExplorationState();
+  state.setLevels(levels);
+  state.chooseRoute(levels[0][0]);
+  assert.equal(typeof presentation.getNodeProgressPresentation, "function");
+  const status = presentation.getNodeProgressPresentation(levels[0][0], state.getNodeViewState(levels[0][0]));
+  assert.equal(status.kind, "chosen");
+  assert.equal(status.marker, null);
+});
+
+test("guidance follows the existing choice, completion and floor advance permissions", () => {
+  const levels = chain([3, 3]);
+  levels.flat().forEach(n => { n.requiresCompletion = true; });
+  const state = createExplorationState();
+  state.setLevels(levels);
+  assert.equal(typeof presentation.getNodeMapGuidance, "function");
+  assert.match(presentation.getNodeMapGuidance(levels, state, true), /Escolha um nodo/);
+  state.chooseRoute(levels[0][0]);
+  assert.match(presentation.getNodeMapGuidance(levels, state, true), /Conclua o encontro/);
+  state.completeNode(levels[0][0]);
+  assert.match(presentation.getNodeMapGuidance(levels, state, true), /Escolha um nodo/);
+  state.chooseRoute(levels[1][0]);
+  state.completeNode(levels[1][0]);
+  assert.match(presentation.getNodeMapGuidance(levels, state, true), /Andar concluído/);
+  assert.equal(presentation.getNodeMapGuidance(levels, state, false), "Etapa concluída.");
+  assert.match(presentation.getNodeMapGuidance(levels, state, true, false), /Gere o mapa do andar selecionado/);
 });

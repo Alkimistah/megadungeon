@@ -1,4 +1,5 @@
 import { assetUrl } from "./assetUrl.js";
+import { getNodeProgressPresentation } from "./nodeProgressPresentation.js";
 
 const NODE_RADIUS = 22;
 const LEVEL_HEIGHT = 120;
@@ -138,6 +139,19 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
       const missionLabel = createMissionLabel(node);
       if (missionLabel) group.appendChild(missionLabel);
 
+      const progressBadge = createSvgElement("g");
+      progressBadge.setAttribute("class", "node-progress-badge");
+      progressBadge.setAttribute("transform", "translate(25, -5)");
+      progressBadge.setAttribute("visibility", "hidden");
+      progressBadge.setAttribute("aria-hidden", "true");
+      const badgeBackground = createSvgElement("circle");
+      badgeBackground.setAttribute("r", "9");
+      const badgeText = createSvgElement("text");
+      badgeText.setAttribute("text-anchor", "middle");
+      badgeText.setAttribute("dy", "0.35em");
+      progressBadge.append(badgeBackground, badgeText);
+      group.appendChild(progressBadge);
+
       group.setAttribute("role", "button");
       group.setAttribute("tabindex", "0");
       group.setAttribute(
@@ -175,6 +189,8 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
       if (!element) return;
 
       const nodeState = state.getNodeViewState(node);
+      const progress = getNodeProgressPresentation(node, nodeState);
+      element.dataset.progress = progress.kind;
       const icon = element.querySelector(".node-icon");
       element.classList.toggle("is-chosen", nodeState.chosen);
       element.classList.toggle("is-active", nodeState.active && !nodeState.chosen);
@@ -183,6 +199,9 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
       element.classList.toggle("is-locked", nodeState.locked);
       element.classList.toggle("is-hidden-path", !nodeState.visible);
       element.classList.toggle("is-concealed", nodeState.visible && !nodeState.revealed);
+      const badge = element.querySelector(".node-progress-badge");
+      badge.setAttribute("visibility", progress.marker ? "visible" : "hidden");
+      badge.querySelector("text").textContent = progress.marker || "";
 
       if (icon) {
         icon.setAttribute("href", nodeState.revealed ? icon.dataset.revealedIcon : activeHiddenNodeIcon);
@@ -194,8 +213,9 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
       element.setAttribute("aria-disabled", String(!nodeState.canOpen));
       element.setAttribute(
         "aria-label",
-        `${node.label}, encontro ${node.level}, coluna ${node.column + 1}${node.missionBindings?.length ? ", missão vinculada" : ""}`
+        `${nodeState.revealed ? (node.type === "unknown" && nodeState.chosen ? node.revealedLabel : node.label) : "Caminho desconhecido"}, encontro ${node.level}, coluna ${node.column + 1}, ${progress.label}${nodeState.visible && node.missionBindings?.length ? ", missão vinculada" : ""}`
       );
+      element.setAttribute("aria-hidden", String(!nodeState.visible));
       element.setAttribute("tabindex", nodeState.canOpen ? "0" : "-1");
     });
 

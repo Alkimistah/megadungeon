@@ -6,7 +6,7 @@ import { dungeon1to10Profile } from "../src/floorProfiles/dungeon1to10.js";
 import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
 import { encodeSessionCode } from "../src/sessionCode.js";
 
-const APP_URL = process.env.QA_APP_URL || "http://localhost:5173/megadungeon/";
+const APP_URL = process.env.QA_APP_URL || (process.argv.includes("--production") ? "http://localhost:4173/megadungeon/" : "http://localhost:5173/megadungeon/");
 const OUTPUT_DIR = "tmp/floors-1-10-qa";
 
 function createExtendedSession({ floor, mapSeed, mission = null, phase = null }) {

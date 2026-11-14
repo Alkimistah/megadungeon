@@ -4,6 +4,7 @@ import { createExplorationState } from "./appState.js";
 import { FLOOR_RANGES, applyTheme, getFloorRange } from "./floorRanges.js";
 import { formatElapsedTime } from "./format.js";
 import { generateMapData } from "./generator.js";
+import { getNodeMapGuidance } from "./nodeProgressPresentation.js";
 import { prepareForestExpedition, serializeForestExpedition, restoreForestExpedition } from "./forestExpedition.js";
 import { createArchipelagoRenderer } from "./archipelagoRenderer.js";
 import { createArchipelagoState } from "./archipelagoState.js";
@@ -49,6 +50,7 @@ const elements = {
   manualEncounterTerrainInput: document.getElementById("manualEncounterTerrainInput"),
   manualEncounterTrapModeInput: document.getElementById("manualEncounterTrapModeInput"),
   advanceNodeFloorButton: document.getElementById("advanceNodeFloorButton"),
+  nodeMapGuidance: document.getElementById("nodeMapGuidance"),
   settingsToggle: document.getElementById("settingsToggle"),
   settingsToggleIcon: document.getElementById("settingsToggleIcon"),
   settingsPanel: document.getElementById("settingsPanel"),
@@ -175,6 +177,8 @@ function syncNodeFloorAdvanceControl() {
   elements.advanceNodeFloorButton.textContent = hasNextNodeMapFloor()
     ? "Avançar andar"
     : isTopLevelRouteChosen() ? "Faixa concluída" : "Último andar";
+  elements.nodeMapGuidance.textContent = isNodeMapMode()
+    ? getNodeMapGuidance(state.getLevels(), state, hasNextNodeMapFloor(), renderedNodeMapFloor === Number(elements.floorInput.value)) : "";
 }
 
 function advanceNodeMapFloor() {

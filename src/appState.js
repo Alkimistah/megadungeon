@@ -169,6 +169,7 @@ export function createExplorationState() {
       attempted,
       canOpen: canOpenNode(node),
       chosen,
+      completed: isNodeCompleted(node),
       explored,
       locked: !active && !chosen,
       revealed,

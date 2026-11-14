@@ -2,9 +2,11 @@
 
 Atualizado em 14/11/2026. Próximo uso informado: **14/11/2026, a partir das 15h, horário de Brasília**. Andar inicial da sessão não informado.
 
-Este documento consolida as decisões da revisão e orienta entregas pequenas e verificáveis. **O MVP foi implementado e validado localmente em 14/11/2026**, incluindo QA do build de produção sem rede após cache. Publicação e teste no tablet físico continuam pendentes. Melhorias de variedade e continuidade ambiental permanecem para depois.
+Este documento consolida as decisões da revisão e orienta entregas pequenas e verificáveis. **O MVP foi implementado, validado e publicado em 14/11/2026 no commit `7afd21b`**, incluindo QA do build de produção sem rede após cache. O teste no tablet físico continua pendente. Melhorias de variedade e continuidade ambiental permanecem para depois.
 
 ## 1. Leitura rápida: o que vem primeiro
+
+> Ajuste de prioridade às 13h39 de 14/11: antes da sessão, priorizar clareza visual dos estados e indicação da próxima ação. Salvamento automático não é prioridade do usuário. O plano curto está em [Usabilidade dos nodos](docs/superpowers/plans/2026-11-14-usabilidade-nodos.md); mudanças de regras e mecânicas novas ficam para depois.
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
@@ -374,7 +376,7 @@ Essa lista orienta o trabalho; o plano técnico executável de cada entrega deve
 
 ### Limites e pendências
 
-- Não houve publicação nem teste no tablet físico. O QA usou Chrome local e viewports de tablet/mobile.
+- O MVP foi publicado após as verificações no commit `7afd21b`. Não houve teste no tablet físico; o QA usou Chrome local e viewports de tablet/mobile.
 - Sessões antigas são preservadas, mas não recebem retroativamente as garantias novas de materialização; iniciar uma nova expedição usa o MVP.
 - O contador de tempo continua zerando ao descansar. Separar tempo total e duração do descanso exige a evolução já prevista.
 - Mecânica especial da Quimera é importante e permanece pendente por decisão do usuário.
@@ -383,3 +385,9 @@ Essa lista orienta o trabalho; o plano técnico executável de cada entrega deve
 ### Correção após uso: missões no mesmo nodo
 
 O usuário encontrou duas missões do andar 15 no mesmo nodo. A busca anterior agrupava os objetivos não combativos compatíveis no primeiro ponto elegível. A busca agora escolhe no máximo uma missão por nodo e pode adiar objetivos para manter uma rota comum. Se faltarem posições distintas, tenta outro mapa ou recusa a configuração com explicação, preservando a sessão anterior. Snapshots já salvos não são reposicionados automaticamente.
+
+## 12. Clareza visual antes da sessão
+
+Implementados contorno tracejado para exploração registrada, marcador `…` para encontro pendente e `✓` para concluído, preservando o ícone do tipo. A legenda explica os estados e mapa/modal indicam a próxima ação. Não houve mudança de regra, permissão, encontro ou formato de sessão. Marcação extra de descanso foi excluída a pedido do usuário.
+
+Suíte ampliada para 24 testes de 11–20. Testes de missões, de 1–10, build e QA de produção dos dois modos passaram, incluindo leitura em tablet/mobile e offline após cache. O [plano de usabilidade](docs/superpowers/plans/2026-11-14-usabilidade-nodos.md) registra os detalhes; a publicação segue o workflow do commit desta entrega.

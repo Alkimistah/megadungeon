@@ -96,12 +96,40 @@ async function missionFlow() {
   const page = await pageFor(encodeSessionCode(sessionFor(expedition)));
   const path = missionPath(entry);
   let credited = false;
+  let exploredChecked = false;
+  let pendingCaptured = false;
+  assert.match(await page.locator("#nodeMapGuidance").innerText(), /Escolha um nodo/);
   for (const node of path) {
     const index = entry.levels.flat().findIndex(n => n.id === node.id);
     await page.locator(".node").nth(index).click();
     await page.locator("#nodeDialog[open]").waitFor();
+    if (!exploredChecked && node.skill && node.type !== "unknown") {
+      await page.locator(".explored-choice").click();
+      assert.equal(await page.locator("#nodeDialog .node-progress-status").innerText(), "Exploração registrada");
+      assert.equal(await page.locator(".node").nth(index).getAttribute("data-progress"), "explored");
+      exploredChecked = true;
+    }
     await page.locator(".route-choice").click();
     await page.locator(".complete-choice").waitFor();
+    assert.equal(await page.locator("#nodeDialog .node-progress-status").innerText(), "Encontro pendente");
+    assert.equal(await page.locator(".node").nth(index).getAttribute("data-progress"), "pending");
+    assert.equal(await page.locator(".node").nth(index).locator(".node-progress-badge text").textContent(), "…");
+    assert.match(await page.locator("#nodeMapGuidance").innerText(), /Conclua o encontro/);
+    const badgeBox = await page.locator(".node").nth(index).locator(".node-progress-badge").boundingBox();
+    for (const selector of [".mission-node-label", ".check-label", ".node-icon"]) {
+      const part = page.locator(".node").nth(index).locator(selector);
+      if (!await part.count()) continue;
+      const box = await part.boundingBox();
+      if (box && badgeBox) {
+        const overlapWidth = Math.min(box.x + box.width, badgeBox.x + badgeBox.width) - Math.max(box.x, badgeBox.x);
+        const overlapHeight = Math.min(box.y + box.height, badgeBox.y + badgeBox.height) - Math.max(box.y, badgeBox.y);
+        assert.ok(overlapWidth <= 1 || overlapHeight <= 1, `Progress badge overlaps ${selector}`);
+      }
+    }
+    if (!pendingCaptured) {
+      await page.screenshot({ path: "tmp/forest-mvp-qa/pending-scene.png", fullPage: true });
+      pendingCaptured = true;
+    }
     assert.equal(await page.locator("#advanceNodeFloorButton").isDisabled(), true);
     const extermIndex = node.missionBindings?.findIndex(m => m.id === "qa-extermination") ?? -1;
     if (extermIndex >= 0 && !credited) {
@@ -122,10 +150,15 @@ async function missionFlow() {
       assert.match(await page.locator("#nodeDialog").innerText(), /Descanso registrado/);
     }
     await page.locator(".complete-choice").click();
+    assert.equal(await page.locator("#nodeDialog .node-progress-status").innerText(), "Encontro concluído");
+    assert.equal(await page.locator(".node").nth(index).getAttribute("data-progress"), "completed");
+    assert.equal(await page.locator(".node").nth(index).locator(".node-progress-badge text").textContent(), "✓");
     await page.locator("#nodeDialogClose").click();
   }
+  assert.equal(exploredChecked, true);
   assert.equal(credited, true);
   assert.equal(await page.locator("#advanceNodeFloorButton").isDisabled(), false);
+  assert.match(await page.locator("#nodeMapGuidance").innerText(), /Andar concluído/);
   const code = await copySession(page);
   const saved = decodeSessionCode(code);
   assert.ok(saved.missions.selected.find(m => m.id === "qa-extermination").progress.current > 0);
@@ -133,12 +166,14 @@ async function missionFlow() {
   await page.screenshot({ path: "tmp/forest-mvp-qa/mission-route.png", fullPage: true });
   await page.close();
   const restored = await pageFor(code);
+  assert.equal(await restored.locator('.node[data-progress="completed"]').count(), 5);
   assert.equal(await restored.locator("#advanceNodeFloorButton").isDisabled(), false);
   const roundTrip = decodeSessionCode(await copySession(restored));
   assert.deepEqual(roundTrip.missions, saved.missions);
   assert.deepEqual(roundTrip.state, saved.state);
   await restored.locator("#advanceNodeFloorButton").click();
   assert.equal(await restored.locator("#floorInput").inputValue(), "16");
+  assert.match(await restored.locator("#nodeMapGuidance").innerText(), /Escolha um nodo/);
   const advanced = decodeSessionCode(await copySession(restored));
   assert.deepEqual(advanced.missions, saved.missions);
   assert.equal(advanced.forestExpedition.floors.find(f => f.floor === 15).state.completed.length, 5);
@@ -165,11 +200,18 @@ async function bossFlow() {
     await page.locator("#nodeDialogClose").click();
   }
   assert.equal(await page.locator("#advanceNodeFloorButton").innerText(), "Faixa concluída");
+  assert.equal(await page.locator("#nodeMapGuidance").innerText(), "Etapa concluída.");
   await page.setViewportSize({ width: 390, height: 844 });
   await page.locator("#missionButton").click();
   const width = await page.locator("#missionDialog").evaluate(el => ({ scroll: el.scrollWidth, client: el.clientWidth }));
   assert.ok(width.scroll <= width.client + 2);
   await page.screenshot({ path: "tmp/forest-mvp-qa/mobile.png", fullPage: true });
+  await page.locator("#missionClose").click();
+  await page.locator("#legendToggle").click();
+  await page.locator(".legend-progress").scrollIntoViewIfNeeded();
+  const legend = await page.locator("#legendPanel").boundingBox();
+  assert.ok(legend.y >= 0 && legend.y + legend.height <= 844);
+  await page.screenshot({ path: "tmp/forest-mvp-qa/mobile-legend.png", fullPage: true });
   await page.close();
   console.log("Quimera fixa, conclusão da faixa e modal mobile: passaram.");
 }
@@ -215,11 +257,15 @@ async function futureAndLegacyFlow() {
   await legacy.locator(".node.is-active").first().click();
   await legacy.locator(".route-choice").click();
   assert.equal(await legacy.locator(".complete-choice").count(), 0);
+  assert.equal(await legacy.locator("#nodeDialog .node-progress-status").innerText(), "Rota percorrida");
   await legacy.locator("#nodeDialogClose").click();
   assert.ok(await legacy.locator(".node.is-active").count() > 0);
   const saved = decodeSessionCode(await copySession(legacy));
   assert.equal(saved.baseDc, 15);
   assert.equal(saved.forestExpedition, undefined);
+  await legacy.locator("#floorInput").selectOption("12");
+  assert.equal(await legacy.locator("#advanceNodeFloorButton").isDisabled(), true);
+  assert.match(await legacy.locator("#nodeMapGuidance").innerText(), /Gere o mapa do andar selecionado/);
   await legacy.close();
   console.log("Missão futura não colide com ID atual; sessão legada preserva geração e fluxo: passaram.");
 }
