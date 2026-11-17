@@ -471,9 +471,7 @@ function getCurrentSession() {
     v: 1,
     mode: "node-map",
     profile: activeFloorRange.id,
-    floor: Number(elements.floorInput.value),
-    depth: Number(elements.depthInput.value),
-    baseDc: Number(elements.baseDcInput.value),
+    ...renderedNodeMapSettings,
     unknownPaths: state.isUnknownPathsEnabled(),
     mapSeed: currentMapSeed,
     missions: missionState.exportSessionState(),
@@ -482,15 +480,9 @@ function getCurrentSession() {
   };
 }
 
-function getCurrentSessionCode() {
-  return encodeSessionCode(getCurrentSession());
-}
-
 async function saveCurrentExpedition() {
   try {
-    const session = getCurrentSession();
-    if (isNodeMapMode()) Object.assign(session, renderedNodeMapSettings);
-    await saveAutosave(session);
+    await saveAutosave(getCurrentSession());
     elements.autosaveError.hidden = true;
   } catch {
     elements.autosaveError.hidden = false;
@@ -523,7 +515,7 @@ function updateInfo() {
     : isExtendedExplorationMode()
     ? "Labirinto"
     : "Mapa";
-  elements.info.textContent = `${modeLabel} | Seed: ${currentMapSeed} | Clique para copiar sessão`;
+  elements.info.textContent = `Exportar sessão (.txt) | ${modeLabel} | Seed: ${currentMapSeed}`;
 }
 
 function showInfoMessage(message) {
@@ -537,28 +529,21 @@ function showInfoMessage(message) {
   }, 1800);
 }
 
-async function copyTextToClipboard(text) {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
+function exportCurrentSession() {
+  const session = getCurrentSession();
+  const file = new Blob([encodeSessionCode(session)], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(file);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `mega-dungeon-andar-${session.floor}.txt`;
+  document.body.appendChild(link);
+  try {
+    link.click();
+  } finally {
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "fixed";
-  textarea.style.opacity = "0";
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  document.body.removeChild(textarea);
-}
-
-async function copyCurrentSessionCode() {
-  const sessionCode = getCurrentSessionCode();
-
-  await copyTextToClipboard(sessionCode);
-  showInfoMessage("Mapa atual e todas as informações foram salvos no clipboard.");
+  showInfoMessage("Download do arquivo de sessão solicitado.");
 }
 
 function rememberRenderedMap() {
@@ -988,9 +973,11 @@ function bindEvents() {
   elements.advanceNodeFloorButton.addEventListener("click", advanceNodeMapFloor);
 
   elements.info.addEventListener("click", () => {
-    copyCurrentSessionCode().catch(() => {
-      showInfoMessage("Não foi possível copiar a sessão atual.");
-    });
+    try {
+      exportCurrentSession();
+    } catch {
+      showInfoMessage("Não foi possível exportar a sessão atual.");
+    }
   });
 
   elements.reloadAppButton.addEventListener("click", () => {

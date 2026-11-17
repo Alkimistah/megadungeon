@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { chromium } from "@playwright/test";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { prepareForestExpedition, serializeForestExpedition } from "../src/forestExpedition.js";
@@ -48,9 +48,6 @@ function missionPath(entry) {
 async function pageFor(code = null, viewport = { width: 1024, height: 768 }) {
   const page = await browser.newPage({ viewport, serviceWorkers: "block" });
   page.on("pageerror", error => errors.push(error.message));
-  await page.addInitScript(() => {
-    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async text => { window.__qaSession = text; } } });
-  });
   await page.goto(url);
   await page.locator("#rangeDialog[open]").waitFor();
   if (code) {
@@ -61,11 +58,16 @@ async function pageFor(code = null, viewport = { width: 1024, height: 768 }) {
   return page;
 }
 
-async function copySession(page) {
+async function exportSession(page) {
   if (!(await page.locator("#info").isVisible())) await page.locator("#settingsToggle").click();
-  await page.locator("#info").click();
-  await page.waitForFunction(() => window.__qaSession?.startsWith("MD1."));
-  return page.evaluate(() => window.__qaSession);
+  const [download] = await Promise.all([
+    page.waitForEvent("download", { timeout: 5000 }),
+    page.locator("#info").click()
+  ]);
+  assert.match(download.suggestedFilename(), /^mega-dungeon-andar-\d+\.txt$/);
+  const code = await readFile(await download.path(), "utf8");
+  assert.ok(code.startsWith("MD1."));
+  return code;
 }
 
 async function newSelection(count) {
@@ -78,7 +80,7 @@ async function newSelection(count) {
   for (let i = 0; i < selected; i++) await page.locator(".mission-card.is-selectable").nth(i).click();
   await page.locator(".mission-dialog-actions .generate-button").click();
   await page.locator("#missionDialog").waitFor({ state: "hidden" });
-  const saved = decodeSessionCode(await copySession(page));
+  const saved = decodeSessionCode(await exportSession(page));
   assert.equal(saved.missions.selected.length, selected);
   assert.ok(saved.forestExpedition);
   for (const m of saved.missions.selected) assert.ok(m.integration.bindings.length);
@@ -159,22 +161,32 @@ async function missionFlow() {
   assert.equal(credited, true);
   assert.equal(await page.locator("#advanceNodeFloorButton").isDisabled(), false);
   assert.match(await page.locator("#nodeMapGuidance").innerText(), /Andar concluído/);
-  const code = await copySession(page);
+  const code = await exportSession(page);
   const saved = decodeSessionCode(code);
   assert.ok(saved.missions.selected.find(m => m.id === "qa-extermination").progress.current > 0);
   assert.equal(saved.state.completed.length, 5);
   await page.screenshot({ path: "tmp/forest-mvp-qa/mission-route.png", fullPage: true });
   await page.close();
-  const restored = await pageFor(code);
+  const restored = await pageFor();
+  const [fileChooser] = await Promise.all([
+    restored.waitForEvent("filechooser", { timeout: 5000 }),
+    restored.getByRole("button", { name: "Importar arquivo de sessão" }).click()
+  ]);
+  await fileChooser.setFiles({
+    name: "mega-dungeon-andar-15.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from(code)
+  });
+  await restored.locator("#rangeDialog").waitFor({ state: "hidden" });
   assert.equal(await restored.locator('.node[data-progress="completed"]').count(), 5);
   assert.equal(await restored.locator("#advanceNodeFloorButton").isDisabled(), false);
-  const roundTrip = decodeSessionCode(await copySession(restored));
+  const roundTrip = decodeSessionCode(await exportSession(restored));
   assert.deepEqual(roundTrip.missions, saved.missions);
   assert.deepEqual(roundTrip.state, saved.state);
   await restored.locator("#advanceNodeFloorButton").click();
   assert.equal(await restored.locator("#floorInput").inputValue(), "16");
   assert.match(await restored.locator("#nodeMapGuidance").innerText(), /Escolha um nodo/);
-  const advanced = decodeSessionCode(await copySession(restored));
+  const advanced = decodeSessionCode(await exportSession(restored));
   assert.deepEqual(advanced.missions, saved.missions);
   assert.equal(advanced.forestExpedition.floors.find(f => f.floor === 15).state.completed.length, 5);
   await restored.close();
@@ -222,12 +234,12 @@ async function configurationFailure() {
     objective("extermination", "Infecto", "infecto", 8)
   ] });
   const page = await pageFor(encodeSessionCode(sessionFor(expedition)));
-  const before = decodeSessionCode(await copySession(page));
+  const before = decodeSessionCode(await exportSession(page));
   await page.locator("#depthInput").fill("3");
   await page.evaluate(() => { Math.random = () => 0.25; Date.now = () => 1000; });
   await page.locator("#generateButton").click();
   assert.match(await page.locator("#info").innerText(), /Não há nodos suficientes/);
-  const after = decodeSessionCode(await copySession(page));
+  const after = decodeSessionCode(await exportSession(page));
   assert.deepEqual(after, before, "A failed reconfiguration must preserve the entire expedition");
   await page.close();
   console.log("Configuração impossível é explicada e preserva a sessão anterior: passou.");
@@ -260,7 +272,7 @@ async function futureAndLegacyFlow() {
   assert.equal(await legacy.locator("#nodeDialog .node-progress-status").innerText(), "Rota percorrida");
   await legacy.locator("#nodeDialogClose").click();
   assert.ok(await legacy.locator(".node.is-active").count() > 0);
-  const saved = decodeSessionCode(await copySession(legacy));
+  const saved = decodeSessionCode(await exportSession(legacy));
   assert.equal(saved.baseDc, 15);
   assert.equal(saved.forestExpedition, undefined);
   await legacy.locator("#floorInput").selectOption("12");
@@ -289,8 +301,9 @@ async function offlineFlow() {
   await page.locator(".mission-dialog-actions .generate-button").click();
   await page.locator("#missionDialog").waitFor({ state: "hidden" });
   assert.ok(await page.locator(".node.is-active").count() > 0);
+  assert.equal(decodeSessionCode(await exportSession(page)).profile, profile.id);
   await page.close();
-  console.log("Build de produção recarrega e inicia floresta sem rede após cache: passou.");
+  console.log("Build de produção recarrega, inicia floresta e exporta sessão sem rede após cache: passou.");
 }
 
 try {

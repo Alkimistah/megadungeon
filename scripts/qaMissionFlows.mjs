@@ -263,17 +263,6 @@ async function setupPage(width = 1366, height = 900) {
   await waitFor(client, "document.readyState === 'complete'", "page load");
   await waitFor(client, "document.querySelector('#rangeDialog')?.open === true", "range dialog");
 
-  await evaluate(client, `
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: {
-        writeText: async (text) => {
-          window.__qaCopiedSession = text;
-        }
-      }
-    });
-  `);
-
   return client;
 }
 
@@ -528,9 +517,21 @@ async function runSaveLoadFlow(results) {
     await waitFor(client, "document.querySelector('#missionDialog')?.open === true", "tracking before save");
     const before = await getOpenDialogText(client, "#missionDialog");
     await click(client, "#missionClose");
+    await evaluate(client, `
+      const clickLink = HTMLAnchorElement.prototype.click;
+      HTMLAnchorElement.prototype.click = function () {
+        if (this.download.endsWith(".txt") && this.protocol === "blob:") {
+          fetch(this.href).then(response => response.text()).then(code => {
+            window.__qaExportedSession = code;
+          });
+        } else {
+          clickLink.call(this);
+        }
+      };
+    `);
     await click(client, "#info");
-    await waitFor(client, "window.__qaCopiedSession?.startsWith('MD1.')", "copied session code");
-    const sessionCode = await evaluate(client, "window.__qaCopiedSession");
+    await waitFor(client, "window.__qaExportedSession?.startsWith('MD1.')", "exported session code");
+    const sessionCode = await evaluate(client, "window.__qaExportedSession");
 
     await client.send("Page.navigate", { url: APP_URL });
     await waitFor(client, "document.querySelector('#rangeDialog')?.open === true", "range dialog after reload");
