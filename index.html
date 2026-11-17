@@ -69,6 +69,7 @@
       <span>Tempo de exploração</span>
       <strong id="timeTrackerValue">0min</strong>
     </div>
+    <p id="autosaveError" role="status" hidden>O progresso recente não foi salvo no aplicativo. Use o código de sessão como backup.</p>
 
     <main>
       <div id="container">
@@ -149,6 +150,9 @@
           <button id="installButton" class="install-button" type="button" hidden>Instalar app</button>
         </div>
 
+        <button id="resumeExpedition" class="generate-button" type="button" hidden>Continuar expedição</button>
+        <p id="sessionStatus" role="status" hidden></p>
+
         <label class="range-field">
           Grupo de andares
           <select id="floorRangeInput"></select>
@@ -158,6 +162,8 @@
           Seed de sessão
           <input id="seedInput" type="text" placeholder="Cole uma sessão MD1 ou deixe vazio" />
         </label>
+        <button id="importSessionFile" type="button">Importar arquivo de sessão</button>
+        <input id="sessionFile" type="file" accept=".txt,text/plain" hidden />
 
         <label id="initialUnknownPathsField" class="checkbox-field">
           <input id="initialUnknownPathsInput" type="checkbox" />

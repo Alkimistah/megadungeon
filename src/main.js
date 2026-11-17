@@ -21,17 +21,21 @@ import { createMissionState } from "./missions/missionState.js";
 import { resolveNodeEncounter } from "./encounterResolver.js";
 import { createNodeDialogController } from "./nodeDialog.js";
 import { decodeSessionCode, encodeSessionCode, isSessionCode } from "./sessionCode.js";
+import { loadAutosave, saveAutosave } from "./sessionAutosave.js";
 
 const elements = {
   svg: document.getElementById("map"),
   extendedExploration: document.getElementById("extendedExploration"),
   info: document.getElementById("info"),
   timeTrackerValue: document.getElementById("timeTrackerValue"),
+  autosaveError: document.getElementById("autosaveError"),
   floorRangeTitle: document.getElementById("floorRangeTitle"),
   floorInput: document.getElementById("floorInput"),
   depthInput: document.getElementById("depthInput"),
   baseDcInput: document.getElementById("baseDcInput"),
   seedInput: document.getElementById("seedInput"),
+  sessionFile: document.getElementById("sessionFile"),
+  importSessionFile: document.getElementById("importSessionFile"),
   unknownPathsInput: document.getElementById("unknownPathsInput"),
   generateButton: document.getElementById("generateButton"),
   installButton: document.getElementById("installButton"),
@@ -62,6 +66,8 @@ const elements = {
   initialUnknownPathsField: document.getElementById("initialUnknownPathsField"),
   initialUnknownPathsInput: document.getElementById("initialUnknownPathsInput"),
   rangeConfirm: document.getElementById("rangeConfirm"),
+  resumeExpedition: document.getElementById("resumeExpedition"),
+  sessionStatus: document.getElementById("sessionStatus"),
   nodeDialog: document.getElementById("nodeDialog"),
   nodeDialogTitle: document.getElementById("nodeDialogTitle"),
   nodeDialogType: document.getElementById("nodeDialogType"),
@@ -78,7 +84,10 @@ const archipelagoState = createArchipelagoState(activeFloorRange, createRng(curr
 const missionState = createMissionState();
 let missionDialogController = null;
 let renderedNodeMapFloor = null;
+let renderedNodeMapSettings = null;
 let forestExpedition = null;
+let autosaveActive = false;
+let savedExpedition;
 
 function adjustMissionProgress(missionId, delta, eventKey = null) {
   if (eventKey) missionState.recordEncounterProgress(missionId, eventKey, delta);
@@ -477,6 +486,37 @@ function getCurrentSessionCode() {
   return encodeSessionCode(getCurrentSession());
 }
 
+async function saveCurrentExpedition() {
+  try {
+    const session = getCurrentSession();
+    if (isNodeMapMode()) Object.assign(session, renderedNodeMapSettings);
+    await saveAutosave(session);
+    elements.autosaveError.hidden = true;
+  } catch {
+    elements.autosaveError.hidden = false;
+  }
+}
+
+function showSessionStatus(message) {
+  elements.sessionStatus.textContent = message;
+  elements.sessionStatus.hidden = false;
+}
+
+async function offerSavedExpedition() {
+  try {
+    savedExpedition = await loadAutosave();
+    if (!savedExpedition) return;
+    const profile = FLOOR_RANGES.find(({ id }) => id === savedExpedition.profile);
+    if (savedExpedition.v !== 1 || !profile?.floors.includes(savedExpedition.floor)) {
+      throw new Error("Sessão incompatível.");
+    }
+    elements.resumeExpedition.textContent = `Continuar expedição · Andar ${savedExpedition.floor}`;
+    elements.resumeExpedition.hidden = false;
+  } catch {
+    showSessionStatus("Não foi possível ler o salvamento automático. Você pode importar um código de sessão.");
+  }
+}
+
 function updateInfo() {
   const modeLabel = isArchipelagoMode()
     ? "Arquipélago"
@@ -521,13 +561,22 @@ async function copyCurrentSessionCode() {
   showInfoMessage("Mapa atual e todas as informações foram salvos no clipboard.");
 }
 
-function drawGeneratedLevels(levels) {
+function rememberRenderedMap() {
+  renderedNodeMapFloor = Number(elements.floorInput.value);
+  renderedNodeMapSettings = {
+    floor: renderedNodeMapFloor,
+    depth: Number(elements.depthInput.value),
+    baseDc: Number(elements.baseDcInput.value)
+  };
+}
+
+function drawGeneratedLevels(levels, startSession) {
   elements.svg.hidden = false;
   elements.extendedExploration.hidden = true;
-  renderedNodeMapFloor = Number(elements.floorInput.value);
+  rememberRenderedMap();
   state.setLevels(levels);
   mapRenderer.drawMap(levels, activeFloorRange.theme.columnColors);
-  refreshExplorationDisplay();
+  refreshExplorationDisplay({ startSession });
   updateInfo(levels);
 }
 
@@ -604,7 +653,7 @@ function restoreSession(session) {
       session.extendedState
     );
     materializeActiveMissions({ floor: session.floor });
-    refreshExplorationDisplay();
+    refreshExplorationDisplay({ startSession: true });
     updateInfo();
     return;
   }
@@ -617,7 +666,7 @@ function restoreSession(session) {
       session.archipelagoState
     );
     materializeActiveMissions({ floor: session.floor });
-    refreshExplorationDisplay();
+    refreshExplorationDisplay({ startSession: true });
     updateInfo();
     return;
   }
@@ -631,10 +680,10 @@ function restoreSession(session) {
     const entry = forestExpedition.floors.find(f => f.floor === session.floor);
     if (!entry) throw new Error("Andar não encontrado na expedição salva.");
     state.setLevels(entry.levels);
-    renderedNodeMapFloor = entry.floor;
     state.importSessionState(session.state);
     mapRenderer.drawMap(entry.levels, activeFloorRange.theme.columnColors);
-    refreshExplorationDisplay();
+    rememberRenderedMap();
+    refreshExplorationDisplay({ startSession: true });
     updateInfo(entry.levels);
     return;
   }
@@ -648,42 +697,58 @@ function restoreSession(session) {
   );
 
   state.setLevels(levels);
-  renderedNodeMapFloor = session.floor;
   state.importSessionState(session.state);
   resolveChosenRouteEncounters(levels, session.state);
   materializeActiveMissions({ floor: session.floor, levels });
   mapRenderer.drawMap(levels, activeFloorRange.theme.columnColors);
-  refreshExplorationDisplay();
+  rememberRenderedMap();
+  refreshExplorationDisplay({ startSession: true });
   updateInfo(levels);
 }
 
-function refreshExplorationDisplay() {
+async function importSessionFile() {
+  const [file] = elements.sessionFile.files;
+  if (!file) return;
+
+  elements.sessionFile.value = "";
+  elements.importSessionFile.disabled = true;
+  elements.sessionStatus.hidden = true;
+  try {
+    const code = await file.text();
+    if (!elements.rangeDialog.open) return;
+    restoreSession(decodeSessionCode(code));
+    elements.rangeDialog.close();
+  } catch {
+    if (elements.rangeDialog.open) {
+      showSessionStatus("Não foi possível importar o arquivo. Selecione um .txt com o código MD1 completo.");
+    }
+  } finally {
+    elements.importSessionFile.disabled = false;
+  }
+}
+
+function refreshExplorationDisplay({ startSession = false } = {}) {
   syncExtendedFloorControls();
 
   if (isArchipelagoMode()) {
     elements.svg.hidden = true;
     elements.extendedExploration.hidden = false;
     archipelagoRenderer.render();
-    syncNodeFloorAdvanceControl();
-    updateTimeTracker();
-    return;
-  }
-
-  if (isExtendedExplorationMode()) {
+  } else if (isExtendedExplorationMode()) {
     elements.svg.hidden = true;
     elements.extendedExploration.hidden = false;
     elements.extendedExploration.className = "extended-exploration";
     extendedExplorationRenderer.render();
-    syncNodeFloorAdvanceControl();
-    updateTimeTracker();
-    return;
+  } else {
+    elements.svg.hidden = false;
+    elements.extendedExploration.hidden = true;
+    mapRenderer.updateDisplay(state.getLevels(), state);
   }
 
-  elements.svg.hidden = false;
-  elements.extendedExploration.hidden = true;
-  mapRenderer.updateDisplay(state.getLevels(), state);
   syncNodeFloorAdvanceControl();
   updateTimeTracker();
+  if (startSession) autosaveActive = true;
+  if (autosaveActive) void saveCurrentExpedition();
 }
 
 function populateFloorRangeSelect() {
@@ -763,20 +828,15 @@ function setUnknownPathsMode(isEnabled) {
   elements.unknownPathsInput.checked = isEnabled;
   elements.initialUnknownPathsInput.checked = isEnabled;
   document.body.classList.toggle("unknown-paths", isEnabled);
-
-  if (isArchipelagoMode()) return;
-
-  refreshExplorationDisplay();
-  nodeDialogController.rerenderCurrent();
 }
 
-function generateMap({ reuseSeed = false } = {}) {
+function generateMap({ reuseSeed = false, startSession = true } = {}) {
   if (isArchipelagoMode()) {
     if (!reuseSeed) currentMapSeed = createRandomSeed();
     renderedNodeMapFloor = null;
     archipelagoState.initialize(activeFloorRange, createRng(currentMapSeed));
     materializeActiveMissions({ floor: archipelagoState.getSnapshot().activeExploration?.floor || activeFloorRange.floors[0] });
-    refreshExplorationDisplay();
+    refreshExplorationDisplay({ startSession });
     updateInfo();
     return;
   }
@@ -794,7 +854,7 @@ function generateMap({ reuseSeed = false } = {}) {
       createRng(currentMapSeed)
     );
     materializeActiveMissions({ floor: Number(elements.floorInput.value) });
-    refreshExplorationDisplay();
+    refreshExplorationDisplay({ startSession });
     updateInfo();
     return;
   }
@@ -821,7 +881,7 @@ function generateMap({ reuseSeed = false } = {}) {
       if (!entry) throw new Error("Andar não encontrado nesta expedição.");
       elements.depthInput.value = entry.depth;
       elements.baseDcInput.value = entry.baseDc;
-      drawGeneratedLevels(entry.levels);
+      drawGeneratedLevels(entry.levels, startSession);
       return;
     }
   }
@@ -848,7 +908,7 @@ function generateMap({ reuseSeed = false } = {}) {
   );
 
   materializeActiveMissions({ floor: Number(elements.floorInput.value), levels });
-  drawGeneratedLevels(levels);
+  drawGeneratedLevels(levels, startSession);
 }
 
 function setupInstallButton() {
@@ -967,6 +1027,8 @@ function bindEvents() {
 
   elements.unknownPathsInput.addEventListener("change", () => {
     setUnknownPathsMode(elements.unknownPathsInput.checked);
+    refreshExplorationDisplay();
+    nodeDialogController.rerenderCurrent();
   });
 
   elements.initialUnknownPathsInput.addEventListener("change", () => {
@@ -975,6 +1037,18 @@ function bindEvents() {
 
   elements.seedInput.addEventListener("input", () => {
     elements.seedInput.setCustomValidity("");
+  });
+
+  elements.importSessionFile.addEventListener("click", () => elements.sessionFile.click());
+  elements.sessionFile.addEventListener("change", importSessionFile);
+
+  elements.resumeExpedition.addEventListener("click", () => {
+    try {
+      restoreSession(savedExpedition);
+      elements.rangeDialog.close();
+    } catch {
+      showSessionStatus("Não foi possível continuar a expedição salva. Você pode importar um código de sessão.");
+    }
   });
 
   elements.rangeConfirm.addEventListener("click", (event) => {
@@ -1035,10 +1109,11 @@ function boot() {
   elements.floorRangeInput.addEventListener("change", syncInitialUnknownPathsVisibility);
   syncInitialUnknownPathsVisibility();
   applyFloorRange(activeFloorRange.id);
-  generateMap();
+  generateMap({ startSession: false });
 
   window.addEventListener("load", () => {
     elements.rangeDialog.showModal();
+    void offerSavedExpedition();
   });
 }
 
