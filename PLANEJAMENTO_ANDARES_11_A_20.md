@@ -1,12 +1,12 @@
 # Andares 11–20 — decisões, prioridades e andamento
 
-Atualizado em 14/11/2026. Próximo uso informado: **14/11/2026, a partir das 15h, horário de Brasília**. Andar inicial da sessão não informado.
+Atualizado em 17/11/2026. A expedição da última sessão foi recuperada no **andar 14**, após o descanso no acampamento e antes do último nodo. A próxima data de jogo ainda não foi registrada.
 
-Este documento consolida as decisões da revisão e orienta entregas pequenas e verificáveis. **O MVP foi implementado, validado e publicado em 14/11/2026 no commit `7afd21b`**, incluindo QA do build de produção sem rede após cache. O teste no tablet físico continua pendente. Melhorias de variedade e continuidade ambiental permanecem para depois.
+Este documento consolida as decisões, as entregas e as pendências dos andares 11–20. O MVP foi publicado no commit `7afd21b`. A versão publicada em 17/11 inclui salvamento automático no PWA e importação e exportação de sessão por arquivo TXT. As evidências dessas entregas estão na [seção 13](#13-persistência-após-a-sessão).
 
 ## 1. Leitura rápida: o que vem primeiro
 
-> Ajuste de prioridade às 13h39 de 14/11: antes da sessão, priorizar clareza visual dos estados e indicação da próxima ação. Salvamento automático não é prioridade do usuário. O plano curto está em [Usabilidade dos nodos](docs/superpowers/plans/2026-11-14-usabilidade-nodos.md); mudanças de regras e mecânicas novas ficam para depois.
+**Próximo passo indicado:** testar em mesa a modal de missão enxuta e a leitura de XP. Para a próxima mudança de regras, avaliar a rerrolagem de criaturas no mesmo ND. A [seção 14](#14-retorno-da-mesa-e-propostas-para-a-próxima-entrega) reúne o retorno da mesa e as propostas de calibragem. A conferência de importação, retomada e exportação no tablet físico continua pendente.
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
@@ -319,7 +319,7 @@ Sem prazo técnico estimado: a janela entre 02h42 e 15h do mesmo dia não é tem
 | Composição | `src/encounterResolver.js`, `creatures.js`, `traps.js` | Alvo presente e ND do encontro validado |
 | Estado e UI | `src/missions/missionState.js`, `missionDialog.js`, `src/main.js`, `nodeDialog.js`, `mapRenderer.js` | Disponibilidade, progresso, conclusão e histórico corretos |
 | Cena tática | `src/nodeTacticalMap.js` | Abrir missão preserva a cena base do nodo |
-| Persistência | `src/sessionCode.js`, `appState.js`, orquestração em `main.js` | Restauração sem perder ou trocar vínculos |
+| Persistência | `src/sessionCode.js`, `src/sessionAutosave.js`, `src/forestExpedition.js` e orquestração em `src/main.js` | Retomada local e exportação/importação sem perder ou trocar vínculos |
 | Ambiente | `src/environment.js`, `generator.js` | Transições válidas e seed determinística |
 | Chefe | Nova definição dedicada a decidir, com referência em `dungeon1to10FinalEncounters.js` | Mesma cena em seeds e restaurações diferentes |
 
@@ -342,11 +342,11 @@ Essa lista orienta o trabalho; o plano técnico executável de cada entrega deve
 - [x] P0 implementado e validado em novas expedições.
 - [x] CDs recalibradas no aplicativo: curva 20–23 confirmada pelo usuário.
 - [x] Revelação, descanso seguro, conclusão de cenas e Quimera simples fixa implementados e validados.
+- [x] Salvamento automático local, retomada e importação/exportação TXT publicados.
 - [ ] P1 restante: relógios separados e apresentação mais explícita do teste de descoberta.
 - [ ] P2, P3 e P4 implementados e validados em entregas separadas.
-- [ ] Versão candidata validada no dispositivo e disponibilizada para a sessão.
-
-**Próxima ação ao retomar:** disponibilizar a versão validada pelo fluxo do projeto e conferir no tablet. Depois priorizar a mecânica especial da Quimera e as próximas entregas; não refazer P0 nem reabrir as regras confirmadas.
+- [ ] Confirmar no tablet usado em mesa a importação, a retomada pelo ícone do PWA e o download do TXT.
+- [x] Registrar o relato da última sessão e identificar as correções que afetam o andamento da expedição.
 
 ## 11. Entrega do MVP e evidências
 
@@ -391,3 +391,28 @@ O usuário encontrou duas missões do andar 15 no mesmo nodo. A busca anterior a
 Implementados contorno tracejado para exploração registrada, marcador `…` para encontro pendente e `✓` para concluído, preservando o ícone do tipo. A legenda explica os estados e mapa/modal indicam a próxima ação. Não houve mudança de regra, permissão, encontro ou formato de sessão. Marcação extra de descanso foi excluída a pedido do usuário.
 
 Suíte ampliada para 24 testes de 11–20. Testes de missões, de 1–10, build e QA de produção dos dois modos passaram, incluindo leitura em tablet/mobile e offline após cache. O [plano de usabilidade](docs/superpowers/plans/2026-11-14-usabilidade-nodos.md) registra os detalhes; a publicação segue o workflow do commit desta entrega.
+
+## 13. Persistência após a sessão
+
+- O código guardado no WhatsApp chegou cortado em 20.000 caracteres. A recuperação preservou o estado gravado do andar 14, as três missões e o histórico legível do andar 11. Os mapas foram reconstruídos pela seed com os vínculos de missão conferidos. O histórico percorrido nos andares 12 e 13 ficou fora do trecho disponível.
+- O PWA guarda uma expedição por vez no IndexedDB do dispositivo. **Continuar expedição** abre o último estado salvo. Abrir a configuração ou sair da seleção antes de iniciar preserva o save anterior. Uma expedição iniciada ou uma importação bem-sucedida atualiza o autosave. [Publicação do autosave e da importação TXT](https://github.com/Alkimistah/megadungeon/actions/runs/44193664119).
+- **Exportar sessão (.txt)**, em **Configurações**, baixa o código MD1 em um arquivo como `mega-dungeon-andar-14.txt`. Na tela inicial, **Importar arquivo de sessão** lê o TXT diretamente. A entrada dos códigos MD1 pelo campo de texto continua disponível. [Publicação da exportação TXT](https://github.com/Alkimistah/megadungeon/actions/runs/44195295956).
+- O QA no Chrome confirmou a importação da sessão recuperada, o progresso das missões e o avanço ao andar 15. O build de produção foi verificado com retomada e exportação offline. O teste de exportação e reimportação comparou o estado dos nodos e as missões. A confirmação no tablet físico continua pendente.
+- A ideia de compactar o backup permanece disponível para quando o tamanho do arquivo voltar a causar dificuldade. O formato atual preserva os mapas completos, o que evita depender de regeneração idêntica entre navegadores ou versões do jogo.
+
+## 14. Retorno da mesa e propostas para a próxima entrega
+
+A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O mestre observou muitos acampamentos, inimigos repetidos e pouca pressão em combate. Na maioria das vezes, os inimigos, inclusive os Infectos, caíram antes de agir. Quando agiram, frequentemente erraram. O ambiente, sobretudo as quedas de penhascos, causou a maior parte do dano percebido. A missão aberta pelo nodo também apresentou diferenças no mapa e excesso de texto e tabelas.
+
+### Interface do nodo e da missão
+
+- Implementado e validado no Chrome. O mapa tático do nodo mantém terreno, inimigos e armadilhas e sobrepõe os destaques de missão. A modal integrada mostra objetivo, progresso e ações de registro ou conclusão, com pistas, prova e consequências recolhidas em **Detalhes da missão**.
+- Quando o desafio está revelado, **XP com clima e terreno** usa o ND total exibido e **XP sem clima e terreno** usa o ND base do encontro, preservando a contribuição de armadilhas. Cada valor é calculado como `1.000 × ND`. Exemplo com ND total 3¼ e ND base 3: **3.250 XP** e **3.000 XP**. Os valores são alternativas para o mestre usar, sem somá-los.
+- O teste com a sessão recuperada confirmou **2.250 XP / 1.000 XP** no nodo da bússola e **4.000 XP / 3.000 XP** no nodo do Infecto. O progresso de **2 de 8 alvos** permaneceu preservado e o encontro já registrado não ofereceu nova contagem.
+
+### Calibragem e variedade
+
+- **Acampamentos e tempo:** testar menos acampamentos nas revelações de desconhecidos e travessias mais longas. A primeira hipótese é reduzir a chance de acampamento oculto de 20% para 5–10% e testar 30 minutos como mínimo para nodos com teste. Separar tempo total e tempo desde o último descanso. Validar a proposta observando uma rota típica antes de definir os valores finais.
+- **Composição:** oferecer ao mestre uma rerrolagem em nodos de combate sem missão, mantendo o orçamento de ND e as restrições do nodo. Guardar o resultado aceito na sessão. Considerar composições com mais de um adversário, quando houver alternativa no mesmo ND, para reduzir a frequência de encontros decididos antes da primeira ação inimiga.
+- **Reforço:** avaliar um ajuste manual, visível e reversível por ficha. Iniciativa ou PV podem ajudar uma criatura a chegar ao turno. Bônus de ataque trata acerto depois que ela age. Testar os efeitos separadamente e manter o ND original como referência, com o reforço indicado na ficha e sem crédito extra de XP automático.
+- **Ordem proposta:** entregar primeiro a modal enxuta e a leitura de XP, que ajudam na expedição já salva. Em seguida, testar variedade de composição e reforço com os encontros que ocorreram em mesa. Aplicar novas frequências e tempos na geração de novos mapas, preservando o mapa da expedição em curso.

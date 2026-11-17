@@ -1,9 +1,9 @@
 import { createTacticalMapPanel } from "../tacticalMapRenderer.js";
-import { createNodeTacticalMap } from "../nodeTacticalMap.js";
 import { formatChallengeRating } from "../challenge.js";
 import { getCreatureById } from "../creatureCatalog/index.js";
 import { CREATURE_TYPES } from "../creatures.js";
-import { createCreatureDetail } from "../nodeDialog.js";
+import { createCreatureDetail, createEncounterMissionPanel } from "../nodeDialog.js";
+import { getEncounterMissionMatches } from "./missionEncounterIntegration.js";
 import { createMissionTacticalMap } from "./missionTacticalMap.js";
 
 function createElement(tagName, className = null, text = null) {
@@ -294,11 +294,8 @@ function createMissionCreatureItem(mission, tacticalMap = null) {
   };
 }
 
-function renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress = null, node = null) {
-  const actual = node?.resolvedEncounter?.items.find(i => i.creatureId === mission.objective?.targetId);
-  const item = actual ? { ...actual, encounterKey: node.resolvedEncounter.seed }
-    : node ? null : createMissionCreatureItem(mission, tacticalMap);
-
+function renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress = null) {
+  const item = createMissionCreatureItem(mission, tacticalMap);
   if (!item) return null;
 
   const wrapper = createElement("section", "mission-creature-details");
@@ -309,36 +306,58 @@ function renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress = n
   return wrapper;
 }
 
-function getEncounterItemsText(node) {
-  const items = node?.resolvedEncounter?.items || [];
+function renderIntegratedMission(mission, node, onComplete, onAdjustProgress) {
+  const card = createElement("article", "mission-card");
+  const objective = node.missionObjectives?.find(item => item.missionId === mission.id);
+  const header = createElement("div", "mission-card-header");
+  header.append(
+    createElement("h3", null, mission.title),
+    createElement("span", "mission-status", getMissionStatusLabel(mission))
+  );
+  const target = mission.objective?.targetName;
+  const condition = mission.objective?.condition;
+  const objectiveText = objective?.description || [condition, target].filter(Boolean).join(" — ");
+  card.append(header, createElement("p", "mission-proof", objectiveText));
 
-  if (!items.length) return "Encontro ainda não resolvido.";
+  const progress = renderMissionProgress(mission, onAdjustProgress);
+  if (progress) card.appendChild(progress);
 
-  return items.map((item) => `${item.quantity || 1}x ${item.name}`).join("; ");
-}
+  const encounter = node.resolvedEncounter;
+  const matches = encounter?.items.flatMap(item =>
+    getEncounterMissionMatches({ ...item, encounterKey: encounter.seed }, [mission])
+  ) || [];
+  const encounterProgress = createEncounterMissionPanel(matches, onAdjustProgress);
+  if (encounterProgress) card.appendChild(encounterProgress);
 
-function renderIntegratedNodeDetails(mission, node, tacticalMap) {
-  const list = createElement("ul", "mission-map-details");
-  const objective = node.missionObjectives?.find(o => o.missionId === mission.id);
+  if (mission.status !== "completed") {
+    const actions = createElement("div", "mission-card-actions");
+    const complete = createElement("button", "extended-action is-compact", "Marcar como concluída");
+    complete.type = "button";
+    complete.addEventListener("click", () => onComplete(mission.id));
+    actions.appendChild(complete);
+    card.appendChild(actions);
+  }
+
+  const details = createElement("details", "mission-run-guidance");
+  details.appendChild(createElement("summary", null, "Detalhes da missão"));
   const entries = [
-    ["Nodo", objective?.description || node?.label || "Nodo vinculado"],
-    ["Objetivo da missão", `${mission.objective?.condition || "resolver"} ${mission.objective?.targetName || "o objetivo"}`],
-    ["Encontro do nodo", getEncounterItemsText(node)],
-    ...(objective ? [["Abordagem", objective.approach], ["Resolução", objective.resolution]] : []),
-    ...(objective?.question ? [["Pergunta", objective.question], ["Evidências", objective.evidence.join(" ")], ["Conclusão para o mestre", objective.answer]] : []),
-    ...(objective ? [["Sucesso", objective.onSuccess], ["Falha", objective.onFailure]] : []),
-    ["Mapa", `${formatCountLabel(tacticalMap.objectiveCount || 0, "ponto de interesse", "pontos de interesse")}, ${formatCountLabel(tacticalMap.enemyCount, "inimigo", "inimigos")} e ${formatCountLabel(tacticalMap.trapCount, "zona de risco", "zonas de risco")}`]
+    ["Abordagem", objective?.approach],
+    ["Pergunta", objective?.question],
+    ["Evidências", objective?.evidence?.join(" ")],
+    ["Conclusão para o mestre", objective?.answer],
+    ["Prova", mission.proofType],
+    ["Sucesso", objective?.onSuccess],
+    ["Falha", objective?.onFailure],
+    ["Recompensa", mission.reward?.text]
   ];
-
   entries.forEach(([label, value]) => {
-    const item = createElement("li");
-
-    item.appendChild(createElement("strong", null, `${label}: `));
-    item.appendChild(document.createTextNode(value));
-    list.appendChild(item);
+    if (!value) return;
+    const line = createElement("p");
+    line.append(createElement("strong", null, label), document.createTextNode(` · ${value}`));
+    details.appendChild(line);
   });
-
-  return list;
+  if (details.children.length > 1) card.appendChild(details);
+  return card;
 }
 
 function getConfirmSelectionLabel(selectedCount) {
@@ -434,19 +453,14 @@ function renderMissionCard(mission, {
 }
 
 function renderMissionRunContent(mission, onComplete, context = null, profile = null, onAdjustProgress = null, rewardExpanded = false, onToggleReward = null) {
+  if (context?.kind === "node") return renderIntegratedMission(mission, context.node, onComplete, onAdjustProgress);
+
   const container = createElement("div", "mission-run");
   const card = renderMissionCard(mission, { onAdjustProgress, onComplete, onToggleReward, rewardExpanded });
   const guidance = createElement("section", "mission-run-guidance");
-  const node = context?.kind === "node" ? context.node : null;
   const pendingNode = context?.kind === "pending-node";
-  const tacticalMap = node
-    ? createNodeTacticalMap(node, { mission })
-    : pendingNode
-      ? null
-      : createMissionTacticalMap(mission, { profile });
-  const tacticalPanel = createTacticalMapPanel(tacticalMap, {
-    mapKind: node ? "Mapa tático do nodo" : "Mapa tático da missão"
-  });
+  const tacticalMap = pendingNode ? null : createMissionTacticalMap(mission, { profile });
+  const tacticalPanel = createTacticalMapPanel(tacticalMap, { mapKind: "Mapa tático da missão" });
   const title = createElement("h3", null, "Encontro de missão");
   const text = createElement(
     "p",
@@ -468,16 +482,14 @@ function renderMissionRunContent(mission, onComplete, context = null, profile = 
     const mapNote = createElement(
       "p",
       "mission-map-note",
-      node
-        ? "Mapa do próprio nodo com o ponto de interesse da missão marcado."
-        : "Mapa opcional para conduzir a missão sem substituir o encontro normal do andar."
+      "Mapa opcional para conduzir a missão sem substituir o encontro normal do andar."
     );
 
-    container.append(mapNote, node ? renderIntegratedNodeDetails(mission, node, tacticalMap) : renderMissionMapDetails(mission, tacticalMap));
-    if (!node && tacticalMap.riskDetails?.length) {
+    container.append(mapNote, renderMissionMapDetails(mission, tacticalMap));
+    if (tacticalMap.riskDetails?.length) {
       container.appendChild(renderMissionRiskDetails(tacticalMap));
     }
-    const creatureDetails = renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress, node);
+    const creatureDetails = renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress);
     if (creatureDetails) container.appendChild(creatureDetails);
     container.appendChild(tacticalPanel);
   }

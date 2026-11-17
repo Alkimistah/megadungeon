@@ -91,12 +91,18 @@ export function createTacticalGrid(tacticalMap) {
   grid.style.setProperty("--tactical-fit-ratio", String(tacticalMap.width / tacticalMap.height));
   grid.style.setProperty("--tactical-max-width", `${tacticalMap.width * 40}px`);
 
-  tacticalMap.cells.forEach((cell) => {
+  const objectives = new Map((tacticalMap.objectiveMarkers || []).map(({ index, label }) => [index, label]));
+  tacticalMap.cells.forEach((cell, index) => {
     const tile = createElement("span", `tactical-cell is-${cell}`);
     const glyph = TACTICAL_CELL_GLYPHS[cell];
 
     tile.title = getTacticalCellLabel(cell);
     if (glyph) tile.textContent = glyph;
+    if (objectives.has(index)) {
+      tile.classList.add("has-objective");
+      tile.title += ` · Objetivo de missão: ${objectives.get(index)}`;
+      tile.appendChild(createElement("span", "tactical-objective-marker", "!"));
+    }
     grid.appendChild(tile);
   });
 
@@ -106,6 +112,7 @@ export function createTacticalGrid(tacticalMap) {
 export function createTacticalLegend(tacticalMap) {
   const legend = createElement("div", "tactical-legend");
   const presentCells = new Set(tacticalMap?.cells || []);
+  if (tacticalMap?.objectiveMarkers?.length) presentCells.add("objective");
   const cells = TACTICAL_LEGEND_ORDER.filter((cell) => presentCells.has(cell));
 
   cells.forEach((cell) => {

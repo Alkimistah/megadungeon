@@ -92,13 +92,21 @@ test("Quimera is alone in the same simple arena for every seed", () => {
   }
 });
 
-test("opening a mission preserves the tactical scene of its node", () => {
+test("mission objectives mark the node map without replacing terrain or combat markers", () => {
   const node = map(15).flat().find(n => n.type === "normal");
   resolveNodeEncounter(node, { mapSeed: "same-scene" });
   const base = createNodeTacticalMap(node);
-  const withMission = createNodeTacticalMap(node, { mission: { id: "test-mission" } });
+  node.missionObjectives = [{ missionId: "test-mission", targetType: "object", targetName: "Relicário" }];
+  const withMission = createNodeTacticalMap(node);
   assert.equal(withMission.objectiveCount, 1);
-  assert.deepEqual(withMission.cells.map((c, i) => c === "objective" ? base.cells[i] : c), base.cells);
+  assert.deepEqual(withMission.cells, base.cells);
+  const [target] = node.resolvedEncounter.items.filter(item => item.kind === "creature");
+  assert.ok(target);
+  node.missionObjectives = [{ missionId: "hunt", targetType: "creature", targetId: target.creatureId, targetName: target.name }];
+  const hunt = createNodeTacticalMap(node);
+  assert.deepEqual(hunt.cells, base.cells);
+  assert.ok(hunt.objectiveMarkers.length > 0);
+  assert.ok(hunt.objectiveMarkers.every(marker => hunt.cells[marker.index] === "enemy"));
 });
 
 test("special hunt places the promised creature inside the node encounter budget", () => {

@@ -12,6 +12,7 @@ import { getNodeProgressPresentation } from "./nodeProgressPresentation.js";
 const COMBAT_ICON = assetUrl("/assets/icons/winged-sword.svg");
 const ENVIRONMENT_ICON = assetUrl("/assets/icons/earth-arrow-left.svg");
 const TACTICAL_MAP_ICON = assetUrl("/assets/icons/game-icons--treasure-map.svg");
+const xpNumberFormat = new Intl.NumberFormat("pt-BR");
 
 function createNodeMissionNotice(node, onOpenMission, state) {
   if (!node.missionBindings?.length) return null;
@@ -247,8 +248,11 @@ function getChallengeText(node, state) {
   return `ND ${formatChallengeRating(node.challenge.total)}`;
 }
 
-function setNodeDialogMeta(element, checkText, explorationText, challengeText) {
-  element.innerHTML = `<strong>Teste:</strong> ${checkText} | <strong>Exploração:</strong> ${explorationText} | <strong>Desafio:</strong> ${challengeText}`;
+function setNodeDialogMeta(element, checkText, explorationText, challengeText, challenge) {
+  const xpText = challenge && Number.isFinite(challenge.encounter) && Number.isFinite(challenge.total)
+    ? ` | Com clima e terreno: ${xpNumberFormat.format(challenge.total * 1000)} XP · Sem clima e terreno: ${xpNumberFormat.format(challenge.encounter * 1000)} XP`
+    : "";
+  element.innerHTML = `<strong>Teste:</strong> ${checkText} | <strong>Exploração:</strong> ${explorationText} | <strong>Desafio:</strong> ${challengeText}${xpText}`;
 }
 
 function getNodeDialogTitle(node, state) {
@@ -353,7 +357,7 @@ function createEncounterMissionBadge(match) {
   return badge;
 }
 
-function createEncounterMissionPanel(matches, onAdjustMissionProgress = null) {
+export function createEncounterMissionPanel(matches, onAdjustMissionProgress = null) {
   if (!matches.length) return null;
 
   const panel = document.createElement("div");
@@ -776,10 +780,6 @@ export function createNodeDialogController({
     return state.isNodeChosen(node) && Boolean(node.resolvedEncounter?.items?.length);
   }
 
-  function canShowTacticalMap(node) {
-    return canShowCombatPage(node);
-  }
-
   function getViewMode(node) {
     const viewMode = viewModeByNode.get(node.id) || "environment";
 
@@ -830,13 +830,20 @@ export function createNodeDialogController({
   }
 
   function createTacticalMapControl(node) {
-    if (!canShowTacticalMap(node)) return null;
+    if (!state.isNodeChosen(node)) return null;
+    const objectives = node.missionObjectives || (node.missionBindings || []).flatMap(binding => {
+      const mission = getActiveMissions().find(item => item.id === binding.id);
+      if (!mission?.objective) return [];
+      const { targetType, targetId, targetName } = mission.objective;
+      return [{ missionId: mission.id, targetType, targetId, targetName }];
+    });
+    if (!canShowCombatPage(node) && !objectives.length) return null;
 
     return createIconButton(
       "icon-button modal-tactical-map-toggle",
       TACTICAL_MAP_ICON,
       "Abrir mapa tático",
-      () => openTacticalMapFullscreen(createNodeTacticalMap(node))
+      () => openTacticalMapFullscreen(createNodeTacticalMap(node, objectives))
     );
   }
 
@@ -895,7 +902,7 @@ export function createNodeDialogController({
     currentNode = node;
     titleElement.textContent = `Encontro ${node.level}`;
     typeElement.textContent = getNodeDialogTitle(node, state);
-    setNodeDialogMeta(metaElement, checkText, explorationText, challengeText);
+    setNodeDialogMeta(metaElement, checkText, explorationText, challengeText, state.isNodeRevealed(node) ? node.challenge : null);
     contentElement.innerHTML = "";
     const progress = getNodeProgressPresentation(node, state.getNodeViewState(node));
     const progressNotice = document.createElement("p");

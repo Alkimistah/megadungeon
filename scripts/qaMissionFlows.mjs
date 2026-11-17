@@ -474,8 +474,9 @@ async function runNodeMissionAndAdvanceFlow(results) {
     await click(client, ".mission-context-action");
     await waitFor(client, "document.querySelector('#missionDialog')?.open === true", "mission run dialog");
     const missionText = await getOpenDialogText(client, "#missionDialog");
-    if (!missionText.includes("Mapa tático do nodo")) {
-      throw new Error("Missão em nodo não abriu com mapa tático do próprio nodo.");
+    const hasDuplicateScene = await evaluate(client, "Boolean(document.querySelector('#missionDialog .tactical-grid, #missionDialog .mission-creature-details'))");
+    if (!missionText.includes("Detalhes da missão") || hasDuplicateScene) {
+      throw new Error("Missão em nodo deve exibir detalhes recolhíveis sem duplicar o mapa ou a ficha do encontro.");
     }
     await screenshot(client, "node-mission-run");
     await click(client, "#missionClose");

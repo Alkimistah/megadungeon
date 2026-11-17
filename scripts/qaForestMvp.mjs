@@ -135,9 +135,19 @@ async function missionFlow() {
     assert.equal(await page.locator("#advanceNodeFloorButton").isDisabled(), true);
     const extermIndex = node.missionBindings?.findIndex(m => m.id === "qa-extermination") ?? -1;
     if (extermIndex >= 0 && !credited) {
+      const xp = new Intl.NumberFormat("pt-BR");
+      assert.match(await page.locator("#nodeDialogMeta").innerText(), new RegExp(`Com clima e terreno.*${xp.format(node.challenge.total * 1000)} XP`, "i"));
+      assert.match(await page.locator("#nodeDialogMeta").innerText(), new RegExp(`Sem clima e terreno.*${xp.format(node.challenge.encounter * 1000)} XP`, "i"));
+      await page.locator('[aria-label="Abrir mapa tático"]').click();
+      assert.ok(await page.locator(".tactical-map-fullscreen .is-enemy.has-objective").count() > 0);
+      await page.keyboard.press("Escape");
       await page.locator(".mission-context-action").nth(extermIndex).click();
       await page.locator("#missionDialog[open]").waitFor();
-      assert.match(await page.locator("#missionDialog").innerText(), /Mapa tático do nodo/);
+      assert.equal(await page.locator("#missionDialog .tactical-grid, #missionDialog .mission-creature-details").count(), 0);
+      const details = page.locator("#missionDialog details");
+      assert.equal(await details.getAttribute("open"), null);
+      await details.locator("summary").click();
+      assert.match(await details.innerText(), /Evidências|Prova|Sucesso/);
       await page.locator("#missionDialog .encounter-mission-action").click();
       assert.equal(await page.locator("#missionDialog .encounter-mission-action").count(), 0);
       assert.match(await page.locator("#missionDialog").innerText(), /já registrados/);
