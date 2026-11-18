@@ -1,12 +1,14 @@
 # Andares 11–20 — decisões, prioridades e andamento
 
-Atualizado em 17/11/2026. A expedição da última sessão foi recuperada no **andar 14**, após o descanso no acampamento e antes do último nodo. A próxima data de jogo ainda não foi registrada.
+Atualizado em 18/11/2026. A expedição da última sessão foi recuperada no **andar 14**, após o descanso no acampamento e antes do último nodo. A próxima data de jogo ainda não foi registrada.
 
-Este documento consolida as decisões, as entregas e as pendências dos andares 11–20. O MVP foi publicado no commit `7afd21b`. A versão publicada em 17/11 inclui salvamento automático no PWA e importação e exportação de sessão por arquivo TXT. As evidências dessas entregas estão na [seção 13](#13-persistência-após-a-sessão).
+Este documento consolida as decisões, as entregas e as pendências dos andares 11–20. O MVP foi publicado no commit `7afd21b`. O histórico de salvamento automático no PWA e de importação e exportação por TXT está na [seção 13](#13-persistência-após-a-sessão).
+
+A versão `c992c22` está publicada e inclui a continuidade de terreno e clima para novas expedições, os PV individuais e a adição temporária de criaturas. A validação em Chrome e a publicação no GitHub Pages foram concluídas. A conferência dessa versão no tablet físico está pendente. [Publicação no GitHub Pages](https://github.com/Alkimistah/megadungeon/actions/runs/44232391826).
 
 ## 1. Leitura rápida: o que vem primeiro
 
-**Próximo passo indicado:** publicar a continuidade de terreno e clima e o [controle de PV individual](#16-controle-de-pv-individual). A próxima implementação é a [luta da Quimera](#6-p1--encontro-fixo-da-quimera), que reutilizará o controlador.
+**Próxima implementação:** a [mecânica especial da Quimera](#6-p1--encontro-fixo-da-quimera). Começar pelo sorteio das quatro cabeças numeradas e de suas fraquezas na preparação do andar 20, preservando o resultado no save. Em seguida, integrar à ficha os PV compartilhados, a RD 5, o atordoamento e a recarga do sopro.
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
@@ -14,8 +16,8 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 | 2 | P1 — calibragem | CDs de exploração coerentes com personagens de níveis 4–7 | Curva 20–23 confirmada e implementada |
 | 3 | P1 — regras essenciais | Revelação correta, descanso verdadeiro seguro e estados claros de resolução | Implementado, com relógios separados na floresta |
 | 4 | P2 — desconhecidos | Mais variedade com tabela temática própria e descanso falso explícito | Primeira tabela implementada |
-| 5 | P3 — continuidade | Terreno e clima com transições coerentes entre nodos | Primeira versão implementada para novas expedições |
-| 6 | PV individual | Registrar dano e cura por criatura nas fichas de combate | Implementado como base para a Quimera |
+| 5 | P3 — continuidade | Terreno e clima com transições coerentes entre nodos | Publicado para novas expedições |
+| 6 | PV individual | Registrar dano e cura por criatura nas fichas de combate | Publicado e validado no Chrome |
 | 7 | P1 — Quimera | Arena fixa, chefe solo e quatro cabeças sorteadas no andar 20 | Arena simples implementada; mecânica especial planejada |
 | 8 | P4 — pistas de rota | Informação parcial útil, sem entregar o tipo do nodo | Intenção aceita; regras ainda precisam de desenho |
 
@@ -31,7 +33,7 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 - Toda missão aceita deve ter realização concreta em um ou mais nodos. Missão criada por outro fluxo também deve passar pela mesma integração.
 - Cada nodo pode abrigar no máximo uma missão, inclusive quando os objetivos são semelhantes. Missões do mesmo andar ocupam nodos distintos numa rota possível. Extermínio pode ocupar vários nodos, sem compartilhar esses nodos com outra missão.
 - Acampamento é descanso verdadeiro e seguro. Descanso falso é uma cena própria que só pode surgir dentro do desconhecido.
-- A Quimera é a única criatura do encontro fixo do andar 20. A arena usa posições iniciais fixas. A mecânica planejada sorteia as cabeças e suas fraquezas para cada luta.
+- A Quimera é a única criatura do encontro fixo do andar 20. A arena usa posições iniciais fixas. A mecânica planejada sorteia as cabeças e suas fraquezas ao preparar o andar 20 e guarda o resultado no save.
 - Pistas específicas da Quimera só aparecem no andar 20.
 - Desconhecidos devem aparecer mais e podem conter cenas sem combate, adequadas à região e ao clima.
 - Terreno e clima devem apresentar continuidade entre nodos, sem exigir reconstruir a estrutura do grafo.
@@ -450,8 +452,8 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 4. **Tempo de exploração.** Implementado. Novas travessias com teste variam entre 30, 45 e 60 minutos. Os dois relógios persistem ao avançar, retomar e exportar. Em saves anteriores, o total é reconstruído a partir dos nodos e tentativas registrados. Quando faltam andares do histórico, o app indica **Tempo total (parcial)**.
 5. **Reforço manual por criatura.** Implementado e verificado no Chrome. Disponível na ficha de um encontro pendente, inclusive em nodos de missão. Quando a ficha representa várias criaturas, o ajuste vale para todas as daquela ficha. Os bônus são reversíveis, ficam no save e não alteram ND ou XP. A Quimera mantém a ficha fixa. Se o mestre rerrolar as criaturas, as novas fichas começam com os reforços desativados.
 6. **Cenas dos nodos desconhecidos.** Primeira tabela de exploração, obstáculo, descoberta e descanso falso implementada. Aplica-se às novas expedições.
-7. **Continuidade de terreno e clima.** Primeira versão implementada para novas expedições. Terrenos consideram todas as entradas e o clima evolui por etapa. A geração preserva a estrutura do mapa e a restauração preserva os ambientes já salvos.
-8. **Controle de PV individual.** Implementado nas fichas de combate, com anotações e criaturas extras mantidas enquanto o app está aberto. Ver seção 16.
+7. **Continuidade de terreno e clima.** Publicada para novas expedições no commit `c992c22`. Terrenos consideram todas as entradas e o clima evolui por etapa. A geração preserva a estrutura do mapa e a restauração preserva os ambientes já salvos.
+8. **Controle de PV individual.** Publicado no commit `c992c22`. As fichas de combate mantêm as anotações e as criaturas extras enquanto o app está aberto. Ver seção 16.
 9. **Mecânica especial da Quimera.** Reutilizar o controlador de PV e ligar a RD, as quatro cabeças, as fraquezas, o atordoamento e a recarga do sopro. Ver seção 6.
 10. **Pistas de rota.** Dar informação parcial antes da escolha, preservando o mistério do conteúdo.
 
@@ -485,6 +487,6 @@ O app apresenta o **ND de referência do nodo e os valores de XP calculados para
 
 **Bloqueio de rerrolagem.** O primeiro lançamento de dano ou cura, reforço ou adição manual bloqueia a rerrolagem do encontro. Desfazer um lançamento mantém o bloqueio na sessão aberta. Ao retomar, o app usa o estado salvo, incluindo os bloqueios por reforço ou progresso.
 
-A primeira implementação registra o dano e a cura informados pelo mestre. A Quimera reutiliza os mesmos PV compartilhados do corpo e integra sua RD 5, a fraqueza da cabeça atingida e o atordoamento. A conclusão do encontro permanece uma confirmação do mestre.
+A implementação publicada registra o dano e a cura informados pelo mestre. A próxima entrega reutilizará o controle para os PV compartilhados da Quimera e integrará a RD 5, a fraqueza da cabeça atingida e o atordoamento. A conclusão do encontro permanece uma confirmação do mestre.
 
-Validar dano e cura em inimigos repetidos, desfazer o lançamento e aplicar e retirar reforço depois de sofrer dano. Conferir que reabrir a ficha mantém PV e adições, e que retomar por autosave ou TXT restaura a composição salva, com PV máximos e sem criaturas extras. Conferir o XP de referência e o bloqueio da rerrolagem depois de registrar dano. Em um encontro misto com alvo de extermínio, verificar que o botão bloqueia a adição do alvo e permite adicionar as outras criaturas sem aumentar a contagem da missão.
+O QA no Chrome verificou a aplicação de dano e cura em unidades da mesma ficha, a adição de criaturas e o bloqueio da rerrolagem. Reabrir a ficha mantém os ajustes. Retomar pelo autosave ou pelo TXT recupera a composição salva com PV máximos. A suíte automatizada também verificou o bloqueio da adição do alvo de extermínio. A conferência no tablet físico está pendente.

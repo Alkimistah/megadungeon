@@ -1347,12 +1347,17 @@ svg {
   padding: 0;
 }
 
-.tactical-map-fullscreen-panel {
+.tactical-map-fullscreen-panel,
+#nodeDialog.is-combat-view {
   width: 100vw;
   height: 100vh;
+  max-width: none;
   max-height: 100vh;
-  padding: 12px;
   border-radius: 0;
+}
+
+.tactical-map-fullscreen-panel {
+  padding: 12px;
   grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
@@ -1810,6 +1815,27 @@ svg {
   max-height: inherit;
   padding: 18px;
   overflow: auto;
+}
+
+#nodeDialog.is-combat-view {
+  inset: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.is-combat-view .node-dialog {
+  height: 100%;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.is-combat-view #nodeDialogContent {
+  overflow-y: auto;
+}
+
+.is-combat-view .encounter-detail-card {
+  max-height: none;
+  overflow: visible;
 }
 
 .node-dialog-header {

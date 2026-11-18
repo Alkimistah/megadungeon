@@ -452,6 +452,12 @@ async function creatureHealthFlow() {
   await page.locator(".node").nth(nodeIndex).click();
   await dialog.locator(".route-choice").click();
   await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+  const combatBounds = await dialog.boundingBox();
+  await dialog.getByRole("button", { name: "Abrir mapa tático" }).click();
+  const map = page.locator(".tactical-map-fullscreen-panel");
+  assert.deepEqual(combatBounds, await map.boundingBox(), "A ficha de combate deve ocupar a mesma área que o mapa tático");
+  await map.getByRole("button", { name: "Fechar", exact: true }).click();
+  assert.equal(await dialog.locator(".encounter-detail-card").evaluate(card => getComputedStyle(card).maxHeight), "none");
   const reroll = dialog.getByRole("button", { name: "Rerrolar criaturas" });
   const units = dialog.getByRole("combobox", { name: "Criatura para registrar PV" });
   const amount = dialog.getByRole("spinbutton", { name: "Quantidade de PV" });

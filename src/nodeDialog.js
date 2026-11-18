@@ -1034,6 +1034,7 @@ export function createNodeDialogController({
     const viewMode = getViewMode(node);
 
     currentNode = node;
+    dialogElement.classList.toggle("is-combat-view", viewMode === "combat");
     titleElement.textContent = `Encontro ${node.level}`;
     typeElement.textContent = content.label;
     setNodeDialogMeta(metaElement, checkText, explorationText, challengeText, challenge);
