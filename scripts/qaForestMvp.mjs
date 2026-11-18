@@ -609,6 +609,22 @@ async function creatureHealthFlow() {
     assert.ok(text.includes("mordida +20"));
     assert.ok(text.includes(`PDF p. ${pdfPage}`));
   }
+  for (const [id, name, book, nd, pdfPage] of [
+    ["ogro", "Ogro", "Ameaças de Arton", 4, 43],
+    ["ogro-livro-basico", "Ogro", "Livro Básico", 4, 299],
+    ["chefe-bandido", "Chefe Bandido", "Ameaças de Arton", 1, 47],
+    ["chefe-bandido-livro-basico", "Chefe Bandido", "Livro Básico", 1, 295]
+  ]) {
+    const label = `${name} · ${book}`;
+    await creature.selectOption({ label });
+    assert.equal(await creature.inputValue(), id);
+    await manual.getByRole("button", { name: "Gerar encontro", exact: true }).click();
+    assert.deepEqual(await list.locator("strong").allTextContents(), [`1 x ${label}`]);
+    const text = await detail.innerText();
+    assert.ok(text.includes(`ND ${nd}`));
+    assert.ok(text.includes(`PDF p. ${pdfPage}`));
+  }
+  assert.match(await detail.innerText(), /Uma vez por rodada, causa \+2d6.*alvo desprevenido ou flanqueado/);
   await creature.selectOption("");
   assert.equal(await budget.isEnabled(), true);
   await page.close();

@@ -4047,8 +4047,9 @@ export const sapoAtroz = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 38,
         "bookPage": 36
     },
     "stats": {
@@ -4119,8 +4120,9 @@ export const trogAnaoBruto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 41,
         "bookPage": 39
     },
     "stats": {
@@ -4181,8 +4183,9 @@ export const trogAnaoEremita = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 41,
         "bookPage": 39
     },
     "stats": {
@@ -4253,8 +4256,9 @@ export const trogCacador = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 40,
         "bookPage": 38
     },
     "stats": {
@@ -4319,8 +4323,9 @@ export const trogCombatente = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 40,
         "bookPage": 38
     },
     "stats": {
@@ -4380,9 +4385,12 @@ export const trogReiDosTuneis = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 9,
-        "bookPage": 38
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 40,
+        "bookPage": 38,
+        "pdfPageEnd": 41,
+        "bookPageEnd": 39
     },
     "stats": {
         "initiative": 5,
