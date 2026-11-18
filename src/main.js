@@ -211,6 +211,7 @@ const nodeDialogController = createNodeDialogController({
   contentElement: elements.nodeDialogContent,
   dialogElement: elements.nodeDialog,
   getActiveMissions: () => missionState.getSelected(),
+  getProfileId: () => activeFloorRange.id,
   metaElement: elements.nodeDialogMeta,
   onAttempt: (node) => {
     state.markAttempted(node);

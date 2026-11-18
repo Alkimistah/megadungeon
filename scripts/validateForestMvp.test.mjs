@@ -9,10 +9,38 @@ import { calculateCombatND } from "../src/challenge.js";
 import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
 import { createExplorationState } from "../src/appState.js";
 import { createMissionState } from "../src/missions/missionState.js";
+import { getForestTrapPresentation } from "../src/forestTrapPresentation.js";
 
 const integration = await import("../src/missions/forestMissionIntegration.js").catch(() => ({}));
 const expeditionModule = await import("../src/forestExpedition.js").catch(() => ({}));
 const presentation = await import("../src/nodeProgressPresentation.js").catch(() => ({}));
+
+test("outdoor trap presentations use the terrain and repeat after restoring the encounter", () => {
+  const node = {
+    encounterSeed: "14:N2",
+    environment: { terrain: { name: "Pântano" } },
+    resolvedEncounter: { seed: "BADNZX7EM1:14:N2:encounter-v9" }
+  };
+  const item = { kind: "trap", trapId: "pendulo-de-teto", name: "Pêndulo de Teto", challengeRating: 1 };
+  const saved = structuredClone({ node, item });
+  const variation = getForestTrapPresentation(profile.id, node, item);
+  assert.match(variation.name, /lâmina|laminado/i);
+  assert.match(variation.description, /pântano|alagad[ao]/i);
+  assert.deepEqual(getForestTrapPresentation(profile.id, saved.node, saved.item), variation);
+  assert.deepEqual({ node, item }, saved);
+  assert.deepEqual(Object.keys(variation).sort(), ["description", "name"]);
+
+  node.environment.terrain.name = "Floresta";
+  assert.notEqual(getForestTrapPresentation(profile.id, node, item).name, variation.name);
+  const forestNames = new Set(Array.from({ length: 20 }, (_, index) =>
+    getForestTrapPresentation(profile.id, { ...node, resolvedEncounter: { seed: `node-${index}` } }, item).name
+  ));
+  assert.ok(forestNames.size > 1);
+  assert.equal(getForestTrapPresentation("dungeon-1-10", node, item), null);
+  assert.equal(getForestTrapPresentation(profile.id, node, { ...item, trapId: "runa-de-protecao" }), null);
+  node.environment.terrain.name = "Urbano";
+  assert.equal(getForestTrapPresentation(profile.id, node, item), null);
+});
 
 function mission(category, { floor = 15, targetId = "sucuri", targetName = "Sucuri", quantity = 1, ...extra } = {}) {
   return {

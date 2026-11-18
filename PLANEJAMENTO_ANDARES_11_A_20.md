@@ -6,7 +6,7 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 
 ## 1. Leitura rápida: o que vem primeiro
 
-**Próximo passo indicado:** testar em mesa a modal de missão enxuta e a leitura de XP. Para a próxima mudança de regras, avaliar a rerrolagem de criaturas no mesmo ND. A [seção 14](#14-retorno-da-mesa-e-propostas-para-a-próxima-entrega) reúne o retorno da mesa e as propostas de calibragem. A conferência de importação, retomada e exportação no tablet físico continua pendente.
+**Próximo passo indicado:** conferir no tablet as variações narrativas de armadilhas por terreno. A [lista de próximas entregas](#15-próximas-entregas-em-ordem) segue com a rerrolagem de criaturas no mesmo ND.
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
@@ -343,6 +343,7 @@ Essa lista orienta o trabalho; o plano técnico executável de cada entrega deve
 - [x] CDs recalibradas no aplicativo: curva 20–23 confirmada pelo usuário.
 - [x] Revelação, descanso seguro, conclusão de cenas e Quimera simples fixa implementados e validados.
 - [x] Salvamento automático local, retomada e importação/exportação TXT publicados.
+- [x] Modal de missão enxuta, destaques no mapa e XP com e sem ambiente publicados. Primeira conferência no tablet aprovada pelo mestre.
 - [ ] P1 restante: relógios separados e apresentação mais explícita do teste de descoberta.
 - [ ] P2, P3 e P4 implementados e validados em entregas separadas.
 - [ ] Confirmar no tablet usado em mesa a importação, a retomada pelo ícone do PWA e o download do TXT.
@@ -406,7 +407,7 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 
 ### Interface do nodo e da missão
 
-- Implementado e validado no Chrome. O mapa tático do nodo mantém terreno, inimigos e armadilhas e sobrepõe os destaques de missão. A modal integrada mostra objetivo, progresso e ações de registro ou conclusão, com pistas, prova e consequências recolhidas em **Detalhes da missão**.
+- Implementado, validado no Chrome e conferido pelo mestre no tablet. O mapa tático do nodo mantém terreno, inimigos e armadilhas e sobrepõe os destaques de missão. A modal integrada mostra objetivo, progresso e ações de registro ou conclusão, com pistas, prova e consequências recolhidas em **Detalhes da missão**. [Publicação da interface e do XP](https://github.com/Alkimistah/megadungeon/actions/runs/44201560517).
 - Quando o desafio está revelado, **XP com clima e terreno** usa o ND total exibido e **XP sem clima e terreno** usa o ND base do encontro, preservando a contribuição de armadilhas. Cada valor é calculado como `1.000 × ND`. Exemplo com ND total 3¼ e ND base 3: **3.250 XP** e **3.000 XP**. Os valores são alternativas para o mestre usar, sem somá-los.
 - O teste com a sessão recuperada confirmou **2.250 XP / 1.000 XP** no nodo da bússola e **4.000 XP / 3.000 XP** no nodo do Infecto. O progresso de **2 de 8 alvos** permaneceu preservado e o encontro já registrado não ofereceu nova contagem.
 
@@ -415,4 +416,27 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 - **Acampamentos e tempo:** testar menos acampamentos nas revelações de desconhecidos e travessias mais longas. A primeira hipótese é reduzir a chance de acampamento oculto de 20% para 5–10% e testar 30 minutos como mínimo para nodos com teste. Separar tempo total e tempo desde o último descanso. Validar a proposta observando uma rota típica antes de definir os valores finais.
 - **Composição:** oferecer ao mestre uma rerrolagem em nodos de combate sem missão, mantendo o orçamento de ND e as restrições do nodo. Guardar o resultado aceito na sessão. Considerar composições com mais de um adversário, quando houver alternativa no mesmo ND, para reduzir a frequência de encontros decididos antes da primeira ação inimiga.
 - **Reforço:** avaliar um ajuste manual, visível e reversível por ficha. Iniciativa ou PV podem ajudar uma criatura a chegar ao turno. Bônus de ataque trata acerto depois que ela age. Testar os efeitos separadamente e manter o ND original como referência, com o reforço indicado na ficha e sem crédito extra de XP automático.
-- **Ordem proposta:** entregar primeiro a modal enxuta e a leitura de XP, que ajudam na expedição já salva. Em seguida, testar variedade de composição e reforço com os encontros que ocorreram em mesa. Aplicar novas frequências e tempos na geração de novos mapas, preservando o mapa da expedição em curso.
+
+## 15. Próximas entregas em ordem
+
+1. **Variações de armadilhas por terreno.** Implementadas e verificadas no Chrome. Conferência no tablet pendente.
+2. **Rerrolagem de criaturas no mesmo ND.** Dar ao mestre uma alternativa de composição em nodos de combate sem missão. Preservar terreno, clima, armadilha e restrições do nodo. Gravar a composição aceita no save.
+3. **Menos acampamentos ocultos.** Testar a redução da chance de acampamento nas revelações de nodos desconhecidos e medir quantos descansos continuam acessíveis em rotas típicas.
+4. **Tempo de exploração.** Testar um mínimo maior e mais variação conforme a travessia. Separar tempo total e tempo desde o último descanso. Aplicar a calibragem a novos mapas.
+5. **Reforço manual por criatura.** Depois de experimentar outras composições, testar ajustes reversíveis e separados de iniciativa e ataque. Mostrar a alteração na ficha e manter o ND original como referência.
+6. **Mecânica especial da Quimera.** Desenhar e testar o que diferencia o combate do andar 20, partindo da composição e da arena fixas.
+7. **Cenas desconhecidas, continuidade ambiental e pistas de rota.** Expandir o conteúdo conforme P2, P3 e P4, começando por uma tabela pequena de cenas e pelo descanso falso.
+
+### Ferramenta de variações de armadilha
+
+A lista do combate mostra o nome narrativo quando há uma variação para a armadilha e o terreno. Na ficha, **Na cena** descreve o que o mestre pode narrar, e **Armadilha de referência** identifica a ficha de origem. A variação é derivada da seed do encontro salvo. Preserva ND, dano e seu tipo, área, resistência, detecção, desarme e posição no mapa tático. Quando falta uma variação compatível, o app mostra a ficha com o nome original.
+
+| Referência | Variação narrativa possível |
+|---|---|
+| Lâmina na Parede | **Espada oculta no tronco**, em uma trilha entre árvores. Mantém o dano de corte. |
+| Pêndulo de Teto | **Tronco laminado suspenso entre árvores**. A lâmina explica o dano de corte da ficha. |
+| Bloco de Pedra | **Tronco que despenca da ribanceira**, em uma colina ou margem elevada. Mantém o dano de impacto. |
+| Fosso com Estacas | **Fosso de estacas sob o capim** ou **fosso de estacas de punji**. Preserva a queda e o dano de perfuração da ficha. |
+| Virote | **Dardo entre as folhagens** ou **Dardo da margem**, de acordo com o terreno. Mantém o dano de perfuração. |
+
+No teste com a sessão recuperada do andar 14, o Pêndulo de Teto apareceu como **Tronco laminado do pântano** e a Lâmina na Parede como **Lâmina entre as raízes**. As fichas mantiveram os efeitos originais, os nomes se repetiram após a retomada e o estado do andar exportado coincidiu com o importado.

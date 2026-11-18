@@ -1,6 +1,7 @@
 import { formatChallengeRating } from "./challenge.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getDamageType } from "./damageTypes.js";
+import { getForestTrapPresentation } from "./forestTrapPresentation.js";
 import { getWeaponVariationLabel } from "./equipment/weaponVariation.js";
 import { getEncounterMissionMatches } from "./missions/missionEncounterIntegration.js";
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
@@ -390,7 +391,7 @@ export function createEncounterMissionPanel(matches, onAdjustMissionProgress = n
   return panel;
 }
 
-function createEncounterList(node, selectedKey, onSelect, missions = []) {
+function createEncounterList(node, selectedKey, onSelect, missions, trapPresentations) {
   const panel = document.createElement("section");
   const heading = document.createElement("h3");
   const list = document.createElement("div");
@@ -409,9 +410,7 @@ function createEncounterList(node, selectedKey, onSelect, missions = []) {
     const generatedClass = item.generated ? " is-generated" : "";
     button.className = `encounter-list-item ${kindClass}${generatedClass}`;
     button.classList.toggle("is-selected", key === selectedKey);
-    name.textContent = item.kind === "trap"
-      ? `${item.quantity} x ${item.name}`
-      : `${item.quantity} x ${item.name}`;
+    name.textContent = `${item.quantity} x ${trapPresentations.get(item)?.name || item.name}`;
     button.appendChild(name);
     getEncounterMissionMatches({ ...item, encounterKey: node.resolvedEncounter.seed }, missions).forEach((match) => {
       button.appendChild(createEncounterMissionBadge(match));
@@ -612,14 +611,21 @@ function getTrapForItem(node, item) {
   return getTrapById(item.trapId);
 }
 
-function createTrapDetail(node, item) {
+function createTrapDetail(node, item, presentation) {
   const trap = getTrapForItem(node, item);
   const section = document.createElement("section");
   const heading = document.createElement("h3");
 
   section.className = "encounter-detail-card trap-detail-card";
-  heading.textContent = item.name;
+  heading.textContent = presentation?.name || item.name;
   section.appendChild(heading);
+
+  if (presentation) {
+    section.append(
+      createDetailLine("Na cena", presentation.description),
+      createDetailLine("Armadilha de referência", trap?.name || item.name)
+    );
+  }
 
   if (!trap) {
     section.appendChild(createDetailLine("ND", `ND ${item.challengeLabel}`));
@@ -652,7 +658,7 @@ function createTrapDetail(node, item) {
   return section;
 }
 
-function createEncounterDetail(node, selectedKey, missions = [], onAdjustMissionProgress = null) {
+function createEncounterDetail(node, selectedKey, missions, onAdjustMissionProgress, trapPresentations) {
   const panel = document.createElement("div");
   const selectedItem = node.resolvedEncounter.items.find((item, index) =>
     getEncounterItemKey(item, index) === selectedKey
@@ -661,7 +667,7 @@ function createEncounterDetail(node, selectedKey, missions = [], onAdjustMission
   panel.className = "encounter-detail-panel";
   panel.appendChild(
     selectedItem.kind === "trap"
-      ? createTrapDetail(node, selectedItem)
+      ? createTrapDetail(node, selectedItem, trapPresentations.get(selectedItem))
       : createCreatureDetail({ ...selectedItem, encounterKey: node.resolvedEncounter.seed }, missions, onAdjustMissionProgress)
   );
 
@@ -674,13 +680,16 @@ function getFirstEncounterItemKey(node) {
     : null;
 }
 
-function createCombatPage(node, selectedKey, onSelect, missions = [], onAdjustMissionProgress = null) {
+function createCombatPage(node, selectedKey, onSelect, missions, onAdjustMissionProgress, profileId) {
   const page = document.createElement("div");
   const currentSelectedKey = selectedKey || getFirstEncounterItemKey(node);
+  const trapPresentations = new Map(node.resolvedEncounter.items.map(item =>
+    [item, getForestTrapPresentation(profileId, node, item)]
+  ));
 
   page.className = "combat-page";
-  page.appendChild(createEncounterList(node, currentSelectedKey, onSelect, missions));
-  page.appendChild(createEncounterDetail(node, currentSelectedKey, missions, onAdjustMissionProgress));
+  page.appendChild(createEncounterList(node, currentSelectedKey, onSelect, missions, trapPresentations));
+  page.appendChild(createEncounterDetail(node, currentSelectedKey, missions, onAdjustMissionProgress, trapPresentations));
 
   return page;
 }
@@ -711,6 +720,7 @@ export function createNodeDialogController({
   onComplete = () => {},
   onExplore,
   getActiveMissions = () => [],
+  getProfileId = () => null,
   onAdjustMissionProgress = null,
   onOpenMission = () => {},
   onRest,
@@ -886,7 +896,7 @@ export function createNodeDialogController({
     }, getActiveMissions(), (missionId, delta, eventKey) => {
       onAdjustMissionProgress?.(missionId, delta, eventKey);
       render(node);
-    }));
+    }, getProfileId()));
   }
 
   function render(node) {
