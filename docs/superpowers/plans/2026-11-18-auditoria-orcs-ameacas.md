@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak e os dois primeiros lotes de Dragões, com 5 fichas.
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak e três dos quatro lotes de Dragões, com 9 fichas.
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -247,9 +247,30 @@ Os 28 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciat
 
 Além das Imunidades Dracônicas, o catálogo acrescenta Metamorfose Dracônica às duas fichas. O quadro Habilidades Dracônicas do Livro Básico, p. 311 impressa, concede essa habilidade a dragões jovens ou mais velhos. A resistência a magia +2 impressa corresponde à categoria jovem. O quadro Dragões como Familiares e Parceiros, pp. 66–67, descreve regras para personagens e não altera as fichas. A atualização se limita às duas referências.
 
+### Terceiro lote — Adultos, Feral e Bicéfalo
+
+| ID do catálogo | ND | PV | PM | Página impressa | Página no PDF integral |
+|---|---:|---:|---:|---:|---:|
+| `dragao-adulto-da-tirania` | 11 | 614 | 77 | 68–69 | 70–71 |
+| `dragao-adulto-dos-segredos` | 11 | 522 | 90 | 69 | 71 |
+| `dragao-feral` | 10 | 495 | — | 72 | 74 |
+| `dragao-bicefalo` | 12 | 650 | — | 74 | 76 |
+
+Os 58 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM dos dois Adultos. Também foram conferidos tipo, subtipo, tamanho, deslocamento, sentidos, defesas, ataques, habilidades, sopros, CDs, custos e execução das magias, perícias e tesouro. A ficha da Tirania começa na segunda coluna da p. 68 e continua na p. 69, a partir do Sopro. A referência agora cobre as duas páginas. As pp. 73 e 75 impressas trazem só texto descritivo e quadros, sem dados de ficha.
+
+As CDs diferentes dentro da mesma ficha estão impressas assim. No Adulto dos Segredos, a Aura Aterradora tem CD 32, as magias têm CD 35 e o Sopro tem CD 38. As garras do Segredos atacam a +35, acima da mordida, a +33. Na Tirania, a referência ao vendaval com chuva, Tormenta20 p. 208, foi omitida do texto da Tempestade Divina sem alterar o efeito. Em Criar Ilusão, o livro imprime “A ilusões”, e o catálogo corrige para “As ilusões”.
+
+As habilidades dracônicas acrescentadas seguem o quadro do Livro Básico, p. 311 impressa:
+
+- Os dois Adultos recebem Imunidades Dracônicas, Metamorfose Dracônica e Magia Dracônica. A resistência a magia +3 corresponde à categoria adulto.
+- O Feral recebe só Imunidades Dracônicas, conforme Amadurecimento Primitivo, que exclui Magia Dracônica e Metamorfose Dracônica.
+- O Bicéfalo recebe Imunidades Dracônicas e Metamorfose Dracônica, sem Magia Dracônica. O texto da p. 73 impressa diz que os bicéfalos conhecidos não demonstraram conjurar magias, e a ficha não traz lista de magias. Pela regra Poder Dracônico, Metamorfose se aplica a toda criatura com o subtipo dragão, mas a ficha não a menciona. A decisão foi preservada e fica registrada como interpretação.
+
+A Aura Aterradora das quatro fichas usa o texto abreviado impresso, “Vontade CD X evita”. As fichas genéricas do Livro Básico no catálogo trazem o efeito completo da habilidade. Assim como as regras dos lefeu no Culto, a apresentação dessa regra compartilhada fica para revisão. A atualização se limita às quatro referências.
+
 ## Pendências e ponto de retomada
 
-1. **Dragões.** Inventário e dois lotes concluídos, conforme acima. Seguir pelo lote dos Adultos, do Feral e do Bicéfalo, PDF pp. 70–71, 74 e 76, confirmando a extensão da ficha do Adulto da Tirania até a p. 69 impressa.
+1. **Dragões.** Inventário e três lotes concluídos, conforme acima. Seguir pelo último lote, com os Veneráveis, PDF p. 73, e Sckhar, PDF p. 79. Considerar, ao fim da seção, se o efeito completo da Aura Aterradora deve ser exibido nas fichas de Ameaças.
 2. **Restante de Ameaças de Arton.** Seguir pelos blocos posteriores a Dragões e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
 3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.

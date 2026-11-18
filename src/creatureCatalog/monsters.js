@@ -5277,9 +5277,12 @@ export const dragaoAdultoDaTirania = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 5,
-        "bookPage": 68
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 70,
+        "bookPage": 68,
+        "pdfPageEnd": 71,
+        "bookPageEnd": 69
     },
     "stats": {
         "initiative": 12,
@@ -5396,8 +5399,9 @@ export const dragaoAdultoDosSegredos = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 6,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 71,
         "bookPage": 69
     },
     "stats": {
@@ -5532,8 +5536,9 @@ export const dragaoBicefalo = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 11,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 76,
         "bookPage": 74
     },
     "stats": {
@@ -5614,8 +5619,9 @@ export const dragaoFeral = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 74,
         "bookPage": 72
     },
     "stats": {
