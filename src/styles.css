@@ -1952,6 +1952,12 @@ svg {
   flex-wrap: wrap;
 }
 
+.discovery-cost-note {
+  flex-basis: 100%;
+  margin: 0;
+  text-align: center;
+}
+
 .modal-choice {
   display: flex;
   align-items: center;

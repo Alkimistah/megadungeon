@@ -113,9 +113,26 @@ async function missionFlow() {
     await page.locator(".node").nth(index).click();
     await page.locator("#nodeDialog[open]").waitFor();
     if (!exploredChecked && node.skill && node.type !== "unknown") {
-      await page.locator(".explored-choice").click();
+      const dialog = page.locator("#nodeDialog");
+      assert.ok((await dialog.locator("#nodeDialogMeta").innerText()).includes(`Teste de descoberta: ${node.skill} (CD ${node.dc})`));
+      await dialog.locator("#nodeDialogClose").click();
+      const beforeDiscovery = await exportSession(page);
+      await page.locator(".node").nth(index).click();
+      await dialog.getByRole("checkbox", { name: "Registrar sucesso (+15 min)", exact: true }).click();
+      assert.equal(await page.locator("#totalTimeTrackerValue").innerText(), formatElapsedTime(totalMinutes + 15));
       assert.equal(await page.locator("#nodeDialog .node-progress-status").innerText(), "Exploração registrada");
       assert.equal(await page.locator(".node").nth(index).getAttribute("data-progress"), "explored");
+
+      const failed = await pageFor(encodeSessionCode({ ...decodeSessionCode(beforeDiscovery), unknownPaths: true }));
+      const failedDialog = failed.locator("#nodeDialog");
+      await failed.locator(".node").nth(index).click();
+      await failedDialog.getByRole("checkbox", { name: "Registrar falha (+15 min)", exact: true }).click();
+      assert.equal(await failedDialog.locator(".node-progress-status").innerText(), "Tentativa registrada");
+      assert.equal(await failedDialog.locator(".environment-columns").count(), 0);
+      assert.equal(await failed.locator("#totalTimeTrackerValue").innerText(), formatElapsedTime(totalMinutes + 15));
+      await failedDialog.locator(".route-choice").click();
+      assert.equal(await failed.locator("#totalTimeTrackerValue").innerText(), formatElapsedTime(totalMinutes + 15 + node.investigationMinutes));
+      await failed.close();
       exploredChecked = true;
     }
     await page.locator(".route-choice").click();

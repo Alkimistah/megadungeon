@@ -1,6 +1,6 @@
 import { getEncounterForSave } from "./encounterCreatureHealth.js";
 
-const DISCOVERY_MINUTES = 15;
+export const DISCOVERY_MINUTES = 15;
 
 export function getRecordedExplorationMinutes(levels, sessionState) {
   const chosen = new Set((sessionState.chosenByLevel || []).map(([, id]) => id));

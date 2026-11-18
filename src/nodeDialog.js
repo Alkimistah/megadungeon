@@ -1,3 +1,4 @@
+import { DISCOVERY_MINUTES } from "./appState.js";
 import { formatChallengeRating } from "./challenge.js";
 import { createChimeraCombatControls } from "./chimeraCombatView.js";
 import { CREATURE_REINFORCEMENT_BONUSES, getCreatureReinforcement } from "./creatureReinforcement.js";
@@ -251,7 +252,7 @@ function setNodeDialogMeta(element, checkText, explorationText, challengeText, c
   const xpText = challenge && Number.isFinite(challenge.encounter) && Number.isFinite(challenge.total)
     ? ` | Com clima e terreno: ${xpNumberFormat.format(challenge.total * 1000)} XP · Sem clima e terreno: ${xpNumberFormat.format(challenge.encounter * 1000)} XP`
     : "";
-  element.innerHTML = `<strong>Teste:</strong> ${checkText} | <strong>Exploração:</strong> ${explorationText} | <strong>Desafio:</strong> ${challengeText}${xpText}`;
+  element.innerHTML = `<strong>Teste de descoberta:</strong> ${checkText} | <strong>Exploração:</strong> ${explorationText} | <strong>Desafio:</strong> ${challengeText}${xpText}`;
 }
 
 function createDivider() {
@@ -824,11 +825,12 @@ export function createNodeDialogController({
   const viewModeByNode = new Map();
 
   function createAttemptControl(node) {
+    const attempted = state.isNodeAttempted(node);
     return createModalCheckbox(
       "modal-choice attempt-choice",
-      state.isNodeAttempted(node),
-      state.isNodeAttempted(node) || state.isNodeExplored(node) || state.isNodeChosen(node),
-      state.isNodeAttempted(node) ? "Tentativa registrada" : "Tentativa de exploração",
+      attempted,
+      attempted || state.isNodeExplored(node),
+      attempted ? "Falha registrada" : `Registrar falha (+${DISCOVERY_MINUTES} min)`,
       () => onAttempt(node)
     );
   }
@@ -836,13 +838,12 @@ export function createNodeDialogController({
   function createExploredControl(node) {
     const explored = state.isNodeExplored(node);
     const attempted = state.isNodeAttempted(node);
-    const chosen = state.isNodeChosen(node);
 
     return createModalCheckbox(
       "modal-choice explored-choice",
       explored,
-      explored || attempted || chosen,
-      explored ? "Explorado" : "Marcar como explorado",
+      explored || attempted,
+      explored ? "Sucesso registrado" : `Registrar sucesso (+${DISCOVERY_MINUTES} min)`,
       () => onExplore(node)
     );
   }
@@ -909,10 +910,12 @@ export function createNodeDialogController({
 
     actions.className = "modal-actions";
 
-    if (node.skill && node.dc && !content.campUndecided &&
-      !(node.requiresCompletion && node.type === "unknown" && !state.isNodeChosen(node))) {
-      actions.appendChild(createAttemptControl(node));
-      actions.appendChild(createExploredControl(node));
+    if (node.skill && node.dc && !state.isNodeChosen(node) && !content.campUndecided &&
+      !(node.requiresCompletion && node.type === "unknown")) {
+      const explanation = document.createElement("p");
+      explanation.className = "node-dialog-meta discovery-cost-note";
+      explanation.textContent = `Sucesso revela detalhes ocultos e abate ${DISCOVERY_MINUTES} min da travessia. Em caso de falha, a travessia cobra seu tempo integral.`;
+      actions.append(createExploredControl(node), createAttemptControl(node), explanation);
     }
 
     if (canRestAtNode(node) && !content.campUndecided) {
@@ -1037,7 +1040,7 @@ export function createNodeDialogController({
     const content = getNodeContentPresentation(node, nodeView);
     const checkText = node.requiresCompletion && node.type === "unknown" && !state.isNodeChosen(node)
       ? "Revelado ao escolher a rota"
-      : node.skill && node.dc && !content.campUndecided ? `${node.skill} ${node.dc}` : "Sem teste de descoberta";
+      : node.skill && node.dc && !content.campUndecided ? `${node.skill} (CD ${node.dc})` : "Indisponível";
     const explorationText = `${node.investigationMinutes} min`;
     const challenge = nodeView.revealed && !content.campUndecided ? node.challenge : null;
     const challengeText = challenge ? `ND ${formatChallengeRating(challenge.total)}` : "Desconhecido";

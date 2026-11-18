@@ -10,7 +10,9 @@ A versão `398a98b` publicou a [modal do nodo em tela cheia](#17-modal-do-nodo-e
 
 ## 1. Leitura rápida: o que vem primeiro
 
-**Entrega atual:** a [mecânica especial da Quimera](#6-p1--encontro-fixo-da-quimera) está implementada e validada no Chrome. A próxima entrega será a de pistas de rota.
+A [mecânica especial da Quimera](#6-p1--encontro-fixo-da-quimera) foi publicada em `a75e2a0` e conferida pelo mestre. [Publicação no GitHub Pages](https://github.com/Alkimistah/megadungeon/actions/runs/44328452202).
+
+**Ajuste de interface:** a modal explicita os resultados e os custos do teste de descoberta. As pistas de rota saíram da fila de entregas.
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
@@ -20,8 +22,8 @@ A versão `398a98b` publicou a [modal do nodo em tela cheia](#17-modal-do-nodo-e
 | 4 | P2 — desconhecidos | Mais variedade com tabela temática própria e descanso falso explícito | Primeira tabela implementada |
 | 5 | P3 — continuidade | Terreno e clima com transições coerentes entre nodos | Publicado para novas expedições |
 | 6 | PV individual | Registrar dano e cura por criatura nas fichas de combate | Publicado e validado no Chrome |
-| 7 | P1 — Quimera | Arena fixa, chefe solo e quatro cabeças sorteadas no andar 20 | Implementado e validado no Chrome |
-| 8 | P4 — pistas de rota | Informação parcial útil, sem entregar o tipo do nodo | Intenção aceita; regras ainda precisam de desenho |
+| 7 | P1 — Quimera | Arena fixa, chefe solo e quatro cabeças sorteadas no andar 20 | Publicado e conferido pelo mestre |
+| 8 | P4 — pistas de rota | Informação parcial antes da escolha | Fora da fila de entregas |
 
 **Regra de corte:** não iniciar P2–P4 enquanto o mínimo de missões não estiver validado. Não condicionar a correção das missões à construção do sistema completo de clima, terreno ou desconhecidos.
 
@@ -187,7 +189,7 @@ Na primeira entrega, preservar os acampamentos seguros existentes. O descanso fa
 
 - O painel da expedição de floresta mostra o tempo total de exploração e o tempo desde o último descanso. Descansar zera apenas o segundo. A duração do descanso ainda fica a cargo do mestre.
 - Na geração de mapas novos, um nodo com teste custa 30 minutos, mais 15 por evento climático e mais 15 quando o ND do terreno é pelo menos 1, até 60 minutos. Nodos sem teste continuam em 30 minutos. Mapas armazenados mantêm as durações registradas.
-- Tentativa custa 15 minutos e a escolha que vem depois cobra o tempo integral do nodo. Marcar explorado antes da escolha desconta os 15 minutos já gastos. Uma apresentação mais explícita do teste de descoberta permanece pendente.
+- A modal mostra a perícia, a CD e as ações **Registrar sucesso (+15 min)** e **Registrar falha (+15 min)** antes da escolha, quando há teste disponível. O sucesso revela detalhes ocultos e abate os 15 minutos já gastos da travessia. Após uma falha, a travessia cobra seu tempo integral.
 - Implementado nas novas expedições: escolher a rota abre a cena; concluir o encontro libera os próximos nodos. O último encontro deve ser concluído antes de avançar. A Quimera possui confirmação de derrota.
 - O mestre confirma a conclusão; isso não exige automatizar combate. O avanço normal deve depender da cena obrigatória concluída.
 
@@ -204,7 +206,7 @@ O MVP do andar 20 termina com a **Quimera ND 8 sozinha** numa clareira plana de 
 5. **Sopro do Dragão.** Se o Dragão for sorteado, **Usar sopro** marca o uso da ação padrão e muda o estado para **Em recarga**. **Recarregar sopro** volta a deixá-lo disponível quando o mestre registrar que a Quimera gastou uma ação de movimento. **Fim do turno** trata o atordoamento. Um Dragão atordoado fica impedido de usar o sopro mesmo que esteja carregado. O estado do sopro fica no save.
 6. **Ficha do mestre.** No topo, mostrar PV atuais e máximos, RD 5 e o último lançamento, como `Corpo · 18 de corte − 5 de RD = 13 PV perdidos`. Em seguida, mostrar apenas as cabeças sorteadas, com número, habilidade, fraqueza sorteada e estado. Os ataques do corpo e as ações aplicáveis às cabeças sorteadas ficam acessíveis na mesma ficha, com os controles pertinentes a cada habilidade.
 7. **Ajustes opcionais do chefe.** Reaproveitar **Iniciativa +2** e **Ataque +1**. Oferecer **PV extras** com valor escolhido pelo mestre, somado aos PV atuais e máximos para preservar o dano sofrido. A base é **333 PV** e a Defesa é **33**. Ajustes adicionais de Defesa ou resistências ficam para avaliação em mesa. O ND 8 e o XP de referência permanecem.
-8. **Arena.** A Quimera fica sozinha e as posições iniciais são fixas. Em novas expedições, a clareira tem troncos marcados no mapa como coberturas destrutíveis. A destruição é resolvida em mesa. Pistas específicas ficam restritas ao andar 20 e entram no trabalho de pistas de rota.
+8. **Arena.** A Quimera fica sozinha e as posições iniciais são fixas. Em novas expedições, a clareira tem troncos marcados no mapa como coberturas destrutíveis. A destruição é resolvida em mesa.
 
 ### Fraquezas candidatas
 
@@ -314,6 +316,8 @@ A chuva e a tempestade usam os efeitos já cadastrados, inclusive os de vento. O
 
 ## 9. P4 — pistas antes da escolha
 
+Proposta arquivada. O mestre avaliou que as pistas são desnecessárias para o fluxo atual.
+
 Pistas descrevem sinais verdadeiros e incompletos da cena, não seu tipo, ND ou recompensa. O mesmo sinal pode ocorrer em conteúdos diferentes: fumaça pode indicar exploradores, inimigos, abrigo ou restos de incêndio.
 
 Testes podem revelar detalhes úteis, mas não devem entregar automaticamente a composição inteira. Evitar tanto sinais exclusivos de um tipo quanto pistas tão ambíguas que não ajudem em nenhuma decisão.
@@ -337,7 +341,6 @@ Sem prazo técnico estimado: a janela entre 02h42 e 15h do mesmo dia não é tem
 - **B:** completar P1 restante, incluindo arena fixa se não tiver sido necessária em A, estados de conclusão e relógios claros.
 - **C:** P2, com tabela pequena de cenas completas e revisão da frequência dos desconhecidos.
 - **D:** P3, primeiro terreno e clima básicos, depois memória ambiental e continuidade detalhada de rios.
-- **E:** P4, após definição e avaliação das pistas de rota.
 
 ### Mapa de implementação futura
 
@@ -375,9 +378,10 @@ Essa lista orienta o trabalho; o plano técnico executável de cada entrega deve
 - [x] Salvamento automático local, retomada e importação/exportação TXT publicados.
 - [x] Modal de missão enxuta, destaques no mapa e XP com e sem ambiente publicados. Primeira conferência no tablet aprovada pelo mestre.
 - [x] P1: tempo total e tempo desde o último descanso separados.
-- [ ] P1 restante: apresentação mais explícita do teste de descoberta.
-- [ ] P2, P3 e P4 implementados e validados em entregas separadas.
-- [ ] Confirmar no tablet usado em mesa a importação, a retomada pelo ícone do PWA e o download do TXT.
+- [x] P1: apresentação mais explícita do teste de descoberta na modal.
+- [x] P2: primeira tabela de cenas desconhecidas e descanso falso publicados.
+- [x] P3: primeira versão da continuidade de terreno e clima publicada para novas expedições.
+- [x] Importação e exportação por TXT e retomada pelo ícone do PWA validadas pelo mestre no tablet.
 - [x] Registrar o relato da última sessão e identificar as correções que afetam o andamento da expedição.
 
 ## 11. Entrega do MVP e evidências
@@ -429,7 +433,7 @@ Suíte ampliada para 24 testes de 11–20. Testes de missões, de 1–10, build 
 - O código guardado no WhatsApp chegou cortado em 20.000 caracteres. A recuperação preservou o estado gravado do andar 14, as três missões e o histórico legível do andar 11. Os mapas foram reconstruídos pela seed com os vínculos de missão conferidos. O histórico percorrido nos andares 12 e 13 ficou fora do trecho disponível.
 - O PWA guarda uma expedição por vez no IndexedDB do dispositivo. **Continuar expedição** abre o último estado salvo. Abrir a configuração ou sair da seleção antes de iniciar preserva o save anterior. Uma expedição iniciada ou uma importação bem-sucedida atualiza o autosave. [Publicação do autosave e da importação TXT](https://github.com/Alkimistah/megadungeon/actions/runs/44193664119).
 - **Exportar sessão (.txt)**, em **Configurações**, baixa o código MD1 em um arquivo como `mega-dungeon-andar-14.txt`. Na tela inicial, **Importar arquivo de sessão** lê o TXT diretamente. A entrada dos códigos MD1 pelo campo de texto continua disponível. [Publicação da exportação TXT](https://github.com/Alkimistah/megadungeon/actions/runs/44195295956).
-- O QA no Chrome confirmou a importação da sessão recuperada, o progresso das missões e o avanço ao andar 15. O build de produção foi verificado com retomada e exportação offline. O teste de exportação e reimportação comparou o estado dos nodos e as missões. A confirmação no tablet físico continua pendente.
+- O QA no Chrome confirmou a importação da sessão recuperada, o progresso das missões e o avanço ao andar 15. O build de produção foi verificado com retomada e exportação offline. O teste de exportação e reimportação comparou o estado dos nodos e as missões. O mestre também confirmou no tablet os fluxos de importação e exportação por TXT e de retomada pelo ícone do PWA.
 - A ideia de compactar o backup permanece disponível para quando o tamanho do arquivo voltar a causar dificuldade. O formato atual preserva os mapas completos, o que evita depender de regeneração idêntica entre navegadores ou versões do jogo.
 
 ## 14. Retorno da mesa e propostas para a próxima entrega
@@ -458,8 +462,7 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 6. **Cenas dos nodos desconhecidos.** Primeira tabela de exploração, obstáculo, descoberta e descanso falso implementada. Aplica-se às novas expedições.
 7. **Continuidade de terreno e clima.** Publicada para novas expedições no commit `c992c22`. Terrenos consideram todas as entradas e o clima evolui por etapa. A geração preserva a estrutura do mapa e a restauração preserva os ambientes já salvos.
 8. **Controle de PV individual.** Publicado no commit `c992c22`. As fichas de combate mantêm as anotações e as criaturas extras enquanto o app está aberto. Ver seção 16.
-9. **Mecânica especial da Quimera.** A ficha integra PV compartilhados, RD, quatro cabeças, fraquezas, atordoamento e recarga do sopro. O QA no Chrome verificou a luta e a retomada por TXT. Ver seção 6.
-10. **Pistas de rota.** Dar informação parcial antes da escolha, preservando o mistério do conteúdo.
+9. **Mecânica especial da Quimera.** Publicada em `a75e2a0` e conferida pelo mestre. A ficha integra PV compartilhados, RD, quatro cabeças, fraquezas, atordoamento e recarga do sopro. O QA no Chrome verificou a luta e a retomada por TXT. Ver seção 6.
 
 ### Ferramenta de variações de armadilha
 
