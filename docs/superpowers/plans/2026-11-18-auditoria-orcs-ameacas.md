@@ -190,9 +190,41 @@ Os dois comparativos entre livros geraram versões com IDs próprios. As fichas 
 
 As 11 fichas do Culto foram publicadas em `648a0e1`, com o papel Solo do Avatar de Deuses conferido em `1cb85ea`. A publicação elevou o total de Ameaças para 49 fichas auditadas. Passaram os testes dos andares 1–20, das missões e do build de produção no Chrome, incluindo seleção de ND S e uso offline. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44397168339)
 
+## Dragões — inventário
+
+A seção ocupa as pp. 64–77 impressas, pp. 66–79 do PDF integral, e reúne 12 fichas. Os NDs foram confirmados pelo índice por ND, pp. 422–423 do PDF. As 12 fichas já estão no catálogo com IDs próprios. As referências atuais ainda apontam para o recorte `ameacas de arton p66 ate 79.pdf` e serão substituídas pelas do PDF integral a cada lote auditado.
+
+| ID do catálogo | ND | Página impressa | Página no PDF integral | Referência atual no catálogo |
+|---|---:|---:|---:|---|
+| `dragao-filhote-do-bosque` | 3 | 64 | 66 | p. 64 |
+| `dragao-filhote-dos-rios` | 3 | 64–65 | 66–67 | p. 64 |
+| `ninhada-de-dragoes-filhotes` | 5 | 65 | 67 | p. 65 |
+| `dragao-jovem-da-protecao` | 7 | 66 | 68 | p. 66 |
+| `dragao-jovem-do-ocaso` | 7 | 66–67 | 68–69 | p. 66 |
+| `dragao-adulto-da-tirania` | 11 | 68–69 | 70–71 | p. 68 |
+| `dragao-adulto-dos-segredos` | 11 | 69 | 71 | p. 69 |
+| `dragao-veneravel-da-equidade` | 15 | 71 | 73 | p. 71 |
+| `dragao-veneravel-dos-recifes` | 15 | 71 | 73 | p. 71 |
+| `dragao-feral` | 10 | 72 | 74 | p. 72 |
+| `dragao-bicefalo` | 12 | 74 | 76 | p. 74 |
+| `sckhar-dragao-rei-do-fogo` | S+ | 77 | 79 | p. 77 |
+
+As faixas de página vêm dos limites dos blocos extraídos e devem ser confirmadas na conferência de cada lote. A p. 70 impressa traz a introdução dos Veneráveis. As pp. 73 e 75 trazem a introdução do Bicéfalo e o quadro Modificando Dragões, e a p. 76 é a abertura ilustrada de Sckhar. O quadro Dragões como Familiares e Parceiros, pp. 66–67, e Modificando Dragões ficam fora do inventário por serem regras.
+
+Nenhuma ficha tem homônimo no Livro Básico. As fichas `dragao-filhote`, `dragao-jovem`, `dragao-adulto`, `dragao-veneravel` e `dragao-rei` do Livro Básico, pp. 310–313 impressas, são categorias de idade genéricas com nomes distintos. O quadro Poder Dracônico, p. 73 impressa, remete às habilidades dracônicas da seção Dragões do Livro Básico. Assim como as regras dos lefeu no Culto, essas habilidades compartilhadas devem ser lidas junto com as fichas na conferência.
+
+Outras fichas dracônicas de Ameaças ficam nas próprias seções e entram nos respectivos lotes. São elas os três Dragões Celestiais, pp. 165–166, Tarso, Dragão-Rei dos Mortos, p. 241, os Necrodracos, pp. 238–239, o Avatar de Kallyadranoch, p. 153, e os Dracomantes, p. 149.
+
+### Lotes propostos
+
+1. **Filhotes e Ninhada.** Três fichas, PDF pp. 66–67.
+2. **Jovens.** Duas fichas, PDF pp. 68–69.
+3. **Adultos, Feral e Bicéfalo.** Quatro fichas, PDF pp. 70–71, 74 e 76.
+4. **Veneráveis e Sckhar.** Três fichas, PDF pp. 73 e 79.
+
 ## Pendências e ponto de retomada
 
-1. **Dragões.** Retomar na p. 64 impressa, p. 66 do PDF integral, pelos Filhotes do Bosque e dos Rios. Inventariar o restante da seção antes de definir os próximos lotes. Cruzar as fichas homônimas com o Livro Básico, preservando os IDs atuais.
+1. **Dragões.** Inventário concluído, conforme acima. Começar a conferência pelo lote dos Filhotes e da Ninhada, PDF pp. 66–67, comparando os campos e substituindo as referências do recorte pelas do PDF integral.
 2. **Restante de Ameaças de Arton.** Seguir pelos blocos posteriores a Dragões e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
 3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
