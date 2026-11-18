@@ -41,16 +41,19 @@ function uniqueSources(sources) {
 }
 
 function withCreatureSources(creature) {
+  const catalogSource = sourceByCreatureId[creature.id];
+  const inlineSource = creature.source;
+  const replacesInline = catalogSource?.edition && catalogSource.book === inlineSource?.book;
   const sources = uniqueSources([
-    creature.source,
-    sourceByCreatureId[creature.id]
+    replacesInline ? catalogSource : inlineSource,
+    catalogSource
   ]);
 
   if (sources.length === 0) return creature;
 
   return {
     ...creature,
-    source: creature.source || sources[0],
+    source: sources[0],
     sources
   };
 }

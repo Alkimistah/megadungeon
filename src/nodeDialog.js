@@ -673,8 +673,15 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
   if (item.generated) {
     section.appendChild(createSheetLine("ORIGEM", `Variante gerada de ${creature.baseCreatureName || item.name}`));
   } else if (source) {
-    const page = source.bookPage ? `, p. ${source.bookPage}` : "";
-    section.appendChild(createSheetLine("FONTE", `${source.book}${page}`));
+    const bookPage = source.bookPageEnd ? `${source.bookPage}–${source.bookPageEnd}` : source.bookPage;
+    const pdfPage = source.pdfPageEnd ? `${source.pdfPage}–${source.pdfPageEnd}` : source.pdfPage;
+    const reference = [
+      source.book,
+      source.edition,
+      bookPage && `p. ${bookPage}`,
+      source.edition && pdfPage && `PDF p. ${pdfPage}`
+    ].filter(Boolean).join(" · ");
+    section.appendChild(createSheetLine("FONTE", reference));
   }
 
   return section;
