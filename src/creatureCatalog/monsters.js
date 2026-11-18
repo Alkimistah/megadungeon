@@ -5819,8 +5819,9 @@ export const dragaoJovemDaProtecao = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 68,
         "bookPage": 66
     },
     "stats": {
@@ -5886,9 +5887,12 @@ export const dragaoJovemDoOcaso = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 3,
-        "bookPage": 66
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 68,
+        "bookPage": 66,
+        "pdfPageEnd": 69,
+        "bookPageEnd": 67
     },
     "stats": {
         "initiative": 11,

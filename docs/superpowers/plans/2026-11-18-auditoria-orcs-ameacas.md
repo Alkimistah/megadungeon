@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak e o primeiro lote de Dragões, com 3 fichas.
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak e os dois primeiros lotes de Dragões, com 5 fichas.
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -236,9 +236,20 @@ O catálogo acrescenta Imunidades Dracônicas às três fichas. A habilidade vem
 
 O livro imprime “visão no esuro” no Filhote do Bosque. O catálogo mantém “visão no escuro”, o que é uma correção de transcrição. A atualização se limita às três referências.
 
+### Segundo lote — Jovens
+
+| ID do catálogo | ND | PV | Página impressa | Página no PDF integral |
+|---|---:|---:|---:|---:|
+| `dragao-jovem-da-protecao` | 7 | 320 | 66 | 68 |
+| `dragao-jovem-do-ocaso` | 7 | 320 | 66–67 | 68–69 |
+
+Os 28 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha. Também foram conferidos tipo, subtipo, tamanho, deslocamento, sentidos, fortificação, imunidade, redução de dano, resistência a magia, vulnerabilidade, ataques com margem de ameaça, Asas Guardiãs, Sopro, Mordida Definhante, Ver o Fim, perícias e tesouro. A ficha do Ocaso começa na segunda coluna da p. 66 e continua na p. 67, a partir dos ataques. A referência agora cobre as duas páginas.
+
+Além das Imunidades Dracônicas, o catálogo acrescenta Metamorfose Dracônica às duas fichas. O quadro Habilidades Dracônicas do Livro Básico, p. 311 impressa, concede essa habilidade a dragões jovens ou mais velhos. A resistência a magia +2 impressa corresponde à categoria jovem. O quadro Dragões como Familiares e Parceiros, pp. 66–67, descreve regras para personagens e não altera as fichas. A atualização se limita às duas referências.
+
 ## Pendências e ponto de retomada
 
-1. **Dragões.** Inventário e primeiro lote concluídos, conforme acima. Seguir pelo lote dos Jovens, PDF pp. 68–69, confirmando a extensão da ficha do Jovem do Ocaso até a p. 67 impressa.
+1. **Dragões.** Inventário e dois lotes concluídos, conforme acima. Seguir pelo lote dos Adultos, do Feral e do Bicéfalo, PDF pp. 70–71, 74 e 76, confirmando a extensão da ficha do Adulto da Tirania até a p. 69 impressa.
 2. **Restante de Ameaças de Arton.** Seguir pelos blocos posteriores a Dragões e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
 3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
