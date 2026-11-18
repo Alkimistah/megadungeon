@@ -342,6 +342,10 @@ As páginas foram renderizadas para conferir os ícones. O Bugbear Sentinela é 
 
 O livro marca com asterisco as sete magias da Bruxa, todas de encantamento ou necromancia e, portanto, beneficiadas pelo pilão conspurcado. O catálogo omite os asteriscos, mas mantém a regra do foco arcano no texto de Magias. O pilão traz o ícone de novo item, descrito no Capítulo 3: Bazar Monstruoso, conforme o quadro Novos Itens e Magias, p. 15 impressa. O Raio Conspurcado termina com um ícone em espiral sem legenda nas regras da introdução, pp. 12–17 impressas. O efeito impresso está completo no catálogo. A atualização se limita às três referências, e um teste dos andares 11–20 passa a fixar as referências auditadas de Duyshidakk.
 
+### Publicação de Dragões e do primeiro lote de Duyshidakk
+
+Dragões, o inventário de Duyshidakk e este lote foram publicados de `115d4f4` a `e098ac0`. Passaram os testes dos andares 1–20, das missões e o build de produção. O QA dos andares 11–20 no Chrome passou contra o site publicado, sem erros de JavaScript, incluindo encontro manual e uso offline após o cache. O bundle publicado traz a referência da Bruxa Goblin ao PDF integral. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44406164020)
+
 ## Pendências e ponto de retomada
 
 1. **Dragões.** Seção concluída, com 12 fichas. As referências de todas apontam para o PDF integral, e a Aura Aterradora está completa nas sete fichas que a possuem.
