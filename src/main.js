@@ -18,7 +18,7 @@ import { createMissionDialogController } from "./missions/missionDialog.js";
 import { createMissionGenerationContext, generateMissionOffers } from "./missions/missionGenerator.js";
 import { materializeMissionsForCurrentContent } from "./missions/missionProfileAdapters.js";
 import { createMissionState } from "./missions/missionState.js";
-import { resolveNodeEncounter } from "./encounterResolver.js";
+import { canRerollNodeCreatures, rerollNodeCreatures, resolveNodeEncounter } from "./encounterResolver.js";
 import { createNodeDialogController } from "./nodeDialog.js";
 import { decodeSessionCode, encodeSessionCode, isSessionCode } from "./sessionCode.js";
 import { loadAutosave, saveAutosave } from "./sessionAutosave.js";
@@ -95,6 +95,16 @@ function adjustMissionProgress(missionId, delta, eventKey = null) {
   refreshExplorationDisplay();
   nodeDialogController.rerenderCurrent();
   updateInfo();
+}
+
+function canRerollCreatures(node) {
+  if (activeFloorRange.id !== "forest-11-20" || !node.requiresCompletion ||
+    !state.isNodeChosen(node) || state.isNodeCompleted(node) || !canRerollNodeCreatures(node)) return false;
+
+  const encounterKey = `${node.resolvedEncounter.seed}:`;
+  return !missionState.getSelected().some(mission =>
+    mission.progress?.recordedEncounters?.some(key => key.startsWith(encounterKey))
+  );
 }
 
 function openMissionById(missionId, node = null) {
@@ -208,6 +218,7 @@ function advanceNodeMapFloor() {
 }
 
 const nodeDialogController = createNodeDialogController({
+  canRerollCreatures,
   contentElement: elements.nodeDialogContent,
   dialogElement: elements.nodeDialog,
   getActiveMissions: () => missionState.getSelected(),
@@ -240,6 +251,14 @@ const nodeDialogController = createNodeDialogController({
     nodeDialogController.open(node);
   },
   onOpenMission: openMissionById,
+  onRerollCreatures: (node) => {
+    if (!canRerollCreatures(node)) return false;
+    const encounter = rerollNodeCreatures(node);
+    if (!encounter) return false;
+    node.resolvedEncounter = encounter;
+    refreshExplorationDisplay();
+    return true;
+  },
   onRest: (node) => {
     state.restAtNode(node);
     refreshExplorationDisplay();

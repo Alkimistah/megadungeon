@@ -6,7 +6,7 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 
 ## 1. Leitura rápida: o que vem primeiro
 
-**Próximo passo indicado:** conferir no tablet as variações narrativas de armadilhas por terreno. A [lista de próximas entregas](#15-próximas-entregas-em-ordem) segue com a rerrolagem de criaturas no mesmo ND.
+**Próximo passo indicado:** conferir no tablet a rerrolagem de criaturas no mesmo ND. A [lista de próximas entregas](#15-próximas-entregas-em-ordem) segue com a redução de acampamentos ocultos.
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
@@ -420,7 +420,7 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 ## 15. Próximas entregas em ordem
 
 1. **Variações de armadilhas por terreno.** Implementadas e verificadas no Chrome. Conferência no tablet pendente.
-2. **Rerrolagem de criaturas no mesmo ND.** Dar ao mestre uma alternativa de composição em nodos de combate sem missão. Preservar terreno, clima, armadilha e restrições do nodo. Gravar a composição aceita no save.
+2. **Rerrolagem de criaturas no mesmo ND.** Implementada e verificada no Chrome. Em um nodo de combate pendente, **Rerrolar criaturas** busca outro grupo do mesmo tipo permitido, respeitando a lista de criaturas do nodo. Preserva o ND real das criaturas, o orçamento do encontro, terreno, clima e armadilhas. Missões vinculadas, cenas fixas e encontros já concluídos ou contabilizados em missão ficam protegidos. A composição escolhida é preservada no autosave e no TXT.
 3. **Menos acampamentos ocultos.** Testar a redução da chance de acampamento nas revelações de nodos desconhecidos e medir quantos descansos continuam acessíveis em rotas típicas.
 4. **Tempo de exploração.** Testar um mínimo maior e mais variação conforme a travessia. Separar tempo total e tempo desde o último descanso. Aplicar a calibragem a novos mapas.
 5. **Reforço manual por criatura.** Depois de experimentar outras composições, testar ajustes reversíveis e separados de iniciativa e ataque. Mostrar a alteração na ficha e manter o ND original como referência.

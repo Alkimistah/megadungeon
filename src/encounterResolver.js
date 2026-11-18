@@ -599,6 +599,60 @@ function getEncounterSeed(node, mapSeed) {
   return `${mapSeed || "map"}:${node.encounterSeed || node.id}:encounter-v${ENCOUNTER_RESOLUTION_VERSION}`;
 }
 
+export function canRerollNodeCreatures(node) {
+  return Boolean(node?.creature
+    && ["normal", "elite"].includes(node.contentType || node.type)
+    && !node.missionBindings?.length
+    && !node.missionObjectives?.length
+    && !node.fixedComposition
+    && !node.fixedTacticalMap
+    && !node.creature.creatureId
+    && node.resolvedEncounter?.items.some(item => item.kind === "creature"));
+}
+
+function getCreatureComposition(items) {
+  const counts = new Map();
+  for (const item of items) {
+    const id = item.creatureData?.baseCreatureId || item.creatureId;
+    counts.set(id, (counts.get(id) || 0) + item.quantity);
+  }
+  return JSON.stringify([...counts.entries()].sort());
+}
+
+export function rerollNodeCreatures(node) {
+  if (!canRerollNodeCreatures(node)) return null;
+
+  const encounter = node.resolvedEncounter;
+  const original = encounter.items.filter(item => item.kind === "creature");
+  const originalComposition = getCreatureComposition(original);
+  const challenge = calculateCombatND(original);
+  const { type, allowedCreatureIds } = node.creature;
+  const matchingIds = getAllowedCatalog(allowedCreatureIds)
+    .filter(creature => !type || creature.type === type)
+    .map(creature => creature.id);
+  if (!matchingIds.length || challenge <= 0) return null;
+
+  // A rerrolagem usa o ND do grupo efetivamente encontrado. O orçamento e a
+  // identidade da cena continuam sendo os do encontro original.
+  const searchNode = {
+    ...node,
+    creature: { ...node.creature, type: type || null, targetChallenge: challenge, allowedCreatureIds: matchingIds }
+  };
+  const reroll = (encounter.creatureRerolls || 0) + 1;
+  const rng = createRng(`${encounter.seed}:creature-reroll:${reroll}`);
+  for (let attempt = 0; attempt < 32; attempt++) {
+    const candidate = resolveCreatureGroup(searchNode, rng);
+    if (calculateCombatND(candidate) === challenge && getCreatureComposition(candidate) !== originalComposition) {
+      return {
+        ...encounter,
+        creatureRerolls: reroll,
+        items: [...candidate, ...encounter.items.filter(item => item.kind !== "creature")]
+      };
+    }
+  }
+  return null;
+}
+
 // Builds items from a fixed composition ({ creatures: [{ id, quantity }], traps: [trapId] })
 // declared by cenas curadas (encontros finais). Creatures keep weapon variation via rng;
 // traps are looked up in the catalog by id.

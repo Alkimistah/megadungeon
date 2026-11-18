@@ -3,7 +3,8 @@ import test from "node:test";
 import { generateMapData } from "../src/generator.js";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { createRng } from "../src/random.js";
-import { resolveNodeEncounter } from "../src/encounterResolver.js";
+import { canRerollNodeCreatures, rerollNodeCreatures, resolveNodeEncounter } from "../src/encounterResolver.js";
+import { creatureCatalog } from "../src/creatureCatalog/index.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
 import { calculateCombatND } from "../src/challenge.js";
 import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
@@ -72,6 +73,57 @@ function materialize(args) {
 function map(floor, seed = "forest-mvp", depth = 8) {
   return generateMapData(depth, profile.recommendations.baseDcByFloor[floor], profile, floor, createRng(seed), { version: 2 });
 }
+
+function rerollFixture() {
+  const allowed = creatureCatalog.filter(item => item.type === "animal" && item.challengeRating === 1).slice(0, 2);
+  assert.equal(allowed.length, 2);
+  const trap = { kind: "trap", trapId: "lamina-na-parede", challengeRating: 0.5, quantity: 1 };
+  const node = {
+    type: "unknown", contentType: "normal",
+    environment: { terrain: { name: "Floresta" } },
+    creature: { type: "animal", targetChallenge: 1, allowedCreatureIds: allowed.map(item => item.id) },
+    challenge: { creatures: 1, total: 2.5, trap: 0.5 },
+    resolvedEncounter: {
+      seed: "saved:14:N1", version: 9, budget: { creatures: 1, total: 2.5, trap: 0.5 },
+      items: [{ kind: "creature", creatureId: allowed[0].id, challengeRating: 1, quantity: 1 }, trap]
+    }
+  };
+  return { node, trap, allowed };
+}
+
+test("reroll swaps creatures inside the node's restrictions and preserves the saved encounter identity", () => {
+  const { node, trap, allowed } = rerollFixture();
+  const before = structuredClone(node);
+  const next = rerollNodeCreatures(node);
+  assert.ok(next);
+  assert.deepEqual(node, before);
+  assert.equal(next.seed, before.resolvedEncounter.seed);
+  assert.deepEqual(next.budget, before.resolvedEncounter.budget);
+  const creatures = next.items.filter(item => item.kind === "creature");
+  assert.deepEqual(creatures.map(item => item.creatureId), [allowed[1].id]);
+  assert.equal(calculateCombatND(creatures), 1);
+  assert.deepEqual(next.items.filter(item => item.kind === "trap"), [trap]);
+  const restored = JSON.parse(JSON.stringify({ ...node, resolvedEncounter: next }));
+  assert.deepEqual(resolveNodeEncounter(restored), restored.resolvedEncounter);
+});
+
+test("reroll protects mission and fixed encounters and preserves a group with no alternative", () => {
+  const { node, allowed } = rerollFixture();
+  const protectedNodes = [
+    { ...node, missionBindings: [{ id: "mission" }] },
+    { ...node, fixedComposition: {} },
+    { ...node, contentType: "boss" },
+    { ...node, creature: { ...node.creature, creatureId: allowed[0].id } }
+  ];
+  for (const protectedNode of protectedNodes) {
+    assert.equal(canRerollNodeCreatures(protectedNode), false);
+    assert.equal(rerollNodeCreatures(protectedNode), null);
+  }
+  node.creature.allowedCreatureIds = [allowed[0].id];
+  const before = structuredClone(node);
+  assert.equal(rerollNodeCreatures(node), null);
+  assert.deepEqual(node, before);
+});
 
 test("unknown elite receives elite budget and discovery check", () => {
   let checked = 0;

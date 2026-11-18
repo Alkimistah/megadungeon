@@ -712,6 +712,7 @@ function createCombatUnavailableNotice() {
 }
 
 export function createNodeDialogController({
+  canRerollCreatures = () => false,
   contentElement,
   dialogElement,
   metaElement,
@@ -723,6 +724,7 @@ export function createNodeDialogController({
   getProfileId = () => null,
   onAdjustMissionProgress = null,
   onOpenMission = () => {},
+  onRerollCreatures = () => false,
   onRest,
   state,
   titleElement,
@@ -890,13 +892,36 @@ export function createNodeDialogController({
 
     const selectedKey = getSelectedEncounterItemKey(node);
 
-    contentElement.appendChild(createCombatPage(node, selectedKey, (nextSelectedKey) => {
+    const page = createCombatPage(node, selectedKey, (nextSelectedKey) => {
       selectedEncounterItemByNode.set(node.id, nextSelectedKey);
       render(node);
     }, getActiveMissions(), (missionId, delta, eventKey) => {
       onAdjustMissionProgress?.(missionId, delta, eventKey);
       render(node);
-    }, getProfileId()));
+    }, getProfileId());
+    if (canRerollCreatures(node)) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "extended-action is-compact";
+      button.textContent = "Rerrolar criaturas";
+      const status = document.createElement("p");
+      status.className = "node-dialog-meta";
+      status.setAttribute("role", "status");
+      status.classList.add("creature-reroll-status");
+      button.addEventListener("click", () => {
+        if (!onRerollCreatures(node)) {
+          status.textContent = "Nenhuma outra composição compatível foi encontrada.";
+          return;
+        }
+        selectedEncounterItemByNode.delete(node.id);
+        render(node);
+        const replacement = contentElement.querySelector(".creature-reroll-status");
+        replacement.textContent = "Criaturas atualizadas com o mesmo ND.";
+        replacement.previousElementSibling.focus();
+      });
+      page.firstElementChild.append(button, status);
+    }
+    contentElement.appendChild(page);
   }
 
   function render(node) {
