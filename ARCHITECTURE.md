@@ -503,6 +503,16 @@ O app funciona offline via Service Worker (`public/sw.js`) com cache de todos os
 
 ---
 
+## Ideias futuras do sistema
+
+### Rolagem de tesouros
+
+Proposta para detalhar após a auditoria e a atualização das fichas de criaturas. Um botão no cabeçalho, junto aos acessos de encontros manuais e missões, abrirá a modal **Rolar tesouros**. O mestre informa o ND e a quantidade de tesouros nesse ND. A modal retorna as rolagens individuais e o resultado de cada tesouro gerado, mantendo a correspondência entre as duas informações.
+
+A geração seguirá as regras e tabelas do **Livro Básico** e consultará os itens dos livros disponíveis que tenham itens aplicáveis às tabelas. A revisão futura definirá como associar os itens de cada fonte às categorias de resultado, registrar a procedência e apresentar rolagens que acionem outras tabelas.
+
+---
+
 ## Prioridade Arquitetural Próxima
 
 ### Decisão atual sobre framework
