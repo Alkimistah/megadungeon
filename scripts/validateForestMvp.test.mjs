@@ -67,7 +67,7 @@ test("Ameaças dragons cite the full PDF and show the complete Aura Aterradora",
   );
 });
 
-test("audited Duyshidakk sheets cite the full Ameaças PDF", () => {
+test("Duyshidakk sheets cite the full Ameaças PDF", () => {
   const pages = {
     "bugbear-sentinela": [81, 79],
     "bugbear-guarda-costas": [81, 79],
@@ -76,7 +76,11 @@ test("audited Duyshidakk sheets cite the full Ameaças PDF", () => {
     "horda-goblin": [83, 81],
     "goblin-bomba": [84, 82],
     "goblin-de-ferro": [84, 82, 85, 83],
-    "goblin-de-ferro-mark-ii": [85, 83]
+    "goblin-de-ferro-mark-ii": [85, 83],
+    "hobgoblin-atirador": [86, 84],
+    "hobgoblin-comandante-tatico": [87, 85],
+    "hobgoblin-gladiador": [87, 85],
+    "sangue-do-ayrrak": [89, 87]
   };
   for (const [id, [pdfPage, bookPage, pdfPageEnd, bookPageEnd]] of Object.entries(pages)) {
     const [source] = getCreatureById(id).sources;

@@ -5001,8 +5001,9 @@ export const hobgoblinAtirador = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 86,
         "bookPage": 84
     },
     "stats": {
@@ -5067,8 +5068,9 @@ export const hobgoblinComandanteTatico = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 87,
         "bookPage": 85
     },
     "stats": {
@@ -5139,8 +5141,9 @@ export const hobgoblinGladiador = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 87,
         "bookPage": 85
     },
     "stats": {
@@ -5269,8 +5272,9 @@ export const sangueDoAyrrak = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 89,
         "bookPage": 87
     },
     "stats": {

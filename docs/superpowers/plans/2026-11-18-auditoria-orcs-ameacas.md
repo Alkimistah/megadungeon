@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak, as 12 de Dragões e três dos quatro lotes de Duyshidakk, com 8 fichas.
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak, as 12 de Dragões e as 12 de Duyshidakk.
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -373,10 +373,31 @@ Os 28 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciat
 
 Na tabela de Engenhocas de Combate, o catálogo escreve “como Toque Chocante” onde o livro imprime “como a magia Toque Chocante”, e omite a instrução “consulte a lista abaixo”. Na Armadura Blindada do Mark II, o livro imprime “redução corte”, e o catálogo mantém “redução de corte”. Nenhuma diferença altera o efeito. A atualização se limita às duas referências, e o teste de Duyshidakk passa a cobrir oito fichas.
 
+O terceiro lote foi publicado em `043949f`. O QA dos andares 11–20 no Chrome passou contra o site publicado, sem erros de JavaScript, e o bundle publicado traz a nova referência do Goblin de Ferro. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44407790826)
+
+### Quarto lote — Hobgoblins e Sangue do Ayrrak
+
+| ID do catálogo | ND | PV | PM | Papel impresso | Página impressa | Página no PDF integral |
+|---|---:|---:|---:|---|---:|---:|
+| `hobgoblin-atirador` | 5 | 38 | — | Lacaio | 84 | 86 |
+| `hobgoblin-comandante-tatico` | 11 | 425 | — | Especial | 85 | 87 |
+| `hobgoblin-gladiador` | 16 | 1.000 | — | Solo | 85 | 87 |
+| `sangue-do-ayrrak` | 19 | 1.364 | 57 | Solo | 87 | 89 |
+
+Os 57 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM do Sangue do Ayrrak. Também foram conferidos tipo, subtipo, tamanho, deslocamento, sentidos, defesas, ataques com margem e multiplicador, todas as habilidades com execução e custo, as oito opções da Roda do Akzath, perícias, equipamento e tesouro. Cada ficha cabe em uma página. A introdução do Comandante Tático começa na p. 84, a do Gladiador está na p. 85, e a abertura do Sangue do Ayrrak ocupa a p. 86. Os papéis impressos coincidem com a inferência do catálogo.
+
+Corcel Duyshidakk omite a remissão à ficha do warg, p. 224, e O Mundo Como Deve Ser omite “veja ao lado”, que aponta para a ilustração da Roda do Akzath na p. 87. A lança de fogo do Atirador e a Uyzrrak Da’ukthra trazem o ícone de novo item. Nenhuma omissão altera o efeito.
+
+A espiral que aparece no Raio Conspurcado da Bruxa Goblin se repete nas opções Vida, Mudança, Fim, Morte e Início do Sangue do Ayrrak. Ignorância, Conhecimento e Continuidade, que não envolvem magia, não a trazem. O padrão sugere um marcador de habilidade mágica, mas a introdução não traz legenda para ele. O catálogo não reproduz o ícone, e o registro fica como observação para uma eventual revisão de apresentação.
+
+### Fechamento de Duyshidakk
+
+As 12 fichas da seção estão conferidas, com referências ao PDF integral e cobertas pelo teste de Duyshidakk dos andares 11–20. Nenhuma ficha teve diferença mecânica. A única divergência de papel é o Bugbear Sentinela, Lacaio no livro e Especial no catálogo, preservado conforme a decisão do Culto. Ficam para revisão de apresentação as regras gerais de Bando e Enxame, que o catálogo ainda não exibe, e a espiral sem legenda.
+
 ## Pendências e ponto de retomada
 
 1. **Dragões.** Seção concluída, com 12 fichas. As referências de todas apontam para o PDF integral, e a Aura Aterradora está completa nas sete fichas que a possuem.
-2. **Restante de Ameaças de Arton.** Duyshidakk está inventariado e três lotes foram conferidos, conforme acima. Seguir pelo último lote, com os Hobgoblins e o Sangue do Ayrrak, PDF pp. 86–87 e 89, renderizando as páginas para conferir os ícones de papel. Depois de Duyshidakk, seguir pelos blocos seguintes, a começar por Elementais, p. 88 impressa, p. 90 do PDF, e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
+2. **Restante de Ameaças de Arton.** Duyshidakk está concluído, conforme acima. O próximo bloco do sumário é Elementais, a partir da p. 88 impressa, p. 90 do PDF integral. Inventariar a seção, renderizando as páginas para conferir os ícones de papel. Depois, seguir pelos blocos seguintes e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
 3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
 
