@@ -6,7 +6,7 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 
 ## 1. Leitura rápida: o que vem primeiro
 
-**Próximo passo indicado:** implementar a continuidade de terreno e clima entre nodos conectados. A mecânica especial da Quimera vem depois da continuidade, conforme a [lista de entregas](#15-próximas-entregas-em-ordem).
+**Próximo passo indicado:** publicar a continuidade de terreno e clima e o [controle de PV individual](#16-controle-de-pv-individual). A próxima implementação é a [luta da Quimera](#6-p1--encontro-fixo-da-quimera), que reutilizará o controlador.
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
@@ -14,9 +14,10 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 | 2 | P1 — calibragem | CDs de exploração coerentes com personagens de níveis 4–7 | Curva 20–23 confirmada e implementada |
 | 3 | P1 — regras essenciais | Revelação correta, descanso verdadeiro seguro e estados claros de resolução | Implementado, com relógios separados na floresta |
 | 4 | P2 — desconhecidos | Mais variedade com tabela temática própria e descanso falso explícito | Primeira tabela implementada |
-| 5 | P3 — continuidade | Terreno e clima com transições coerentes entre nodos | Próxima implementação |
-| 6 | P1 — Quimera fixa | Mesmo encontro e mapa no andar 20; sem adições aleatórias | Arena simples implementada; mecânica especial depois da continuidade |
-| 7 | P4 — pistas de rota | Informação parcial útil, sem entregar o tipo do nodo | Intenção aceita; regras ainda precisam de desenho |
+| 5 | P3 — continuidade | Terreno e clima com transições coerentes entre nodos | Primeira versão implementada para novas expedições |
+| 6 | PV individual | Registrar dano e cura por criatura nas fichas de combate | Implementado como base para a Quimera |
+| 7 | P1 — Quimera | Arena fixa, chefe solo e quatro cabeças sorteadas no andar 20 | Arena simples implementada; mecânica especial planejada |
+| 8 | P4 — pistas de rota | Informação parcial útil, sem entregar o tipo do nodo | Intenção aceita; regras ainda precisam de desenho |
 
 **Regra de corte:** não iniciar P2–P4 enquanto o mínimo de missões não estiver validado. Não condicionar a correção das missões à construção do sistema completo de clima, terreno ou desconhecidos.
 
@@ -30,7 +31,7 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 - Toda missão aceita deve ter realização concreta em um ou mais nodos. Missão criada por outro fluxo também deve passar pela mesma integração.
 - Cada nodo pode abrigar no máximo uma missão, inclusive quando os objetivos são semelhantes. Missões do mesmo andar ocupam nodos distintos numa rota possível. Extermínio pode ocupar vários nodos, sem compartilhar esses nodos com outra missão.
 - Acampamento é descanso verdadeiro e seguro. Descanso falso é uma cena própria que só pode surgir dentro do desconhecido.
-- A Quimera tem nodo, arena e encontro fixos no andar 20, seguindo a intenção do encontro da Aranha Matriarca.
+- A Quimera é a única criatura do encontro fixo do andar 20. A arena usa posições iniciais fixas. A mecânica planejada sorteia as cabeças e suas fraquezas para cada luta.
 - Pistas específicas da Quimera só aparecem no andar 20.
 - Desconhecidos devem aparecer mais e podem conter cenas sem combate, adequadas à região e ao clima.
 - Terreno e clima devem apresentar continuidade entre nodos, sem exigir reconstruir a estrutura do grafo.
@@ -188,13 +189,37 @@ Na primeira entrega, preservar os acampamentos seguros existentes. O descanso fa
 
 ## 6. P1 — encontro fixo da Quimera
 
-O andar 20 termina sempre no mesmo encontro: **Quimera ND 8 sozinha**, com arena e posições iniciais fixas. A rota anterior pode variar. Por decisão explícita do usuário, o MVP usa uma clareira plana sem perigos ou mecânicas adicionais.
+O MVP do andar 20 termina com a **Quimera ND 8 sozinha** numa clareira plana de 20×14, com posições iniciais fixas. Quatro personagens começam de um lado e a Quimera Grande ocupa 2×2 no outro. A rota anterior pode variar.
 
-Implementado: não sortear armadilhas incidentais, clima ou terreno que alterem a cena fixa. A arena é 20×14, com quatro personagens e a Quimera Grande ocupando 2×2, sem inimigos adicionais.
+### Mecânica especial planejada
 
-Pistas da Quimera são exclusivas do andar 20. Vantagens mecânicas obtidas com elas, se existirem, precisam ser efeitos controlados previstos pela cena; não devem trocar a composição nem regerar a arena. A primeira entrega pode ter a arena fixa sem o sistema completo de pistas.
+1. **Sorteio na geração do andar 20.** Ao preparar a expedição, sortear quatro cabeças distintas entre as dez da ficha. Para cada uma, sortear uma fraqueza entre os candidatos da tabela abaixo. Numerar as quatro cabeças de **1 a 4**. A composição, a ordem e as fraquezas fazem parte do encontro original salvo com o andar. Abrir a ficha ou retomar a expedição usa o mesmo resultado.
+2. **Um turno da Quimera.** O mestre rola **1d4** para escolher qual cabeça conduz a próxima ação no turno. O número corresponde à lista exibida. O chefe continua com o número de ataques da ficha como ponto de partida. Uma habilidade passiva atua enquanto a cabeça estiver ativa, independentemente do dado. Se a cabeça sorteada estiver atordoada ou com a ação indisponível, a Quimera usa os ataques normais.
+3. **Dano e RD.** O mestre informa o valor, o tipo de dano e o alvo, **Corpo** ou uma das quatro cabeças. O corpo e uma cabeça atingida com tipo diferente de sua fraqueza aplicam **RD 5**, até o dano chegar a zero. Dano da fraqueza direcionado à cabeça passa integralmente. Todo dano reduz os PV compartilhados da Quimera. O app usa os tipos do [catálogo de dano do projeto](src/damageTypes.js), conferidos na [referência oficial de Tormenta20](https://jamboeditora.com.br/wp-content/uploads/2023/06/Tormenta20-Resumo-de-Regras.pdf).
+4. **Atordoamento por cabeça.** A primeira vez que uma cabeça sofre dano de sua fraqueza, sua habilidade especial fica suspensa até o fim do próximo turno da Quimera. O mestre encerra esse turno com **Fim do turno da Quimera**. A ficha registra o atordoamento e se a cabeça já foi atordoada nesse combate. A fraqueza continua ignorando a RD depois de usado o atordoamento. A Quimera continua agindo com as demais cabeças e os ataques normais.
+5. **Sopro do Dragão.** Se o Dragão for sorteado, **Usar sopro** marca o uso da ação padrão e muda o estado para **Em recarga**. **Recarregar sopro** volta a deixá-lo disponível quando o mestre registrar que a Quimera gastou uma ação de movimento. **Fim do turno** trata o atordoamento. Um Dragão atordoado fica impedido de usar o sopro mesmo que esteja carregado. O estado do sopro fica no save.
+6. **Ficha do mestre.** No topo, mostrar PV atuais e máximos, RD 5 e o último lançamento, como `Corpo · 18 de corte − 5 de RD = 13 PV perdidos`. Em seguida, mostrar apenas as cabeças sorteadas, com número, habilidade, fraqueza sorteada e estado. Os ataques do corpo e as ações aplicáveis às cabeças sorteadas ficam acessíveis na mesma ficha, com os controles pertinentes a cada habilidade.
+7. **Ajustes opcionais do chefe.** Reaproveitar **Iniciativa +2** e **Ataque +1**. Oferecer **PV extras** com valor escolhido pelo mestre, somado aos PV atuais e máximos para preservar o dano sofrido. A base é **333 PV** e a Defesa é **33**. Ajustes adicionais de Defesa ou resistências ficam para avaliação em mesa. O ND 8 e o XP de referência permanecem.
+8. **Arena.** Manter a Quimera sozinha e as posições iniciais fixas. A proposta é desenhar coberturas destrutíveis na clareira e conduzir a destruição em mesa. Pistas específicas ficam restritas ao andar 20 e entram no trabalho de pistas de rota.
 
-**Pendência importante do projeto:** desenhar uma mecânica especial interessante e temática para a Quimera. A arena simples é um corte de escopo do MVP, não a solução definitiva do chefe. Novas regras e perigos precisam ser discutidos antes de substituir a cena atual. Pistas específicas continuam restritas ao andar 20 e não fazem parte desta entrega.
+### Fraquezas candidatas
+
+Esta tabela é uma proposta para a luta do andar 20. A ficha do mestre mostra apenas a fraqueza efetivamente sorteada de cada cabeça presente.
+
+| Cabeça | Fraquezas candidatas |
+|---|---|
+| Águia | Impacto ou eletricidade |
+| Bode | Impacto ou perfuração |
+| Dragão | Frio ou eletricidade |
+| Gorlogg | Impacto ou psíquico |
+| Hidra | Fogo ou ácido |
+| Javali | Perfuração ou psíquico |
+| Leão | Impacto ou corte |
+| Serpente | Corte ou frio |
+| Tigre | Perfuração ou eletricidade |
+| Tubarão | Eletricidade ou corte |
+
+A regra de cura acelerada da Hidra conserva fogo e ácido, conforme a [ficha original](src/creatureCatalog/monsters.js#L2993). A fraqueza sorteada define qual dos dois tipos contorna a RD e pode atordoar a cabeça. Ataques com múltiplos tipos de dano e o eventual ajuste de potência das combinações mais fortes precisam de definição antes de implementar.
 
 ## 7. P2 — desconhecidos e cenas externas
 
@@ -253,35 +278,33 @@ Um acampamento descoberto permite **Seguir viagem** ou **Iniciar descanso**. At�
 
 ### Arquitetura e sequência
 
-Preservar criação de níveis, nodos e links. Alterar a atribuição de ambiente para consultar predecessores e tendências regionais. Escolher ambientes antes de compor encontros, pois eles influenciam criatura, armadilha, missão, ND e mapa tático.
+Implementado a partir da geração 4 da floresta. A criação de níveis, nodos e links segue o mesmo fluxo. O ambiente é definido antes de compor encontros e vincular missões, pois influencia criatura, armadilha, missão, ND e mapa tático.
 
-Gerar o contexto de forma determinística a partir da seed e guardar a versão de geração. Escolher uma rota ou abrir uma modal não pode mudar um nodo já definido.
+O contexto é gerado a partir da seed e a versão de geração fica no save. Os mapas já armazenados restauram seus ambientes originais.
 
 ### Terreno
 
 Favorecer permanência e transições plausíveis. Exemplo possível: planície → colina com nascente → bosque com riacho → mata alagada → pântano. Não transformar essa sequência em roteiro obrigatório.
 
-Começar com transições entre tipos de terreno. Continuidade exata de rios, nascentes, margens e elevações entra depois, pois exige relações mais fortes. Uma planície pode não ter acidentes especiais; hoje a tabela sempre lhe atribui trincheira, o que merece revisão nessa etapa.
+Nesta entrega, cada predecessor aumenta o peso de seu próprio terreno e o de terrenos compatíveis. Em convergências, os pesos consideram todos os caminhos de entrada. Uma planície pode aparecer sem acidentes especiais. Continuidade exata de rios, nascentes, margens e elevações permanece para uma expansão futura.
 
-Em convergências, considerar todos os predecessores; não herdar arbitrariamente um deles e criar transições contraditórias com os demais.
+Na comparação de 500 mapas pareados com a geração anterior, o terreno se manteve em 7.357 de 17.332 conexões antes da mudança (42%) e em 10.560 depois (61%). Uma amostra de 500 novas expedições com até três missões foi preparada sem falhas de posicionamento.
 
 ### Clima
 
 Tempo aberto → chuva leve → chuva leve, tempo aberto ou temporal é uma sequência possível. Permanecer no mesmo estado deve ser comum. Evitar saltos de calor extremo para neve sem justificativa excepcional.
 
-Proposta de implementação: tendência climática compartilhada por etapa do mapa, com variações locais coerentes com exposição e terreno. Separar precipitação, vento, temperatura e neblina; nem toda mudança precisa sortear todos esses componentes novamente.
+Precipitação e temperatura compartilham uma tendência por etapa de cada andar. A temperatura muda gradualmente. Sem chuva, o terreno influencia a chance de vento ou neblina local.
 
-| Estado atual ilustrativo | Próximos estados possíveis |
-|---|---|
-| Tempo aberto | Tempo aberto, nublado, chuva leve |
-| Chuva leve | Chuva leve, tempo aberto, temporal |
-| Temporal | Temporal, chuva, chuva leve |
-
-As probabilidades de transição ainda não foram definidas. O código atual usa `Clima normal` e `Chuva`, sem distinguir todos esses estados: definir efeitos e modificadores antes de acrescentar os nomes.
+| Precipitação na etapa atual | Tempo aberto | Chuva | Tempestade |
+|---|---:|---:|---:|
+| Tempo aberto | 88% | 12% | 0% |
+| Chuva | 36% | 57% | 7% |
+| Tempestade | 0% | 75% | 25% |
 
 O clima pode deixar efeitos posteriores: solo molhado após abrir o tempo e rio cheio depois de uma chuva. Essa memória é uma evolução posterior à continuidade básica; não criar simulação meteorológica completa para a primeira versão.
 
-Garantir que vento, precipitação e neblina respeitem as incompatibilidades definidas. Acampamento seguro usa abrigo para neutralizar exposição, sem precisar mudar o clima de toda a região. A arena fixa da Quimera prevalece sobre as regras procedurais.
+A chuva e a tempestade usam os efeitos já cadastrados, inclusive os de vento. O acampamento seguro filtra os efeitos danosos da cena sem alterar o tempo regional dos nodos vizinhos. A arena fixa da Quimera prevalece sobre a geração procedural.
 
 ## 9. P4 — pistas antes da escolha
 
@@ -382,7 +405,7 @@ Essa lista orienta o trabalho; o plano técnico executável de cada entrega deve
 - O MVP foi publicado após as verificações no commit `7afd21b`. Não houve teste no tablet físico; o QA usou Chrome local e viewports de tablet/mobile.
 - Sessões antigas são preservadas, mas não recebem retroativamente as garantias novas de materialização; iniciar uma nova expedição usa o MVP.
 - No MVP, o contador zerava ao descansar. Os dois relógios foram implementados posteriormente. A duração do descanso continua a cargo do mestre.
-- Mecânica especial da Quimera é importante e permanece pendente por decisão do usuário.
+- A mecânica especial da Quimera está planejada na seção 6 e aguarda o controle de PV individual.
 - Não foram acrescentados editor manual, nova tabela de desconhecidos, descanso falso, continuidade de clima/terreno ou pistas de rota.
 
 ### Correção após uso: missões no mesmo nodo
@@ -427,9 +450,10 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 4. **Tempo de exploração.** Implementado. Novas travessias com teste variam entre 30, 45 e 60 minutos. Os dois relógios persistem ao avançar, retomar e exportar. Em saves anteriores, o total é reconstruído a partir dos nodos e tentativas registrados. Quando faltam andares do histórico, o app indica **Tempo total (parcial)**.
 5. **Reforço manual por criatura.** Implementado e verificado no Chrome. Disponível na ficha de um encontro pendente, inclusive em nodos de missão. Quando a ficha representa várias criaturas, o ajuste vale para todas as daquela ficha. Os bônus são reversíveis, ficam no save e não alteram ND ou XP. A Quimera mantém a ficha fixa. Se o mestre rerrolar as criaturas, as novas fichas começam com os reforços desativados.
 6. **Cenas dos nodos desconhecidos.** Primeira tabela de exploração, obstáculo, descoberta e descanso falso implementada. Aplica-se às novas expedições.
-7. **Continuidade de terreno e clima.** Implementar transições coerentes entre nodos conectados e verificar o impacto na preparação das missões.
-8. **Mecânica especial da Quimera.** Depois da continuidade, desenhar e testar o que diferencia o combate do andar 20, partindo da composição e da arena fixas.
-9. **Pistas de rota.** Dar informação parcial antes da escolha, preservando o mistério do conteúdo.
+7. **Continuidade de terreno e clima.** Primeira versão implementada para novas expedições. Terrenos consideram todas as entradas e o clima evolui por etapa. A geração preserva a estrutura do mapa e a restauração preserva os ambientes já salvos.
+8. **Controle de PV individual.** Implementado nas fichas de combate, com anotações e criaturas extras mantidas enquanto o app está aberto. Ver seção 16.
+9. **Mecânica especial da Quimera.** Reutilizar o controlador de PV e ligar a RD, as quatro cabeças, as fraquezas, o atordoamento e a recarga do sopro. Ver seção 6.
+10. **Pistas de rota.** Dar informação parcial antes da escolha, preservando o mistério do conteúdo.
 
 ### Ferramenta de variações de armadilha
 
@@ -444,3 +468,23 @@ A lista do combate mostra o nome narrativo quando há uma variação para a arma
 | Virote | **Dardo entre as folhagens** ou **Dardo da margem**, de acordo com o terreno. Mantém o dano de perfuração. |
 
 No teste com a sessão recuperada do andar 14, o Pêndulo de Teto apareceu como **Tronco laminado do pântano** e a Lâmina na Parede como **Lâmina entre as raízes**. As fichas mantiveram os efeitos originais, os nomes se repetiram após a retomada e o estado do andar exportado coincidiu com o importado.
+
+## 16. Controle de PV individual
+
+O mestre pode registrar **dano**, **cura** e **desfazer o último lançamento** na ficha de combate. Cada criatura tem seus próprios PV atuais e máximos. Uma composição de três Infectos apresenta três contadores independentes sob a mesma ficha. A interface indica qual criatura recebe o lançamento antes de aplicá-lo.
+
+O controlador está nas fichas de combate dos nodos, da exploração estendida e do gerador de encontro manual, acessível também durante o uso do arquipélago. Os PV anotados e o último lançamento para desfazer ficam disponíveis enquanto o app está aberto, inclusive ao fechar e reabrir a ficha. Ao retomar pelo autosave ou importar o TXT, os PV voltam ao máximo da ficha com os reforços salvos.
+
+O reforço de PV soma o bônus ao atual e ao máximo, preservando o dano já sofrido. Uma criatura com **30 PV máximos e 10 restantes** passa a **40 de 60** com o reforço de **+30 PV**. Ao retirar o reforço, o controlador retira o mesmo bônus. Cada unidade mantém seu próprio dano acumulado, inclusive quando o reforço se aplica a todas as criaturas de uma ficha.
+
+**Adicionar criatura da ficha selecionada.** O botão acrescenta uma unidade da mesma ficha. Em um encontro com dois zumbis e um rato, escolher o zumbi acrescenta um terceiro zumbi. A nova unidade começa com os PV máximos da ficha, incluindo reforço de PV se estiver ativo. As unidades existentes mantêm seus PV e lançamentos. Ao retomar pelo autosave ou importar o TXT, volta a composição gerada para o encontro, incluindo eventual rerrolagem já confirmada.
+
+Se a criatura selecionada for alvo de uma missão de extermínio ativa no nodo, **Adicionar criatura** fica indisponível para aquela ficha. Assim, a quantidade de alvos usada para contabilizar a missão permanece a do encontro original. Outras criaturas presentes no mesmo nodo continuam elegíveis para adição.
+
+O app apresenta o **ND de referência do nodo e os valores de XP calculados para o encontro gerado**.
+
+**Bloqueio de rerrolagem.** O primeiro lançamento de dano ou cura, reforço ou adição manual bloqueia a rerrolagem do encontro. Desfazer um lançamento mantém o bloqueio na sessão aberta. Ao retomar, o app usa o estado salvo, incluindo os bloqueios por reforço ou progresso.
+
+A primeira implementação registra o dano e a cura informados pelo mestre. A Quimera reutiliza os mesmos PV compartilhados do corpo e integra sua RD 5, a fraqueza da cabeça atingida e o atordoamento. A conclusão do encontro permanece uma confirmação do mestre.
+
+Validar dano e cura em inimigos repetidos, desfazer o lançamento e aplicar e retirar reforço depois de sofrer dano. Conferir que reabrir a ficha mantém PV e adições, e que retomar por autosave ou TXT restaura a composição salva, com PV máximos e sem criaturas extras. Conferir o XP de referência e o bloqueio da rerrolagem depois de registrar dano. Em um encontro misto com alvo de extermínio, verificar que o botão bloqueia a adição do alvo e permite adicionar as outras criaturas sem aumentar a contagem da missão.

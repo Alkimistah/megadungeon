@@ -18,5 +18,5 @@ export function withCreatureReinforcement(encounter, item, stat, enabled) {
   if (enabled) next[stat] = true;
   else delete next[stat];
   const updated = Object.keys(next).length ? { ...baseItem, reinforcement: next } : baseItem;
-  return { ...encounter, items: encounter.items.map(candidate => candidate === item ? updated : candidate) };
+  return { ...encounter, adjusted: true, items: encounter.items.map(candidate => candidate === item ? updated : candidate) };
 }

@@ -189,7 +189,7 @@ export function createManualEncounterDialogController({
     }, getActiveMissions(), (missionId, delta) => {
       onAdjustMissionProgress?.(missionId, delta);
       renderResult();
-    }));
+    }, { onEncounterAdjusted: renderResult }));
   }
 
   function generateEncounter() {

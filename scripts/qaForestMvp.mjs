@@ -6,6 +6,8 @@ import { prepareForestExpedition, serializeForestExpedition } from "../src/fores
 import { encodeSessionCode, decodeSessionCode } from "../src/sessionCode.js";
 import { formatElapsedTime } from "../src/format.js";
 import { calculateCombatND } from "../src/challenge.js";
+import { getCreatureUnits } from "../src/encounterCreatureHealth.js";
+import { canRerollNodeCreatures, resolveNodeEncounter } from "../src/encounterResolver.js";
 
 const production = process.argv.includes("--production");
 const url = process.env.QA_APP_URL || (production ? "http://localhost:4173/megadungeon/" : "http://localhost:5173/megadungeon/");
@@ -150,6 +152,7 @@ async function missionFlow() {
       const initiative = sheet.getByRole("button", { name: "Iniciativa +2" });
       const attack = sheet.getByRole("button", { name: "Ataque +1" });
       const hitPoints = sheet.getByRole("button", { name: "PV +13" });
+      assert.equal(await sheet.getByRole("button", { name: "Adicionar criatura" }).isDisabled(), true);
       const nd = await dialog.locator("#nodeDialogMeta").innerText();
       await initiative.click();
       assert.equal(await initiative.getAttribute("aria-pressed"), "true");
@@ -428,6 +431,97 @@ async function outdoorSceneFlow() {
   console.log("Descanso falso, emboscada opcional, salvamento e liberação da próxima rota: passaram.");
 }
 
+async function creatureHealthFlow() {
+  let expedition;
+  let entry;
+  let node;
+  for (let attempt = 0; attempt < 60 && !node; attempt++) {
+    expedition = prepareForestExpedition({ seed: `qa-health-${attempt}`, profile, startFloor: 14, missions: [] });
+    entry = expedition.floors[0];
+    node = entry.levels[0].find(candidate => {
+      resolveNodeEncounter(candidate, { mapSeed: expedition.seed });
+      return canRerollNodeCreatures(candidate) && getCreatureUnits(candidate.resolvedEncounter.items[0]).length >= 2;
+    });
+  }
+  assert.ok(node);
+  const item = node.resolvedEncounter.items[0];
+  const max = getCreatureUnits(item)[0].max;
+  const nodeIndex = entry.levels.flat().indexOf(node);
+  const page = await pageFor(encodeSessionCode(sessionFor(expedition)), { width: 768, height: 1024 });
+  const dialog = page.locator("#nodeDialog");
+  await page.locator(".node").nth(nodeIndex).click();
+  await dialog.locator(".route-choice").click();
+  await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+  const reroll = dialog.getByRole("button", { name: "Rerrolar criaturas" });
+  const units = dialog.getByRole("combobox", { name: "Criatura para registrar PV" });
+  const amount = dialog.getByRole("spinbutton", { name: "Quantidade de PV" });
+  assert.equal(await reroll.count(), 1);
+  await units.selectOption("1");
+  await amount.fill("3");
+  await dialog.getByRole("button", { name: "Aplicar dano" }).click();
+  assert.equal(await reroll.count(), 0);
+  assert.match(await units.locator("option").nth(0).innerText(), new RegExp(`${max}/${max} PV`));
+  assert.match(await units.locator("option").nth(1).innerText(), new RegExp(`${max - 3}/${max} PV`));
+  await dialog.getByRole("button", { name: "Adicionar criatura" }).click();
+  assert.equal(await units.locator("option").count(), item.quantity + 1);
+  assert.match(await units.locator("option").last().innerText(), new RegExp(`${max}/${max} PV`));
+  await amount.fill("1");
+  await dialog.getByRole("button", { name: "Curar" }).click();
+  assert.match(await units.locator("option").nth(1).innerText(), new RegExp(`${max - 2}/${max} PV`));
+  await dialog.locator("#nodeDialogClose").click();
+  const exported = decodeSessionCode(await exportSession(page));
+  const encounter = new Map(exported.state.resolvedEncounters).get(node.id);
+  assert.deepEqual(encounter.budget, node.resolvedEncounter.budget);
+  assert.equal(encounter.items[0].quantity, item.quantity);
+  assert.equal(encounter.items[0].unitDamage, undefined);
+  assert.equal(encounter.lastHealthEdit, undefined);
+  assert.equal(encounter.temporaryAdjustments, undefined);
+  await page.locator(".node").nth(nodeIndex).click();
+  assert.equal(await units.locator("option").count(), item.quantity + 1);
+  assert.equal(await reroll.count(), 0);
+  assert.match(await units.locator("option").nth(1).innerText(), new RegExp(`${max - 2}/${max} PV`));
+  await page.reload();
+  await page.getByRole("button", { name: "Continuar expedição · Andar 14" }).click();
+  await page.locator(".node").nth(nodeIndex).click();
+  await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+  assert.equal(await reroll.count(), 1);
+  assert.equal(await units.locator("option").count(), item.quantity);
+  assert.equal(await dialog.getByRole("button", { name: "Desfazer último lançamento" }).isEnabled(), false);
+  assert.match(await units.locator("option").nth(1).innerText(), new RegExp(`${max}/${max} PV`));
+  await dialog.locator("#nodeDialogClose").click();
+
+  await page.getByRole("button", { name: "Gerar encontro manual" }).click();
+  const manual = page.locator("#manualEncounterDialog");
+  await manual.getByRole("button", { name: "Gerar encontro", exact: true }).click();
+  await manual.locator(".encounter-list-item.is-creature").first().click();
+  assert.equal(await manual.getByRole("button", { name: "Adicionar criatura" }).isEnabled(), true);
+  await page.close();
+
+  const dungeon = await pageFor(encodeSessionCode({
+    v: 1, mode: "extended-exploration", profile: "dungeon-1-10", floor: 10, mapSeed: "qa-pv-matriarca",
+    extendedState: { floor: 10, phase: "boss" }
+  }));
+  const matriarch = dungeon.getByRole("button", { name: "Abrir encontro da Matriarca" });
+  const bossScene = dungeon.locator(".scene-modal");
+  await matriarch.click();
+  await bossScene.getByRole("spinbutton", { name: "Quantidade de PV" }).fill("8");
+  await bossScene.getByRole("button", { name: "Aplicar dano" }).click();
+  await bossScene.getByRole("button", { name: "Fechar", exact: true }).click();
+  const dungeonSave = await exportSession(dungeon);
+  const originalBoss = decodeSessionCode(dungeonSave).extendedState.bossEncounter;
+  assert.ok(originalBoss?.encounterNode.resolvedEncounter.items.length);
+  assert.ok(originalBoss.encounterNode.resolvedEncounter.items.every(item => !item.unitDamage));
+  await dungeon.close();
+  const resumed = await pageFor(dungeonSave);
+  await resumed.getByRole("button", { name: "Abrir encontro da Matriarca" }).click();
+  assert.equal(await resumed.locator(".scene-modal").getByRole("button", { name: "Desfazer último lançamento" }).isEnabled(), false);
+  await resumed.locator(".scene-modal").getByRole("button", { name: "Fechar", exact: true }).click();
+  const resumedBoss = decodeSessionCode(await exportSession(resumed)).extendedState.bossEncounter;
+  assert.deepEqual(resumedBoss, originalBoss);
+  await resumed.close();
+  console.log("PV individuais, adição, bloqueio da rerrolagem, encontro manual e restauração nos dois perfis: passaram.");
+}
+
 async function offlineFlow() {
   const page = await browser.newPage({ viewport: { width: 1024, height: 768 }, serviceWorkers: "allow" });
   page.on("pageerror", error => errors.push(error.message));
@@ -457,6 +551,7 @@ try {
   await newSelection(3);
   await missionFlow();
   await outdoorSceneFlow();
+  await creatureHealthFlow();
   await bossFlow();
   await configurationFailure();
   await futureAndLegacyFlow();

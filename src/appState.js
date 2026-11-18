@@ -1,3 +1,5 @@
+import { getEncounterForSave } from "./encounterCreatureHealth.js";
+
 const DISCOVERY_MINUTES = 15;
 
 export function getRecordedExplorationMinutes(levels, sessionState) {
@@ -67,7 +69,7 @@ export function createExplorationState() {
     const resolvedEncounters = levels
       .flat()
       .filter((node) => node.resolvedEncounter)
-      .map((node) => [node.id, node.resolvedEncounter]);
+      .map((node) => [node.id, getEncounterForSave(node.resolvedEncounter)]);
 
     return {
       attempted: [...attemptedNodeIds],
@@ -94,7 +96,7 @@ export function createExplorationState() {
 
     const resolvedEncounterByNode = new Map(sessionState.resolvedEncounters || []);
     levels.flat().forEach((node) => {
-      node.resolvedEncounter = resolvedEncounterByNode.get(node.id) || null;
+      node.resolvedEncounter = getEncounterForSave(resolvedEncounterByNode.get(node.id)) || null;
     });
 
     rebuildActiveNodesFromChosenRoutes();

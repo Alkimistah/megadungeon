@@ -3,6 +3,7 @@ import { assignCreatureProfile } from "./creatures.js";
 import { assignTrapProfile } from "./traps.js";
 import { generateEnvironmentContext } from "./environment.js";
 import { createForestBossEncounter } from "./forestBossEncounter.js";
+import { assignForestEnvironments } from "./forestEnvironment.js";
 import { chooseForestUnknownScene, FOREST_UNKNOWN_REVEALS, isForestSceneReveal } from "./forestUnknownScenes.js";
 import { pick, pickWeighted, randomInt } from "./random.js";
 import {
@@ -502,7 +503,11 @@ export function generateMapData(depth, baseDC, floorProfile, floor, rng = Math.r
       node.requiresCompletion = true;
     });
   }
-  assignEnvironments(levels, profile, rng);
+  if (version >= 4 && profile.id === "forest-11-20") {
+    assignForestEnvironments(levels, profile.environmentRules, rng);
+  } else {
+    assignEnvironments(levels, profile, rng);
+  }
   if (weights) {
     for (const node of levels.flat().filter(node => node.contentType === "scene")) {
       node.scene = chooseForestUnknownScene(node.revealedLabel, node.environment, rng);

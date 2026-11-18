@@ -12,6 +12,7 @@ import { createExplorationState } from "../src/appState.js";
 import { createMissionState } from "../src/missions/missionState.js";
 import { getForestTrapPresentation } from "../src/forestTrapPresentation.js";
 import { getCreatureReinforcement, withCreatureReinforcement } from "../src/creatureReinforcement.js";
+import { canAddEncounterCreature, getCreatureUnits, hasEncounterAdjustments, withCreatureAdded, withCreatureHealthChange, withLastHealthChangeUndone } from "../src/encounterCreatureHealth.js";
 
 const integration = await import("../src/missions/forestMissionIntegration.js").catch(() => ({}));
 const expeditionModule = await import("../src/forestExpedition.js").catch(() => ({}));
@@ -153,7 +154,79 @@ test("creature reinforcements toggle independently and survive save without chan
   const onlyAttack = withCreatureReinforcement(withoutInitiative, withoutInitiative.items[0], "hitPoints", false);
   assert.deepEqual(getCreatureReinforcement(onlyAttack.items[0], 30), { initiative: 0, attack: 1, hitPoints: 0 });
   const original = withCreatureReinforcement(onlyAttack, onlyAttack.items[0], "attack", false);
-  assert.deepEqual(original, encounter);
+  assert.deepEqual(original, { ...encounter, adjusted: true });
+  assert.ok(hasEncounterAdjustments(original));
+  assert.equal(rerollNodeCreatures({ ...node, resolvedEncounter: original }), null);
+});
+
+test("individual damage, healing and undo preserve repeated creatures in the current combat", () => {
+  const { node } = rerollFixture();
+  const original = node.resolvedEncounter;
+  const group = { ...original.items[0], quantity: 2, creatureData: { stats: { hitPoints: 30 } } };
+  const encounter = { ...original, items: [group, original.items[1]] };
+  const display = state => getCreatureUnits(state.items[0]).map(unit => unit.current);
+  const damaged = withCreatureHealthChange(encounter, group, 0, 20);
+  assert.deepEqual(display(damaged), [10, 30]);
+  assert.equal(canRerollNodeCreatures({ ...node, resolvedEncounter: damaged }), false);
+  assert.equal(canRerollNodeCreatures({ ...node, resolvedEncounter: withLastHealthChangeUndone(damaged) }), false);
+  const cured = withCreatureHealthChange(damaged, damaged.items[0], 0, -7);
+  assert.deepEqual(display(cured), [17, 30]);
+  const undone = withLastHealthChangeUndone(cured);
+  assert.deepEqual(display(undone), [10, 30]);
+  assert.equal(withLastHealthChangeUndone(undone), undone);
+  const reinforced = withCreatureReinforcement(undone, undone.items[0], "hitPoints", true);
+  assert.deepEqual(display(reinforced), [40, 60]);
+  const originalHealth = withCreatureReinforcement(reinforced, reinforced.items[0], "hitPoints", false);
+  assert.deepEqual(display(originalHealth), [10, 30]);
+  assert.deepEqual(display(encounter), [30, 30]);
+});
+
+test("adding a creature preserves damaged units and blocks an active extermination target", () => {
+  const { node } = rerollFixture();
+  const encounter = node.resolvedEncounter;
+  const zombie = { ...encounter.items[0], creatureId: "zumbi", quantity: 2, creatureData: { stats: { hitPoints: 30 } },
+    reinforcement: { hitPoints: true }, unitDamage: { 0: 20 } };
+  const rat = { kind: "creature", creatureId: "rato", challengeRating: 0.25, quantity: 1, creatureData: { stats: { hitPoints: 5 } } };
+  const mixed = { ...encounter, items: [zombie, rat] };
+  const missions = [mission("extermination", { targetId: "zumbi" })];
+  assert.equal(canAddEncounterCreature(zombie, missions), false);
+  assert.equal(withCreatureAdded(mixed, zombie, missions), mixed);
+  const extraRat = withCreatureAdded(mixed, rat, missions);
+  assert.equal(extraRat.items[0], zombie);
+  assert.deepEqual(getCreatureUnits(extraRat.items[1]).map(unit => unit.current), [5, 5]);
+  const extraZombie = withCreatureAdded(mixed, zombie);
+  assert.deepEqual(getCreatureUnits(extraZombie.items[0]).map(unit => unit.current), [40, 60, 60]);
+  assert.deepEqual(extraZombie.budget, mixed.budget);
+  assert.ok(hasEncounterAdjustments(extraZombie));
+});
+
+test("save preserves the original encounter, progress and reinforcement without temporary PV or additional creatures", () => {
+  const fixture = rerollFixture();
+  const levels = chain();
+  const [node] = levels[0];
+  const original = { ...fixture.node.resolvedEncounter, bossSetup: { heads: ["hidra", "bode"] } };
+  node.resolvedEncounter = original;
+  const state = createExplorationState();
+  state.setLevels(levels);
+  state.chooseRoute(node);
+  const damaged = withCreatureHealthChange(original, original.items[0], 0, 1);
+  const added = withCreatureAdded(damaged, damaged.items[0]);
+  node.resolvedEncounter = added;
+
+  assert.deepEqual(state.exportSessionState().resolvedEncounters, [[node.id, original]]);
+  assert.deepEqual(state.exportSessionState().chosenByLevel, [[node.level, node.id]]);
+  assert.ok(hasEncounterAdjustments(added));
+  assert.equal(added.items[0].quantity, original.items[0].quantity + 1);
+  assert.equal(added.items[0].unitDamage[0], 1);
+  const expedition = { profileId: profile.id, seed: "recorded", startFloor: 11, floors: [{ floor: 11, levels }] };
+  const snapshot = expeditionModule.serializeForestExpedition(expedition);
+  assert.deepEqual(snapshot.floors[0].levels[0][0].resolvedEncounter, original);
+  assert.ok(!hasEncounterAdjustments(snapshot.floors[0].levels[0][0].resolvedEncounter));
+
+  node.resolvedEncounter = withCreatureReinforcement(added, added.items[0], "initiative", true);
+  const saved = new Map(state.exportSessionState().resolvedEncounters).get(node.id);
+  assert.deepEqual(saved.items[0], { ...original.items[0], reinforcement: { initiative: true } });
+  assert.equal(saved.adjusted, true);
 });
 
 test("unknown elite receives elite budget and discovery check", () => {
@@ -290,6 +363,64 @@ test("an unrevealed rest stop looks the same for real and false camps", () => {
   const ambushed = { ...fake, resolvedEncounter: { items: [{ kind: "creature" }] } };
   assert.equal(getNodeContentPresentation(ambushed, view).label, "Emboscada");
   assert.equal(getNodeContentPresentation(ambushed, view).iconType, "normal");
+});
+
+test("forest continuity keeps terrain across more links and shares gradual weather by stage", () => {
+  let repeatedBefore = 0;
+  let repeatedAfter = 0;
+  let plainWithoutFeatures = 0;
+  let regionalRain = 0;
+  let sheltered = 0;
+  const precipitation = ["Chuva", "Tempestade"];
+  const temperature = ["Frio extremo", "Frio", null, "Calor", "Calor extremo"];
+  const regionalIndex = (node, names) => names.indexOf(names.find(name =>
+    node.environment.climate.some(climate => climate.name === name)
+  ) ?? null);
+
+  for (let index = 0; index < 200; index++) {
+    const seed = `continuity-${index}`;
+    const generate = version => generateMapData(7, 22, profile, 17, createRng(seed), { version });
+    const previous = generate(3);
+    const current = generate(4);
+    const footprint = levels => levels.map(row => row.map(node => [node.id, node.type, node.links.map(next => next.id)]));
+    assert.deepEqual(footprint(current), footprint(previous));
+    const matchingLinks = levels => levels.flat().reduce((total, node) =>
+      total + node.links.filter(next => node.environment.terrain.name === next.environment.terrain.name).length, 0);
+    repeatedBefore += matchingLinks(previous);
+    repeatedAfter += matchingLinks(current);
+
+    let lastWeather;
+    let lastTemperature;
+    for (const row of current) {
+      const exposed = row.filter(node => node.contentType !== "camp");
+      if (exposed.length) {
+        const rain = regionalIndex(exposed[0], precipitation);
+        const heat = regionalIndex(exposed[0], temperature);
+        assert.ok(exposed.every(node => regionalIndex(node, precipitation) === rain && regionalIndex(node, temperature) === heat));
+        if (lastWeather !== undefined) assert.ok(Math.abs(rain - lastWeather) <= 1);
+        if (lastTemperature !== undefined) assert.ok(Math.abs(heat - lastTemperature) <= 1);
+        lastWeather = rain;
+        lastTemperature = heat;
+        if (rain >= 0) regionalRain++;
+      } else {
+        lastWeather = undefined;
+        lastTemperature = undefined;
+      }
+    }
+    for (const node of current.flat()) {
+      const { terrain, climate } = node.environment;
+      if (terrain.name === "Planície aberta" && !terrain.features.length) plainWithoutFeatures++;
+      if (node.contentType === "camp") {
+        assert.ok(climate.every(event => !profile.environmentRules.climate.damagingClimateNames.includes(event.name)));
+        sheltered++;
+      }
+    }
+    if (index === 0) {
+      assert.deepEqual(current.flat().map(node => node.environment), generate(4).flat().map(node => node.environment));
+    }
+  }
+  assert.ok(repeatedAfter > repeatedBefore * 1.12);
+  assert.ok(regionalRain > 0 && plainWithoutFeatures > 0 && sheltered > 0);
 });
 
 test("new forest maps spend 30 to 60 minutes per traversal according to weather and terrain", () => {

@@ -1,6 +1,7 @@
 import { calculateCombatND, formatChallengeRating, roundToQuarter } from "./challenge.js";
 import { creatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
 import { assignCreatureProfile } from "./creatures.js";
+import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
 import { applyWeaponVariation } from "./equipment/weaponVariation.js";
 import { createRng, pickWeighted } from "./random.js";
 import { createModificationPlan, getThreatParameters, THREAT_CHALLENGE_ORDER } from "./threatCreationRules.js";
@@ -608,6 +609,7 @@ export function canRerollNodeCreatures(node) {
     && !node.fixedComposition
     && !node.fixedTacticalMap
     && !node.creature.creatureId
+    && !hasEncounterAdjustments(node.resolvedEncounter)
     && node.resolvedEncounter?.items.some(item => item.kind === "creature"));
 }
 

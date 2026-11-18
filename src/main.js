@@ -258,6 +258,7 @@ const nodeDialogController = createNodeDialogController({
     refreshExplorationDisplay();
     nodeDialogController.open(node);
   },
+  onEncounterAdjusted: () => refreshExplorationDisplay(),
   onAdjustMissionProgress: adjustMissionProgress,
   onExplore: (node) => {
     state.markExplored(node);
@@ -368,12 +369,11 @@ const extendedExplorationRenderer = createExtendedExplorationRenderer({
   getActiveMissions: () => missionState.getSelected(),
   getSnapshot: () => extendedState.getSnapshot(),
   getMissionsForFloor: (floor) => missionState.getMissionsForFloor(floor),
-  onOpenMission: openMissionById,
-  onAdjustMissionProgress: (missionId, delta) => {
-    missionState.adjustProgress(missionId, delta);
-    refreshExplorationDisplay();
-    updateInfo();
+  onEncounterAdjusted: () => {
+    if (autosaveActive) void saveCurrentExpedition();
   },
+  onOpenMission: openMissionById,
+  onAdjustMissionProgress: adjustMissionProgress,
   onAdvanceFloor: () => {
     extendedState.advanceFloor();
     elements.floorInput.value = String(extendedState.getSnapshot().floor);

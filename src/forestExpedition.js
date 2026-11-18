@@ -1,7 +1,10 @@
 import { getRecordedExplorationMinutes } from "./appState.js";
+import { getEncounterForSave } from "./encounterCreatureHealth.js";
 import { generateMapData } from "./generator.js";
 import { createRng } from "./random.js";
 import { materializeForestFloorMissions } from "./missions/forestMissionIntegration.js";
+
+const GENERATION_VERSION = 4;
 
 /** Prepara a faixa inteira antes de aceitar a seleção: cada vínculo aponta para
  * um mapa real. Os mapas futuros são salvos, não reinterpretados por outra seed. */
@@ -19,7 +22,7 @@ export function prepareForestExpedition({ seed, profile, missions, startFloor = 
     let prepared = null;
     for (let attempt = 0; attempt < 60 && !prepared; attempt++) {
       const mapSeed = `${seed}:forest:${floor}:${attempt}`;
-      const levels = generateMapData(floorDepth, floorDc, profile, floor, createRng(mapSeed), { version: 3 });
+      const levels = generateMapData(floorDepth, floorDc, profile, floor, createRng(mapSeed), { version: GENERATION_VERSION });
       levels.flat().forEach(node => { node.encounterSeed = `${floor}:${node.encounterSeed}`; });
       try {
         const nextMissions = materializeForestFloorMissions({ floor, levels, missions: preparedMissions });
@@ -39,15 +42,19 @@ export function prepareForestExpedition({ seed, profile, missions, startFloor = 
       throw new Error(`Não há nodos suficientes para cumprir a missão “${mission.title}”. Altere a seleção ou a profundidade.`);
     }
   }
-  return { version: 1, profileId: profile.id, seed, startFloor, floors, missions: preparedMissions };
+  return { version: 1, generationVersion: GENERATION_VERSION, profileId: profile.id, seed, startFloor, floors, missions: preparedMissions };
 }
 
 export function serializeForestExpedition(expedition) {
   return {
     version: 1, profileId: expedition.profileId, seed: expedition.seed, startFloor: expedition.startFloor,
+    ...(expedition.generationVersion ? { generationVersion: expedition.generationVersion } : {}),
     floors: expedition.floors.map(({ levels, ...entry }) => ({
       ...entry,
-      levels: levels.map(row => row.map(({ links, ...node }) => ({ ...structuredClone(node), links: links.map(next => next.id) })))
+      levels: levels.map(row => row.map(({ links, ...node }) => {
+        if (node.resolvedEncounter) node.resolvedEncounter = getEncounterForSave(node.resolvedEncounter);
+        return { ...structuredClone(node), links: links.map(next => next.id) };
+      }))
     }))
   };
 }
@@ -65,6 +72,7 @@ export function restoreForestExpedition(snapshot) {
     const byId = new Map(nodes.map(node => [node.id, node]));
     if (byId.size !== nodes.length) throw new Error("Nodo duplicado no andar.");
     for (const node of nodes) {
+      if (node.resolvedEncounter) node.resolvedEncounter = getEncounterForSave(node.resolvedEncounter);
       node.links = node.links.map(id => {
         const next = byId.get(id);
         if (!next || next.level !== node.level + 1) throw new Error("Conexão inválida na expedição.");

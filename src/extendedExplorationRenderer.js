@@ -1,5 +1,6 @@
 import { formatChallengeRating } from "./challenge.js";
 import { createEncounterCombatPage, getDefaultEncounterItemKey } from "./nodeDialog.js";
+import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
 import { createTacticalMapPanel } from "./tacticalMapRenderer.js";
 
 function createElement(tagName, className = null, text = null) {
@@ -479,9 +480,10 @@ function createSceneEffects(scene) {
   return list;
 }
 
-function createResolvedEncounter(scene, selectedItemKey, onSelectItem, onRerollMap, tacticalMapActions = [], missions = [], onAdjustMissionProgress = null) {
+function createResolvedEncounter(scene, selectedItemKey, onSelectItem, onRerollMap, tacticalMapActions, missions, onAdjustMissionProgress, onEncounterAdjusted) {
   const hasItems = Boolean(scene?.encounterNode?.resolvedEncounter?.items?.length);
-  const tacticalMap = createTacticalMap(scene, onRerollMap, tacticalMapActions);
+  const adjusted = hasEncounterAdjustments(scene?.encounterNode?.resolvedEncounter);
+  const tacticalMap = createTacticalMap(scene, adjusted ? null : onRerollMap, adjusted ? [] : tacticalMapActions);
 
   if (!hasItems && !tacticalMap) return null;
 
@@ -492,7 +494,14 @@ function createResolvedEncounter(scene, selectedItemKey, onSelectItem, onRerollM
   if (tacticalMap) wrapper.appendChild(tacticalMap);
   if (hasItems) {
     const selectedKey = selectedItemKey || getDefaultEncounterItemKey(scene.encounterNode);
-    wrapper.appendChild(createEncounterCombatPage(scene.encounterNode, selectedKey, onSelectItem, missions, onAdjustMissionProgress));
+    wrapper.appendChild(createEncounterCombatPage(scene.encounterNode, selectedKey, onSelectItem, missions, (missionId, delta, eventKey) => {
+      if (eventKey) {
+        const encounter = scene.encounterNode.resolvedEncounter;
+        scene.encounterNode.resolvedEncounter = { ...encounter, adjusted: true };
+      }
+      onAdjustMissionProgress?.(missionId, delta, eventKey);
+      if (eventKey) onEncounterAdjusted?.();
+    }, { onEncounterAdjusted }));
   }
 
   return wrapper;
@@ -512,7 +521,7 @@ function createFinalGimmick(gimmickData) {
   return gimmick;
 }
 
-function buildSceneModalContent(scene, rerollTarget, selectedEncounterItemByScene, onRerollTacticalMap, refresh, tacticalMapActions = [], missions = [], onAdjustMissionProgress = null) {
+function buildSceneModalContent(scene, rerollTarget, selectedEncounterItemByScene, onRerollTacticalMap, refresh, tacticalMapActions, missions, onAdjustMissionProgress, onEncounterAdjusted) {
   const wrapper = createElement("div", "scene-modal-content");
   const sceneKey = getSceneKey(scene);
 
@@ -533,14 +542,18 @@ function buildSceneModalContent(scene, rerollTarget, selectedEncounterItemByScen
     },
     tacticalMapActions,
     missions,
-    onAdjustMissionProgress
+    onAdjustMissionProgress,
+    onEncounterAdjusted && (() => {
+      onEncounterAdjusted();
+      refresh();
+    })
   );
   if (encounter) wrapper.appendChild(encounter);
 
   return wrapper;
 }
 
-function createCurrentResult(snapshot, selectedEncounterItemByScene, onRerollTacticalMap, missions = [], onAdjustMissionProgress = null) {
+function createCurrentResult(snapshot, selectedEncounterItemByScene, onRerollTacticalMap, missions, onAdjustMissionProgress, onEncounterAdjusted) {
   const section = createElement("section", "extended-panel");
   const heading = createElement("h3", null, "Cena revelada");
   const results = snapshot.currentResults?.length
@@ -587,7 +600,8 @@ function createCurrentResult(snapshot, selectedEncounterItemByScene, onRerollTac
             refresh,
             [],
             missions,
-            onAdjustMissionProgress
+            onAdjustMissionProgress,
+            onEncounterAdjusted
           )
         }))
       })
@@ -597,7 +611,7 @@ function createCurrentResult(snapshot, selectedEncounterItemByScene, onRerollTac
   return section;
 }
 
-function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor, selectedEncounterItemByScene, onRerollTacticalMap, onRerollFinalEncounter, missions = [], onAdjustMissionProgress = null) {
+function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor, selectedEncounterItemByScene, onRerollTacticalMap, onRerollFinalEncounter, missions, onAdjustMissionProgress, onEncounterAdjusted) {
   const section = createElement("section", "extended-panel final-encounter-panel");
   const heading = createElement("h3", null, "Última ameaça do andar");
 
@@ -644,7 +658,8 @@ function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor,
               })]
               : [],
             missions,
-            onAdjustMissionProgress
+            onAdjustMissionProgress,
+            snapshot.phase === "floorEncounter" ? onEncounterAdjusted : null
           )
         }]
       })
@@ -664,7 +679,7 @@ function createFinalEncounter(snapshot, onResolveFinalEncounter, onAdvanceFloor,
   return section;
 }
 
-function createBossPanel(snapshot, selectedEncounterItemByScene, onResolveBossEncounter, missions = [], onAdjustMissionProgress = null) {
+function createBossPanel(snapshot, selectedEncounterItemByScene, onResolveBossEncounter, missions, onAdjustMissionProgress, onEncounterAdjusted) {
   const section = createElement("section", "extended-panel boss-panel");
   const boss = snapshot.bossEncounter;
 
@@ -695,7 +710,8 @@ function createBossPanel(snapshot, selectedEncounterItemByScene, onResolveBossEn
           refresh,
           [],
           missions,
-          onAdjustMissionProgress
+          onAdjustMissionProgress,
+          onEncounterAdjusted
         )
       }]
     })
@@ -743,6 +759,7 @@ export function createExtendedExplorationRenderer({
   onConfirmFloorReset,
   onConfirmPitDescent,
   onDismissPitDescent,
+  onEncounterAdjusted = null,
   onOutcome,
   onResolveBossEncounter,
   onResolveFinalEncounter,
@@ -784,10 +801,10 @@ export function createExtendedExplorationRenderer({
       left.appendChild(createBossPanel(snapshot, selectedEncounterItemByScene, () => {
         onResolveBossEncounter();
         render();
-      }, activeMissions, (missionId, delta) => {
-        onAdjustMissionProgress?.(missionId, delta);
+      }, activeMissions, (missionId, delta, eventKey) => {
+        onAdjustMissionProgress?.(missionId, delta, eventKey);
         render();
-      }));
+      }, onEncounterAdjusted));
     } else if (snapshot.phase === "completed") {
       left.appendChild(createCompletedPanel(snapshot));
     } else {
@@ -806,10 +823,11 @@ export function createExtendedExplorationRenderer({
         selectedEncounterItemByScene,
         onRerollTacticalMap,
         activeMissions,
-        (missionId, delta) => {
-          onAdjustMissionProgress?.(missionId, delta);
+        (missionId, delta, eventKey) => {
+          onAdjustMissionProgress?.(missionId, delta, eventKey);
           render();
-        }
+        },
+        onEncounterAdjusted
       );
       left.appendChild(currentEncounter);
       const resetPanel = createPendingResetPanel(snapshot, () => {
@@ -837,10 +855,11 @@ export function createExtendedExplorationRenderer({
           render();
         },
         activeMissions,
-        (missionId, delta) => {
-          onAdjustMissionProgress?.(missionId, delta);
+        (missionId, delta, eventKey) => {
+          onAdjustMissionProgress?.(missionId, delta, eventKey);
           render();
-        }
+        },
+        onEncounterAdjusted
       ));
     }
 

@@ -25,7 +25,7 @@ function pickWeighted(rng, options) {
   return options[0].value;
 }
 
-const CLIMATE_NORMAL = {
+export const CLIMATE_NORMAL = {
   name: "Clima normal",
   effect: "Sem modificadores climáticos relevantes neste encontro."
 };
@@ -361,13 +361,16 @@ function addUniqueFeature(features, feature) {
   }
 }
 
-function generateTerrain(options = {}) {
+export function generateTerrain(options = {}) {
   const rules = getTerrainRules(options);
   const rng = getRng(options);
-  const terrain = pickWeighted(rng, rules.terrainOptions);
+  const terrain = pickWeighted(rng, options.terrainOptions || rules.terrainOptions);
   const desiredFeatureCount = terrain.name === "Floresta" ? randomInt(rng, 1, 3) : randomInt(rng, 1, 2);
   const uniqueFeatureCount = new Set(terrain.featureOptions.map((option) => option.value.name)).size;
-  const featureCount = Math.min(desiredFeatureCount, uniqueFeatureCount);
+  const featureChance = options.featureChanceByTerrain?.[terrain.name];
+  const featureCount = featureChance == null || chance(rng, featureChance)
+    ? Math.min(desiredFeatureCount, uniqueFeatureCount)
+    : 0;
   const features = [];
 
   while (features.length < featureCount) {

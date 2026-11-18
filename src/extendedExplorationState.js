@@ -1,6 +1,7 @@
 import { formatChallengeRating } from "./challenge.js";
 import { assignCreatureProfile } from "./creatures.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
+import { getEncounterForSave, hasEncounterAdjustments } from "./encounterCreatureHealth.js";
 import { resolveNodeEncounter } from "./encounterResolver.js";
 import { pick, randomInt } from "./random.js";
 import { assignTrapProfile } from "./traps.js";
@@ -1605,9 +1606,10 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     return results.some(sceneHasPitTrap);
   }
 
-function refreshSceneEncounter(scene) {
+  function refreshSceneEncounter(scene) {
     if (!scene?.encounterNode) return scene;
 
+    scene.encounterNode.resolvedEncounter = getEncounterForSave(scene.encounterNode.resolvedEncounter);
     resolveNodeEncounter(scene.encounterNode, { mapSeed: `extended-floor-${floor}` });
     return scene;
   }
@@ -1634,9 +1636,9 @@ function refreshSceneEncounter(scene) {
       successes = sessionState.successes || 0;
       failures = sessionState.failures || 0;
       usedApproachIds = new Set(sessionState.usedApproachIds || sessionState.usedSuccessfulSkills || []);
-      currentResult = refreshSceneEncounter(sessionState.currentResult || null);
-      currentResults = (sessionState.currentResults || (currentResult ? [currentResult] : []))
+      currentResults = (sessionState.currentResults || (sessionState.currentResult ? [sessionState.currentResult] : []))
         .map(refreshSceneEncounter);
+      currentResult = currentResults.at(-1) || null;
       finalEncounter = restoreFinalEncounter(sessionState);
       bossEncounter = refreshSceneEncounter(sessionState.bossEncounter || null);
       log = sessionState.log || [];
@@ -1975,7 +1977,7 @@ function refreshSceneEncounter(scene) {
       ? finalEncounter
       : currentResults.find((result) => result.id === target) || currentResult;
 
-    if (scene?.tacticalMap?.preset) return;
+    if (scene?.tacticalMap?.preset || hasEncounterAdjustments(scene?.encounterNode?.resolvedEncounter)) return;
     if (!scene?.encounterNode?.resolvedEncounter?.items?.length) return;
 
     scene.tacticalMap = createTacticalMap({
@@ -1988,7 +1990,8 @@ function refreshSceneEncounter(scene) {
   }
 
   function rerollFinalEncounter() {
-    if (phase !== "floorEncounter" || !finalEncounter) return;
+    if (phase !== "floorEncounter" || !finalEncounter ||
+      hasEncounterAdjustments(finalEncounter.encounterNode?.resolvedEncounter)) return;
 
     finalEncounter = createFinalEncounter(finalEncounter.sceneId || null);
     addLog(`A sala final muda de forma. Novo encontro revelado: ${finalEncounter.title}.`, "final");
@@ -2025,6 +2028,12 @@ function refreshSceneEncounter(scene) {
   }
 
   function exportSessionState() {
+    const sceneForSave = scene => {
+      if (!scene.encounterNode?.resolvedEncounter) return scene;
+      const { encounterNode } = scene;
+      return { ...scene, encounterNode: { ...encounterNode, resolvedEncounter: getEncounterForSave(encounterNode.resolvedEncounter) } };
+    };
+    const results = currentResults.length ? currentResults : currentResult ? [currentResult] : [];
     return {
       descentPending,
       elapsedMinutes,
@@ -2038,7 +2047,10 @@ function refreshSceneEncounter(scene) {
       resetPending,
       successes,
       usedApproachIds: [...usedApproachIds],
-      usedSuccessfulSkills: [...usedApproachIds]
+      usedSuccessfulSkills: [...usedApproachIds],
+      ...(results.length ? { currentResults: results.map(sceneForSave) } : {}),
+      ...(finalEncounter ? { finalEncounter: sceneForSave(finalEncounter) } : {}),
+      ...(bossEncounter ? { bossEncounter: sceneForSave(bossEncounter) } : {})
     };
   }
 
