@@ -77,7 +77,9 @@ test("cult book variants keep the original encounter IDs and profile defaults", 
   assert.match(reflexText("reishid"), /alcance natural.*voluntariamente/);
   assert.match(reflexText("reishid-livro-basico"), /alvo adjacente.*se mova para fora/);
   assert.equal(getCreatureById("avatar-de-aharadak").stats.hitPoints, 2804);
-  assert.equal(getCreatureById("avatar-de-aharadak-deuses-de-arton").stats.hitPoints, 2477);
+  const divineAvatar = getCreatureById("avatar-de-aharadak-deuses-de-arton");
+  assert.equal(divineAvatar.stats.hitPoints, 2477);
+  assert.equal(divineAvatar.role, "solo");
 });
 
 test("the two Gnoll Filibusteiro sources preserve old encounter and mission IDs", () => {

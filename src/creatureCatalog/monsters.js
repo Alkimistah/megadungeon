@@ -4658,6 +4658,8 @@ const avatarDeAharadakDivine = {
     subtype: "lekael",
     size: "Colossal",
     challengeRating: "S",
+    role: "solo",
+    roleSource: "pdf-review",
     description: [],
     source: {
         book: "Deuses de Arton",

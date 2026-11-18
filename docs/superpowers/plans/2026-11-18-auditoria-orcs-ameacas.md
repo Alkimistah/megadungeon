@@ -179,7 +179,7 @@ Os 157 campos numéricos conferidos coincidem com as fichas. A conferência tamb
 Os dois comparativos entre livros geraram versões com IDs próprios. As fichas de Ameaças mantêm seus IDs e são as versões padrão das famílias. A seleção manual identifica o livro e permite abrir fichas de ND S e S+, preservando o rótulo no combate.
 
 - **Reishid do Livro Básico** (`reishid-livro-basico`, pp. 314–315 impressas, pp. 320–321 do PDF). Ataque Reflexo menciona um alvo adjacente que esteja desprevenido ou que se mova para fora do alcance. Em Ameaças, o alvo precisa estar ao alcance natural e o gatilho de movimento é voluntário. Os 14 campos numéricos conferidos coincidem.
-- **Avatar de Aharadak de Deuses de Arton** (`avatar-de-aharadak-deuses-de-arton`, p. 151 impressa, p. 153 do PDF, 1ª edição v1.1). É um lekael com 2.477 PV, Defesa 73 e sete garras a +67. A ficha de Ameaças é um lefeu com 2.804 PV, Defesa 70, quatro tentáculos e uma mordida a +58. As listas de poderes são próprias de cada edição. Os 14 campos numéricos da nova ficha foram conferidos.
+- **Avatar de Aharadak de Deuses de Arton** (`avatar-de-aharadak-deuses-de-arton`, p. 151 impressa, p. 153 do PDF, 1ª edição v1.1). É um lekael Solo com 2.477 PV, Defesa 73 e sete garras a +67. A ficha de Ameaças é um lefeu com 2.804 PV, Defesa 70, quatro tentáculos e uma mordida a +58. As listas de poderes são próprias de cada livro. Os 14 campos numéricos da nova ficha foram conferidos.
 
 ### Diferenças para revisão futura
 
