@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak, as 12 de Dragões e os dois primeiros lotes de Duyshidakk, com 6 fichas.
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak, as 12 de Dragões e três dos quatro lotes de Duyshidakk, com 8 fichas.
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -360,10 +360,23 @@ Os papéis impressos coincidem com a inferência do catálogo. Gangue e Horda ta
 
 O catálogo omite em Cada Um por Si! a remissão aos goblins salteadores, Tormenta20 p. 300, que correspondem à ficha `goblin-salteador` do Livro Básico. Em Granadas a Granel, também omite a frase descritiva sobre as bandoleiras desorganizadas. Nenhuma das omissões altera o efeito. A atualização se limita às três referências, e o teste de Duyshidakk passa a cobrir seis fichas.
 
+O segundo lote foi publicado em `c4b5522`. O QA dos andares 11–20 no Chrome passou contra o site publicado, sem erros de JavaScript, e o bundle publicado traz a nova referência da Gangue Goblin. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44406823686)
+
+### Terceiro lote — Goblins de Ferro
+
+| ID do catálogo | ND | PV | Papel impresso | Página impressa | Página no PDF integral |
+|---|---:|---:|---|---:|---:|
+| `goblin-de-ferro` | 5 | 150 | Especial | 82–83 | 84–85 |
+| `goblin-de-ferro-mark-ii` | 8 | 300 | Solo | 83 | 85 |
+
+Os 28 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha. Também foram conferidos tipo, subtipo, tamanho, deslocamento, sentidos, redução de dano, ataques, Armadura Blindada, Engenhocas de Combate e sua tabela, Arco Voltaico, Canhão Congelante, Foguete Explosivo, Garra-Gancho, perícias, equipamento e tesouro. A ficha do Goblin de Ferro começa na segunda coluna da p. 82 e continua na p. 83, a partir do Deslocamento. A referência agora cobre as duas páginas. Os papéis impressos coincidem com a inferência do catálogo.
+
+Na tabela de Engenhocas de Combate, o catálogo escreve “como Toque Chocante” onde o livro imprime “como a magia Toque Chocante”, e omite a instrução “consulte a lista abaixo”. Na Armadura Blindada do Mark II, o livro imprime “redução corte”, e o catálogo mantém “redução de corte”. Nenhuma diferença altera o efeito. A atualização se limita às duas referências, e o teste de Duyshidakk passa a cobrir oito fichas.
+
 ## Pendências e ponto de retomada
 
 1. **Dragões.** Seção concluída, com 12 fichas. As referências de todas apontam para o PDF integral, e a Aura Aterradora está completa nas sete fichas que a possuem.
-2. **Restante de Ameaças de Arton.** Duyshidakk está inventariado e dois lotes foram conferidos, conforme acima. Seguir pelo lote dos Goblins de Ferro, PDF pp. 84–85, renderizando as páginas para conferir os ícones de papel. Depois de Duyshidakk, seguir pelos blocos seguintes, a começar por Elementais, p. 88 impressa, p. 90 do PDF, e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
+2. **Restante de Ameaças de Arton.** Duyshidakk está inventariado e três lotes foram conferidos, conforme acima. Seguir pelo último lote, com os Hobgoblins e o Sangue do Ayrrak, PDF pp. 86–87 e 89, renderizando as páginas para conferir os ícones de papel. Depois de Duyshidakk, seguir pelos blocos seguintes, a começar por Elementais, p. 88 impressa, p. 90 do PDF, e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
 3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
 

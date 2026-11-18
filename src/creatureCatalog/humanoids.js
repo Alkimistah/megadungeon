@@ -4868,9 +4868,12 @@ export const goblinDeFerro = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 5,
-        "bookPage": 82
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 84,
+        "bookPage": 82,
+        "pdfPageEnd": 85,
+        "bookPageEnd": 83
     },
     "stats": {
         "initiative": 11,
@@ -4925,8 +4928,9 @@ export const goblinDeFerroMarkII = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 6,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 85,
         "bookPage": 83
     },
     "stats": {
