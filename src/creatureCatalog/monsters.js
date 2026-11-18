@@ -5696,8 +5696,9 @@ export const dragaoFilhoteDoBosque = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 1,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 66,
         "bookPage": 64
     },
     "stats": {
@@ -5758,9 +5759,12 @@ export const dragaoFilhoteDosRios = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 1,
-        "bookPage": 64
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 66,
+        "bookPage": 64,
+        "pdfPageEnd": 67,
+        "bookPageEnd": 65
     },
     "stats": {
         "initiative": 9,
@@ -6227,8 +6231,9 @@ export const ninhadaDeDragoesFilhotes = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 67,
         "bookPage": 65
     },
     "stats": {

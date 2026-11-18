@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros e as 11 do Culto de Aharadak.
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak e o primeiro lote de Dragões, com 3 fichas.
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -222,9 +222,23 @@ Outras fichas dracônicas de Ameaças ficam nas próprias seções e entram nos 
 3. **Adultos, Feral e Bicéfalo.** Quatro fichas, PDF pp. 70–71, 74 e 76.
 4. **Veneráveis e Sckhar.** Três fichas, PDF pp. 73 e 79.
 
+### Primeiro lote — Filhotes e Ninhada
+
+| ID do catálogo | ND | PV | Página impressa | Página no PDF integral |
+|---|---:|---:|---:|---:|
+| `dragao-filhote-do-bosque` | 3 | 120 | 64 | 66 |
+| `dragao-filhote-dos-rios` | 3 | 120 | 64–65 | 66–67 |
+| `ninhada-de-dragoes-filhotes` | 5 | 240 | 65 | 67 |
+
+Os 42 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha. Também foram conferidos tipo, subtipo, tamanho, deslocamento, sentidos, imunidade, vulnerabilidade, resistência a magia, ataques, Bote, Sopro, Avalanche de Escamas, Sopro Duplo, perícias e tesouro. A ficha do Filhote dos Rios começa na segunda coluna da p. 64 e continua na p. 65, a partir dos PV. A referência agora cobre as duas páginas.
+
+O catálogo acrescenta Imunidades Dracônicas às três fichas. A habilidade vem do quadro Habilidades Dracônicas do Livro Básico, p. 311 impressa, p. 317 do PDF integral, aplicável por Poder Dracônico a toda criatura com o subtipo dragão. Pelo mesmo quadro, filhotes não têm Aura Aterradora, Magia Dracônica nem Metamorfose Dracônica, e a resistência a magia +1 impressa corresponde à categoria filhote. O marcador [Bando] da Ninhada usa a habilidade geral Bando já modelada no catálogo, descrita também na introdução de Ameaças.
+
+O livro imprime “visão no esuro” no Filhote do Bosque. O catálogo mantém “visão no escuro”, o que é uma correção de transcrição. A atualização se limita às três referências.
+
 ## Pendências e ponto de retomada
 
-1. **Dragões.** Inventário concluído, conforme acima. Começar a conferência pelo lote dos Filhotes e da Ninhada, PDF pp. 66–67, comparando os campos e substituindo as referências do recorte pelas do PDF integral.
+1. **Dragões.** Inventário e primeiro lote concluídos, conforme acima. Seguir pelo lote dos Jovens, PDF pp. 68–69, confirmando a extensão da ficha do Jovem do Ocaso até a p. 67 impressa.
 2. **Restante de Ameaças de Arton.** Seguir pelos blocos posteriores a Dragões e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
 3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
