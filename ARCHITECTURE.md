@@ -507,9 +507,16 @@ O app funciona offline via Service Worker (`public/sw.js`) com cache de todos os
 
 ### Rolagem de tesouros
 
-Proposta para detalhar após a auditoria e a atualização das fichas de criaturas. Um botão no cabeçalho, junto aos acessos de encontros manuais e missões, abrirá a modal **Rolar tesouros**. O mestre informa o ND e a quantidade de tesouros nesse ND. A modal retorna as rolagens individuais e o resultado de cada tesouro gerado, mantendo a correspondência entre as duas informações.
+Proposta para detalhar após a auditoria e a atualização das fichas de criaturas. Um botão no cabeçalho, junto aos acessos de encontros manuais e missões, abrirá a modal **Rolar tesouros**.
 
-A geração seguirá as regras e tabelas do **Livro Básico** e consultará os itens dos livros disponíveis que tenham itens aplicáveis às tabelas. A revisão futura definirá como associar os itens de cada fonte às categorias de resultado, registrar a procedência e apresentar rolagens que acionem outras tabelas.
+- **Entrada.** Uma linha de controles com **ND**, **Quantidade**, um grupo de opções exclusivas **Padrão**, **Item** e **Riqueza**, e o botão **Rolar**.
+- **Tabela de resultados.** Uma linha numerada por tesouro. **Padrão** mostra as colunas **Item** e **Riqueza**. **Item** e **Riqueza** exibem somente a coluna selecionada.
+- **Detalhe por célula.** Mostrar, em ordem, o valor de cada rolagem e o resultado da tabela consultada. Quando o resultado direcionar a outra tabela, exibir a rolagem seguinte logo abaixo. Quando houver uma expressão de dados, mostrar a expressão e o valor obtido.
+- **Resumo do lote.** O rodapé reúne os itens e suas quantidades, os valores em T$ e as demais riquezas discriminadas, incluindo quantidade, valor e outras informações relevantes quando aplicáveis.
+
+No exemplo de interface com **ND 2**, **Quantidade 3** e modo **Padrão**, o resultado tem três linhas. Uma célula de item pode mostrar `62 — Equipamento` e, logo abaixo, `55 — Gadanho`. Outra pode mostrar uma poção sorteada após a rolagem na tabela de poções. Uma célula de riqueza pode mostrar a rolagem que leva a `2d4 × 100 T$` e, abaixo, `200 T$`. Se a rolagem indicar uma riqueza menor, a célula também mostra a consulta à tabela correspondente e a riqueza obtida. Esses valores ilustram a apresentação.
+
+A geração seguirá as regras e tabelas do **Livro Básico** e consultará os itens aplicáveis de todos os livros disponíveis. O planejamento futuro definirá a associação entre fontes e categorias, a procedência dos resultados e as regras de consolidação do rodapé.
 
 ---
 
