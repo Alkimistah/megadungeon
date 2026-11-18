@@ -88,7 +88,7 @@ main.js → seleciona perfil
 
 Os andares 1 a 10 usam o modo `extended-exploration`: o labirinto é abstrato, o progresso é medido por sucessos/falhas, e cenas táticas surgem dinamicamente a partir de falhas d100, encontros finais e sala de chefe.
 
-Os andares 11 a 20 usam o modo `node-map`: o mapa em grafo é a representação principal de uma região maior, com rotas e salas pré-geradas. Esse modo deve permanecer como base para essa faixa; uma melhoria possível é adicionar mapas táticos aos encontros abertos pelos nodos, sem substituir o grafo.
+Os andares 11 a 20 usam o modo `node-map`. O grafo representa as rotas da região e o mapa tático representa a cena de um nodo. O escopo da faixa está fechado. A documentação específica reúne regras, dados persistidos, arquivos responsáveis e verificações de regressão. [Requisitos dos andares 11–20](REQUISITOS_ANDARES_11_A_20.md).
 
 Os andares 21 a 30 usam o modo `archipelago`: a base funcional de navegação, persistência e progresso fica em `archipelagoState.js`, enquanto `archipelagoRenderer.js` controla sua apresentação. Conteúdo definitivo, mapas táticos e parte da revisão visual dessa faixa continuam evoluindo separadamente.
 
@@ -97,6 +97,14 @@ O módulo `missions/` é transversal aos perfis. Ele gera ofertas para a faixa a
 ---
 
 ## Sistemas principais
+
+### Expedição da floresta (andares 11–20)
+
+1. `main.js` seleciona o perfil, apresenta as ofertas e aciona `prepareForestExpedition`. [Perfil da floresta](src/floorProfiles/forest11to20.js) · [Preparação da expedição](src/forestExpedition.js).
+2. `forestExpedition.js` prepara do andar inicial ao 20. O gerador cria grafo, ambiente e orçamento antes de o integrador materializar missões em rotas viáveis. O chefe recebe suas cabeças na preparação do andar. A geração atual é a versão 4. [Gerador](src/generator.js) · [Ambiente](src/forestEnvironment.js) · [Integração de missões](src/missions/forestMissionIntegration.js).
+3. `appState.js` controla escolha, descoberta, conclusão, descanso e os relógios. O resolvedor prepara a composição ao abrir a rota e ao revelar uma emboscada. A interface apresenta as fichas e o mapa tático com os marcadores de missão. [Estado](src/appState.js) · [Resolvedor](src/encounterResolver.js) · [Modal](src/nodeDialog.js) · [Mapa tático](src/nodeTacticalMap.js).
+4. `forestBossEncounter.js` define arena e composição fixa. `chimeraCombat.js` define cabeças, fraquezas, dano, atordoamento e recarga. [Arena](src/forestBossEncounter.js) · [Mecânica da Quimera](src/chimeraCombat.js).
+5. Ao avançar, o estado do andar fica arquivado na expedição. Autosave e TXT carregam o snapshot dos mapas e o estado da sessão. Consulte o [contrato de persistência da floresta](REQUISITOS_ANDARES_11_A_20.md#persistência-e-compatibilidade).
 
 ### 1. Geração de mapas em nodos (`generator.js`)
 
@@ -151,6 +159,7 @@ Gerencia o que o jogador já viu, tentou e escolheu no modo `node-map`. Toda a l
 ```javascript
 {
   attempted: Set<nodeId>,
+  completed: Set<nodeId>,
   explored: Set<nodeId>,
   rested: Set<nodeId>,
   chosenByLevel: Map<level, nodeId>,
@@ -163,11 +172,12 @@ Gerencia o que o jogador já viu, tentou e escolheu no modo `node-map`. Toda a l
 | Função | O que faz |
 |---|---|
 | `setLevels(levels)` | Inicializa o estado a partir do mapa gerado |
-| `chooseRoute(node)` | Marca nó como escolhido, desbloqueia seus filhos, avança o tempo |
-| `markExplored(node)` | Marca nó como explorado (encontro concluído) |
-| `markAttempted(node)` | Marca tentativa (falhou, mas foi visitado) |
-| `restAtNode(node)` | Descansa no acampamento, zerando o tempo decorrido |
-| `getNodeViewState(node)` | Retorna `{active, chosen, explored, attempted, locked, revealed, visible}` |
+| `chooseRoute(node)` | Escolhe a rota e cobra a travessia. Mapas legados podem liberar as saídas nesse momento |
+| `completeNode(node)` | Confirma a resolução e libera as saídas de um nodo que exige conclusão |
+| `markExplored(node)` | Registra sucesso no teste de descoberta e cobra 15 minutos, que entram no tempo da travessia se a rota for escolhida |
+| `markAttempted(node)` | Registra falha na descoberta e cobra 15 minutos |
+| `restAtNode(node)` | Registra descanso em acampamento elegível e zera o tempo desde o último descanso |
+| `getNodeViewState(node)` | Retorna o estado de visibilidade, escolha, descoberta e conclusão para a interface |
 | `getLinkViewState(source, target)` | Retorna estado visual do link (rota/opaco/oculto) |
 
 **Visibilidade de nós** (modo "caminhos desconhecidos"):
@@ -233,12 +243,12 @@ Controla o `<dialog>` HTML que aparece ao clicar em um nó ativo.
 
 Renderiza:
 - Tipo e nome da sala.
-- Perícia e DC do teste.
+- Perícia e CD do teste de descoberta, com registro explícito de sucesso ou falha.
 - ND do encontro (com breakdown: base + clima + terreno).
 - Perfil de criatura quando aplicável (tipo predominante, ND da criatura e orientação de ajuste).
 - Clima gerado (temperatura, precipitação, vento, névoa).
 - Terreno (tipo + características).
-- Botões de ação: explorar, tentar, descansar (acampamento), escolher rota.
+- Ações de descoberta, escolha, descanso e conclusão. Na floresta, a modal ocupa a tela inteira, com cabeçalho e rodapé fixos. O rodapé alterna as fichas de ambiente e combate e abre o mapa tático quando disponível.
 
 ---
 
@@ -433,7 +443,9 @@ Permite salvar e restaurar o estado completo da exploração como uma string por
 }
 ```
 
-Para os andares 1 a 10, o payload salva `extendedState`, incluindo andar atual, sucessos, falhas, ações usadas, efeitos pendentes, cenas e log recente. Para os andares 11 a 20, o mapa é regenerado deterministicamente a partir do `mapSeed`; o payload salva a rota e o progresso do mapa em nodos.
+O exemplo acima ilustra o envelope legado da floresta. O envelope atual acrescenta `missions`, `forestExpedition` e campos de conclusão, relógio total e encontros resolvidos no estado. `forestExpedition.js` restaura os mapas gravados e religa os nodos por ID. Códigos legados sem snapshot continuam regenerando o mapa pela seed. Autosave e TXT preservam o mesmo estado lógico, com ajustes temporários de PV e unidades excluídos. [Contrato de sessão dos andares 11–20](REQUISITOS_ANDARES_11_A_20.md#persistência-e-compatibilidade).
+
+Para os andares 1 a 10, o payload salva `extendedState`, incluindo andar atual, sucessos, falhas, ações usadas, efeitos pendentes, cenas e log recente.
 
 ---
 
@@ -485,7 +497,7 @@ O app funciona offline via Service Worker (`public/sw.js`) com cache de todos os
 | Novo terreno | `environment.js` + `challengeRules.terrainWeights` no perfil |
 | Novo efeito dos andares 1-10 | Tabelas e resolvedores em `dungeon1to10.js` + aplicação em `extendedExplorationState.js` |
 | Novo encontro final dos andares 1-10 | `dungeon1to10FinalEncounters.js`, usando fichas do catálogo e mapa tático coerente |
-| Mapa tático para encontros 11-20 | Integrar `encounterResolver.js` ao modal de nó sem substituir o grafo de `forest11to20.js` |
+| Ajuste nos mapas táticos dos andares 11–20 | Atualizar `nodeTacticalMap.js` e `tacticalMapRenderer.js`, mantendo a composição do resolvedor e os marcadores de missão |
 | Nova categoria ou integração de missão | `missions/missionTables.js`, `missionGenerator.js` e o adaptador do perfil em `missionProfileAdapters.js` |
 | Internacionalização | Strings de label estão em `tables.js` e nos perfis |
 

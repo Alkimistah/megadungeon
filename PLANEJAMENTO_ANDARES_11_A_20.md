@@ -1,5 +1,7 @@
 # Andares 11–20 — decisões, prioridades e andamento
 
+**Escopo fechado em 18/11/2026**, com referência na versão publicada `75379a3`. Este planejamento fica como histórico da entrega. Regras atuais, arquitetura, compatibilidade e instruções de manutenção estão nos [requisitos dos andares 11–20](REQUISITOS_ANDARES_11_A_20.md). Conferências pontuais em mesa seguem como acompanhamento.
+
 Atualizado em 18/11/2026. A expedição da última sessão foi recuperada no **andar 14**, após o descanso no acampamento e antes do último nodo. A próxima data de jogo ainda não foi registrada.
 
 Este documento consolida as decisões, as entregas e as pendências dos andares 11–20. O MVP foi publicado no commit `7afd21b`. O histórico de salvamento automático no PWA e de importação e exportação por TXT está na [seção 13](#13-persistência-após-a-sessão).
@@ -8,7 +10,7 @@ A versão `c992c22` está publicada e inclui a continuidade de terreno e clima p
 
 A versão `398a98b` publicou a [modal do nodo em tela cheia](#17-modal-do-nodo-em-tela-cheia). [Publicação no GitHub Pages](https://github.com/Alkimistah/megadungeon/actions/runs/44235659633).
 
-## 1. Leitura rápida: o que vem primeiro
+## 1. Resumo do escopo entregue
 
 A [mecânica especial da Quimera](#6-p1--encontro-fixo-da-quimera) foi publicada em `a75e2a0` e conferida pelo mestre. [Publicação no GitHub Pages](https://github.com/Alkimistah/megadungeon/actions/runs/44328452202).
 
@@ -452,7 +454,7 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 - **Composição:** oferecer ao mestre uma rerrolagem em nodos de combate sem missão, mantendo o orçamento de ND e as restrições do nodo. Guardar o resultado aceito na sessão. Considerar composições com mais de um adversário, quando houver alternativa no mesmo ND, para reduzir a frequência de encontros decididos antes da primeira ação inimiga.
 - **Reforço:** o mestre pode aplicar **Iniciativa +2**, **Ataque +1** e **PV + valor base** separadamente. A ficha mostra a iniciativa ajustada e indica o bônus de ataque. O reforço de PV dobra o máximo exibido. Em combate, o mestre soma os PV originais ao valor atual, preservando o dano já sofrido, ou retira o bônus ao desativar. Os valores iniciais precisam ser avaliados em mesa.
 
-## 15. Próximas entregas em ordem
+## 15. Entregas em ordem de implementação
 
 1. **Variações de armadilhas por terreno.** Implementadas e verificadas no Chrome. Conferência no tablet pendente.
 2. **Rerrolagem de criaturas no mesmo ND.** Implementada e verificada no Chrome. Em um nodo de combate pendente, **Rerrolar criaturas** busca outro grupo do mesmo tipo permitido, respeitando a lista de criaturas do nodo. Preserva o ND real das criaturas, o orçamento do encontro, terreno, clima e armadilhas. Missões vinculadas, cenas fixas e encontros já concluídos ou contabilizados em missão ficam protegidos. A composição escolhida é preservada no autosave e no TXT.
