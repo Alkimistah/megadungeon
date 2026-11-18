@@ -6,13 +6,13 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 
 ## 1. Leitura rápida: o que vem primeiro
 
-**Próximo passo indicado:** conferir o ritmo dos acampamentos ocultos numa nova expedição. O ajuste do tempo de exploração é o próximo item da [lista de entregas](#15-próximas-entregas-em-ordem).
+**Próximo passo indicado:** desenhar a mecânica especial da Quimera. A conferência dos relógios e do reforço manual em mesa segue como validação na [lista de entregas](#15-próximas-entregas-em-ordem).
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
 | 1 | P0 — missões | Missões próprias de 11–20, ligadas a nodos com conteúdo que permita cumpri-las e estado preservado | Implementado e validado para novas expedições |
 | 2 | P1 — calibragem | CDs de exploração coerentes com personagens de níveis 4–7 | Curva 20–23 confirmada e implementada |
-| 3 | P1 — regras essenciais | Revelação correta, descanso verdadeiro seguro e estados claros de resolução | Implementado; relógio total separado permanece pendente |
+| 3 | P1 — regras essenciais | Revelação correta, descanso verdadeiro seguro e estados claros de resolução | Implementado, com relógios separados na floresta |
 | 4 | P1 — Quimera fixa | Mesmo encontro e mapa no andar 20; sem adições aleatórias | Arena simples implementada; mecânica especial futura é importante |
 | 5 | P2 — desconhecidos | Mais variedade com tabela temática própria e descanso falso explícito | Proposta aceita; conteúdo e distribuição ainda não implementados |
 | 6 | P3 — continuidade | Terreno e clima com transições coerentes entre nodos | Proposta aceita; implementação posterior |
@@ -180,9 +180,9 @@ Na primeira entrega, preservar os acampamentos seguros existentes. O descanso fa
 
 ### Tempo e resolução
 
-- Hoje descansar zera o relógio. Isso representa tempo desde o descanso, não tempo total de exploração.
-- Evolução prevista: separar tempo total e tempo desde o descanso; registrar duração do descanso com regra explicitamente definida.
-- Hoje tentativa custa 15 minutos; depois escolher cobra o tempo integral do nodo. Marcar explorado antes da escolha desconta 15 minutos. Definir se a diferença é penalidade intencional e apresentá-la claramente.
+- O painel da expedição de floresta mostra o tempo total de exploração e o tempo desde o último descanso. Descansar zera apenas o segundo. A duração do descanso ainda fica a cargo do mestre.
+- Na geração de mapas novos, um nodo com teste custa 30 minutos, mais 15 por evento climático e mais 15 quando o ND do terreno é pelo menos 1, até 60 minutos. Nodos sem teste continuam em 30 minutos. Mapas armazenados mantêm as durações registradas.
+- Tentativa custa 15 minutos e a escolha que vem depois cobra o tempo integral do nodo. Marcar explorado antes da escolha desconta os 15 minutos já gastos. Uma apresentação mais explícita do teste de descoberta permanece pendente.
 - Implementado nas novas expedições: escolher a rota abre a cena; concluir o encontro libera os próximos nodos. O último encontro deve ser concluído antes de avançar. A Quimera possui confirmação de derrota.
 - O mestre confirma a conclusão; isso não exige automatizar combate. O avanço normal deve depender da cena obrigatória concluída.
 
@@ -344,7 +344,8 @@ Essa lista orienta o trabalho; o plano técnico executável de cada entrega deve
 - [x] Revelação, descanso seguro, conclusão de cenas e Quimera simples fixa implementados e validados.
 - [x] Salvamento automático local, retomada e importação/exportação TXT publicados.
 - [x] Modal de missão enxuta, destaques no mapa e XP com e sem ambiente publicados. Primeira conferência no tablet aprovada pelo mestre.
-- [ ] P1 restante: relógios separados e apresentação mais explícita do teste de descoberta.
+- [x] P1: tempo total e tempo desde o último descanso separados.
+- [ ] P1 restante: apresentação mais explícita do teste de descoberta.
 - [ ] P2, P3 e P4 implementados e validados em entregas separadas.
 - [ ] Confirmar no tablet usado em mesa a importação, a retomada pelo ícone do PWA e o download do TXT.
 - [x] Registrar o relato da última sessão e identificar as correções que afetam o andamento da expedição.
@@ -379,7 +380,7 @@ Essa lista orienta o trabalho; o plano técnico executável de cada entrega deve
 
 - O MVP foi publicado após as verificações no commit `7afd21b`. Não houve teste no tablet físico; o QA usou Chrome local e viewports de tablet/mobile.
 - Sessões antigas são preservadas, mas não recebem retroativamente as garantias novas de materialização; iniciar uma nova expedição usa o MVP.
-- O contador de tempo continua zerando ao descansar. Separar tempo total e duração do descanso exige a evolução já prevista.
+- No MVP, o contador zerava ao descansar. Os dois relógios foram implementados posteriormente. A duração do descanso continua a cargo do mestre.
 - Mecânica especial da Quimera é importante e permanece pendente por decisão do usuário.
 - Não foram acrescentados editor manual, nova tabela de desconhecidos, descanso falso, continuidade de clima/terreno ou pistas de rota.
 
@@ -413,17 +414,17 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 
 ### Calibragem e variedade
 
-- **Acampamentos e tempo:** novos mapas da floresta passaram de 20% para 8% de chance de um nodo desconhecido revelar acampamento. Para o tempo, resta testar 30 minutos como mínimo para nodos com teste e separar tempo total de tempo desde o último descanso.
+- **Acampamentos e tempo:** novos mapas da floresta passaram de 20% para 8% de chance de um nodo desconhecido revelar acampamento. Os novos tempos e os relógios separados estão descritos na seção 5.
 - **Composição:** oferecer ao mestre uma rerrolagem em nodos de combate sem missão, mantendo o orçamento de ND e as restrições do nodo. Guardar o resultado aceito na sessão. Considerar composições com mais de um adversário, quando houver alternativa no mesmo ND, para reduzir a frequência de encontros decididos antes da primeira ação inimiga.
-- **Reforço:** avaliar um ajuste manual, visível e reversível por ficha. Iniciativa ou PV podem ajudar uma criatura a chegar ao turno. Bônus de ataque trata acerto depois que ela age. Testar os efeitos separadamente e manter o ND original como referência, com o reforço indicado na ficha e sem crédito extra de XP automático.
+- **Reforço:** o mestre pode aplicar **Iniciativa +2**, **Ataque +1** e **PV + valor base** separadamente. A ficha mostra a iniciativa ajustada e indica o bônus de ataque. O reforço de PV dobra o máximo exibido. Em combate, o mestre soma os PV originais ao valor atual, preservando o dano já sofrido, ou retira o bônus ao desativar. Os valores iniciais precisam ser avaliados em mesa.
 
 ## 15. Próximas entregas em ordem
 
 1. **Variações de armadilhas por terreno.** Implementadas e verificadas no Chrome. Conferência no tablet pendente.
 2. **Rerrolagem de criaturas no mesmo ND.** Implementada e verificada no Chrome. Em um nodo de combate pendente, **Rerrolar criaturas** busca outro grupo do mesmo tipo permitido, respeitando a lista de criaturas do nodo. Preserva o ND real das criaturas, o orçamento do encontro, terreno, clima e armadilhas. Missões vinculadas, cenas fixas e encontros já concluídos ou contabilizados em missão ficam protegidos. A composição escolhida é preservada no autosave e no TXT.
 3. **Menos acampamentos ocultos.** Implementado para novos mapas dos andares 11–20, com chance de 8% por nodo desconhecido. Fileiras com acampamentos visíveis e acampamentos extras seguem as regras existentes. Em 1.000 mapas pareados, foram 423 acampamentos ocultos antes e 171 depois entre 2.270 nodos desconhecidos. Em 1.000 rotas simuladas, os acampamentos ocultos encontrados passaram de 115 para 47 e os visíveis permaneceram em 1.080. A restauração da sessão recuperada preservou os mapas já salvos.
-4. **Tempo de exploração.** Testar um mínimo maior e mais variação conforme a travessia. Separar tempo total e tempo desde o último descanso. Aplicar a calibragem a novos mapas.
-5. **Reforço manual por criatura.** Depois de experimentar outras composições, testar ajustes reversíveis e separados de iniciativa e ataque. Mostrar a alteração na ficha e manter o ND original como referência.
+4. **Tempo de exploração.** Implementado. Novas travessias com teste variam entre 30, 45 e 60 minutos. Os dois relógios persistem ao avançar, retomar e exportar. Em saves anteriores, o total é reconstruído a partir dos nodos e tentativas registrados. Quando faltam andares do histórico, o app indica **Tempo total (parcial)**.
+5. **Reforço manual por criatura.** Implementado e verificado no Chrome. Disponível na ficha de um encontro pendente, inclusive em nodos de missão. Quando a ficha representa várias criaturas, o ajuste vale para todas as daquela ficha. Os bônus são reversíveis, ficam no save e não alteram ND ou XP. A Quimera mantém a ficha fixa. Se o mestre rerrolar as criaturas, as novas fichas começam com os reforços desativados.
 6. **Mecânica especial da Quimera.** Desenhar e testar o que diferencia o combate do andar 20, partindo da composição e da arena fixas.
 7. **Cenas desconhecidas, continuidade ambiental e pistas de rota.** Expandir o conteúdo conforme P2, P3 e P4, começando por uma tabela pequena de cenas e pelo descanso falso.
 

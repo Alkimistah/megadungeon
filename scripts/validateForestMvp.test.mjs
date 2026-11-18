@@ -11,6 +11,7 @@ import { createMissionGenerationContext, generateMissionOffers } from "../src/mi
 import { createExplorationState } from "../src/appState.js";
 import { createMissionState } from "../src/missions/missionState.js";
 import { getForestTrapPresentation } from "../src/forestTrapPresentation.js";
+import { getCreatureReinforcement, withCreatureReinforcement } from "../src/creatureReinforcement.js";
 
 const integration = await import("../src/missions/forestMissionIntegration.js").catch(() => ({}));
 const expeditionModule = await import("../src/forestExpedition.js").catch(() => ({}));
@@ -125,6 +126,36 @@ test("reroll protects mission and fixed encounters and preserves a group with no
   assert.deepEqual(node, before);
 });
 
+test("creature reinforcements toggle independently and survive save without changing ND or other items", () => {
+  const { node } = rerollFixture();
+  const encounter = node.resolvedEncounter;
+  const [creature, trap] = encounter.items;
+  assert.deepEqual(getCreatureReinforcement(creature), { initiative: 0, attack: 0, hitPoints: 0 });
+  const initiative = withCreatureReinforcement(encounter, creature, "initiative", true);
+  const both = withCreatureReinforcement(initiative, initiative.items[0], "attack", true);
+  assert.deepEqual(getCreatureReinforcement(both.items[0]), { initiative: 2, attack: 1, hitPoints: 0 });
+  const all = withCreatureReinforcement(both, both.items[0], "hitPoints", true);
+  assert.deepEqual(getCreatureReinforcement(all.items[0], 30), { initiative: 2, attack: 1, hitPoints: 30 });
+  assert.equal(withCreatureReinforcement(all, all.items[0], "hitPoints", true), all);
+  assert.deepEqual(all.budget, encounter.budget);
+  assert.equal(withCreatureReinforcement(both, both.items[0], "attack", true), both);
+  assert.deepEqual(both.budget, encounter.budget);
+  assert.equal(both.seed, encounter.seed);
+  assert.equal(both.items[0].challengeRating, creature.challengeRating);
+  assert.equal(both.items[1], trap);
+  assert.equal(withCreatureReinforcement(encounter, trap, "attack", true), encounter);
+  assert.equal(withCreatureReinforcement(encounter, creature, "damage", true), encounter);
+
+  const restored = JSON.parse(JSON.stringify({ ...node, resolvedEncounter: all }));
+  const restoredEncounter = resolveNodeEncounter(restored);
+  assert.deepEqual(getCreatureReinforcement(restoredEncounter.items[0], 30), { initiative: 2, attack: 1, hitPoints: 30 });
+  const withoutInitiative = withCreatureReinforcement(restoredEncounter, restoredEncounter.items[0], "initiative", false);
+  const onlyAttack = withCreatureReinforcement(withoutInitiative, withoutInitiative.items[0], "hitPoints", false);
+  assert.deepEqual(getCreatureReinforcement(onlyAttack.items[0], 30), { initiative: 0, attack: 1, hitPoints: 0 });
+  const original = withCreatureReinforcement(onlyAttack, onlyAttack.items[0], "attack", false);
+  assert.deepEqual(original, encounter);
+});
+
 test("unknown elite receives elite budget and discovery check", () => {
   let checked = 0;
   for (let i = 0; i < 30; i++) {
@@ -183,6 +214,77 @@ test("new forest maps reduce hidden camps and keep the existing visible camps an
   assert.ok(unknownCount > 500);
   assert.ok(currentCamps / unknownCount >= 0.05 && currentCamps / unknownCount <= 0.10);
   assert.ok(currentCamps < previousCamps);
+});
+
+test("new forest maps spend 30 to 60 minutes per traversal according to weather and terrain", () => {
+  const durations = new Set();
+  let compared = 0;
+  for (let index = 0; index < 40; index++) {
+    const seed = `travel-time-${index}`;
+    const levels = map(15, seed);
+    for (const node of levels.flat()) {
+      if (!node.skill || !node.dc) {
+        assert.equal(node.investigationMinutes, 30);
+        continue;
+      }
+      const climate = node.environment.climate.filter(event => event.name !== "Clima normal").length;
+      const extra = climate + Number(node.challenge.terrain >= 1);
+      assert.equal(node.investigationMinutes, Math.min(30 + 15 * extra, 60));
+      durations.add(node.investigationMinutes);
+    }
+    const legacy = generateMapData(8, 22, profile, 15, createRng(seed)).flat();
+    compared += legacy.filter(node => node.skill && node.investigationMinutes === 15).length;
+  }
+  assert.deepEqual([...durations].sort(), [30, 45, 60]);
+  assert.ok(compared > 0);
+});
+
+test("the forest clocks survive rest, floor changes and save restore", () => {
+  const levels = chain();
+  levels[0][0].investigationMinutes = 45;
+  levels[1][0].investigationMinutes = 30;
+  levels[1][0].contentType = "camp";
+  const state = createExplorationState();
+  state.setLevels(levels);
+  state.markExplored(levels[0][0]);
+  state.chooseRoute(levels[0][0]);
+  state.completeNode(levels[0][0]);
+  state.chooseRoute(levels[1][0]);
+  assert.equal(state.getElapsedMinutes(), 75);
+  assert.ok(state.restAtNode(levels[1][0]));
+  assert.equal(state.getElapsedMinutes(), 0);
+  assert.equal(state.getExplorationTime().totalElapsedMinutes, 75);
+
+  const freshFloor = chain();
+  state.setLevels(freshFloor);
+  state.chooseRoute(freshFloor[0][0]);
+  const restored = createExplorationState();
+  restored.setLevels(freshFloor);
+  restored.importSessionState(JSON.parse(JSON.stringify(state.exportSessionState())));
+  assert.equal(restored.getElapsedMinutes(), 15);
+  assert.equal(restored.getExplorationTime().totalElapsedMinutes, 90);
+  restored.setLevels(chain(), { resetTime: true });
+  assert.equal(restored.getElapsedMinutes(), 0);
+  assert.equal(restored.getExplorationTime().totalElapsedMinutes, 0);
+});
+
+test("legacy forest saves reconstruct known travel and indicate missing floor history", () => {
+  const { withForestExplorationTime } = expeditionModule;
+  const levels = chain();
+  const current = { chosenByLevel: [[1, 0]], explored: [0, 1], attempted: [2], elapsedMinutes: 0 };
+  const earlier = { chosenByLevel: [[1, 0], [2, 1]], elapsedMinutes: 30 };
+  const expedition = {
+    floors: [{ floor: 11, levels, state: earlier }, { floor: 12, levels }, { floor: 13, levels }]
+  };
+  const migrated = withForestExplorationTime(expedition, 13, current);
+  assert.equal(migrated.totalElapsedMinutes, 75);
+  assert.equal(migrated.totalElapsedPartial, true);
+  assert.equal(migrated.elapsedMinutes, 0);
+  expedition.floors[1].state = earlier;
+  const complete = withForestExplorationTime(expedition, 13, current);
+  assert.equal(complete.totalElapsedMinutes, 105);
+  assert.equal(complete.totalElapsedPartial, false);
+  assert.equal(withForestExplorationTime(expedition, 13, migrated), migrated);
 });
 
 test("Quimera is alone in the same simple arena for every seed", () => {

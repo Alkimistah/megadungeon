@@ -5,7 +5,7 @@ import { FLOOR_RANGES, applyTheme, getFloorRange } from "./floorRanges.js";
 import { formatElapsedTime } from "./format.js";
 import { generateMapData } from "./generator.js";
 import { getNodeMapGuidance } from "./nodeProgressPresentation.js";
-import { prepareForestExpedition, serializeForestExpedition, restoreForestExpedition } from "./forestExpedition.js";
+import { prepareForestExpedition, serializeForestExpedition, restoreForestExpedition, withForestExplorationTime } from "./forestExpedition.js";
 import { createArchipelagoRenderer } from "./archipelagoRenderer.js";
 import { createArchipelagoState } from "./archipelagoState.js";
 import { canConfigureExtendedExplorationFloor } from "./extendedExplorationControls.js";
@@ -19,6 +19,7 @@ import { createMissionGenerationContext, generateMissionOffers } from "./mission
 import { materializeMissionsForCurrentContent } from "./missions/missionProfileAdapters.js";
 import { createMissionState } from "./missions/missionState.js";
 import { canRerollNodeCreatures, rerollNodeCreatures, resolveNodeEncounter } from "./encounterResolver.js";
+import { withCreatureReinforcement } from "./creatureReinforcement.js";
 import { createNodeDialogController } from "./nodeDialog.js";
 import { decodeSessionCode, encodeSessionCode, isSessionCode } from "./sessionCode.js";
 import { loadAutosave, saveAutosave } from "./sessionAutosave.js";
@@ -27,7 +28,11 @@ const elements = {
   svg: document.getElementById("map"),
   extendedExploration: document.getElementById("extendedExploration"),
   info: document.getElementById("info"),
+  timeTrackerLabel: document.getElementById("timeTrackerLabel"),
   timeTrackerValue: document.getElementById("timeTrackerValue"),
+  totalTimeTracker: document.getElementById("totalTimeTracker"),
+  totalTimeTrackerLabel: document.getElementById("totalTimeTrackerLabel"),
+  totalTimeTrackerValue: document.getElementById("totalTimeTrackerValue"),
   autosaveError: document.getElementById("autosaveError"),
   floorRangeTitle: document.getElementById("floorRangeTitle"),
   floorInput: document.getElementById("floorInput"),
@@ -97,9 +102,17 @@ function adjustMissionProgress(missionId, delta, eventKey = null) {
   updateInfo();
 }
 
+function isPendingForestEncounter(node) {
+  return activeFloorRange.id === "forest-11-20" && node.requiresCompletion &&
+    state.isNodeChosen(node) && !state.isNodeCompleted(node);
+}
+
+function canReinforceCreatures(node) {
+  return isPendingForestEncounter(node) && (node.contentType || node.type) !== "boss";
+}
+
 function canRerollCreatures(node) {
-  if (activeFloorRange.id !== "forest-11-20" || !node.requiresCompletion ||
-    !state.isNodeChosen(node) || state.isNodeCompleted(node) || !canRerollNodeCreatures(node)) return false;
+  if (!isPendingForestEncounter(node) || !canRerollNodeCreatures(node)) return false;
 
   const encounterKey = `${node.resolvedEncounter.seed}:`;
   return !missionState.getSelected().some(mission =>
@@ -218,6 +231,7 @@ function advanceNodeMapFloor() {
 }
 
 const nodeDialogController = createNodeDialogController({
+  canReinforceCreatures,
   canRerollCreatures,
   contentElement: elements.nodeDialogContent,
   dialogElement: elements.nodeDialog,
@@ -251,6 +265,15 @@ const nodeDialogController = createNodeDialogController({
     nodeDialogController.open(node);
   },
   onOpenMission: openMissionById,
+  onSetCreatureReinforcement: (node, item, stat, enabled) => {
+    if (!canReinforceCreatures(node)) return false;
+    const current = node.resolvedEncounter;
+    const updated = withCreatureReinforcement(current, item, stat, enabled);
+    if (updated === current) return false;
+    node.resolvedEncounter = updated;
+    refreshExplorationDisplay();
+    return true;
+  },
   onRerollCreatures: (node) => {
     if (!canRerollCreatures(node)) return false;
     const encounter = rerollNodeCreatures(node);
@@ -456,6 +479,13 @@ function updateTimeTracker() {
     : state.getElapsedMinutes();
 
   elements.timeTrackerValue.textContent = formatElapsedTime(elapsedMinutes);
+  elements.timeTrackerLabel.textContent = forestExpedition ? "Desde o último descanso" : "Tempo de exploração";
+  elements.totalTimeTracker.hidden = !forestExpedition;
+  if (forestExpedition) {
+    const { totalElapsedMinutes, totalElapsedPartial } = state.getExplorationTime();
+    elements.totalTimeTrackerLabel.textContent = totalElapsedPartial ? "Tempo total (parcial)" : "Tempo total de exploração";
+    elements.totalTimeTrackerValue.textContent = formatElapsedTime(totalElapsedMinutes);
+  }
 }
 
 function getCurrentSession() {
@@ -575,11 +605,11 @@ function rememberRenderedMap() {
   };
 }
 
-function drawGeneratedLevels(levels, startSession) {
+function drawGeneratedLevels(levels, startSession, { resetTime = false } = {}) {
   elements.svg.hidden = false;
   elements.extendedExploration.hidden = true;
   rememberRenderedMap();
-  state.setLevels(levels);
+  state.setLevels(levels, { resetTime });
   mapRenderer.drawMap(levels, activeFloorRange.theme.columnColors);
   refreshExplorationDisplay({ startSession });
   updateInfo(levels);
@@ -685,7 +715,7 @@ function restoreSession(session) {
     const entry = forestExpedition.floors.find(f => f.floor === session.floor);
     if (!entry) throw new Error("Andar não encontrado na expedição salva.");
     state.setLevels(entry.levels);
-    state.importSessionState(session.state);
+    state.importSessionState(withForestExplorationTime(forestExpedition, session.floor, session.state));
     mapRenderer.drawMap(entry.levels, activeFloorRange.theme.columnColors);
     rememberRenderedMap();
     refreshExplorationDisplay({ startSession: true });
@@ -886,7 +916,7 @@ function generateMap({ reuseSeed = false, startSession = true } = {}) {
       if (!entry) throw new Error("Andar não encontrado nesta expedição.");
       elements.depthInput.value = entry.depth;
       elements.baseDcInput.value = entry.baseDc;
-      drawGeneratedLevels(entry.levels, startSession);
+      drawGeneratedLevels(entry.levels, startSession, { resetTime: entry.floor === forestExpedition.startFloor });
       return;
     }
   }

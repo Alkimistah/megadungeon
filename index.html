@@ -66,8 +66,12 @@
     </div>
 
     <div id="timeTracker" class="time-tracker" aria-live="polite">
-      <span>Tempo de exploração</span>
+      <span id="timeTrackerLabel">Tempo de exploração</span>
       <strong id="timeTrackerValue">0min</strong>
+      <div id="totalTimeTracker" class="time-tracker-total" hidden>
+        <span id="totalTimeTrackerLabel">Tempo total de exploração</span>
+        <strong id="totalTimeTrackerValue">0min</strong>
+      </div>
     </div>
     <p id="autosaveError" role="status" hidden>O progresso recente não foi salvo no aplicativo. Exporte a sessão para guardar uma cópia.</p>
 

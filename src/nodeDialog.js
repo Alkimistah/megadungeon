@@ -1,4 +1,5 @@
 import { formatChallengeRating } from "./challenge.js";
+import { CREATURE_REINFORCEMENT_BONUSES, getCreatureReinforcement } from "./creatureReinforcement.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getDamageType } from "./damageTypes.js";
 import { getForestTrapPresentation } from "./forestTrapPresentation.js";
@@ -504,7 +505,33 @@ function appendCreatureSheetAbilities(section, entries, { preferEntryName = fals
   });
 }
 
-export function createCreatureDetail(item, missions = [], onAdjustMissionProgress = null) {
+function createCreatureReinforcementControls(item, stats, onSetReinforcement) {
+  const controls = document.createElement("fieldset");
+  controls.className = "creature-reinforcement";
+  const legend = document.createElement("legend");
+  legend.textContent = item.quantity > 1 ? `Reforço · ${item.quantity} criaturas desta ficha` : "Reforço";
+  controls.appendChild(legend);
+  const options = [
+    ["initiative", "Iniciativa", Number.isFinite(stats.initiative) ? CREATURE_REINFORCEMENT_BONUSES.initiative : 0],
+    ["attack", "Ataque", CREATURE_REINFORCEMENT_BONUSES.attack],
+    ["hitPoints", "PV", stats.hitPoints]
+  ];
+  for (const [stat, label, bonus] of options) {
+    if (!Number.isFinite(bonus) || bonus <= 0) continue;
+    const button = document.createElement("button");
+    const enabled = Boolean(item.reinforcement?.[stat]);
+    button.type = "button";
+    button.className = "extended-action is-compact";
+    button.dataset.creatureReinforcement = stat;
+    button.setAttribute("aria-pressed", String(enabled));
+    button.textContent = `${label} +${bonus}`;
+    button.addEventListener("click", () => onSetReinforcement(stat, !enabled));
+    controls.appendChild(button);
+  }
+  return controls;
+}
+
+export function createCreatureDetail(item, missions = [], onAdjustMissionProgress = null, onSetReinforcement = null) {
   const creature = item.creatureData ?? getCreatureById(item.creatureId);
   const section = document.createElement("section");
   const missionPanel = createEncounterMissionPanel(getEncounterMissionMatches(item, missions), onAdjustMissionProgress);
@@ -547,12 +574,25 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
   section.appendChild(header);
   section.appendChild(subtitle);
   if (missionPanel) section.appendChild(missionPanel);
+  if (onSetReinforcement) section.appendChild(createCreatureReinforcementControls(item, stats, onSetReinforcement));
   section.appendChild(createDivider());
 
+  const reinforcement = getCreatureReinforcement(item, stats.hitPoints);
+  const initiative = Number.isFinite(stats.initiative) ? stats.initiative + reinforcement.initiative : stats.initiative;
+  const initiativeNote = reinforcement.initiative ? ` (reforço +${reinforcement.initiative})` : "";
   const perceptionText = [formatModifier(stats.perception), stats.senses].filter(Boolean).join(", ");
-  section.appendChild(createSheetLine("INICIATIVA", `${formatModifier(stats.initiative)},`, " PERCEPÇÃO", `${perceptionText}`));
+  section.appendChild(createSheetLine("INICIATIVA", `${formatModifier(initiative)}${initiativeNote},`, " PERCEPÇÃO", `${perceptionText}`));
   section.appendChild(createSheetLine("DEFESA", `${stats.defense ?? "?"}, FORT ${formatModifier(stats.fortitude)}, REF ${formatModifier(stats.reflex)}, VON ${formatModifier(stats.will)}${stats.defensesText ? `, ${stats.defensesText}` : ""}`));
-  section.appendChild(createSheetLine("PONTOS DE VIDA", String(stats.hitPoints ?? "?")));
+  const hitPointsText = reinforcement.hitPoints
+    ? `${stats.hitPoints + reinforcement.hitPoints} (reforço +${reinforcement.hitPoints})`
+    : String(stats.hitPoints ?? "?");
+  section.appendChild(createSheetLine("PONTOS DE VIDA", hitPointsText));
+  if (reinforcement.hitPoints) {
+    section.appendChild(createSheetLine(
+      "REFORÇO DE PV",
+      `Ao ativar, some ${reinforcement.hitPoints} aos PV atuais. Ao desativar, retire esse bônus.`
+    ));
+  }
 
   if (stats.speedText) {
     section.appendChild(createSheetLine("DESLOCAMENTO", stats.speedText));
@@ -560,6 +600,9 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
 
   section.appendChild(createDivider());
 
+  if (reinforcement.attack) {
+    section.appendChild(createSheetLine("REFORÇO DE ATAQUE", `Some +${reinforcement.attack} às jogadas de ataque da ficha.`));
+  }
   if (creature.actions?.length) {
     appendCreatureSheetAbilities(section, creature.actions);
   }
@@ -658,7 +701,7 @@ function createTrapDetail(node, item, presentation) {
   return section;
 }
 
-function createEncounterDetail(node, selectedKey, missions, onAdjustMissionProgress, trapPresentations) {
+function createEncounterDetail(node, selectedKey, missions, onAdjustMissionProgress, trapPresentations, onSetReinforcement) {
   const panel = document.createElement("div");
   const selectedItem = node.resolvedEncounter.items.find((item, index) =>
     getEncounterItemKey(item, index) === selectedKey
@@ -668,7 +711,12 @@ function createEncounterDetail(node, selectedKey, missions, onAdjustMissionProgr
   panel.appendChild(
     selectedItem.kind === "trap"
       ? createTrapDetail(node, selectedItem, trapPresentations.get(selectedItem))
-      : createCreatureDetail({ ...selectedItem, encounterKey: node.resolvedEncounter.seed }, missions, onAdjustMissionProgress)
+      : createCreatureDetail(
+        { ...selectedItem, encounterKey: node.resolvedEncounter.seed },
+        missions,
+        onAdjustMissionProgress,
+        onSetReinforcement && ((stat, enabled) => onSetReinforcement(selectedItem, stat, enabled))
+      )
   );
 
   return panel;
@@ -680,7 +728,7 @@ function getFirstEncounterItemKey(node) {
     : null;
 }
 
-function createCombatPage(node, selectedKey, onSelect, missions, onAdjustMissionProgress, profileId) {
+function createCombatPage(node, selectedKey, onSelect, missions, onAdjustMissionProgress, { profileId, onSetReinforcement } = {}) {
   const page = document.createElement("div");
   const currentSelectedKey = selectedKey || getFirstEncounterItemKey(node);
   const trapPresentations = new Map(node.resolvedEncounter.items.map(item =>
@@ -689,7 +737,7 @@ function createCombatPage(node, selectedKey, onSelect, missions, onAdjustMission
 
   page.className = "combat-page";
   page.appendChild(createEncounterList(node, currentSelectedKey, onSelect, missions, trapPresentations));
-  page.appendChild(createEncounterDetail(node, currentSelectedKey, missions, onAdjustMissionProgress, trapPresentations));
+  page.appendChild(createEncounterDetail(node, currentSelectedKey, missions, onAdjustMissionProgress, trapPresentations, onSetReinforcement));
 
   return page;
 }
@@ -712,6 +760,7 @@ function createCombatUnavailableNotice() {
 }
 
 export function createNodeDialogController({
+  canReinforceCreatures = () => false,
   canRerollCreatures = () => false,
   contentElement,
   dialogElement,
@@ -725,6 +774,7 @@ export function createNodeDialogController({
   onAdjustMissionProgress = null,
   onOpenMission = () => {},
   onRerollCreatures = () => false,
+  onSetCreatureReinforcement = () => false,
   onRest,
   state,
   titleElement,
@@ -898,7 +948,14 @@ export function createNodeDialogController({
     }, getActiveMissions(), (missionId, delta, eventKey) => {
       onAdjustMissionProgress?.(missionId, delta, eventKey);
       render(node);
-    }, getProfileId());
+    }, {
+      profileId: getProfileId(),
+      onSetReinforcement: canReinforceCreatures(node) && ((item, stat, enabled) => {
+        if (!onSetCreatureReinforcement(node, item, stat, enabled)) return;
+        render(node);
+        contentElement.querySelector(`[data-creature-reinforcement="${stat}"]`)?.focus();
+      })
+    });
     if (canRerollCreatures(node)) {
       const button = document.createElement("button");
       button.type = "button";

@@ -46,7 +46,8 @@ export const forest11to20Profile = {
       { type: "unknown", label: "Desconhecido", short: "?", weight: 5 },
       { type: "treasure", label: "Tesouro", short: "T", weight: 6 }
     ],
-    timeRule: { incrementMinutes: 15, maxMinutes: 60, noCheckMinutes: 30 }
+    timeRule: { incrementMinutes: 15, maxMinutes: 60, noCheckMinutes: 30 },
+    expeditionTimeRule: { minimumMinutes: 30, difficultTerrainNd: 1 }
   },
   trapRules: {
     sources: ["livroBasico", "ameacasArton"],

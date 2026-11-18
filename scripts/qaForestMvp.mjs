@@ -4,6 +4,7 @@ import { chromium } from "@playwright/test";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { prepareForestExpedition, serializeForestExpedition } from "../src/forestExpedition.js";
 import { encodeSessionCode, decodeSessionCode } from "../src/sessionCode.js";
+import { formatElapsedTime } from "../src/format.js";
 
 const production = process.argv.includes("--production");
 const url = process.env.QA_APP_URL || (production ? "http://localhost:4173/megadungeon/" : "http://localhost:5173/megadungeon/");
@@ -100,6 +101,9 @@ async function missionFlow() {
   let credited = false;
   let exploredChecked = false;
   let pendingCaptured = false;
+  let reinforcedNodeId;
+  let totalMinutes = 0;
+  let sinceRestMinutes = 0;
   assert.match(await page.locator("#nodeMapGuidance").innerText(), /Escolha um nodo/);
   for (const node of path) {
     const index = entry.levels.flat().findIndex(n => n.id === node.id);
@@ -112,6 +116,10 @@ async function missionFlow() {
       exploredChecked = true;
     }
     await page.locator(".route-choice").click();
+    totalMinutes += node.investigationMinutes;
+    sinceRestMinutes += node.investigationMinutes;
+    assert.equal(await page.locator("#totalTimeTrackerValue").innerText(), formatElapsedTime(totalMinutes));
+    assert.equal(await page.locator("#timeTrackerValue").innerText(), formatElapsedTime(sinceRestMinutes));
     await page.locator(".complete-choice").waitFor();
     assert.equal(await page.locator("#nodeDialog .node-progress-status").innerText(), "Encontro pendente");
     assert.equal(await page.locator(".node").nth(index).getAttribute("data-progress"), "pending");
@@ -135,6 +143,30 @@ async function missionFlow() {
     assert.equal(await page.locator("#advanceNodeFloorButton").isDisabled(), true);
     const extermIndex = node.missionBindings?.findIndex(m => m.id === "qa-extermination") ?? -1;
     if (extermIndex >= 0 && !credited) {
+      const dialog = page.locator("#nodeDialog");
+      const sheet = dialog.locator(".creature-detail-card");
+      await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+      const initiative = sheet.getByRole("button", { name: "Iniciativa +2" });
+      const attack = sheet.getByRole("button", { name: "Ataque +1" });
+      const hitPoints = sheet.getByRole("button", { name: "PV +13" });
+      const nd = await dialog.locator("#nodeDialogMeta").innerText();
+      await initiative.click();
+      assert.equal(await initiative.getAttribute("aria-pressed"), "true");
+      assert.match(await sheet.innerText(), /INICIATIVA \+10 \(reforço \+2\)/);
+      await attack.click();
+      assert.match(await sheet.innerText(), /Some \+1 às jogadas de ataque/);
+      await hitPoints.click();
+      assert.match(await sheet.innerText(), /PONTOS DE VIDA 26 \(reforço \+13\)/);
+      assert.match(await sheet.innerText(), /some 13 aos PV atuais/);
+      await hitPoints.click();
+      assert.equal(await hitPoints.getAttribute("aria-pressed"), "false");
+      assert.match(await sheet.innerText(), /PONTOS DE VIDA 13/);
+      await hitPoints.click();
+      await initiative.click();
+      assert.equal(await initiative.getAttribute("aria-pressed"), "false");
+      assert.equal(await attack.getAttribute("aria-pressed"), "true");
+      assert.equal(await dialog.locator("#nodeDialogMeta").innerText(), nd);
+      reinforcedNodeId = node.id;
       const xp = new Intl.NumberFormat("pt-BR");
       assert.match(await page.locator("#nodeDialogMeta").innerText(), new RegExp(`Com clima e terreno.*${xp.format(node.challenge.total * 1000)} XP`, "i"));
       assert.match(await page.locator("#nodeDialogMeta").innerText(), new RegExp(`Sem clima e terreno.*${xp.format(node.challenge.encounter * 1000)} XP`, "i"));
@@ -160,8 +192,12 @@ async function missionFlow() {
     if (node.contentType === "camp") {
       await page.locator(".rest-choice").click();
       assert.match(await page.locator("#nodeDialog").innerText(), /Descanso registrado/);
+      sinceRestMinutes = 0;
+      assert.equal(await page.locator("#timeTrackerValue").innerText(), "0min");
+      assert.equal(await page.locator("#totalTimeTrackerValue").innerText(), formatElapsedTime(totalMinutes));
     }
     await page.locator(".complete-choice").click();
+    if (node.id === reinforcedNodeId) assert.equal(await page.locator(".creature-reinforcement").count(), 0);
     assert.equal(await page.locator("#nodeDialog .node-progress-status").innerText(), "Encontro concluído");
     assert.equal(await page.locator(".node").nth(index).getAttribute("data-progress"), "completed");
     assert.equal(await page.locator(".node").nth(index).locator(".node-progress-badge text").textContent(), "✓");
@@ -175,6 +211,7 @@ async function missionFlow() {
   const saved = decodeSessionCode(code);
   assert.ok(saved.missions.selected.find(m => m.id === "qa-extermination").progress.current > 0);
   assert.equal(saved.state.completed.length, 5);
+  assert.deepEqual(new Map(saved.state.resolvedEncounters).get(reinforcedNodeId).items[0].reinforcement, { attack: true, hitPoints: true });
   await page.screenshot({ path: "tmp/forest-mvp-qa/mission-route.png", fullPage: true });
   await page.close();
   const restored = await pageFor();
@@ -193,11 +230,15 @@ async function missionFlow() {
   const roundTrip = decodeSessionCode(await exportSession(restored));
   assert.deepEqual(roundTrip.missions, saved.missions);
   assert.deepEqual(roundTrip.state, saved.state);
+  assert.equal(saved.state.totalElapsedMinutes, totalMinutes);
+  assert.equal(saved.state.elapsedMinutes, sinceRestMinutes);
   await restored.locator("#advanceNodeFloorButton").click();
   assert.equal(await restored.locator("#floorInput").inputValue(), "16");
   assert.match(await restored.locator("#nodeMapGuidance").innerText(), /Escolha um nodo/);
   const advanced = decodeSessionCode(await exportSession(restored));
   assert.deepEqual(advanced.missions, saved.missions);
+  assert.equal(advanced.state.totalElapsedMinutes, totalMinutes);
+  assert.equal(advanced.state.elapsedMinutes, sinceRestMinutes);
   assert.equal(advanced.forestExpedition.floors.find(f => f.floor === 15).state.completed.length, 5);
   await restored.close();
   console.log("Objetivos, contador sem duplicação, descanso, conclusão, salvar/restaurar e avanço: passaram.");
@@ -214,6 +255,7 @@ async function bossFlow() {
     if (node.type === "boss") {
       await page.locator("[aria-label='Mostrar criaturas e armadilhas']").click();
       assert.match(await page.locator("#nodeDialog").innerText(), /Quimera/);
+      assert.equal(await page.locator(".creature-reinforcement").count(), 0);
       await page.locator("[aria-label='Abrir mapa tático']").click();
       await page.keyboard.press("Escape");
       assert.equal(await page.locator("#nodeDialog").evaluate(el => el.open), true, "Escape must close only the tactical map, keeping the encounter open");

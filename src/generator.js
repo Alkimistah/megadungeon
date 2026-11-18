@@ -135,23 +135,25 @@ function getClimateEventCount(node) {
   return node.environment.climate.filter((climate) => climate.name !== "Clima normal").length;
 }
 
-function assignInvestigationTime(node, profile) {
-  const rule = profile.encounterRules.timeRule;
-
+function assignInvestigationTime(node, rule) {
   if (!node.skill || !node.dc) {
     node.investigationMinutes = rule.noCheckMinutes;
     return;
   }
 
   const climateEventCount = getClimateEventCount(node);
-  const minutes = rule.incrementMinutes * (1 + climateEventCount);
+  const { minimumMinutes = rule.incrementMinutes, difficultTerrainNd = Infinity } = rule;
+  const difficultTerrain = Number(node.challenge.terrain >= difficultTerrainNd);
+  const minutes = minimumMinutes + rule.incrementMinutes * (climateEventCount + difficultTerrain);
 
   node.investigationMinutes = Math.min(minutes, rule.maxMinutes);
 }
 
-function assignInvestigationTimes(levels, profile) {
+function assignInvestigationTimes(levels, profile, version) {
+  const { timeRule, expeditionTimeRule } = profile.encounterRules;
+  const rule = version >= 2 && expeditionTimeRule ? { ...timeRule, ...expeditionTimeRule } : timeRule;
   levels.flat().forEach((node) => {
-    assignInvestigationTime(node, profile);
+    assignInvestigationTime(node, rule);
   });
 }
 
@@ -489,7 +491,7 @@ export function generateMapData(depth, baseDC, profile, floor, rng = Math.random
   assignTrapProfiles(levels, profile, rng);
   assignCreatureProfiles(levels, profile, rng);
   assignDiscoveryChecks(levels, baseDC, rng);
-  assignInvestigationTimes(levels, profile);
+  assignInvestigationTimes(levels, profile, version);
 
   if (version >= 2) {
     levels.flat().forEach((node) => {

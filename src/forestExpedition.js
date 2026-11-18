@@ -1,3 +1,4 @@
+import { getRecordedExplorationMinutes } from "./appState.js";
 import { generateMapData } from "./generator.js";
 import { createRng } from "./random.js";
 import { materializeForestFloorMissions } from "./missions/forestMissionIntegration.js";
@@ -72,4 +73,27 @@ export function restoreForestExpedition(snapshot) {
     }
   }
   return restored;
+}
+
+export function withForestExplorationTime(expedition, floor, sessionState = {}) {
+  if (Number.isFinite(sessionState.totalElapsedMinutes)) return sessionState;
+
+  let recordedMinutes = 0;
+  let totalElapsedPartial = false;
+  for (const entry of expedition.floors) {
+    if (entry.floor > floor) continue;
+    const progress = entry.floor === floor ? sessionState : entry.state;
+    if (progress) {
+      recordedMinutes += getRecordedExplorationMinutes(entry.levels, progress);
+    } else {
+      totalElapsedPartial = true;
+    }
+  }
+
+  const elapsedMinutes = sessionState.elapsedMinutes || 0;
+  return {
+    ...sessionState,
+    totalElapsedMinutes: Math.max(recordedMinutes, elapsedMinutes),
+    totalElapsedPartial: totalElapsedPartial || elapsedMinutes > recordedMinutes
+  };
 }

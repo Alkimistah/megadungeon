@@ -1,3 +1,17 @@
+const DISCOVERY_MINUTES = 15;
+
+export function getRecordedExplorationMinutes(levels, sessionState) {
+  const chosen = new Set((sessionState.chosenByLevel || []).map(([, id]) => id));
+  const scouting = new Set(sessionState.attempted || []);
+  for (const id of sessionState.explored || []) {
+    if (!chosen.has(id)) scouting.add(id);
+  }
+  const travelMinutes = levels.flat().reduce((minutes, node) =>
+    minutes + (chosen.has(node.id) ? node.investigationMinutes || 0 : 0), 0
+  );
+  return travelMinutes + scouting.size * DISCOVERY_MINUTES;
+}
+
 export function createExplorationState() {
   let levels = [];
   let activeNodeIds = new Set();
@@ -8,9 +22,11 @@ export function createExplorationState() {
   let restedNodeIds = new Set();
   let completedNodeIds = new Set();
   let elapsedMinutes = 0;
+  let totalElapsedMinutes = 0;
+  let totalElapsedPartial = false;
   let unknownPathsEnabled = false;
 
-  function setLevels(nextLevels) {
+  function setLevels(nextLevels, { resetTime = false } = {}) {
     levels = nextLevels;
     chosenNodeIds = new Set();
     chosenNodeByLevel = new Map();
@@ -19,6 +35,11 @@ export function createExplorationState() {
     restedNodeIds = new Set();
     completedNodeIds = new Set();
     activeNodeIds = new Set(levels[0].map((node) => node.id));
+    if (resetTime) {
+      elapsedMinutes = 0;
+      totalElapsedMinutes = 0;
+      totalElapsedPartial = false;
+    }
   }
 
 
@@ -52,6 +73,7 @@ export function createExplorationState() {
       attempted: [...attemptedNodeIds],
       chosenByLevel: [...chosenNodeByLevel.entries()],
       elapsedMinutes,
+      ...getExplorationTime(),
       completed: [...completedNodeIds],
       explored: [...exploredNodeIds],
       resolvedEncounters,
@@ -67,6 +89,8 @@ export function createExplorationState() {
     restedNodeIds = new Set(sessionState.rested || []);
     completedNodeIds = new Set(sessionState.completed || []);
     elapsedMinutes = sessionState.elapsedMinutes || 0;
+    totalElapsedMinutes = sessionState.totalElapsedMinutes ?? elapsedMinutes;
+    totalElapsedPartial = Boolean(sessionState.totalElapsedPartial);
 
     const resolvedEncounterByNode = new Map(sessionState.resolvedEncounters || []);
     levels.flat().forEach((node) => {
@@ -84,8 +108,13 @@ export function createExplorationState() {
     return elapsedMinutes;
   }
 
+  function getExplorationTime() {
+    return { totalElapsedMinutes, totalElapsedPartial };
+  }
+
   function addElapsedMinutes(minutes) {
     elapsedMinutes += minutes;
+    totalElapsedMinutes += minutes;
   }
 
   function resetElapsedMinutes() {
@@ -197,7 +226,7 @@ export function createExplorationState() {
     if (isNodeAttempted(node) || isNodeExplored(node) || isNodeChosen(node)) return false;
 
     attemptedNodeIds.add(node.id);
-    addElapsedMinutes(15);
+    addElapsedMinutes(DISCOVERY_MINUTES);
     return true;
   }
 
@@ -205,7 +234,7 @@ export function createExplorationState() {
     if (isNodeExplored(node) || isNodeAttempted(node) || isNodeChosen(node)) return false;
 
     exploredNodeIds.add(node.id);
-    addElapsedMinutes(15);
+    addElapsedMinutes(DISCOVERY_MINUTES);
     return true;
   }
 
@@ -213,7 +242,7 @@ export function createExplorationState() {
     if (!isNodeActive(node) || chosenNodeByLevel.has(node.level)) return false;
 
     const wasExplored = isNodeExplored(node);
-    const routeMinutes = Math.max(node.investigationMinutes - (wasExplored ? 15 : 0), 0);
+    const routeMinutes = Math.max(node.investigationMinutes - (wasExplored ? DISCOVERY_MINUTES : 0), 0);
 
     if (!wasExplored) {
       exploredNodeIds.add(node.id);
@@ -248,6 +277,7 @@ export function createExplorationState() {
     completeNode,
     exportSessionState,
     getElapsedMinutes,
+    getExplorationTime,
     getLevels,
     getLinkViewState,
     getNodeViewState,

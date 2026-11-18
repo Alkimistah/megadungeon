@@ -248,6 +248,14 @@ button:disabled:hover {
   line-height: 1.1;
 }
 
+.time-tracker-total {
+  display: grid;
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 5px;
+  border-top: 1px solid var(--header-border);
+}
+
 main {
   height: calc(100vh - 98px);
 }
@@ -2181,6 +2189,25 @@ svg {
   font-size: 13px;
   font-style: italic;
   line-height: 1.3;
+}
+
+.creature-reinforcement {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 6px 8px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  color: #f1d6a8;
+  font-size: 13px;
+}
+
+.creature-reinforcement button[aria-pressed="true"] {
+  border-color: #f1d6a8;
+  background: var(--action-hover);
+  box-shadow: inset 0 0 0 1px #f1d6a8;
 }
 
 .tormenta-creature-sheet .modal-divider {
