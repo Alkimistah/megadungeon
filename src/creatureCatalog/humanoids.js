@@ -4540,9 +4540,12 @@ export const bruxaGoblin = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 2,
-        "bookPage": 79
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 81,
+        "bookPage": 79,
+        "pdfPageEnd": 82,
+        "bookPageEnd": 80
     },
     "stats": {
         "initiative": 11,
@@ -4641,8 +4644,9 @@ export const bugbearGuardaCostas = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 81,
         "bookPage": 79
     },
     "stats": {
@@ -4698,8 +4702,9 @@ export const bugbearSentinela = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 81,
         "bookPage": 79
     },
     "stats": {

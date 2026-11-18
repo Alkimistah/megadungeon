@@ -67,6 +67,24 @@ test("Ameaças dragons cite the full PDF and show the complete Aura Aterradora",
   );
 });
 
+test("audited Duyshidakk sheets cite the full Ameaças PDF", () => {
+  const pages = {
+    "bugbear-sentinela": [81, 79],
+    "bugbear-guarda-costas": [81, 79],
+    "bruxa-goblin": [81, 79, 82, 80]
+  };
+  for (const [id, [pdfPage, bookPage, pdfPageEnd, bookPageEnd]] of Object.entries(pages)) {
+    const [source] = getCreatureById(id).sources;
+    assert.equal(source.pdfFile, "T20 Ameacas de Arton.pdf", id);
+    assert.equal(source.edition, "1ª edição, novembro de 2023", id);
+    assert.deepEqual(
+      [source.pdfPage, source.bookPage, source.pdfPageEnd, source.bookPageEnd],
+      [pdfPage, bookPage, pdfPageEnd, bookPageEnd],
+      id
+    );
+  }
+});
+
 test("an exact encounter with a single special creature preserves its challenge rating", () => {
   for (const id of ["avatar-de-aharadak", "sckhar-dragao-rei-do-fogo"]) {
     const creature = getCreatureById(id);

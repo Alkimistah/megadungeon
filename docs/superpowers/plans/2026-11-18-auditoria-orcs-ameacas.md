@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak e as 12 de Dragões.
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak, as 12 de Dragões e o primeiro lote de Duyshidakk, com 3 fichas.
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -328,10 +328,24 @@ Nenhuma ficha tem homônimo no Livro Básico. Os goblinoides do Livro Básico t�
 3. **Goblins de Ferro.** Duas fichas, PDF pp. 84–85.
 4. **Hobgoblins e Sangue do Ayrrak.** Quatro fichas, PDF pp. 86–87 e 89.
 
+### Primeiro lote — Bugbears e Bruxa Goblin
+
+| ID do catálogo | ND | PV | PM | Papel impresso | Página impressa | Página no PDF integral |
+|---|---:|---:|---:|---|---:|---:|
+| `bugbear-sentinela` | 2 | 18 | — | Lacaio | 79 | 81 |
+| `bugbear-guarda-costas` | 6 | 48 | — | Lacaio | 79 | 81 |
+| `bruxa-goblin` | 11 | 370 | 98 | Especial | 79–80 | 81–82 |
+
+Os 43 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM da Bruxa. Também foram conferidos tipo, subtipo, tamanho, deslocamento, sentidos, resistências, ataques, Êxtase no Medo, Quebrar Armas, Autofagia, Raio Conspurcado, magias com custo, execução e efeitos, perícias, equipamento e tesouro. A ficha da Bruxa começa na segunda coluna da p. 79 e continua na p. 80, a partir das Magias. A referência agora cobre as duas páginas.
+
+As páginas foram renderizadas para conferir os ícones. O Bugbear Sentinela é Lacaio no livro, mas o catálogo infere Especial. Os papéis do Guarda-Costas, Lacaio, e da Bruxa, Especial, coincidem com a inferência. Seguindo a decisão do Culto, o papel impresso fica registrado sem alterar o comportamento de geração.
+
+O livro marca com asterisco as sete magias da Bruxa, todas de encantamento ou necromancia e, portanto, beneficiadas pelo pilão conspurcado. O catálogo omite os asteriscos, mas mantém a regra do foco arcano no texto de Magias. O pilão traz o ícone de novo item, descrito no Capítulo 3: Bazar Monstruoso, conforme o quadro Novos Itens e Magias, p. 15 impressa. O Raio Conspurcado termina com um ícone em espiral sem legenda nas regras da introdução, pp. 12–17 impressas. O efeito impresso está completo no catálogo. A atualização se limita às três referências, e um teste dos andares 11–20 passa a fixar as referências auditadas de Duyshidakk.
+
 ## Pendências e ponto de retomada
 
 1. **Dragões.** Seção concluída, com 12 fichas. As referências de todas apontam para o PDF integral, e a Aura Aterradora está completa nas sete fichas que a possuem.
-2. **Restante de Ameaças de Arton.** Duyshidakk está inventariado, conforme acima. Começar a conferência pelo lote dos Bugbears e da Bruxa Goblin, PDF pp. 81–82, renderizando as páginas para conferir os ícones de papel. Depois de Duyshidakk, seguir pelos blocos seguintes, a começar por Elementais, p. 88 impressa, p. 90 do PDF, e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
+2. **Restante de Ameaças de Arton.** Duyshidakk está inventariado e o primeiro lote foi conferido, conforme acima. Seguir pelo lote da Gangue, da Horda e do Goblin-Bomba, PDF pp. 82–84, renderizando as páginas para conferir os ícones de papel. Depois de Duyshidakk, seguir pelos blocos seguintes, a começar por Elementais, p. 88 impressa, p. 90 do PDF, e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
 3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
 
