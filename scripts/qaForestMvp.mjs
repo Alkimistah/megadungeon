@@ -573,6 +573,30 @@ async function creatureHealthFlow() {
   await manual.getByRole("button", { name: "Gerar encontro", exact: true }).click();
   await manual.locator(".encounter-list-item.is-creature").first().click();
   assert.equal(await manual.getByRole("button", { name: "Adicionar criatura" }).isEnabled(), true);
+  const creature = manual.getByLabel("Ficha da criatura");
+  const budget = manual.getByLabel("Orçamento de combate");
+  const list = manual.locator(".encounter-list-item");
+  const detail = manual.locator(".creature-detail-card");
+  await budget.selectOption("8");
+  for (const [id, book, reflex, ammo, pdfPage] of [
+    ["gnoll-filibusteiro", "Ameaças de Arton", 7, 20, 118],
+    ["gnoll-filibusteiro-livro-basico", "Livro Básico", 11, 10, 297]
+  ]) {
+    await creature.selectOption({ label: `Gnoll Filibusteiro · ${book}` });
+    assert.equal(await creature.inputValue(), id);
+    assert.equal(await budget.isEnabled(), false);
+    await manual.getByRole("button", { name: "Gerar encontro", exact: true }).click();
+    assert.equal(await list.count(), 1);
+    assert.match(await list.first().innerText(), new RegExp(`1 x Gnoll Filibusteiro · ${book}`));
+    const text = await detail.innerText();
+    assert.match(text, /ND 2/);
+    assert.ok(text.includes(`REF +${reflex}`));
+    assert.ok(text.includes(`Balas x${ammo}`));
+    assert.ok(text.includes("Mosquete +12"));
+    assert.ok(text.includes(`PDF p. ${pdfPage}`));
+  }
+  await creature.selectOption("");
+  assert.equal(await budget.isEnabled(), true);
   await page.close();
 
   const dungeon = await pageFor(encodeSessionCode({

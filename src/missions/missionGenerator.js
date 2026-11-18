@@ -1,5 +1,5 @@
 import { formatChallengeRating } from "../challenge.js";
-import { creatureCatalog, getCreatureById } from "../creatureCatalog/index.js";
+import { getAutomaticCreatureCatalog, getCreatureById, isAutomaticCreature } from "../creatureCatalog/index.js";
 import { createRng, pick, pickWeighted, randomInt } from "../random.js";
 import { DEFAULT_CATEGORY_WEIGHTS, DEFAULT_ISSUER_WEIGHTS, DIFFICULTY_MULTIPLIERS, MISSION_CATEGORIES } from "./missionTables.js";
 import { calculateMissionReward } from "./missionRewards.js";
@@ -67,7 +67,7 @@ function getFallbackCreatureCandidates(profile, floor) {
   const typeWeights = profile.creatureRules?.defaultTypeWeights || [];
   const allowedTypes = new Set(typeWeights.map((entry) => entry.type));
 
-  return creatureCatalog.filter((creature) => (
+  return getAutomaticCreatureCatalog(profile).filter((creature) => (
     typeof creature.challengeRating === "number"
       && creature.challengeRating >= minimumChallenge
       && creature.challengeRating <= maximumChallenge
@@ -123,14 +123,16 @@ function getCreatureTarget(profile, floor, rng, categoryId) {
     : 10;
   let candidates = allowedIds
     .map((id) => getCreatureById(id))
-    .filter((creature) => creature && typeof creature.challengeRating === "number" && creature.challengeRating <= maximumChallenge);
+    .filter((creature) => creature && isAutomaticCreature(creature, profile) &&
+      typeof creature.challengeRating === "number" && creature.challengeRating <= maximumChallenge);
 
   candidates = getPreferredCreatureCandidates(candidates, profile, floor, categoryId);
 
   if (!candidates.length && categoryTargetIds?.length && profileTargetIds.length) {
     candidates = profileTargetIds
       .map((id) => getCreatureById(id))
-      .filter((creature) => creature && typeof creature.challengeRating === "number" && creature.challengeRating <= maximumChallenge);
+      .filter((creature) => creature && isAutomaticCreature(creature, profile) &&
+        typeof creature.challengeRating === "number" && creature.challengeRating <= maximumChallenge);
     candidates = getPreferredCreatureCandidates(candidates, profile, floor, categoryId);
   }
 

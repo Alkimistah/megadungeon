@@ -4,12 +4,14 @@ import { generateMapData } from "../src/generator.js";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { createRng } from "../src/random.js";
 import { canRerollNodeCreatures, rerollNodeCreatures, resolveForestAmbush, resolveNodeEncounter } from "../src/encounterResolver.js";
-import { creatureCatalog } from "../src/creatureCatalog/index.js";
+import { creatureCatalog, getCreatureById } from "../src/creatureCatalog/index.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
 import { calculateCombatND } from "../src/challenge.js";
 import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
 import { createExplorationState } from "../src/appState.js";
 import { createMissionState } from "../src/missions/missionState.js";
+import { getEncounterMissionMatches } from "../src/missions/missionEncounterIntegration.js";
+import { decodeSessionCode, encodeSessionCode } from "../src/sessionCode.js";
 import { getForestTrapPresentation } from "../src/forestTrapPresentation.js";
 import { isDamageType } from "../src/damageTypes.js";
 import { withChimeraBreath, withChimeraDamage, withChimeraHealthUndone, withChimeraTurnEnded } from "../src/chimeraCombat.js";
@@ -19,6 +21,79 @@ import { canAddEncounterCreature, getCreatureUnits, getEncounterForSave, hasEnco
 const integration = await import("../src/missions/forestMissionIntegration.js").catch(() => ({}));
 const expeditionModule = await import("../src/forestExpedition.js").catch(() => ({}));
 const presentation = await import("../src/nodeProgressPresentation.js").catch(() => ({}));
+
+test("the two Gnoll Filibusteiro sources preserve old encounter and mission IDs", () => {
+  const originalId = "gnoll-filibusteiro";
+  const basicId = "gnoll-filibusteiro-livro-basico";
+  const original = getCreatureById(originalId);
+  const basic = getCreatureById(basicId);
+  assert.ok(basic);
+  assert.equal(original.source.book, "Ameaças de Arton");
+  assert.equal(original.stats.reflex, 7);
+  assert.match(original.equipment, /x20/);
+  assert.equal(basic.source.book, "Livro Básico");
+  assert.equal(basic.source.bookPage, 291);
+  assert.equal(basic.source.pdfPage, 297);
+  assert.equal(basic.stats.reflex, 11);
+  assert.match(basic.equipment, /x10/);
+  assert.deepEqual(original.sources.map(source => source.book), ["Ameaças de Arton"]);
+
+  const encounter = resolveNodeEncounter({
+    id: "gnoll-legacy", fixedComposition: { creatures: [{ id: originalId, quantity: 1 }] }, challenge: { total: 2 }
+  });
+  const { state } = decodeSessionCode(encodeSessionCode({
+    v: 1, mode: "node-map", profile: profile.id, floor: 14, depth: 3, baseDc: 21, mapSeed: "gnoll-legacy",
+    state: { resolvedEncounters: [[0, encounter]] }
+  }));
+  const [[, restored]] = state.resolvedEncounters;
+  const [item] = restored.items;
+  assert.equal(item.creatureId, originalId);
+  const missions = [{
+    id: "gnoll-hunt", status: "materialized", category: "extermination",
+    objective: { targetType: "creature", targetId: originalId, quantity: 1 }
+  }];
+  assert.equal(getEncounterMissionMatches(item, missions)[0].count, 1);
+  assert.equal(getEncounterMissionMatches({ ...item, creatureId: basicId }, missions).length, 0);
+});
+
+test("automatic resolution and reroll select one Gnoll version for each profile", () => {
+  const originalId = "gnoll-filibusteiro";
+  const basicId = "gnoll-filibusteiro-livro-basico";
+  const alternateProfile = {
+    ...profile, creatureRules: { ...profile.creatureRules, preferredCreatureIdsByFamily: { [originalId]: basicId } }
+  };
+  const makeNode = allowedCreatureIds => ({
+    id: "gnoll-variants", encounterSeed: "gnoll-variants", type: "normal",
+    challenge: { creatures: 2, total: 2 },
+    creature: { type: "humanoid", targetChallenge: 2, allowedCreatureIds }
+  });
+  const standard = makeNode([originalId, basicId]);
+  assert.deepEqual(resolveNodeEncounter(standard, { profile }).items.map(item => item.creatureId), [originalId]);
+  assert.equal(rerollNodeCreatures(standard, profile), null);
+  const alternative = makeNode([originalId, basicId]);
+  assert.deepEqual(resolveNodeEncounter(alternative, { profile: alternateProfile }).items.map(item => item.creatureId), [basicId]);
+  assert.equal(rerollNodeCreatures(alternative, alternateProfile), null);
+  alternative.creature.allowedCreatureIds.push("orc-chefe");
+  assert.deepEqual(rerollNodeCreatures(alternative, alternateProfile).items.map(item => item.creatureId), ["orc-chefe"]);
+  assert.equal(resolveNodeEncounter(makeNode([basicId]), { profile }), null);
+
+  for (const [activeProfile, expectedId] of [[profile, originalId], [alternateProfile, basicId]]) {
+    const missionProfile = {
+      ...activeProfile,
+      missionRules: {
+        ...activeProfile.missionRules,
+        missionFloors: [14],
+        allowedCategories: ["extermination"],
+        creatureTargetIds: [originalId, basicId],
+        exterminationTargetIds: [originalId, basicId],
+        offerCountMin: 1,
+        offerCountMax: 1
+      }
+    };
+    const offers = generateMissionOffers(createMissionGenerationContext({ currentSeed: "gnoll-pilot", profile: missionProfile }));
+    assert.deepEqual(offers.map(offer => offer.objective.targetId), [expectedId]);
+  }
+});
 
 test("outdoor trap presentations use the terrain and repeat after restoring the encounter", () => {
   const node = {

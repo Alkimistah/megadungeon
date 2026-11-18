@@ -3,7 +3,7 @@ import { formatChallengeRating } from "./challenge.js";
 import { createChimeraCombatControls } from "./chimeraCombatView.js";
 import { CREATURE_REINFORCEMENT_BONUSES, getCreatureReinforcement } from "./creatureReinforcement.js";
 import { createCreatureHealthControls } from "./encounterCreatureHealthView.js";
-import { getCreatureById } from "./creatureCatalog/index.js";
+import { formatCreatureCatalogName, getCreatureById } from "./creatureCatalog/index.js";
 import { getDamageType } from "./damageTypes.js";
 import { getForestTrapPresentation } from "./forestTrapPresentation.js";
 import { getWeaponVariationLabel } from "./equipment/weaponVariation.js";
@@ -439,7 +439,10 @@ function createEncounterList(node, selectedKey, onSelect, missions, trapPresenta
     const generatedClass = item.generated ? " is-generated" : "";
     button.className = `encounter-list-item ${kindClass}${generatedClass}`;
     button.classList.toggle("is-selected", key === selectedKey);
-    name.textContent = `${item.quantity} x ${trapPresentations.get(item)?.name || item.name}`;
+    const itemName = item.kind === "creature"
+      ? formatCreatureCatalogName(item.creatureData ?? getCreatureById(item.creatureId), item.name)
+      : trapPresentations.get(item)?.name || item.name;
+    name.textContent = `${item.quantity} x ${itemName}`;
     button.appendChild(name);
     getEncounterMissionMatches({ ...item, encounterKey: node.resolvedEncounter.seed }, missions).forEach((match) => {
       button.appendChild(createEncounterMissionBadge(match));
@@ -587,7 +590,7 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
   const typeText = `${item.typeLabel}${creature.subtype ? ` (${creature.subtype})` : ""}`;
 
   header.className = "creature-sheet-header";
-  title.textContent = item.name;
+  title.textContent = formatCreatureCatalogName(creature, item.name);
   challenge.textContent = `ND ${item.challengeLabel}`;
   subtitle.className = "creature-sheet-subtitle";
   subtitle.textContent = `${typeText} ${creature.size || ""} · ${item.roleLabel} · ${item.quantity} no encontro`;

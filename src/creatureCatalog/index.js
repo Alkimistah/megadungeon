@@ -92,6 +92,30 @@ export const creaturesByType = Object.fromEntries(
 
 export const creatureCatalog = Object.values(creaturesByType).flat();
 
+const variantsByFamily = new Map();
+for (const creature of creatureCatalog) {
+  if (!creature.variantOf) continue;
+  if (!variantsByFamily.has(creature.variantOf)) variantsByFamily.set(creature.variantOf, new Set([creature.variantOf]));
+  variantsByFamily.get(creature.variantOf).add(creature.id);
+}
+
+export function isAutomaticCreature(creature, profile) {
+  const family = creature.variantOf || creature.id;
+  const variants = variantsByFamily.get(family);
+  if (!variants) return true;
+  const preferred = profile?.creatureRules?.preferredCreatureIdsByFamily?.[family];
+  return creature.id === (variants.has(preferred) ? preferred : family);
+}
+
+export function getAutomaticCreatureCatalog(profile) {
+  return creatureCatalog.filter(creature => isAutomaticCreature(creature, profile));
+}
+
+export function formatCreatureCatalogName(creature, name = creature?.name) {
+  const family = creature?.variantOf || creature?.id;
+  return variantsByFamily.has(family) && creature.source?.book ? `${name} · ${creature.source.book}` : name;
+}
+
 export function getCreatureById(id) {
   return creatureCatalog.find((creature) => creature.id === id) || null;
 }

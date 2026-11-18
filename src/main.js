@@ -53,6 +53,7 @@ const elements = {
   manualEncounterChallengeInput: document.getElementById("manualEncounterChallengeInput"),
   manualEncounterClose: document.getElementById("manualEncounterClose"),
   manualEncounterCreatureTypeInput: document.getElementById("manualEncounterCreatureTypeInput"),
+  manualEncounterCreatureInput: document.getElementById("manualEncounterCreatureInput"),
   manualEncounterDialog: document.getElementById("manualEncounterDialog"),
   manualEncounterForm: document.getElementById("manualEncounterForm"),
   manualEncounterResult: document.getElementById("manualEncounterResult"),
@@ -174,7 +175,7 @@ function getMissionContext(mission) {
       : { kind: "past-node", message: "A rota escolhida deixou este objetivo para trás." };
   }
 
-  resolveNodeEncounter(node, { mapSeed: currentMapSeed });
+  resolveNodeEncounter(node, { mapSeed: currentMapSeed, profile: activeFloorRange });
 
   return {
     kind: "node",
@@ -249,7 +250,7 @@ const nodeDialogController = createNodeDialogController({
     const changed = state.chooseRoute(node);
 
     if (changed) {
-      resolveNodeEncounter(node, { mapSeed: currentMapSeed });
+      resolveNodeEncounter(node, { mapSeed: currentMapSeed, profile: activeFloorRange });
     }
 
     refreshExplorationDisplay();
@@ -279,7 +280,7 @@ const nodeDialogController = createNodeDialogController({
   },
   onRerollCreatures: (node) => {
     if (!canRerollCreatures(node)) return false;
-    const encounter = rerollNodeCreatures(node);
+    const encounter = rerollNodeCreatures(node, activeFloorRange);
     if (!encounter) return false;
     node.resolvedEncounter = encounter;
     refreshExplorationDisplay();
@@ -316,6 +317,7 @@ const mapRenderer = createMapRenderer({
 const manualEncounterDialogController = createManualEncounterDialogController({
   challengeInput: elements.manualEncounterChallengeInput,
   closeButton: elements.manualEncounterClose,
+  creatureInput: elements.manualEncounterCreatureInput,
   creatureTypeInput: elements.manualEncounterCreatureTypeInput,
   dialogElement: elements.manualEncounterDialog,
   formElement: elements.manualEncounterForm,
@@ -634,7 +636,7 @@ function resolveChosenRouteEncounters(levels, sessionState = {}) {
 
   levels.flat().forEach((node) => {
     if (chosenNodeIds.has(node.id)) {
-      resolveNodeEncounter(node, { mapSeed: currentMapSeed });
+      resolveNodeEncounter(node, { mapSeed: currentMapSeed, profile: activeFloorRange });
     }
   });
 }

@@ -199,12 +199,17 @@
           <div>
             <p class="node-dialog-type">Gerador manual</p>
             <h2 id="manualEncounterDialogTitle">Encontro</h2>
-            <p class="node-dialog-meta">Configure o orçamento de combate e gere uma composição.</p>
+            <p class="node-dialog-meta">Escolha uma ficha ou gere uma composição pelo orçamento de combate.</p>
           </div>
           <button id="manualEncounterClose" class="icon-button" type="button" aria-label="Fechar"><img src="/assets/icons/close-modal.svg" alt="" /></button>
         </div>
 
         <div class="manual-encounter-controls">
+          <label class="manual-encounter-creature">
+            Ficha da criatura
+            <select id="manualEncounterCreatureInput"></select>
+          </label>
+
           <label>
             Orçamento de combate
             <select id="manualEncounterChallengeInput"></select>

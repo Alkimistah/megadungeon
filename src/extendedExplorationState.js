@@ -245,7 +245,7 @@ function createEncounterNode({ categoryId, categoryLabel, challenge, floor, prof
   if (node.challenge.creatures > 0) {
     assignCreatureProfile(node, profile, rng);
   }
-  resolveNodeEncounter(node, { mapSeed: `extended-floor-${floor}` });
+  resolveNodeEncounter(node, { mapSeed: `extended-floor-${floor}`, profile });
 
   return node;
 }
@@ -1610,7 +1610,7 @@ export function createExtendedExplorationState(profile, rng = Math.random) {
     if (!scene?.encounterNode) return scene;
 
     scene.encounterNode.resolvedEncounter = getEncounterForSave(scene.encounterNode.resolvedEncounter);
-    resolveNodeEncounter(scene.encounterNode, { mapSeed: `extended-floor-${floor}` });
+    resolveNodeEncounter(scene.encounterNode, { mapSeed: `extended-floor-${floor}`, profile: activeProfile });
     return scene;
   }
 

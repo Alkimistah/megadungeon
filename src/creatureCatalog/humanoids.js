@@ -243,8 +243,9 @@ export const gnollFilibuster = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 15,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 118,
         "bookPage": 116
     },
     "stats": {
@@ -287,6 +288,15 @@ export const gnollFilibuster = {
     "equipment": "Balas x20, espada curta, mosquete",
     "treasure": "Padrão.",
     "skillsText": null
+};
+
+const gnollFilibusterBasic = {
+    ...gnollFilibuster,
+    id: "gnoll-filibusteiro-livro-basico",
+    variantOf: gnollFilibuster.id,
+    source: undefined,
+    stats: { ...gnollFilibuster.stats, reflex: 11 },
+    equipment: "Balas x10, espada curta, mosquete"
 };
 
 export const orcMutante = {
@@ -9963,7 +9973,7 @@ export const liderMercenarioDeAslothia = {
 export const humanoidCreatures = [
     // Manuais, Livro Básico e Ameaças de Arton
     orcCombatant, orcEnfraquecido, orcChief, ogre,
-    gnollMarauder, gnollFilibuster, orcMutante, bandido,
+    gnollMarauder, gnollFilibuster, gnollFilibusterBasic, orcMutante, bandido,
     chefeBandido, guardaDeCidade, sargentoDaGuarda, centauroCombatente,
     centauroXama, trog, recrutaPurista, soldadoPurista,
     sargentoMor, capelaoDeGuerra, capitaoBaluarte, cavaleiroDeLeopardoSangrento,

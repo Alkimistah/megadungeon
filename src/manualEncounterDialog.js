@@ -1,4 +1,5 @@
 import { formatChallengeRating } from "./challenge.js";
+import { creatureCatalog, formatCreatureCatalogName, getCreatureById } from "./creatureCatalog/index.js";
 import { createEncounterCombatPage, getDefaultEncounterItemKey } from "./nodeDialog.js";
 import { CREATURE_TYPES } from "./creatures.js";
 import { resolveNodeEncounter } from "./encounterResolver.js";
@@ -94,7 +95,7 @@ function getTrapProfile(profile, trapMode) {
   };
 }
 
-function createManualNode({ challengeRating, profile, rng, seed, terrainName, trapMode, type }) {
+function createManualNode({ challengeRating, profile, rng, seed, terrainName, trapMode, type, fixedCreature }) {
   const node = {
     id: `manual-${seed}`,
     encounterSeed: `manual-${seed}`,
@@ -130,7 +131,13 @@ function createManualNode({ challengeRating, profile, rng, seed, terrainName, tr
     assignTrapProfile(node, getTrapProfile(profile, trapMode), rng);
   }
 
-  if (node.challenge.creatures > 0) {
+  if (fixedCreature) {
+    node.fixedComposition = {
+      creatures: [{ id: fixedCreature.id, quantity: 1 }],
+      traps: [],
+      useWeaponVariation: false
+    };
+  } else if (node.challenge.creatures > 0) {
     const creatureType = CREATURE_TYPES[type] || CREATURE_TYPES.monster;
 
     node.creature = {
@@ -149,7 +156,7 @@ function createManualNode({ challengeRating, profile, rng, seed, terrainName, tr
     };
   }
 
-  resolveNodeEncounter(node, { mapSeed: `manual-${seed}` });
+  resolveNodeEncounter(node, { mapSeed: `manual-${seed}`, profile });
 
   return node;
 }
@@ -157,6 +164,7 @@ function createManualNode({ challengeRating, profile, rng, seed, terrainName, tr
 export function createManualEncounterDialogController({
   challengeInput,
   closeButton,
+  creatureInput,
   creatureTypeInput,
   dialogElement,
   formElement,
@@ -177,7 +185,7 @@ export function createManualEncounterDialogController({
     if (!currentNode?.resolvedEncounter) {
       const notice = document.createElement("p");
       notice.className = "hidden-environment-notice";
-      notice.textContent = "Defina o orçamento e gere um encontro.";
+      notice.textContent = "Escolha uma ficha ou defina o orçamento e gere um encontro.";
       resultElement.appendChild(notice);
       return;
     }
@@ -196,9 +204,10 @@ export function createManualEncounterDialogController({
     const profile = getProfile();
     const seed = createRandomSeed();
     const rng = createRng(`manual-${seed}`);
-    const challengeRating = Number(challengeInput.value);
+    const fixedCreature = getCreatureById(creatureInput.value);
+    const challengeRating = fixedCreature?.challengeRating ?? Number(challengeInput.value);
     const terrainName = terrainInput.value;
-    const type = pickCreatureType(profile, terrainName, creatureTypeInput.value, rng);
+    const type = fixedCreature?.type ?? pickCreatureType(profile, terrainName, creatureTypeInput.value, rng);
 
     currentNode = createManualNode({
       challengeRating,
@@ -206,8 +215,9 @@ export function createManualEncounterDialogController({
       rng,
       seed,
       terrainName,
-      trapMode: trapModeInput.value,
-      type
+      trapMode: fixedCreature ? "none" : trapModeInput.value,
+      type,
+      fixedCreature
     });
     selectedItemKey = null;
     renderResult();
@@ -219,6 +229,19 @@ export function createManualEncounterDialogController({
 
   populateChallengeOptions(challengeInput);
   populateCreatureTypeOptions(creatureTypeInput);
+  const options = creatureCatalog
+    .filter(creature => Number.isFinite(creature.challengeRating))
+    .map(creature => createOption(creature.id, formatCreatureCatalogName(creature)))
+    .sort((a, b) => a.textContent.localeCompare(b.textContent, "pt-BR"));
+  creatureInput.replaceChildren(createOption("", "Gerar pelo orçamento"), ...options);
+  const syncSelection = () => {
+    const usesExactCreature = Boolean(creatureInput.value);
+    for (const control of [challengeInput, creatureTypeInput, trapModeInput]) {
+      control.disabled = usesExactCreature;
+    }
+  };
+  creatureInput.addEventListener("change", syncSelection);
+  syncSelection();
   syncProfileOptions();
   renderResult();
 

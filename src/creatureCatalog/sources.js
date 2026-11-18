@@ -34,7 +34,7 @@ export const sourceByCreatureId = {
     "centauro-combatente": basicBookSource(290),
     "centauro-xama": basicBookSource(290),
     "gnoll-saqueador": basicBookSource(290),
-    "gnoll-filibusteiro": basicBookSource(291),
+    "gnoll-filibusteiro-livro-basico": basicBookSource(291),
     "gorlogg": basicBookSource(291),
     "trog": basicBookSource(291, 292),
     "lobo-das-cavernas": basicBookSource(292),

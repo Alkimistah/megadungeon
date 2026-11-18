@@ -2433,6 +2433,10 @@ svg {
   width: 100%;
 }
 
+.manual-encounter-creature {
+  grid-column: 1 / -1;
+}
+
 .manual-encounter-result:empty {
   display: none;
 }
