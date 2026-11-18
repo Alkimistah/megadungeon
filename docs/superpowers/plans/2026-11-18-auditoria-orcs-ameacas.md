@@ -186,4 +186,15 @@ Os dois comparativos entre livros geraram versões com IDs próprios. As fichas 
 - O papel impresso de Iniciado da Agonia e dos dois Fanáticos é Lacaio. Os dois Reishids são Especiais, e o Avatar de Ameaças é Solo. A inferência do catálogo difere nesses seis casos. Os papéis existentes foram preservados nesta entrega para manter o comportamento de geração.
 - O texto abreviado de Insanidade da Tormenta deve ser lido com a regra compartilhada dos lefeu do Livro Básico, p. 315, referenciada em Ameaças na p. 21. Ameaças também acrescenta a imunidade a Roubar a Alma e efeitos semelhantes na p. 60. Uma revisão de apresentação pode expor essas regras compartilhadas nas fichas.
 
-Na sequência do sumário, o próximo bloco é Dragões, a partir da p. 64 impressa, p. 66 do PDF. Áreas de Tormenta, a partir da p. 18 impressa, p. 20 do PDF, também segue pendente.
+### Publicação do Culto
+
+As 11 fichas do Culto foram publicadas em `648a0e1`, com o papel Solo do Avatar de Deuses conferido em `1cb85ea`. A publicação elevou o total de Ameaças para 49 fichas auditadas. Passaram os testes dos andares 1–20, das missões e do build de produção no Chrome, incluindo seleção de ND S e uso offline. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44397168339)
+
+## Pendências e ponto de retomada
+
+1. **Dragões.** Retomar na p. 64 impressa, p. 66 do PDF integral, pelos Filhotes do Bosque e dos Rios. Inventariar o restante da seção antes de definir os próximos lotes. Cruzar as fichas homônimas com o Livro Básico, preservando os IDs atuais.
+2. **Restante de Ameaças de Arton.** Seguir pelos blocos posteriores a Dragões e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
+3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
+4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
+
+A implementação de rolagem de tesouros segue prevista para depois da auditoria. [Planejamento da rolagem de tesouros](../../../ARCHITECTURE.md#rolagem-de-tesouros)
