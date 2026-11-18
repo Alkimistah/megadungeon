@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis e as 17 fichas de Capangas & Bandoleiros.
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros e as 11 do Culto de Aharadak.
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -151,3 +151,39 @@ Os 14 campos numéricos conferidos coincidem. A ficha confirma cura acelerada 5,
 ## Fechamento de Capangas & Bandoleiros
 
 As 17 fichas publicadas na seção, das pp. 42–51 impressas, estão no catálogo com referências para o PDF integral. Nos quatro lotes finais foram conferidos 114 campos numéricos, além de ataques, habilidades, defesas, perícias, equipamento e tesouro. As alterações desses lotes se limitam às referências. O comparativo do Chefe Bandido com o Livro Básico permanece documentado no oitavo lote.
+
+## Publicação e retomada
+
+Em 18 de novembro de 2026, a publicação em `main` fechou Brutos & Indomáveis e Capangas & Bandoleiros, com 38 fichas auditadas ao todo. O lote inicial dos Orcs saiu em `78d85bf`. O commit `3c510e1` publicou as 31 fichas dos lotes seguintes e as versões do Livro Básico de Ogro e Chefe Bandido. O commit `2860070` registrou o planejamento da interface de tesouros. [Implantação no GitHub Pages](https://github.com/Alkimistah/megadungeon/actions/runs/44391788335)
+
+Passaram os testes dos andares 1–10 e 11–20, a amostragem de missões e o QA do build de produção no Chrome. O QA confirmou a escolha manual de fichas por livro e a restauração de saves. Com o cache ativo, o app recarregou, iniciou uma expedição e exportou a sessão sem rede. O site público apontou para o bundle JavaScript do build validado.
+
+## Culto de Aharadak
+
+| Ficha | ND | Página impressa | Página no PDF integral |
+|---|---:|---:|---:|
+| Iniciado da Agonia | 3 | 52 | 54 |
+| Sacerdote da Agonia | 9 | 52–53 | 54–55 |
+| Aspecto de Aharadak | 10 | 54 | 56 |
+| Fanático Lefou | 5 | 55 | 57 |
+| Líder Fanático Lefou | 8 | 55 | 57 |
+| Reishid | 8 | 56 | 58 |
+| Reishid Líder de Culto | 12 | 56 | 58 |
+| Senhor do Gigante Rubro Forma Inicial | 9 | 58–59 | 60–61 |
+| Senhor do Gigante Rubro Forma Final | 16 | 58–59 | 60–61 |
+| Zyrrinaz | 5 | 59 | 61 |
+| Avatar de Aharadak | S | 62 | 64 |
+
+Os 157 campos numéricos conferidos coincidem com as fichas. A conferência também abrangeu ataques, habilidades, magias, custos, perícias, equipamento e tesouro. A referência do Sacerdote cobre a continuação da ficha na p. 53. Os intervalos das duas formas do Gigante Rubro incluem o quadro Dolorosa Separação, na p. 59. Templos e Dádivas permanecem fora do inventário de fichas.
+
+Os dois comparativos entre livros geraram versões com IDs próprios. As fichas de Ameaças mantêm seus IDs e são as versões padrão das famílias. A seleção manual identifica o livro e permite abrir fichas de ND S e S+, preservando o rótulo no combate.
+
+- **Reishid do Livro Básico** (`reishid-livro-basico`, pp. 314–315 impressas, pp. 320–321 do PDF). Ataque Reflexo menciona um alvo adjacente que esteja desprevenido ou que se mova para fora do alcance. Em Ameaças, o alvo precisa estar ao alcance natural e o gatilho de movimento é voluntário. Os 14 campos numéricos conferidos coincidem.
+- **Avatar de Aharadak de Deuses de Arton** (`avatar-de-aharadak-deuses-de-arton`, p. 151 impressa, p. 153 do PDF, 1ª edição v1.1). É um lekael com 2.477 PV, Defesa 73 e sete garras a +67. A ficha de Ameaças é um lefeu com 2.804 PV, Defesa 70, quatro tentáculos e uma mordida a +58. As listas de poderes são próprias de cada edição. Os 14 campos numéricos da nova ficha foram conferidos.
+
+### Diferenças para revisão futura
+
+- O papel impresso de Iniciado da Agonia e dos dois Fanáticos é Lacaio. Os dois Reishids são Especiais, e o Avatar de Ameaças é Solo. A inferência do catálogo difere nesses seis casos. Os papéis existentes foram preservados nesta entrega para manter o comportamento de geração.
+- O texto abreviado de Insanidade da Tormenta deve ser lido com a regra compartilhada dos lefeu do Livro Básico, p. 315, referenciada em Ameaças na p. 21. Ameaças também acrescenta a imunidade a Roubar a Alma e efeitos semelhantes na p. 60. Uma revisão de apresentação pode expor essas regras compartilhadas nas fichas.
+
+Na sequência do sumário, o próximo bloco é Dragões, a partir da p. 64 impressa, p. 66 do PDF. Áreas de Tormenta, a partir da p. 18 impressa, p. 20 do PDF, também segue pendente.

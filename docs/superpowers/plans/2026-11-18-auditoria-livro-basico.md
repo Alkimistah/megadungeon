@@ -13,8 +13,18 @@ O cotejo de ND, atributos e estatísticas cobriu 1.120 campos. As diferenças nu
 
 A revisão manual resolveu os 48 alertas textuais de 17 fichas. Os resultados foram 32 regras compartilhadas confirmadas nos quadros de dragões (p. 311) e lefeu (p. 315), 9 diferenças de redação, abreviação ou layout, e 7 diferenças de ficha entre os livros. O relatório local `tmp/livros/auditoria-livro-basico-revisao.csv` registra cada decisão com páginas e campo.
 
-Além das duas diferenças numéricas acima, a revisão confirmou diferenças no ataque do Orc Mutante, na munição do Gnoll Filibusteiro, em quatro entradas de magia e habilidade do Capelão de Guerra e no gatilho de Ataque Reflexo do Reishid. Esses quatro, junto com o Gorlogg, são os primeiros candidatos confirmados à separação por fonte. A revisão preservou o conteúdo e os IDs do catálogo.
+Além das duas diferenças numéricas acima, a revisão confirmou diferenças no ataque do Orc Mutante, na munição do Gnoll Filibusteiro, em quatro entradas de magia e habilidade do Capelão de Guerra e no gatilho de Ataque Reflexo do Reishid. A primeira rodada registrou essas diferenças e preservou o conteúdo e os IDs existentes.
 
-O Gnoll Filibusteiro é o piloto proposto. O ID atual continua associado a Ameaças de Arton, com Reflexos +7 e 20 balas. A ficha do Livro Básico terá ID próprio, Reflexos +11 e 10 balas, após implementação e teste do suporte às duas versões.
+## Versões por fonte
 
-Os PDFs e o relatório detalhado ficam em `tmp/livros/`. A escolha manual e a preferência de versão por perfil serão tratadas ao introduzir as fichas de fontes diferentes, com teste de compatibilidade de saves.
+| Ficha | ID do Livro Básico | Commit |
+|---|---|---|
+| Gnoll Filibusteiro | `gnoll-filibusteiro-livro-basico` | `7ca2fd8` |
+| Orc Mutante | `orc-mutante-livro-basico` | `78d85bf` |
+| Ogro | `ogro-livro-basico` | `3c510e1` |
+| Chefe Bandido | `chefe-bandido-livro-basico` | `3c510e1` |
+| Reishid | `reishid-livro-basico` | Lote do Culto de Aharadak |
+
+As versões do Básico estão disponíveis na seleção manual. As fichas de Ameaças mantêm os IDs originais e seguem como padrão dos perfis existentes. Gorlogg e Capelão de Guerra seguem pendentes de separação por fonte. [Piloto do Gnoll Filibusteiro](2026-11-18-piloto-versoes-gnoll.md) · [Auditoria de Ameaças de Arton](2026-11-18-auditoria-orcs-ameacas.md)
+
+Os PDFs e o relatório detalhado ficam em `tmp/livros/`.

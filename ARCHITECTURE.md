@@ -291,9 +291,11 @@ O diretório `creatureCatalog/` armazena fichas de criaturas específicas por ti
 
 Além do tipo da criatura, o catálogo enriquece cada ficha com papel de ameaça (`role`): `solo`, `minion`/`lacaio` ou `special`/`especial`. Esse campo representa o ícone mecânico da ficha, não a espécie ou origem da criatura. Quando o papel não está explícito no cadastro, `inferThreatRole` compara PV, Defesa, ataque e quantidade de habilidades com as tabelas de criação de ameaças e marca o resultado com `roleSource: "inferred"` e `roleConfidence`; fichas cadastradas com papel explícito usam `roleSource: "explicit"`.
 
-A subpasta `creatureCatalog/bookBasic/` contém cadastros importados do PDF textual do Livro Básico. Esses registros ficam separados por tipo, têm `source: { book: "Livro Básico", pdfPage, bookPage }` e enriquecem criaturas manuais já existentes com a mesma fonte sem duplicar ids.
+As referências vêm do campo `source` das fichas e do mapeamento por ID em `creatureCatalog/sources.js`. O índice reúne as referências aplicáveis em `sources`. As referências auditadas identificam livro, edição e página impressa e do PDF integral, com o intervalo quando a ficha ocupa mais de uma página.
 
-A subpasta `creatureCatalog/ameacasArton/` contém cadastros importados dos PDFs textuais de Ameaças de Arton. Duplicatas já presentes no catálogo principal não são recadastradas; em vez disso, entram como fonte adicional em `sources`. O perfil atual usa `creatureRules.bossCreatureId: "quimera"`, fazendo a Quimera de Ameaças de Arton ser a criatura específica do boss do andar 20.
+As versões homônimas cadastradas têm IDs próprios. A variante aponta para o ID padrão em `variantOf`. O seletor manual e a lista de combate mostram o livro, e o sorteio usa a ficha padrão da família ou a preferência em `creatureRules.preferredCreatureIdsByFamily`. Saves e encontros fixos continuam a resolver pelo ID gravado. [Especificação e progresso da auditoria](docs/superpowers/specs/2026-11-18-auditoria-catalogo-criaturas-design.md)
+
+O perfil da floresta usa `creatureRules.bossCreatureId: "quimera"` para selecionar a Quimera de Ameaças de Arton no andar 20.
 
 `damageTypes.js` centraliza os tipos de dano (`acid`, `slashing`, `electricity`, `essence`, `fire`, `cold`, `bludgeoning`, `light`, `piercing`, `psychic`, `darkness`) com rótulos em português, aliases e categorias. Esse catálogo é usado como referência comum por ameaças, armadilhas, perigos ambientais e habilidades.
 
@@ -507,7 +509,7 @@ O app funciona offline via Service Worker (`public/sw.js`) com cache de todos os
 
 ### Rolagem de tesouros
 
-Proposta para detalhar após a auditoria e a atualização das fichas de criaturas. Um botão no cabeçalho, junto aos acessos de encontros manuais e missões, abrirá a modal **Rolar tesouros**.
+A interface proposta foi registrada no commit `2860070`. O detalhamento das regras e a implementação ficam para depois da auditoria das fichas de criaturas. Um botão no cabeçalho, junto aos acessos de encontros manuais e missões, abrirá a modal **Rolar tesouros**.
 
 - **Entrada.** Uma linha de controles com **ND**, **Quantidade**, um grupo de opções exclusivas **Padrão**, **Item** e **Riqueza**, e o botão **Rolar**.
 - **Tabela de resultados.** Uma linha numerada por tesouro. **Padrão** mostra as colunas **Item** e **Riqueza**. **Item** e **Riqueza** exibem somente a coluna selecionada.

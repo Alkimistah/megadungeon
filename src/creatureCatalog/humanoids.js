@@ -4366,8 +4366,9 @@ export const iniciadoDaAgonia = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 1,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 54,
         "bookPage": 52
     },
     "stats": {
@@ -4442,9 +4443,12 @@ export const sacerdoteDaAgonia = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 1,
-        "bookPage": 52
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 54,
+        "bookPage": 52,
+        "pdfPageEnd": 55,
+        "bookPageEnd": 53
     },
     "stats": {
         "initiative": 15,

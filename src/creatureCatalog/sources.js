@@ -91,7 +91,7 @@ export const sourceByCreatureId = {
     "maniaco-lefou": basicBookSource(314),
     "uktril": basicBookSource(314),
     "geraktril": basicBookSource(314),
-    "reishid": basicBookSource(314, 315),
+    "reishid-livro-basico": basicBookSource(314, 315),
     "otyugh": basicBookSource(315, 316),
     "thuwarokk": basicBookSource(315),
     "sacerdote-de-aharadak": basicBookSource(316),

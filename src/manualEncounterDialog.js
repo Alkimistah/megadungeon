@@ -1,4 +1,4 @@
-import { formatChallengeRating } from "./challenge.js";
+import { formatChallengeRating, isSpecialChallengeRating } from "./challenge.js";
 import { creatureCatalog, formatCreatureCatalogName, getCreatureById } from "./creatureCatalog/index.js";
 import { createEncounterCombatPage, getDefaultEncounterItemKey } from "./nodeDialog.js";
 import { CREATURE_TYPES } from "./creatures.js";
@@ -230,7 +230,7 @@ export function createManualEncounterDialogController({
   populateChallengeOptions(challengeInput);
   populateCreatureTypeOptions(creatureTypeInput);
   const options = creatureCatalog
-    .filter(creature => Number.isFinite(creature.challengeRating))
+    .filter(creature => Number.isFinite(creature.challengeRating) || isSpecialChallengeRating(creature.challengeRating))
     .map(creature => createOption(creature.id, formatCreatureCatalogName(creature)))
     .sort((a, b) => a.textContent.localeCompare(b.textContent, "pt-BR"));
   creatureInput.replaceChildren(createOption("", "Gerar pelo orçamento"), ...options);

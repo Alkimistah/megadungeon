@@ -1753,8 +1753,9 @@ export const reishid = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 58,
         "bookPage": 56
     },
     "stats": {
@@ -1828,6 +1829,19 @@ export const reishid = {
     "equipment": null,
     "treasure": "Padrão mais adaga da Tormenta. Esta é uma arma mágica específica que conta como uma adaga formidável tumular. Sua lâmina é longa e ondulada e seu cabo lembra uma carapaça. A adaga secreta muco adesivo pelo cabo, que mantém a arma firme na mão, fornecendo +5 em testes contra desarmar. Soltar uma adaga da Tormenta gasta uma ação de movimento.",
     "skillsText": "Furtividade +20"
+};
+
+const reishidBasic = {
+    ...reishid,
+    id: "reishid-livro-basico",
+    variantOf: reishid.id,
+    source: undefined,
+    abilities: reishid.abilities.map(ability => ability.name === "Ataque Reflexo"
+        ? {
+            ...ability,
+            text: "Uma vez por rodada, o reishid pode fazer um ataque corpo a corpo contra um alvo adjacente que esteja desprevenido ou que se mova para fora de seu alcance."
+        }
+        : ability)
 };
 
 export const otyugh = {
@@ -4460,8 +4474,9 @@ export const aspectoDeAharadak = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 56,
         "bookPage": 54
     },
     "stats": {
@@ -4547,8 +4562,9 @@ export const avatarDeAharadak = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 64,
         "bookPage": 62
     },
     "stats": {
@@ -4634,6 +4650,100 @@ export const avatarDeAharadak = {
     "skillsText": null
 };
 
+const avatarDeAharadakDivine = {
+    id: "avatar-de-aharadak-deuses-de-arton",
+    name: "Avatar de Aharadak",
+    variantOf: avatarDeAharadak.id,
+    type: "monster",
+    subtype: "lekael",
+    size: "Colossal",
+    challengeRating: "S",
+    description: [],
+    source: {
+        book: "Deuses de Arton",
+        edition: "1ª edição, maio de 2025 (v1.1)",
+        pdfFile: "T20 Deuses de Arton.pdf",
+        pdfPage: 153,
+        bookPage: 151
+    },
+    stats: {
+        initiative: 22,
+        perception: 31,
+        defense: 73,
+        fortitude: 37,
+        reflex: 27,
+        will: 31,
+        hitPoints: 2477,
+        speedText: "3m (2q), voo 12m (8q)",
+        senses: "percepção às cegas (longo)",
+        defensesText: "imunidade a efeitos mentais e medo, maior que a morte, redução de dano 20",
+        attributes: {
+            str: 18,
+            dex: 6,
+            con: 12,
+            int: 16,
+            wis: 10,
+            cha: 5
+        }
+    },
+    actions: [
+        {
+            name: "Corpo a Corpo",
+            text: "Sete garras +67 (4d10+31, 19)."
+        }
+    ],
+    abilities: [
+        {
+            name: "Carapaça Suprema",
+            timing: null,
+            text: "Reduz à metade o dano de fontes mundanas, exceto o de aço-rubi."
+        },
+        {
+            name: "Domínio sobre o Tempo",
+            timing: null,
+            text: "Pode fazer duas ações padrão e duas ações de movimento a cada turno."
+        },
+        {
+            name: "Insanidade da Tormenta",
+            timing: null,
+            text: "2d20 PM (Von CD 51 evita). Pode afetar criaturas que já sofreram Insanidade da Tormenta de outras criaturas no mesmo dia."
+        },
+        {
+            name: "Invocar Lefeu",
+            timing: "completa",
+            text: "Uma vez por cena, invoca um ou mais lefeu à sua escolha, com ND total 20. Eles surgem em alcance curto e agem a partir da rodada seguinte, em suas iniciativas."
+        },
+        {
+            name: "Poder sobre a Realidade",
+            timing: null,
+            text: "Pode lançar qualquer magia simulada de até 4º círculo como um conjurador de 20º nível, sem gastar PM (CD 51, limite de PM 20). Uma vez por rodada, pode lançar Momento de Tormenta como ação livre."
+        },
+        {
+            name: "Percepção Perfeita",
+            timing: null,
+            text: "Está sempre sob efeito de Visão da Verdade com todos os aprimoramentos."
+        },
+        {
+            name: "Presentes Rubros",
+            timing: "completa",
+            text: "Uma criatura voluntária em alcance curto recebe dois poderes da Tormenta à escolha dela. Com o suplemento Ameaças de Arton, pode receber um simbionte da p. 61 no lugar dos poderes. Cada criatura pode receber esta bênção uma vez. Ao morrer, ela vai para o mundo de Aharadak e não pode ser revivida."
+        },
+        {
+            name: "Telepatia",
+            timing: null,
+            text: "Pode se comunicar com qualquer criatura de Int –3 ou maior em uma área de Tormenta ou a até 1km dela."
+        },
+        {
+            name: "Terror Absoluto",
+            timing: null,
+            text: "Emana uma aura de medo de 30m de raio. Criaturas à escolha do Avatar que entram na aura ou começam o turno nela ficam abaladas (CD 51 evita). Se já estiverem abaladas, ficam apavoradas. Criaturas sob esse efeito de pavor sofrem os efeitos de falhar no teste contra a Insanidade da Tormenta do Avatar, mesmo se já afetadas nesse dia. Criaturas imunes a medo ainda são afetadas e recebem +5 nos testes de resistência contra a aura. Medo."
+        }
+    ],
+    equipment: null,
+    treasure: "2d6 peças rubras (CD 35 para extrair, cada peça vale T$ 1.500 para fabricar itens de matéria vermelha).",
+    skillsText: "Atletismo +34, Conhecimento +34, Diplomacia +36, Enganação +36, Intimidação +36, Intuição +36, Misticismo +34, Religião +28"
+};
+
 export const fanaticoLefou = {
     "id": "fanatico-lefou",
     "name": "Fanático Lefou",
@@ -4644,8 +4754,9 @@ export const fanaticoLefou = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 57,
         "bookPage": 55
     },
     "stats": {
@@ -4706,8 +4817,9 @@ export const liderFanaticoLefou = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 57,
         "bookPage": 55
     },
     "stats": {
@@ -4768,8 +4880,9 @@ export const reishidLiderDeCulto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 58,
         "bookPage": 56
     },
     "stats": {
@@ -4880,9 +4993,12 @@ export const senhorDoGiganteRubroFormaFinal = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 7,
-        "bookPage": 58
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 60,
+        "bookPage": 58,
+        "pdfPageEnd": 61,
+        "bookPageEnd": 59
     },
     "stats": {
         "initiative": 20,
@@ -4987,9 +5103,12 @@ export const senhorDoGiganteRubroFormaInicial = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 7,
-        "bookPage": 58
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 60,
+        "bookPage": 58,
+        "pdfPageEnd": 61,
+        "bookPageEnd": 59
     },
     "stats": {
         "initiative": 13,
@@ -5079,8 +5198,9 @@ export const zyrrinaz = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p54 ate 64.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 61,
         "bookPage": 59
     },
     "stats": {
@@ -7660,14 +7780,14 @@ export const monsterCreatures = [
     ursoCoruja, serpe, hidra, lagash,
     ganchador, troll, trollDasCavernas, dragaoFilhote,
     dragaoJovem, dragaoAdulto, dragaoVeneravel, dragaoRei,
-    uktril, geraktril, reishid, otyugh,
+    uktril, geraktril, reishid, reishidBasic, otyugh,
     thuwarokk, caoDeKally, koboldBruto, koboldMae,
     kaijinBruto, kaijinCapanga, kaijinNinja, altoClerigoDeKally,
     avatarDeKallyadranoch, corcelDeKally, kallyanachBarbaro, kallyanachMorteGlacial,
     dragaoAdultoDaTirania, dragaoAdultoDosSegredos, dragaoBicefalo, dragaoFeral,
     dragaoFilhoteDoBosque, dragaoFilhoteDosRios, dragaoJovemDaProtecao, dragaoJovemDoOcaso,
     dragaoVeneravelDaEquidade, dragaoVeneravelDosRecifes, ninhadaDeDragoesFilhotes, sckharDragaoReiDoFogo,
-    aspectoDeAharadak, avatarDeAharadak, fanaticoLefou, liderFanaticoLefou,
+    aspectoDeAharadak, avatarDeAharadak, avatarDeAharadakDivine, fanaticoLefou, liderFanaticoLefou,
     reishidLiderDeCulto, senhorDoGiganteRubroFormaFinal, senhorDoGiganteRubroFormaInicial, zyrrinaz,
     sapoAtroz, trogAnaoBruto, trogAnaoEremita, trogCacador,
     trogCombatente, trogReiDosTuneis, arquibruxoDaTormenta, enxameInfernal,

@@ -1,5 +1,5 @@
 import { DISCOVERY_MINUTES } from "./appState.js";
-import { formatChallengeRating } from "./challenge.js";
+import { formatChallengeRating, isSpecialChallengeRating } from "./challenge.js";
 import { createChimeraCombatControls } from "./chimeraCombatView.js";
 import { CREATURE_REINFORCEMENT_BONUSES, getCreatureReinforcement } from "./creatureReinforcement.js";
 import { createCreatureHealthControls } from "./encounterCreatureHealthView.js";
@@ -360,8 +360,8 @@ function getEncounterItemKey(item, index) {
 
 function createEncounterBudget(node) {
   const budget = document.createElement("p");
-  const resolved = node.resolvedEncounter;
-  const combatChallenge = (resolved.budget.creatures || 0) + (resolved.budget.trap || 0);
+  const { creatures, trap } = node.resolvedEncounter.budget;
+  const combatChallenge = isSpecialChallengeRating(creatures) ? creatures : (creatures || 0) + (trap || 0);
 
   budget.className = "encounter-budget";
   budget.textContent = `ND do combate: ${formatChallengeRating(combatChallenge)}`;

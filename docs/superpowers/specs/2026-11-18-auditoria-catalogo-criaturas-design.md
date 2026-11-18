@@ -2,7 +2,13 @@
 
 ## Objetivo
 
-Usar os quatro PDFs integrais em `tmp/livros/` como referência das fichas publicadas. A auditoria precisa indicar quais fichas de cada livro foram localizadas, a qual registro correspondem e quais diferenças exigem revisão. A primeira rodada será pelo Livro Básico — Jogo do Ano, seguida por Ameaças de Arton, Deuses de Arton e Heróis de Arton.
+Usar os quatro PDFs integrais em `tmp/livros/` como referência das fichas publicadas. A auditoria precisa indicar quais fichas de cada livro foram localizadas, a qual registro correspondem e quais diferenças exigem revisão.
+
+## Progresso por livro
+
+- **Livro Básico — Jogo do Ano.** Primeira rodada publicada com 80 fichas inventariadas e referências atualizadas. O plano acompanha as diferenças entre livros e as versões já publicadas. [Plano da primeira rodada](../plans/2026-11-18-auditoria-livro-basico.md)
+- **Ameaças de Arton.** Brutos & Indomáveis, Capangas & Bandoleiros e Culto de Aharadak auditados, com 49 fichas conferidas. O próximo bloco na sequência do sumário é Dragões. [Relatório e ponto de retomada](../plans/2026-11-18-auditoria-orcs-ameacas.md#culto-de-aharadak)
+- **Deuses de Arton e Heróis de Arton.** PDFs disponíveis. O inventário das fichas de cada livro segue pendente.
 
 ## Método
 

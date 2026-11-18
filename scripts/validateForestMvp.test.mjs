@@ -4,7 +4,7 @@ import { generateMapData } from "../src/generator.js";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { createRng } from "../src/random.js";
 import { canRerollNodeCreatures, rerollNodeCreatures, resolveForestAmbush, resolveNodeEncounter } from "../src/encounterResolver.js";
-import { creatureCatalog, getCreatureById } from "../src/creatureCatalog/index.js";
+import { creatureCatalog, getCreatureById, getAutomaticCreatureCatalog } from "../src/creatureCatalog/index.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
 import { calculateCombatND } from "../src/challenge.js";
 import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
@@ -21,6 +21,64 @@ import { canAddEncounterCreature, getCreatureUnits, getEncounterForSave, hasEnco
 const integration = await import("../src/missions/forestMissionIntegration.js").catch(() => ({}));
 const expeditionModule = await import("../src/forestExpedition.js").catch(() => ({}));
 const presentation = await import("../src/nodeProgressPresentation.js").catch(() => ({}));
+
+test("an exact encounter with a single special creature preserves its challenge rating", () => {
+  for (const id of ["avatar-de-aharadak", "sckhar-dragao-rei-do-fogo"]) {
+    const creature = getCreatureById(id);
+    assert.ok(creature);
+    assert.match(creature.challengeRating, /^S\+?$/);
+    const node = {
+      id,
+      type: "normal",
+      challenge: { total: creature.challengeRating },
+      fixedComposition: { creatures: [{ id, quantity: 1 }], useWeaponVariation: false }
+    };
+    const encounter = resolveNodeEncounter(node);
+    assert.deepEqual(encounter.items.map(item => item.creatureId), [id]);
+    assert.equal(encounter.budget.creatures, creature.challengeRating);
+    assert.equal(encounter.budget.creaturesLabel, creature.challengeRating);
+    assert.equal(encounter.budget.totalLabel, creature.challengeRating);
+  }
+});
+
+test("cult book variants keep the original encounter IDs and profile defaults", () => {
+  const pairs = [
+    ["reishid", "reishid-livro-basico", "Livro Básico"],
+    ["avatar-de-aharadak", "avatar-de-aharadak-deuses-de-arton", "Deuses de Arton"]
+  ];
+  for (const [originalId, variantId, variantBook] of pairs) {
+    const original = getCreatureById(originalId);
+    const variant = getCreatureById(variantId);
+    assert.deepEqual(original.sources.map(source => source.book), ["Ameaças de Arton"]);
+    assert.deepEqual(variant?.sources.map(source => source.book), [variantBook]);
+    assert.equal(variant.challengeRating, original.challengeRating);
+
+    const familyIds = new Set([originalId, variantId]);
+    const availableIds = selectedProfile => getAutomaticCreatureCatalog(selectedProfile)
+      .map(creature => creature.id)
+      .filter(id => familyIds.has(id));
+    assert.deepEqual(availableIds(profile), [originalId]);
+    const alternate = {
+      ...profile,
+      creatureRules: { ...profile.creatureRules, preferredCreatureIdsByFamily: { [originalId]: variantId } }
+    };
+    assert.deepEqual(availableIds(alternate), [variantId]);
+
+    const nodeFor = id => ({
+      id,
+      type: "normal",
+      challenge: { total: original.challengeRating },
+      fixedComposition: { creatures: [{ id, quantity: 1 }], useWeaponVariation: false }
+    });
+    assert.equal(resolveNodeEncounter(nodeFor(originalId), { profile: alternate }).items[0].creatureId, originalId);
+    assert.equal(resolveNodeEncounter(nodeFor(variantId), { profile }).items[0].creatureId, variantId);
+  }
+  const reflexText = id => getCreatureById(id).abilities.find(ability => ability.name === "Ataque Reflexo")?.text;
+  assert.match(reflexText("reishid"), /alcance natural.*voluntariamente/);
+  assert.match(reflexText("reishid-livro-basico"), /alvo adjacente.*se mova para fora/);
+  assert.equal(getCreatureById("avatar-de-aharadak").stats.hitPoints, 2804);
+  assert.equal(getCreatureById("avatar-de-aharadak-deuses-de-arton").stats.hitPoints, 2477);
+});
 
 test("the two Gnoll Filibusteiro sources preserve old encounter and mission IDs", () => {
   const originalId = "gnoll-filibusteiro";

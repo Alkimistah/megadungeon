@@ -625,6 +625,21 @@ async function creatureHealthFlow() {
     assert.ok(text.includes(`PDF p. ${pdfPage}`));
   }
   assert.match(await detail.innerText(), /Uma vez por rodada, causa \+2d6.*alvo desprevenido ou flanqueado/);
+  for (const [name, book, nd, pdfPage, sheetText] of [
+    ["Reishid", "Ameaças de Arton", 8, "58", /alcance natural que esteja desprevenido/],
+    ["Reishid", "Livro Básico", 8, "320–321", /alvo adjacente que esteja desprevenido/],
+    ["Avatar de Aharadak", "Ameaças de Arton", "S", "64", /Quatro tentáculos \+58/],
+    ["Avatar de Aharadak", "Deuses de Arton", "S", "153", /Sete garras \+67/]
+  ]) {
+    const label = `${name} · ${book}`;
+    await creature.selectOption({ label });
+    await manual.getByRole("button", { name: "Gerar encontro", exact: true }).click();
+    assert.deepEqual(await list.locator("strong").allTextContents(), [`1 x ${label}`]);
+    assert.equal(await manual.locator(".encounter-budget").innerText(), `ND do combate: ${nd}`);
+    const text = await detail.innerText();
+    assert.match(text, sheetText);
+    assert.ok(text.includes(`PDF p. ${pdfPage}`));
+  }
   await creature.selectOption("");
   assert.equal(await budget.isEnabled(), true);
   await page.close();

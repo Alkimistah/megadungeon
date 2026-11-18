@@ -80,6 +80,8 @@ export function calculateCombatND(items) {
     Array(quantity).fill(challengeRating)
   );
   const count = allCRs.length;
+  if (count === 1 && isSpecialChallengeRating(allCRs[0])) return allCRs[0];
+
   const total = allCRs.reduce((s, cr) => s + cr, 0);
 
   if (!allCRs.some(cr => cr >= 1)) {
