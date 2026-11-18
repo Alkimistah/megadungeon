@@ -7,7 +7,7 @@ Usar os quatro PDFs integrais em `tmp/livros/` como referência das fichas publi
 ## Progresso por livro
 
 - **Livro Básico — Jogo do Ano.** Primeira rodada publicada com 80 fichas inventariadas e referências atualizadas. O plano acompanha as diferenças entre livros e as versões já publicadas. [Plano da primeira rodada](../plans/2026-11-18-auditoria-livro-basico.md)
-- **Ameaças de Arton.** Brutos & Indomáveis, Capangas & Bandoleiros, Culto de Aharadak e Dragões auditados, com 61 fichas conferidas. O próximo bloco do sumário é Duyshidakk. [Relatório e ponto de retomada](../plans/2026-11-18-auditoria-orcs-ameacas.md#pendências-e-ponto-de-retomada)
+- **Ameaças de Arton.** Brutos & Indomáveis, Capangas & Bandoleiros, Culto de Aharadak e Dragões auditados, com 61 fichas conferidas. Duyshidakk está inventariado, com 12 fichas em quatro lotes. [Relatório e ponto de retomada](../plans/2026-11-18-auditoria-orcs-ameacas.md#pendências-e-ponto-de-retomada)
 - **Deuses de Arton e Heróis de Arton.** PDFs disponíveis. O inventário das fichas de cada livro segue pendente.
 
 ## Método

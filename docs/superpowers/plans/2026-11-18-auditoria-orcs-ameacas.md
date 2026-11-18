@@ -296,10 +296,42 @@ As páginas renderizadas confirmam o ícone Solo nas 12 fichas. A Ninhada també
 
 Fora desta seção, o Avatar de Kallyadranoch, o Necrodraco Lich e Tarso ainda usam o texto abreviado da Aura Aterradora. A revisão deles fica para os respectivos lotes.
 
+## Duyshidakk — inventário
+
+A seção ocupa as pp. 78–87 impressas, pp. 80–89 do PDF integral, e reúne 12 fichas. Os títulos e as linhas de tipo foram localizados pelo tamanho da fonte na extração. A lista coincide com as entradas do índice por ND, pp. 422–423 do PDF, que confirma os NDs. As 12 fichas já estão no catálogo com IDs próprios. As referências atuais ainda apontam para o recorte `ameacas de arton p80 ate 90.pdf` e serão substituídas pelas do PDF integral a cada lote auditado.
+
+| ID do catálogo | ND | Tamanho | Página impressa | Página no PDF integral | Papel inferido no catálogo |
+|---|---:|---|---:|---:|---|
+| `bugbear-sentinela` | 2 | Médio | 79 | 81 | Especial |
+| `bugbear-guarda-costas` | 6 | Médio | 79 | 81 | Lacaio |
+| `bruxa-goblin` | 11 | Pequeno | 79–80 | 81–82 | Especial |
+| `gangue-goblin` | 5 | Grande | 80–81 | 82–83 | Solo |
+| `horda-goblin` | 14 | Colossal | 81 | 83 | Solo |
+| `goblin-bomba` | 3 | Pequeno | 82 | 84 | Especial |
+| `goblin-de-ferro` | 5 | Médio | 82–83 | 84–85 | Especial |
+| `goblin-de-ferro-mark-ii` | 8 | Grande | 83 | 85 | Solo |
+| `hobgoblin-atirador` | 5 | Médio | 84 | 86 | Lacaio |
+| `hobgoblin-comandante-tatico` | 11 | Médio | 85 | 87 | Especial |
+| `hobgoblin-gladiador` | 16 | Médio | 85 | 87 | Solo |
+| `sangue-do-ayrrak` | 19 | Médio | 87 | 89 | Solo |
+
+Três fichas atravessam páginas. A Bruxa Goblin continua na p. 80 impressa, a partir das Magias. A Gangue Goblin continua na p. 81, a partir de Cada Um por Si!. O Goblin de Ferro continua na p. 83, a partir do Deslocamento. As faixas devem ser confirmadas na conferência de cada lote, assim como os papéis impressos, que exigem a renderização das páginas.
+
+A p. 78 impressa abre a seção e apresenta os bugbears. A p. 86 é a abertura ilustrada do Sangue do Ayrrak. Ficam fora do inventário os quadros Bugbear: Habilidades de Raça, p. 79, e Hobgoblin: Habilidades de Raça, p. 84, por serem regras de raça para personagens. O item Uyzrrak Da’ukthra, no equipamento do Sangue do Ayrrak, também fica fora.
+
+Nenhuma ficha tem homônimo no Livro Básico. Os goblinoides do Livro Básico têm nomes distintos: Goblin Salteador, Goblin Engenhoqueiro, Hobgoblin Soldado, Hobgoblin Mago de Batalha e Engenho de Guerra Goblin, pp. 300–303 impressas.
+
+### Lotes propostos
+
+1. **Bugbears e Bruxa Goblin.** Três fichas, PDF pp. 81–82.
+2. **Gangue, Horda e Goblin-Bomba.** Três fichas, PDF pp. 82–84.
+3. **Goblins de Ferro.** Duas fichas, PDF pp. 84–85.
+4. **Hobgoblins e Sangue do Ayrrak.** Quatro fichas, PDF pp. 86–87 e 89.
+
 ## Pendências e ponto de retomada
 
 1. **Dragões.** Seção concluída, com 12 fichas. As referências de todas apontam para o PDF integral, e a Aura Aterradora está completa nas sete fichas que a possuem.
-2. **Restante de Ameaças de Arton.** O próximo bloco do sumário é Duyshidakk, a partir da p. 78 impressa, p. 80 do PDF integral. Depois, seguir pelos blocos seguintes e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
+2. **Restante de Ameaças de Arton.** Duyshidakk está inventariado, conforme acima. Começar a conferência pelo lote dos Bugbears e da Bruxa Goblin, PDF pp. 81–82, renderizando as páginas para conferir os ícones de papel. Depois de Duyshidakk, seguir pelos blocos seguintes, a começar por Elementais, p. 88 impressa, p. 90 do PDF, e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
 3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
 
