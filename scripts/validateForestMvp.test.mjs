@@ -71,7 +71,10 @@ test("audited Duyshidakk sheets cite the full Ameaças PDF", () => {
   const pages = {
     "bugbear-sentinela": [81, 79],
     "bugbear-guarda-costas": [81, 79],
-    "bruxa-goblin": [81, 79, 82, 80]
+    "bruxa-goblin": [81, 79, 82, 80],
+    "gangue-goblin": [82, 80, 83, 81],
+    "horda-goblin": [83, 81],
+    "goblin-bomba": [84, 82]
   };
   for (const [id, [pdfPage, bookPage, pdfPageEnd, bookPageEnd]] of Object.entries(pages)) {
     const [source] = getCreatureById(id).sources;

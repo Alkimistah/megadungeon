@@ -4755,9 +4755,12 @@ export const gangueGoblin = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 3,
-        "bookPage": 80
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 82,
+        "bookPage": 80,
+        "pdfPageEnd": 83,
+        "bookPageEnd": 81
     },
     "stats": {
         "initiative": 5,
@@ -4812,8 +4815,9 @@ export const goblinBomba = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 84,
         "bookPage": 82
     },
     "stats": {
@@ -5203,8 +5207,9 @@ export const hordaGoblin = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p80 ate 90.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 83,
         "bookPage": 81
     },
     "stats": {

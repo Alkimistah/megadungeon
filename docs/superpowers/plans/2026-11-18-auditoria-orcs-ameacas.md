@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak, as 12 de Dragões e o primeiro lote de Duyshidakk, com 3 fichas.
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak, as 12 de Dragões e os dois primeiros lotes de Duyshidakk, com 6 fichas.
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -232,7 +232,7 @@ Outras fichas dracônicas de Ameaças ficam nas próprias seções e entram nos 
 
 Os 42 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha. Também foram conferidos tipo, subtipo, tamanho, deslocamento, sentidos, imunidade, vulnerabilidade, resistência a magia, ataques, Bote, Sopro, Avalanche de Escamas, Sopro Duplo, perícias e tesouro. A ficha do Filhote dos Rios começa na segunda coluna da p. 64 e continua na p. 65, a partir dos PV. A referência agora cobre as duas páginas.
 
-O catálogo acrescenta Imunidades Dracônicas às três fichas. A habilidade vem do quadro Habilidades Dracônicas do Livro Básico, p. 311 impressa, p. 317 do PDF integral, aplicável por Poder Dracônico a toda criatura com o subtipo dragão. Pelo mesmo quadro, filhotes não têm Aura Aterradora, Magia Dracônica nem Metamorfose Dracônica, e a resistência a magia +1 impressa corresponde à categoria filhote. O marcador [Bando] da Ninhada usa a habilidade geral Bando já modelada no catálogo, descrita também na introdução de Ameaças.
+O catálogo acrescenta Imunidades Dracônicas às três fichas. A habilidade vem do quadro Habilidades Dracônicas do Livro Básico, p. 311 impressa, p. 317 do PDF integral, aplicável por Poder Dracônico a toda criatura com o subtipo dragão. Pelo mesmo quadro, filhotes não têm Aura Aterradora, Magia Dracônica nem Metamorfose Dracônica, e a resistência a magia +1 impressa corresponde à categoria filhote. O marcador [Bando] da Ninhada remete à habilidade geral Bando, p. 14 impressa de Ameaças. A regra está definida em `src/generalCreatureAbilities.js`, mas esse módulo ainda não é usado pela ficha nem pelo combate.
 
 O livro imprime “visão no esuro” no Filhote do Bosque. O catálogo mantém “visão no escuro”, o que é uma correção de transcrição. A atualização se limita às três referências.
 
@@ -346,10 +346,24 @@ O livro marca com asterisco as sete magias da Bruxa, todas de encantamento ou ne
 
 Dragões, o inventário de Duyshidakk e este lote foram publicados de `115d4f4` a `e098ac0`. Passaram os testes dos andares 1–20, das missões e o build de produção. O QA dos andares 11–20 no Chrome passou contra o site publicado, sem erros de JavaScript, incluindo encontro manual e uso offline após o cache. O bundle publicado traz a referência da Bruxa Goblin ao PDF integral. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44406164020)
 
+### Segundo lote — Gangue, Horda e Goblin-Bomba
+
+| ID do catálogo | ND | PV | Papel impresso | Página impressa | Página no PDF integral |
+|---|---:|---:|---|---:|---:|
+| `gangue-goblin` | 5 | 171 | Solo, Enxame | 80–81 | 82–83 |
+| `horda-goblin` | 14 | 666 | Solo, Enxame | 81 | 83 |
+| `goblin-bomba` | 3 | 74 | Especial | 82 | 84 |
+
+Os 42 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha. Também foram conferidos tipo, subtipo, tamanho, deslocamento, sentidos, defesas, dano de Enxame, Frenesi Incontrolável, Cada Um por Si!, Pilhar e Devorar, Sobrepujar, Granadas a Granel, Grand Finale, perícias, equipamento e tesouro. A ficha da Gangue começa na segunda coluna da p. 80 e continua na p. 81, a partir de Cada Um por Si!. A referência agora cobre as duas páginas. A introdução do Goblin-Bomba fica na p. 81, e a ficha, na p. 82.
+
+Os papéis impressos coincidem com a inferência do catálogo. Gangue e Horda também trazem o ícone de Enxame, cuja regra geral está na p. 15 impressa. Assim como Bando, essa regra está definida em `src/generalCreatureAbilities.js`, mas ainda não aparece na ficha nem é aplicada no combate. O catálogo registra só a linha de dano do Enxame. Uma revisão de apresentação pode expor as duas regras gerais nas fichas que trazem os ícones.
+
+O catálogo omite em Cada Um por Si! a remissão aos goblins salteadores, Tormenta20 p. 300, que correspondem à ficha `goblin-salteador` do Livro Básico. Em Granadas a Granel, também omite a frase descritiva sobre as bandoleiras desorganizadas. Nenhuma das omissões altera o efeito. A atualização se limita às três referências, e o teste de Duyshidakk passa a cobrir seis fichas.
+
 ## Pendências e ponto de retomada
 
 1. **Dragões.** Seção concluída, com 12 fichas. As referências de todas apontam para o PDF integral, e a Aura Aterradora está completa nas sete fichas que a possuem.
-2. **Restante de Ameaças de Arton.** Duyshidakk está inventariado e o primeiro lote foi conferido, conforme acima. Seguir pelo lote da Gangue, da Horda e do Goblin-Bomba, PDF pp. 82–84, renderizando as páginas para conferir os ícones de papel. Depois de Duyshidakk, seguir pelos blocos seguintes, a começar por Elementais, p. 88 impressa, p. 90 do PDF, e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
+2. **Restante de Ameaças de Arton.** Duyshidakk está inventariado e dois lotes foram conferidos, conforme acima. Seguir pelo lote dos Goblins de Ferro, PDF pp. 84–85, renderizando as páginas para conferir os ícones de papel. Depois de Duyshidakk, seguir pelos blocos seguintes, a começar por Elementais, p. 88 impressa, p. 90 do PDF, e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
 3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
 
