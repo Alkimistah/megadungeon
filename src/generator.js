@@ -19,13 +19,13 @@ const MIN_MIDDLE_NODES = 5;
 const MAX_MIDDLE_NODES = 7;
 const EXTRA_LINK_CHANCE = 0.18;
 const UNKNOWN_INCOMING_THRESHOLD = 3;
-const UNKNOWN_REVEAL_OPTIONS = [
+const UNKNOWN_REVEAL_OPTIONS_WITHOUT_CAMP = [
   "Encontro normal",
   "Encontro elite",
   "Armadilha",
-  "Tesouro",
-  "Acampamento"
+  "Tesouro"
 ];
+const UNKNOWN_REVEAL_OPTIONS = [...UNKNOWN_REVEAL_OPTIONS_WITHOUT_CAMP, "Acampamento"];
 
 const COLUMN_TEMPLATES = {
   3: [[1, 3, 5], [0, 3, 6], [1, 2, 4]],
@@ -75,9 +75,19 @@ function assignEnvironments(levels, profile, rng) {
   });
 }
 
-function assignUnknownReveals(levels, rng) {
+function pickUnknownReveal(rng, campChance) {
+  if (campChance == null) return pick(rng, UNKNOWN_REVEAL_OPTIONS);
+
+  const roll = rng();
+  const otherChance = 1 - campChance;
+  if (roll >= otherChance) return "Acampamento";
+  const options = UNKNOWN_REVEAL_OPTIONS_WITHOUT_CAMP;
+  return options[Math.floor(roll / otherChance * options.length)];
+}
+
+function assignUnknownReveals(levels, rng, campChance) {
   levels.flat().forEach((node) => {
-    node.revealedLabel = node.type === "unknown" ? pick(rng, UNKNOWN_REVEAL_OPTIONS) : null;
+    node.revealedLabel = node.type === "unknown" ? pickUnknownReveal(rng, campChance) : null;
   });
 }
 
@@ -458,7 +468,7 @@ export function generateMapData(depth, baseDC, profile, floor, rng = Math.random
   convertMergedPathsToUnknown(levels);
   addCampsIfEligible(levels, profile, rng);
   guaranteeAtLeastOneTreasure(levels, rng);
-  assignUnknownReveals(levels, rng);
+  assignUnknownReveals(levels, rng, version >= 2 ? profile.encounterRules.unknownCampChance : undefined);
   // A versão 1 mantém a ordem e as regras usadas por códigos de sessão antigos.
   // Na versão 2 o conteúdo real dirige toda a mecânica; o tipo visível continua ?.
   const visibleTypes = new Map();

@@ -34,6 +34,7 @@ export const forest11to20Profile = {
   },
   encounterRules: {
     boss: { enabled: true, finalFloorOnly: true },
+    unknownCampChance: 0.08,
     camps: {
       fullLevelEvery: 4,
       extraNodeChance: 0.02

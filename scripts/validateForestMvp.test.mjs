@@ -153,6 +153,38 @@ test("unknown true camps do not receive damaging climate", () => {
   assert.ok(checked > 0);
 });
 
+test("new forest maps reduce hidden camps and keep the existing visible camps and legacy maps", () => {
+  const previousProfile = { ...profile, encounterRules: { ...profile.encounterRules } };
+  delete previousProfile.encounterRules.unknownCampChance;
+  let unknownCount = 0;
+  let currentCamps = 0;
+  let previousCamps = 0;
+
+  for (let index = 0; index < 240; index++) {
+    const floor = 11 + index % 10;
+    const seed = `camp-frequency-${index}`;
+    const depth = profile.recommendations.encountersByFloor[floor];
+    const dc = profile.recommendations.baseDcByFloor[floor];
+    const current = generateMapData(depth, dc, profile, floor, createRng(seed), { version: 2 }).flat();
+    const previous = generateMapData(depth, dc, previousProfile, floor, createRng(seed), { version: 2 }).flat();
+    const visibleCamps = nodes => nodes.filter(node => node.type === "camp").map(node => node.id);
+    assert.deepEqual(visibleCamps(current), visibleCamps(previous));
+    unknownCount += current.filter(node => node.type === "unknown").length;
+    currentCamps += current.filter(node => node.type === "unknown" && node.contentType === "camp").length;
+    previousCamps += previous.filter(node => node.type === "unknown" && node.contentType === "camp").length;
+
+    if (index < 10) {
+      const legacyReveals = mapProfile =>
+        generateMapData(depth, dc, mapProfile, floor, createRng(seed)).flat().map(node => node.revealedLabel);
+      assert.deepEqual(legacyReveals(profile), legacyReveals(previousProfile));
+    }
+  }
+
+  assert.ok(unknownCount > 500);
+  assert.ok(currentCamps / unknownCount >= 0.05 && currentCamps / unknownCount <= 0.10);
+  assert.ok(currentCamps < previousCamps);
+});
+
 test("Quimera is alone in the same simple arena for every seed", () => {
   let first;
   for (let i = 0; i < 30; i++) {

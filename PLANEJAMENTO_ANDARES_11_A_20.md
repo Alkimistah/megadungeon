@@ -6,7 +6,7 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 
 ## 1. Leitura rápida: o que vem primeiro
 
-**Próximo passo indicado:** conferir no tablet a rerrolagem de criaturas no mesmo ND. A [lista de próximas entregas](#15-próximas-entregas-em-ordem) segue com a redução de acampamentos ocultos.
+**Próximo passo indicado:** conferir o ritmo dos acampamentos ocultos numa nova expedição. O ajuste do tempo de exploração é o próximo item da [lista de entregas](#15-próximas-entregas-em-ordem).
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
@@ -413,7 +413,7 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 
 ### Calibragem e variedade
 
-- **Acampamentos e tempo:** testar menos acampamentos nas revelações de desconhecidos e travessias mais longas. A primeira hipótese é reduzir a chance de acampamento oculto de 20% para 5–10% e testar 30 minutos como mínimo para nodos com teste. Separar tempo total e tempo desde o último descanso. Validar a proposta observando uma rota típica antes de definir os valores finais.
+- **Acampamentos e tempo:** novos mapas da floresta passaram de 20% para 8% de chance de um nodo desconhecido revelar acampamento. Para o tempo, resta testar 30 minutos como mínimo para nodos com teste e separar tempo total de tempo desde o último descanso.
 - **Composição:** oferecer ao mestre uma rerrolagem em nodos de combate sem missão, mantendo o orçamento de ND e as restrições do nodo. Guardar o resultado aceito na sessão. Considerar composições com mais de um adversário, quando houver alternativa no mesmo ND, para reduzir a frequência de encontros decididos antes da primeira ação inimiga.
 - **Reforço:** avaliar um ajuste manual, visível e reversível por ficha. Iniciativa ou PV podem ajudar uma criatura a chegar ao turno. Bônus de ataque trata acerto depois que ela age. Testar os efeitos separadamente e manter o ND original como referência, com o reforço indicado na ficha e sem crédito extra de XP automático.
 
@@ -421,7 +421,7 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 
 1. **Variações de armadilhas por terreno.** Implementadas e verificadas no Chrome. Conferência no tablet pendente.
 2. **Rerrolagem de criaturas no mesmo ND.** Implementada e verificada no Chrome. Em um nodo de combate pendente, **Rerrolar criaturas** busca outro grupo do mesmo tipo permitido, respeitando a lista de criaturas do nodo. Preserva o ND real das criaturas, o orçamento do encontro, terreno, clima e armadilhas. Missões vinculadas, cenas fixas e encontros já concluídos ou contabilizados em missão ficam protegidos. A composição escolhida é preservada no autosave e no TXT.
-3. **Menos acampamentos ocultos.** Testar a redução da chance de acampamento nas revelações de nodos desconhecidos e medir quantos descansos continuam acessíveis em rotas típicas.
+3. **Menos acampamentos ocultos.** Implementado para novos mapas dos andares 11–20, com chance de 8% por nodo desconhecido. Fileiras com acampamentos visíveis e acampamentos extras seguem as regras existentes. Em 1.000 mapas pareados, foram 423 acampamentos ocultos antes e 171 depois entre 2.270 nodos desconhecidos. Em 1.000 rotas simuladas, os acampamentos ocultos encontrados passaram de 115 para 47 e os visíveis permaneceram em 1.080. A restauração da sessão recuperada preservou os mapas já salvos.
 4. **Tempo de exploração.** Testar um mínimo maior e mais variação conforme a travessia. Separar tempo total e tempo desde o último descanso. Aplicar a calibragem a novos mapas.
 5. **Reforço manual por criatura.** Depois de experimentar outras composições, testar ajustes reversíveis e separados de iniciativa e ataque. Mostrar a alteração na ficha e manter o ND original como referência.
 6. **Mecânica especial da Quimera.** Desenhar e testar o que diferencia o combate do andar 20, partindo da composição e da arena fixas.
