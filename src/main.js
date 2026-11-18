@@ -109,7 +109,7 @@ function isPendingForestEncounter(node) {
 }
 
 function canReinforceCreatures(node) {
-  return isPendingForestEncounter(node) && (node.contentType || node.type) !== "boss";
+  return isPendingForestEncounter(node) && ((node.contentType || node.type) !== "boss" || Boolean(node.chimeraHeads));
 }
 
 function canRerollCreatures(node) {

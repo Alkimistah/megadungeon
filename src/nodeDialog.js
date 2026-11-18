@@ -1,4 +1,5 @@
 import { formatChallengeRating } from "./challenge.js";
+import { createChimeraCombatControls } from "./chimeraCombatView.js";
 import { CREATURE_REINFORCEMENT_BONUSES, getCreatureReinforcement } from "./creatureReinforcement.js";
 import { createCreatureHealthControls } from "./encounterCreatureHealthView.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
@@ -531,7 +532,7 @@ function appendCreatureSheetAbilities(section, entries, { preferEntryName = fals
   });
 }
 
-function createCreatureReinforcementControls(item, stats, onSetReinforcement) {
+function createCreatureReinforcementControls(item, stats, onSetReinforcement, customHitPoints) {
   const controls = document.createElement("fieldset");
   controls.className = "creature-reinforcement";
   const legend = document.createElement("legend");
@@ -543,7 +544,7 @@ function createCreatureReinforcementControls(item, stats, onSetReinforcement) {
     ["hitPoints", "PV", stats.hitPoints]
   ];
   for (const [stat, label, bonus] of options) {
-    if (!Number.isFinite(bonus) || bonus <= 0) continue;
+    if ((stat === "hitPoints" && customHitPoints) || !Number.isFinite(bonus) || bonus <= 0) continue;
     const button = document.createElement("button");
     const enabled = Boolean(item.reinforcement?.[stat]);
     button.type = "button";
@@ -557,7 +558,7 @@ function createCreatureReinforcementControls(item, stats, onSetReinforcement) {
   return controls;
 }
 
-export function createCreatureDetail(item, missions = [], onAdjustMissionProgress = null, onSetReinforcement = null, healthControls = null) {
+export function createCreatureDetail(item, missions = [], onAdjustMissionProgress = null, onSetReinforcement = null, healthControls = null, chimeraBoss = false) {
   const creature = item.creatureData ?? getCreatureById(item.creatureId);
   const section = document.createElement("section");
   const missionPanel = createEncounterMissionPanel(getEncounterMissionMatches(item, missions), onAdjustMissionProgress);
@@ -601,7 +602,7 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
   section.appendChild(header);
   section.appendChild(subtitle);
   if (missionPanel) section.appendChild(missionPanel);
-  if (onSetReinforcement) section.appendChild(createCreatureReinforcementControls(item, stats, onSetReinforcement));
+  if (onSetReinforcement) section.appendChild(createCreatureReinforcementControls(item, stats, onSetReinforcement, chimeraBoss));
   if (healthControls) section.appendChild(healthControls);
   section.appendChild(createDivider());
 
@@ -647,7 +648,8 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
       note.textContent = "Habilidades exibem valores da criatura base.";
       section.appendChild(note);
     }
-    appendCreatureSheetAbilities(section, creature.abilities, { preferEntryName: true });
+    const abilities = chimeraBoss ? creature.abilities.filter(ability => ability.name === "Mente Tripla") : creature.abilities;
+    appendCreatureSheetAbilities(section, abilities, { preferEntryName: true });
   }
 
   if (stats.attributes) {
@@ -734,6 +736,8 @@ function createEncounterDetail(node, selectedKey, missions, onAdjustMissionProgr
   const selectedItem = node.resolvedEncounter.items.find((item, index) =>
     getEncounterItemKey(item, index) === selectedKey
   ) || node.resolvedEncounter.items[0];
+  const chimeraBoss = selectedItem.creatureId === "quimera" && !!node.chimeraHeads;
+  const setReinforcement = onSetReinforcement && ((stat, value) => onSetReinforcement(selectedItem, stat, value));
 
   panel.className = "encounter-detail-panel";
   panel.appendChild(
@@ -743,8 +747,11 @@ function createEncounterDetail(node, selectedKey, missions, onAdjustMissionProgr
         { ...selectedItem, encounterKey: node.resolvedEncounter.seed },
         missions,
         onAdjustMissionProgress,
-        onSetReinforcement && ((stat, enabled) => onSetReinforcement(selectedItem, stat, enabled)),
-        createCreatureHealthControls(node, selectedItem, missions, onEncounterAdjusted)
+        setReinforcement,
+        chimeraBoss
+          ? createChimeraCombatControls(node, selectedItem, onEncounterAdjusted, setReinforcement)
+          : createCreatureHealthControls(node, selectedItem, missions, onEncounterAdjusted),
+        chimeraBoss
       )
   );
 

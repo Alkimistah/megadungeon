@@ -2242,6 +2242,56 @@ svg {
   margin: 0;
 }
 
+.chimera-combat {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+}
+
+.chimera-combat > p,
+.chimera-combat h4,
+.chimera-heads h5 {
+  margin: 0;
+}
+
+.chimera-health-summary {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.chimera-combat .creature-health,
+.chimera-heads {
+  width: 100%;
+}
+
+.chimera-heads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.chimera-heads li {
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+}
+
+.chimera-heads h5 {
+  color: #f1d6a8;
+  font-size: 15px;
+}
+
+.chimera-heads p {
+  margin: 6px 0;
+}
+
+.chimera-heads button {
+  margin: 4px 6px 0 0;
+}
+
 .creature-reinforcement button[aria-pressed="true"] {
   border-color: #f1d6a8;
   background: var(--action-hover);

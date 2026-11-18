@@ -11,8 +11,10 @@ import { createMissionGenerationContext, generateMissionOffers } from "../src/mi
 import { createExplorationState } from "../src/appState.js";
 import { createMissionState } from "../src/missions/missionState.js";
 import { getForestTrapPresentation } from "../src/forestTrapPresentation.js";
+import { isDamageType } from "../src/damageTypes.js";
+import { withChimeraBreath, withChimeraDamage, withChimeraHealthUndone, withChimeraTurnEnded } from "../src/chimeraCombat.js";
 import { getCreatureReinforcement, withCreatureReinforcement } from "../src/creatureReinforcement.js";
-import { canAddEncounterCreature, getCreatureUnits, hasEncounterAdjustments, withCreatureAdded, withCreatureHealthChange, withLastHealthChangeUndone } from "../src/encounterCreatureHealth.js";
+import { canAddEncounterCreature, getCreatureUnits, getEncounterForSave, hasEncounterAdjustments, withCreatureAdded, withCreatureHealthChange, withLastHealthChangeUndone } from "../src/encounterCreatureHealth.js";
 
 const integration = await import("../src/missions/forestMissionIntegration.js").catch(() => ({}));
 const expeditionModule = await import("../src/forestExpedition.js").catch(() => ({}));
@@ -507,10 +509,64 @@ test("Quimera is alone in the same simple arena for every seed", () => {
     const tactical = createNodeTacticalMap(boss);
     assert.equal(tactical.cells.filter(c => c === "party").length, 4);
     assert.equal(tactical.cells.filter(c => c === "boss").length, 4);
-    assert.ok(tactical.cells.every(c => ["floor", "party", "boss"].includes(c)));
+    assert.ok(tactical.cells.includes("obstacle"));
+    assert.ok(tactical.cells.every(c => ["floor", "party", "boss", "obstacle"].includes(c)));
     if (first) assert.deepEqual({ environment: boss.environment, tactical }, first);
     first = { environment: boss.environment, tactical };
   }
+});
+
+test("Quimera heads are prepared and preserved, including migration of older expeditions", () => {
+  const { prepareForestExpedition, serializeForestExpedition, restoreForestExpedition } = expeditionModule;
+  const prepare = seed => prepareForestExpedition({ seed, profile, missions: [], startFloor: 20 });
+  const getBoss = expedition => expedition.floors[0].levels.flat().find(node => node.type === "boss");
+  const original = prepare("heads");
+  const heads = getBoss(original).chimeraHeads;
+  assert.equal(heads.length, 4);
+  assert.equal(new Set(heads.map(head => head.name)).size, 4);
+  assert.ok(heads.every(head => isDamageType(head.weakness)));
+  assert.deepEqual(getBoss(prepare("heads")).chimeraHeads, heads);
+  assert.ok(new Set(Array.from({ length: 12 }, (_, i) => JSON.stringify(getBoss(prepare(`heads-${i}`)).chimeraHeads))).size > 1);
+  const saved = serializeForestExpedition(original);
+  assert.deepEqual(getBoss(restoreForestExpedition(saved)).chimeraHeads, heads);
+  const oldBoss = getBoss(saved);
+  delete oldBoss.chimeraHeads;
+  oldBoss.fixedTacticalMap.cells = oldBoss.fixedTacticalMap.cells.map(cell => cell === "obstacle" ? "floor" : cell);
+  const migrated = getBoss(restoreForestExpedition(saved));
+  assert.deepEqual(migrated.chimeraHeads, heads);
+  assert.deepEqual(migrated.fixedTacticalMap, oldBoss.fixedTacticalMap);
+});
+
+test("Quimera shares HP, stuns a head once and tracks breath independently of turns", () => {
+  const boss = map(20).at(-1)[0];
+  const original = resolveNodeEncounter(boss);
+  const dragon = { name: "Dragão", weakness: "cold" };
+  let encounter = withChimeraDamage(original, original.items[0], null, "cold", 4);
+  assert.equal(encounter.lastChimeraHit.lost, 0);
+  encounter = withChimeraDamage(encounter, encounter.items[0], dragon, "fire", 18);
+  assert.equal(getCreatureUnits(encounter.items[0])[0].current, 320);
+  assert.equal(encounter.chimera, undefined);
+  encounter = withChimeraDamage(encounter, encounter.items[0], dragon, "cold", 10);
+  assert.equal(encounter.chimera.stuns.Dragão, "stunned");
+  assert.equal(getCreatureUnits(encounter.items[0])[0].current, 310);
+  assert.equal(withChimeraBreath(encounter, [dragon], false), encounter);
+  assert.equal(withChimeraHealthUndone(encounter).chimera.stuns.Dragão, undefined);
+  encounter = withChimeraTurnEnded(encounter);
+  assert.equal(encounter.chimera.stuns.Dragão, "used");
+  encounter = withChimeraBreath(encounter, [dragon], false);
+  encounter = withChimeraDamage(encounter, encounter.items[0], dragon, "cold", 10);
+  assert.equal(encounter.chimera.stuns.Dragão, "used");
+  assert.equal(encounter.lastChimeraHit.lost, 10);
+  assert.equal(withChimeraTurnEnded(encounter).chimera.breathReady, false);
+  assert.equal(withChimeraBreath(encounter, [dragon], true).chimera.breathReady, true);
+  encounter = withCreatureReinforcement(encounter, encounter.items[0], "hitPoints", 25);
+  assert.deepEqual(getCreatureUnits(encounter.items[0])[0], { index: 0, current: 325, max: 358 });
+  const saved = getEncounterForSave(encounter);
+  assert.equal(saved.chimera.breathReady, false);
+  assert.equal(saved.chimera.stuns.Dragão, "used");
+  assert.equal(saved.lastChimeraHit, undefined);
+  assert.deepEqual(getCreatureUnits(saved.items[0])[0], { index: 0, current: 358, max: 358 });
+  assert.deepEqual(saved.budget, original.budget);
 });
 
 test("mission objectives mark the node map without replacing terrain or combat markers", () => {

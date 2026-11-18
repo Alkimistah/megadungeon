@@ -1,4 +1,5 @@
 import { getRecordedExplorationMinutes } from "./appState.js";
+import { prepareChimeraHeads } from "./chimeraCombat.js";
 import { getEncounterForSave } from "./encounterCreatureHealth.js";
 import { generateMapData } from "./generator.js";
 import { createRng } from "./random.js";
@@ -33,6 +34,7 @@ export function prepareForestExpedition({ seed, profile, missions, startFloor = 
       }
     }
     if (!prepared) throw new Error(`Não foi possível posicionar as missões no andar ${floor}. Altere a seleção ou aumente a profundidade.`);
+    if (floor === 20) prepareChimeraHeads(prepared.levels, prepared.mapSeed);
     floors.push(prepared);
   }
   for (const mission of preparedMissions.filter(m => m.status !== "completed")) {
@@ -79,6 +81,7 @@ export function restoreForestExpedition(snapshot) {
         return next;
       });
     }
+    if (entry.floor === 20) prepareChimeraHeads(entry.levels, entry.mapSeed || `${restored.seed}:forest:20:0`);
   }
   return restored;
 }

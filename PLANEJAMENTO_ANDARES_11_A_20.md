@@ -6,9 +6,11 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 
 A versão `c992c22` está publicada e inclui a continuidade de terreno e clima para novas expedições, os PV individuais e a adição temporária de criaturas. A validação em Chrome e a publicação no GitHub Pages foram concluídas. A conferência dessa versão no tablet físico está pendente. [Publicação no GitHub Pages](https://github.com/Alkimistah/megadungeon/actions/runs/44232391826).
 
+A versão `398a98b` publicou a [modal do nodo em tela cheia](#17-modal-do-nodo-em-tela-cheia). [Publicação no GitHub Pages](https://github.com/Alkimistah/megadungeon/actions/runs/44235659633).
+
 ## 1. Leitura rápida: o que vem primeiro
 
-**Próxima implementação:** a [mecânica especial da Quimera](#6-p1--encontro-fixo-da-quimera). Começar pelo sorteio das quatro cabeças numeradas e de suas fraquezas na preparação do andar 20, preservando o resultado no save. Em seguida, integrar à ficha os PV compartilhados, a RD 5, o atordoamento e a recarga do sopro.
+**Entrega atual:** a [mecânica especial da Quimera](#6-p1--encontro-fixo-da-quimera) está implementada e validada no Chrome. A próxima entrega será a de pistas de rota.
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
@@ -18,7 +20,7 @@ A versão `c992c22` está publicada e inclui a continuidade de terreno e clima p
 | 4 | P2 — desconhecidos | Mais variedade com tabela temática própria e descanso falso explícito | Primeira tabela implementada |
 | 5 | P3 — continuidade | Terreno e clima com transições coerentes entre nodos | Publicado para novas expedições |
 | 6 | PV individual | Registrar dano e cura por criatura nas fichas de combate | Publicado e validado no Chrome |
-| 7 | P1 — Quimera | Arena fixa, chefe solo e quatro cabeças sorteadas no andar 20 | Arena simples implementada; mecânica especial planejada |
+| 7 | P1 — Quimera | Arena fixa, chefe solo e quatro cabeças sorteadas no andar 20 | Implementado e validado no Chrome |
 | 8 | P4 — pistas de rota | Informação parcial útil, sem entregar o tipo do nodo | Intenção aceita; regras ainda precisam de desenho |
 
 **Regra de corte:** não iniciar P2–P4 enquanto o mínimo de missões não estiver validado. Não condicionar a correção das missões à construção do sistema completo de clima, terreno ou desconhecidos.
@@ -33,7 +35,7 @@ A versão `c992c22` está publicada e inclui a continuidade de terreno e clima p
 - Toda missão aceita deve ter realização concreta em um ou mais nodos. Missão criada por outro fluxo também deve passar pela mesma integração.
 - Cada nodo pode abrigar no máximo uma missão, inclusive quando os objetivos são semelhantes. Missões do mesmo andar ocupam nodos distintos numa rota possível. Extermínio pode ocupar vários nodos, sem compartilhar esses nodos com outra missão.
 - Acampamento é descanso verdadeiro e seguro. Descanso falso é uma cena própria que só pode surgir dentro do desconhecido.
-- A Quimera é a única criatura do encontro fixo do andar 20. A arena usa posições iniciais fixas. A mecânica planejada sorteia as cabeças e suas fraquezas ao preparar o andar 20 e guarda o resultado no save.
+- A Quimera é a única criatura do encontro fixo do andar 20. A arena usa posições iniciais fixas. O app sorteia as cabeças e suas fraquezas ao preparar o andar 20 e guarda o resultado no save.
 - Pistas específicas da Quimera só aparecem no andar 20.
 - Desconhecidos devem aparecer mais e podem conter cenas sem combate, adequadas à região e ao clima.
 - Terreno e clima devem apresentar continuidade entre nodos, sem exigir reconstruir a estrutura do grafo.
@@ -193,7 +195,7 @@ Na primeira entrega, preservar os acampamentos seguros existentes. O descanso fa
 
 O MVP do andar 20 termina com a **Quimera ND 8 sozinha** numa clareira plana de 20×14, com posições iniciais fixas. Quatro personagens começam de um lado e a Quimera Grande ocupa 2×2 no outro. A rota anterior pode variar.
 
-### Mecânica especial planejada
+### Mecânica especial
 
 1. **Sorteio na geração do andar 20.** Ao preparar a expedição, sortear quatro cabeças distintas entre as dez da ficha. Para cada uma, sortear uma fraqueza entre os candidatos da tabela abaixo. Numerar as quatro cabeças de **1 a 4**. A composição, a ordem e as fraquezas fazem parte do encontro original salvo com o andar. Abrir a ficha ou retomar a expedição usa o mesmo resultado.
 2. **Um turno da Quimera.** O mestre rola **1d4** para escolher qual cabeça conduz a próxima ação no turno. O número corresponde à lista exibida. O chefe continua com o número de ataques da ficha como ponto de partida. Uma habilidade passiva atua enquanto a cabeça estiver ativa, independentemente do dado. Se a cabeça sorteada estiver atordoada ou com a ação indisponível, a Quimera usa os ataques normais.
@@ -202,7 +204,7 @@ O MVP do andar 20 termina com a **Quimera ND 8 sozinha** numa clareira plana de 
 5. **Sopro do Dragão.** Se o Dragão for sorteado, **Usar sopro** marca o uso da ação padrão e muda o estado para **Em recarga**. **Recarregar sopro** volta a deixá-lo disponível quando o mestre registrar que a Quimera gastou uma ação de movimento. **Fim do turno** trata o atordoamento. Um Dragão atordoado fica impedido de usar o sopro mesmo que esteja carregado. O estado do sopro fica no save.
 6. **Ficha do mestre.** No topo, mostrar PV atuais e máximos, RD 5 e o último lançamento, como `Corpo · 18 de corte − 5 de RD = 13 PV perdidos`. Em seguida, mostrar apenas as cabeças sorteadas, com número, habilidade, fraqueza sorteada e estado. Os ataques do corpo e as ações aplicáveis às cabeças sorteadas ficam acessíveis na mesma ficha, com os controles pertinentes a cada habilidade.
 7. **Ajustes opcionais do chefe.** Reaproveitar **Iniciativa +2** e **Ataque +1**. Oferecer **PV extras** com valor escolhido pelo mestre, somado aos PV atuais e máximos para preservar o dano sofrido. A base é **333 PV** e a Defesa é **33**. Ajustes adicionais de Defesa ou resistências ficam para avaliação em mesa. O ND 8 e o XP de referência permanecem.
-8. **Arena.** Manter a Quimera sozinha e as posições iniciais fixas. A proposta é desenhar coberturas destrutíveis na clareira e conduzir a destruição em mesa. Pistas específicas ficam restritas ao andar 20 e entram no trabalho de pistas de rota.
+8. **Arena.** A Quimera fica sozinha e as posições iniciais são fixas. Em novas expedições, a clareira tem troncos marcados no mapa como coberturas destrutíveis. A destruição é resolvida em mesa. Pistas específicas ficam restritas ao andar 20 e entram no trabalho de pistas de rota.
 
 ### Fraquezas candidatas
 
@@ -221,7 +223,9 @@ Esta tabela é uma proposta para a luta do andar 20. A ficha do mestre mostra ap
 | Tigre | Perfuração ou eletricidade |
 | Tubarão | Eletricidade ou corte |
 
-A regra de cura acelerada da Hidra conserva fogo e ácido, conforme a [ficha original](src/creatureCatalog/monsters.js#L2993). A fraqueza sorteada define qual dos dois tipos contorna a RD e pode atordoar a cabeça. Ataques com múltiplos tipos de dano e o eventual ajuste de potência das combinações mais fortes precisam de definição antes de implementar.
+A regra de cura acelerada da Hidra conserva fogo e ácido, conforme a ficha original. A fraqueza sorteada define qual dos dois tipos contorna a RD e pode atordoar a cabeça. O controlador recebe um tipo de dano por lançamento. Ataques com múltiplos tipos e efeitos das habilidades das cabeças são adjudicados pelo mestre. [Ficha original](src/creatureCatalog/monsters.js#L2993).
+
+O autosave e o TXT preservam as quatro cabeças, a ordem, as fraquezas, o atordoamento, a recarga e os reforços. Os PV atuais e o último lançamento são anotações da sessão aberta. Ao retomar, a Quimera volta aos PV máximos com os reforços salvos. Um save anterior recebe o sorteio a partir da seed do andar 20 e preserva sua arena. Nas novas expedições, a arena inclui troncos como cobertura destrutível, com destruição resolvida em mesa.
 
 ## 7. P2 — desconhecidos e cenas externas
 
@@ -454,7 +458,7 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 6. **Cenas dos nodos desconhecidos.** Primeira tabela de exploração, obstáculo, descoberta e descanso falso implementada. Aplica-se às novas expedições.
 7. **Continuidade de terreno e clima.** Publicada para novas expedições no commit `c992c22`. Terrenos consideram todas as entradas e o clima evolui por etapa. A geração preserva a estrutura do mapa e a restauração preserva os ambientes já salvos.
 8. **Controle de PV individual.** Publicado no commit `c992c22`. As fichas de combate mantêm as anotações e as criaturas extras enquanto o app está aberto. Ver seção 16.
-9. **Mecânica especial da Quimera.** Reutilizar o controlador de PV e ligar a RD, as quatro cabeças, as fraquezas, o atordoamento e a recarga do sopro. Ver seção 6.
+9. **Mecânica especial da Quimera.** A ficha integra PV compartilhados, RD, quatro cabeças, fraquezas, atordoamento e recarga do sopro. O QA no Chrome verificou a luta e a retomada por TXT. Ver seção 6.
 10. **Pistas de rota.** Dar informação parcial antes da escolha, preservando o mistério do conteúdo.
 
 ### Ferramenta de variações de armadilha
@@ -487,6 +491,12 @@ O app apresenta o **ND de referência do nodo e os valores de XP calculados para
 
 **Bloqueio de rerrolagem.** O primeiro lançamento de dano ou cura, reforço ou adição manual bloqueia a rerrolagem do encontro. Desfazer um lançamento mantém o bloqueio na sessão aberta. Ao retomar, o app usa o estado salvo, incluindo os bloqueios por reforço ou progresso.
 
-A implementação publicada registra o dano e a cura informados pelo mestre. A próxima entrega reutilizará o controle para os PV compartilhados da Quimera e integrará a RD 5, a fraqueza da cabeça atingida e o atordoamento. A conclusão do encontro permanece uma confirmação do mestre.
+A implementação publicada registra o dano e a cura informados pelo mestre. A ficha especial da Quimera reutiliza o controle para os PV compartilhados e integra a RD 5, a fraqueza da cabeça atingida e o atordoamento. A conclusão do encontro permanece uma confirmação do mestre.
 
 O QA no Chrome verificou a aplicação de dano e cura em unidades da mesma ficha, a adição de criaturas e o bloqueio da rerrolagem. Reabrir a ficha mantém os ajustes. Retomar pelo autosave ou pelo TXT recupera a composição salva com PV máximos. A suíte automatizada também verificou o bloqueio da adição do alvo de extermínio. A conferência no tablet físico está pendente.
+
+## 17. Modal do nodo em tela cheia
+
+- Em `dc8a7ce`, a ficha de combate passou a usar as mesmas dimensões do mapa tático. [Primeira publicação](https://github.com/Alkimistah/megadungeon/actions/runs/44234296015).
+- Em `398a98b`, a tela cheia passou a valer para toda a modal do nodo. O cabeçalho e o rodapé ficam fixos enquanto o conteúdo central rola. Os botões para alternar entre clima e terreno e a ficha de combate, além do acesso ao mapa tático, aparecem no rodapé quando disponíveis. [Publicação da modal completa](https://github.com/Alkimistah/megadungeon/actions/runs/44235659633).
+- O QA no Chrome verificou que a modal mantém as dimensões ao alternar entre as telas e que o rodapé permanece visível durante a rolagem. A conferência no tablet físico segue pendente.

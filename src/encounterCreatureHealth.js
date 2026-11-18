@@ -46,7 +46,7 @@ export function getEncounterForSave(encounter) {
   if (!encounter?.temporaryAdjustments && !encounter?.lastHealthEdit &&
     !encounter?.items?.some(item => item.unitDamage || item.addedQuantity)) return encounter;
 
-  const { temporaryAdjustments, lastHealthEdit, ...snapshot } = encounter;
+  const { temporaryAdjustments, lastHealthEdit, lastChimeraHit, ...snapshot } = encounter;
   snapshot.items = encounter.items.map(item => {
     if (!item.unitDamage && !item.addedQuantity) return item;
     const { unitDamage, addedQuantity, ...original } = item;
