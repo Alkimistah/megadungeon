@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak e três dos quatro lotes de Dragões, com 9 fichas.
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak e as 12 de Dragões.
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -266,12 +266,40 @@ As habilidades dracônicas acrescentadas seguem o quadro do Livro Básico, p. 31
 - O Feral recebe só Imunidades Dracônicas, conforme Amadurecimento Primitivo, que exclui Magia Dracônica e Metamorfose Dracônica.
 - O Bicéfalo recebe Imunidades Dracônicas e Metamorfose Dracônica, sem Magia Dracônica. O texto da p. 73 impressa diz que os bicéfalos conhecidos não demonstraram conjurar magias, e a ficha não traz lista de magias. Pela regra Poder Dracônico, Metamorfose se aplica a toda criatura com o subtipo dragão, mas a ficha não a menciona. A decisão foi preservada e fica registrada como interpretação.
 
-A Aura Aterradora das quatro fichas usa o texto abreviado impresso, “Vontade CD X evita”. As fichas genéricas do Livro Básico no catálogo trazem o efeito completo da habilidade. Assim como as regras dos lefeu no Culto, a apresentação dessa regra compartilhada fica para revisão. A atualização se limita às quatro referências.
+A Aura Aterradora das quatro fichas usa o texto abreviado impresso, “Vontade CD X evita”. A apresentação completa foi aplicada no fechamento da seção, descrito em [Aura Aterradora e papéis](#aura-aterradora-e-papéis). Neste lote, a atualização se limitou às quatro referências.
+
+### Quarto lote — Veneráveis e Sckhar
+
+| ID do catálogo | ND | PV | PM | Página impressa | Página no PDF integral |
+|---|---:|---:|---:|---:|---:|
+| `dragao-veneravel-da-equidade` | 15 | 800 | 97 | 71 | 73 |
+| `dragao-veneravel-dos-recifes` | 15 | 790 | 97 | 71 | 73 |
+| `sckhar-dragao-rei-do-fogo` | S+ | 4.000 | 287 | 77 | 79 |
+
+Os 45 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV, PM e os seis atributos de cada ficha. Também foram conferidos tipo, subtipo, tamanho, deslocamento, sentidos, defesas, ataques, habilidades, sopros, CDs, custos e execução das magias, perícias e tesouro. As duas fichas de Veneráveis ocupam a p. 71 inteira. As perícias e o tesouro da Equidade ficam no topo da segunda coluna. A ficha de Sckhar ocupa a p. 77. A p. 76 é a abertura ilustrada do Dragão-Rei, sem dados de ficha.
+
+Alguns valores parecem destoar, mas estão impressos assim:
+
+- Equalizar, da Equidade, usa “Von 32 evita”, enquanto as demais CDs da ficha são 40.
+- As garras de Sckhar atacam a +61 e a mordida a +66.
+- Enfeitiçar usa “Von evita” nos Recifes e “Von anula” na Tirania.
+
+Algumas remissões a páginas de Tormenta20 foram omitidas do catálogo sem alterar os efeitos. São elas Controlar o Clima dos Recifes, p. 187, e, em Sckhar, Imposição Real, p. 267, Aprisionamento, p. 180, Chuva de Meteoros, p. 183, Controlar Fogo, p. 187, Muralha Elemental, p. 200, e Segunda Chance, p. 205. Sckhar também recebe Maior que a Morte, a regra de criaturas de ND S e S+, já usada no Avatar de Aharadak.
+
+As habilidades dracônicas seguem o quadro do Livro Básico. Os três recebem Imunidades Dracônicas, Metamorfose Dracônica e Magia Dracônica. A resistência a magia +4 dos Veneráveis corresponde à categoria venerável. A +5 de Sckhar corresponde à categoria seguinte.
+
+### Aura Aterradora e papéis
+
+A Aura Aterradora das sete fichas de Ameaças que a possuem agora traz o efeito completo do quadro Habilidades Dracônicas, p. 311 impressa do Livro Básico, igual ao das fichas genéricas do catálogo. Cada ficha mantém a CD impressa. Sckhar mantém o dano psíquico de 8d6 por falha. São elas os dois Adultos, o Feral, o Bicéfalo, os dois Veneráveis e Sckhar. O texto completo não muda o efeito em jogo, apenas o expõe na ficha. Um teste dos andares 11–20 fixa as 12 referências da seção e o texto completo das sete auras.
+
+As páginas renderizadas confirmam o ícone Solo nas 12 fichas. A Ninhada também traz o ícone de Bando. O catálogo infere Solo para 11 fichas. Sckhar continua sem papel inferido, assim como os demais NDs S e S+. Seguindo a decisão do Culto, o papel impresso fica registrado sem alterar o comportamento de geração.
+
+Fora desta seção, o Avatar de Kallyadranoch, o Necrodraco Lich e Tarso ainda usam o texto abreviado da Aura Aterradora. A revisão deles fica para os respectivos lotes.
 
 ## Pendências e ponto de retomada
 
-1. **Dragões.** Inventário e três lotes concluídos, conforme acima. Seguir pelo último lote, com os Veneráveis, PDF p. 73, e Sckhar, PDF p. 79. Considerar, ao fim da seção, se o efeito completo da Aura Aterradora deve ser exibido nas fichas de Ameaças.
-2. **Restante de Ameaças de Arton.** Seguir pelos blocos posteriores a Dragões e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
+1. **Dragões.** Seção concluída, com 12 fichas. As referências de todas apontam para o PDF integral, e a Aura Aterradora está completa nas sete fichas que a possuem.
+2. **Restante de Ameaças de Arton.** O próximo bloco do sumário é Duyshidakk, a partir da p. 78 impressa, p. 80 do PDF integral. Depois, seguir pelos blocos seguintes e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
 3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
 

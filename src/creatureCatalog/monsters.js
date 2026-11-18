@@ -5315,7 +5315,7 @@ export const dragaoAdultoDaTirania = {
         {
             "name": "Aura Aterradora",
             "timing": null,
-            "text": "Vontade CD 32 evita."
+            "text": "A simples visão de um dragão adulto ou mais velho amedronta o mais valente dos aventureiros. Uma criatura que comece seu turno em alcance longo do dragão fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia. Vontade CD 32 evita."
         },
         {
             "name": "Imposição Avassaladora",
@@ -5435,7 +5435,7 @@ export const dragaoAdultoDosSegredos = {
         {
             "name": "Aura Aterradora",
             "timing": null,
-            "text": "Vontade CD 32 evita."
+            "text": "A simples visão de um dragão adulto ou mais velho amedronta o mais valente dos aventureiros. Uma criatura que comece seu turno em alcance longo do dragão fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia. Vontade CD 32 evita."
         },
         {
             "name": "Enxergar as Farsas",
@@ -5571,7 +5571,7 @@ export const dragaoBicefalo = {
         {
             "name": "Aura Aterradora",
             "timing": null,
-            "text": "Vontade CD 33 evita."
+            "text": "A simples visão de um dragão adulto ou mais velho amedronta o mais valente dos aventureiros. Uma criatura que comece seu turno em alcance longo do dragão fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia. Vontade CD 33 evita."
         },
         {
             "name": "Duas Mentes",
@@ -5659,7 +5659,7 @@ export const dragaoFeral = {
         {
             "name": "Aura Aterradora",
             "timing": null,
-            "text": "Vontade CD 30 evita."
+            "text": "A simples visão de um dragão adulto ou mais velho amedronta o mais valente dos aventureiros. Uma criatura que comece seu turno em alcance longo do dragão fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia. Vontade CD 30 evita."
         },
         {
             "name": "Dilacerar",
@@ -5968,8 +5968,9 @@ export const dragaoVeneravelDaEquidade = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 73,
         "bookPage": 71
     },
     "stats": {
@@ -6003,7 +6004,7 @@ export const dragaoVeneravelDaEquidade = {
         {
             "name": "Aura Aterradora",
             "timing": null,
-            "text": "Vontade CD 40 evita."
+            "text": "A simples visão de um dragão adulto ou mais velho amedronta o mais valente dos aventureiros. Uma criatura que comece seu turno em alcance longo do dragão fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia. Vontade CD 40 evita."
         },
         {
             "name": "Equalizar",
@@ -6105,8 +6106,9 @@ export const dragaoVeneravelDosRecifes = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 73,
         "bookPage": 71
     },
     "stats": {
@@ -6140,7 +6142,7 @@ export const dragaoVeneravelDosRecifes = {
         {
             "name": "Aura Aterradora",
             "timing": null,
-            "text": "Vontade CD 40 evita."
+            "text": "A simples visão de um dragão adulto ou mais velho amedronta o mais valente dos aventureiros. Uma criatura que comece seu turno em alcance longo do dragão fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia. Vontade CD 40 evita."
         },
         {
             "name": "Fluxo de Mana",
@@ -6304,8 +6306,9 @@ export const sckharDragaoReiDoFogo = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p66 ate 79.pdf",
-        "pdfPage": 14,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 79,
         "bookPage": 77
     },
     "stats": {
@@ -6349,7 +6352,7 @@ export const sckharDragaoReiDoFogo = {
         {
             "name": "Aura Aterradora",
             "timing": null,
-            "text": "Vontade CD 55 evita. Uma criatura que falhe no teste de Vontade contra a Aura Aterradora de Sckhar sofre 8d6 pontos de dano psíquico."
+            "text": "A simples visão de um dragão adulto ou mais velho amedronta o mais valente dos aventureiros. Uma criatura que comece seu turno em alcance longo do dragão fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia. Vontade CD 55 evita. Uma criatura que falhe no teste de Vontade contra a Aura Aterradora de Sckhar sofre 8d6 pontos de dano psíquico."
         },
         {
             "name": "Deus das Chamas",

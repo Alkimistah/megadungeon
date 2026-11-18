@@ -22,6 +22,51 @@ const integration = await import("../src/missions/forestMissionIntegration.js").
 const expeditionModule = await import("../src/forestExpedition.js").catch(() => ({}));
 const presentation = await import("../src/nodeProgressPresentation.js").catch(() => ({}));
 
+test("Ameaças dragons cite the full PDF and show the complete Aura Aterradora", () => {
+  const pages = {
+    "dragao-filhote-do-bosque": [66, 64],
+    "dragao-filhote-dos-rios": [66, 64, 67, 65],
+    "ninhada-de-dragoes-filhotes": [67, 65],
+    "dragao-jovem-da-protecao": [68, 66],
+    "dragao-jovem-do-ocaso": [68, 66, 69, 67],
+    "dragao-adulto-da-tirania": [70, 68, 71, 69],
+    "dragao-adulto-dos-segredos": [71, 69],
+    "dragao-veneravel-da-equidade": [73, 71],
+    "dragao-veneravel-dos-recifes": [73, 71],
+    "dragao-feral": [74, 72],
+    "dragao-bicefalo": [76, 74],
+    "sckhar-dragao-rei-do-fogo": [79, 77]
+  };
+  for (const [id, [pdfPage, bookPage, pdfPageEnd, bookPageEnd]] of Object.entries(pages)) {
+    const [source] = getCreatureById(id).sources;
+    assert.equal(source.pdfFile, "T20 Ameacas de Arton.pdf", id);
+    assert.deepEqual(
+      [source.pdfPage, source.bookPage, source.pdfPageEnd, source.bookPageEnd],
+      [pdfPage, bookPage, pdfPageEnd, bookPageEnd],
+      id
+    );
+  }
+
+  const auraDcs = {
+    "dragao-adulto-da-tirania": 32,
+    "dragao-adulto-dos-segredos": 32,
+    "dragao-feral": 30,
+    "dragao-bicefalo": 33,
+    "dragao-veneravel-da-equidade": 40,
+    "dragao-veneravel-dos-recifes": 40,
+    "sckhar-dragao-rei-do-fogo": 55
+  };
+  for (const [id, dc] of Object.entries(auraDcs)) {
+    const aura = getCreatureById(id).abilities.find(ability => ability.name === "Aura Aterradora").text;
+    assert.match(aura, /alcance longo do dragão fica apavorada .* ou abalada .* imune a esta habilidade por um dia/, id);
+    assert.match(aura, new RegExp(`Vontade CD ${dc} evita\\.`), id);
+  }
+  assert.match(
+    getCreatureById("sckhar-dragao-rei-do-fogo").abilities.find(ability => ability.name === "Aura Aterradora").text,
+    /sofre 8d6 pontos de dano psíquico\.$/
+  );
+});
+
 test("an exact encounter with a single special creature preserves its challenge rating", () => {
   for (const id of ["avatar-de-aharadak", "sckhar-dragao-rei-do-fogo"]) {
     const creature = getCreatureById(id);
