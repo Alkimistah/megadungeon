@@ -9,7 +9,7 @@ import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { openTacticalMapFullscreen } from "./tacticalMapRenderer.js";
 import { getTrapById } from "./traps.js";
 import { assetUrl } from "./assetUrl.js";
-import { getNodeProgressPresentation } from "./nodeProgressPresentation.js";
+import { getNodeContentPresentation, getNodeProgressPresentation } from "./nodeProgressPresentation.js";
 
 const COMBAT_ICON = assetUrl("/assets/icons/winged-sword.svg");
 const ENVIRONMENT_ICON = assetUrl("/assets/icons/earth-arrow-left.svg");
@@ -245,28 +245,11 @@ function createIconButton(className, icon, label, onClick) {
   return button;
 }
 
-function getChallengeText(node, state) {
-  if (!state.isNodeRevealed(node)) return "Desconhecido";
-  return `ND ${formatChallengeRating(node.challenge.total)}`;
-}
-
 function setNodeDialogMeta(element, checkText, explorationText, challengeText, challenge) {
   const xpText = challenge && Number.isFinite(challenge.encounter) && Number.isFinite(challenge.total)
     ? ` | Com clima e terreno: ${xpNumberFormat.format(challenge.total * 1000)} XP · Sem clima e terreno: ${xpNumberFormat.format(challenge.encounter * 1000)} XP`
     : "";
   element.innerHTML = `<strong>Teste:</strong> ${checkText} | <strong>Exploração:</strong> ${explorationText} | <strong>Desafio:</strong> ${challengeText}${xpText}`;
-}
-
-function getNodeDialogTitle(node, state) {
-  if (!state.isNodeRevealed(node)) {
-    return "Caminho desconhecido";
-  }
-
-  if (node.type === "unknown" && state.isNodeChosen(node)) {
-    return node.revealedLabel;
-  }
-
-  return node.label;
 }
 
 function createDivider() {
@@ -288,6 +271,48 @@ function createHiddenEnvironmentNotice() {
   notice.textContent = "Clima e terreno desconhecidos. Explore ou escolha a rota para conhecer mais detalhes.";
 
   return notice;
+}
+
+function createOutdoorScene(node) {
+  const section = document.createElement("section");
+  section.className = "outdoor-scene mission-run-guidance";
+  const heading = document.createElement("h3");
+  const ambushed = node.scene.kind === "falseRest" && node.resolvedEncounter?.items.length;
+  heading.textContent = ambushed ? "Descanso interrompido" : "Cena de exploração";
+  const description = document.createElement("p");
+  description.textContent = ambushed ? "Criaturas surpreenderam o grupo antes que pudesse se recuperar." : node.scene.description;
+  section.append(heading, description);
+  if (ambushed) return section;
+
+  section.append(
+    createDetailLine("Abordagem", node.scene.approach),
+    createDetailLine("Sucesso", node.scene.success),
+    createDetailLine("Falha", node.scene.failure)
+  );
+  return section;
+}
+
+function createHiddenCamp(onBeginRest) {
+  const section = document.createElement("section");
+  section.className = "hidden-camp mission-run-guidance";
+  const description = document.createElement("p");
+  description.textContent = onBeginRest
+    ? "O grupo encontrou um lugar onde pode parar. Decida se vai descansar ou seguir viagem."
+    : "O grupo seguiu viagem sem descansar.";
+  section.appendChild(description);
+  if (onBeginRest) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "extended-action is-compact";
+    button.textContent = "Iniciar descanso";
+    const status = document.createElement("p");
+    status.setAttribute("role", "status");
+    button.addEventListener("click", () => {
+      if (!onBeginRest()) status.textContent = "Não foi possível iniciar o descanso.";
+    });
+    section.append(button, status);
+  }
+  return section;
 }
 
 function createEnvironmentColumns(node) {
@@ -766,6 +791,7 @@ export function createNodeDialogController({
   dialogElement,
   metaElement,
   onAttempt,
+  onBeginHiddenRest = () => false,
   onChooseRoute,
   onComplete = () => {},
   onExplore,
@@ -863,27 +889,31 @@ export function createNodeDialogController({
     );
   }
 
-  function createModalActions(node) {
+  function createModalActions(node, content) {
     const actions = document.createElement("div");
 
     actions.className = "modal-actions";
 
-    if (node.skill && node.dc && !(node.requiresCompletion && node.type === "unknown" && !state.isNodeChosen(node))) {
+    if (node.skill && node.dc && !content.campUndecided &&
+      !(node.requiresCompletion && node.type === "unknown" && !state.isNodeChosen(node))) {
       actions.appendChild(createAttemptControl(node));
       actions.appendChild(createExploredControl(node));
     }
 
-    if (canRestAtNode(node)) {
+    if (canRestAtNode(node) && !content.campUndecided) {
       actions.appendChild(createRestControl(node));
     }
 
     actions.appendChild(createRouteChoiceControl(node));
     if (node.requiresCompletion && state.isNodeChosen(node)) {
       const completed = state.isNodeCompleted(node);
+      let label = completed ? "Encontro concluído" : "Concluir encontro";
+      if (node.type === "boss") label = completed ? "Quimera derrotada" : "Confirmar derrota da Quimera";
+      if (content.campUndecided && !completed) label = "Seguir viagem";
+      if (content.ambush) label = completed ? "Emboscada concluída" : "Confirmar conclusão da emboscada";
       actions.appendChild(createModalCheckbox(
         "modal-choice complete-choice", completed, completed,
-        node.type === "boss" ? (completed ? "Quimera derrotada" : "Confirmar derrota da Quimera")
-          : completed ? "Encontro concluído" : "Concluir encontro",
+        label,
         () => onComplete(node)
       ));
     }
@@ -984,29 +1014,42 @@ export function createNodeDialogController({
   function render(node) {
     if (!state.canOpenNode(node)) return;
 
+    const nodeView = state.getNodeViewState(node);
+    const content = getNodeContentPresentation(node, nodeView);
     const checkText = node.requiresCompletion && node.type === "unknown" && !state.isNodeChosen(node)
       ? "Revelado ao escolher a rota"
-      : node.skill && node.dc ? `${node.skill} ${node.dc}` : "Sem teste de descoberta";
+      : node.skill && node.dc && !content.campUndecided ? `${node.skill} ${node.dc}` : "Sem teste de descoberta";
     const explorationText = `${node.investigationMinutes} min`;
-    const challengeText = getChallengeText(node, state);
+    const challenge = nodeView.revealed && !content.campUndecided ? node.challenge : null;
+    const challengeText = challenge ? `ND ${formatChallengeRating(challenge.total)}` : "Desconhecido";
     const viewMode = getViewMode(node);
 
     currentNode = node;
     titleElement.textContent = `Encontro ${node.level}`;
-    typeElement.textContent = getNodeDialogTitle(node, state);
-    setNodeDialogMeta(metaElement, checkText, explorationText, challengeText, state.isNodeRevealed(node) ? node.challenge : null);
+    typeElement.textContent = content.label;
+    setNodeDialogMeta(metaElement, checkText, explorationText, challengeText, challenge);
     contentElement.innerHTML = "";
-    const progress = getNodeProgressPresentation(node, state.getNodeViewState(node));
+    const progress = getNodeProgressPresentation(node, nodeView);
     const progressNotice = document.createElement("p");
     progressNotice.className = "node-progress-status";
     progressNotice.dataset.progress = progress.kind;
     progressNotice.setAttribute("role", "status");
     progressNotice.textContent = progress.label;
     contentElement.appendChild(progressNotice);
-    contentElement.appendChild(createModalActions(node));
+    contentElement.appendChild(createModalActions(node, content));
     const missionNotice = createNodeMissionNotice(node, onOpenMission, state);
     if (missionNotice) contentElement.appendChild(missionNotice);
-    if (node.safeRest && state.isNodeChosen(node)) {
+    if (content.campUndecided) {
+      contentElement.appendChild(createHiddenCamp(!nodeView.completed ? () => {
+        if (!onBeginHiddenRest(node)) return false;
+        if (node.resolvedEncounter) viewModeByNode.set(node.id, "combat");
+        render(node);
+        return true;
+      } : null));
+    } else if (node.scene && nodeView.chosen) {
+      contentElement.appendChild(createOutdoorScene(node));
+    }
+    if (node.safeRest && nodeView.chosen && !content.campUndecided) {
       const safeRestNotice = document.createElement("p");
       safeRestNotice.className = "safe-rest-notice";
       safeRestNotice.textContent = node.safeRest.description;
@@ -1015,7 +1058,7 @@ export function createNodeDialogController({
 
     if (viewMode === "combat") {
       renderCombatPage(node);
-    } else {
+    } else if (!content.campUndecided) {
       renderEnvironmentPage(node);
     }
 

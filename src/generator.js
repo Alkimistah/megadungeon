@@ -3,6 +3,7 @@ import { assignCreatureProfile } from "./creatures.js";
 import { assignTrapProfile } from "./traps.js";
 import { generateEnvironmentContext } from "./environment.js";
 import { createForestBossEncounter } from "./forestBossEncounter.js";
+import { chooseForestUnknownScene, FOREST_UNKNOWN_REVEALS, isForestSceneReveal } from "./forestUnknownScenes.js";
 import { pick, pickWeighted, randomInt } from "./random.js";
 import {
   bossRoom,
@@ -85,9 +86,12 @@ function pickUnknownReveal(rng, campChance) {
   return options[Math.floor(roll / otherChance * options.length)];
 }
 
-function assignUnknownReveals(levels, rng, campChance) {
+function assignUnknownReveals(levels, rng, campChance, outdoorScenes) {
   levels.flat().forEach((node) => {
-    node.revealedLabel = node.type === "unknown" ? pickUnknownReveal(rng, campChance) : null;
+    if (node.type !== "unknown") return;
+    node.revealedLabel = outdoorScenes
+      ? pickWeighted(rng, FOREST_UNKNOWN_REVEALS).label
+      : pickUnknownReveal(rng, campChance);
   });
 }
 
@@ -111,7 +115,7 @@ function assignCreatureProfiles(levels, profile, rng) {
 }
 
 function assignDiscoveryCheck(node, baseDC, rng) {
-  if (node.type === "unknown" || node.type === "camp" || node.type === "boss") {
+  if (node.type === "unknown" || node.type === "camp" || node.type === "boss" || node.scene?.kind === "falseRest") {
     node.skill = null;
     node.dc = null;
     return;
@@ -121,7 +125,7 @@ function assignDiscoveryCheck(node, baseDC, rng) {
   const modifier = getRoomTypeDCModifier(rng, node.type);
   const variation = node.type === "elite" ? 0 : getRandomDCVariation(rng);
 
-  node.skill = pickWeightedSkill(rng, options);
+  node.skill = node.scene?.skill || pickWeightedSkill(rng, options);
   node.dc = Math.max(baseDC + modifier + variation, 5);
 }
 
@@ -462,15 +466,23 @@ function convertMergedPathsToUnknown(levels) {
   }
 }
 
-export function generateMapData(depth, baseDC, profile, floor, rng = Math.random, { version = 1 } = {}) {
+export function generateMapData(depth, baseDC, floorProfile, floor, rng = Math.random, { version = 1 } = {}) {
+  const weights = version >= 3 ? floorProfile.encounterRules.expeditionRoomTypeWeights : null;
+  const profile = weights ? {
+    ...floorProfile,
+    encounterRules: {
+      ...floorProfile.encounterRules,
+      roomTypes: floorProfile.encounterRules.roomTypes.map(room => ({ ...room, weight: weights[room.type] ?? room.weight }))
+    }
+  } : floorProfile;
   nodeId = 0;
   const levels = createSlayLikeMap(depth, profile, rng);
 
   addFinalBoss(levels, profile, floor);
-  convertMergedPathsToUnknown(levels);
+  if (!weights) convertMergedPathsToUnknown(levels);
   addCampsIfEligible(levels, profile, rng);
   guaranteeAtLeastOneTreasure(levels, rng);
-  assignUnknownReveals(levels, rng, version >= 2 ? profile.encounterRules.unknownCampChance : undefined);
+  assignUnknownReveals(levels, rng, version >= 2 ? profile.encounterRules.unknownCampChance : undefined, Boolean(weights));
   // A versão 1 mantém a ordem e as regras usadas por códigos de sessão antigos.
   // Na versão 2 o conteúdo real dirige toda a mecânica; o tipo visível continua ?.
   const visibleTypes = new Map();
@@ -481,12 +493,22 @@ export function generateMapData(depth, baseDC, profile, floor, rng = Math.random
     };
     levels.flat().forEach((node) => {
       visibleTypes.set(node.id, node.type);
-      node.contentType = node.type === "unknown" ? contentTypes[node.revealedLabel] : node.type;
+      if (node.type === "unknown") {
+        node.contentType = isForestSceneReveal(node.revealedLabel) ? "scene" : contentTypes[node.revealedLabel];
+      } else {
+        node.contentType = node.type;
+      }
       node.type = node.contentType;
       node.requiresCompletion = true;
     });
   }
   assignEnvironments(levels, profile, rng);
+  if (weights) {
+    for (const node of levels.flat().filter(node => node.contentType === "scene")) {
+      node.scene = chooseForestUnknownScene(node.revealedLabel, node.environment, rng);
+      node.revealedLabel = node.scene.title;
+    }
+  }
   assignChallengeRatings(levels, profile, floor);
   assignTrapProfiles(levels, profile, rng);
   assignCreatureProfiles(levels, profile, rng);

@@ -673,8 +673,10 @@ export function assignTrapProfile(node, profile, rng) {
   if (!role) {
     node.trap = null;
     node.challenge.trap = 0;
-    node.challenge.creatures = node.challenge.encounter;
-    node.challenge.encounterBudgetLabel = `ND ${formatChallengeRating(node.challenge.encounter)} para criaturas`;
+    node.challenge.creatures = node.scene ? 0 : node.challenge.encounter;
+    node.challenge.encounterBudgetLabel = node.scene
+      ? `ND ${formatChallengeRating(node.challenge.encounter)} da cena`
+      : `ND ${formatChallengeRating(node.challenge.encounter)} para criaturas`;
     return;
   }
 

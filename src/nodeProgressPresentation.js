@@ -1,4 +1,23 @@
 /** Apresentação derivada: não altera permissões nem o estado salvo. */
+export function getNodeContentPresentation(node, view) {
+  if (!view.revealed) return { label: "Caminho desconhecido", iconType: "unknown" };
+  if (node.type !== "unknown" || !view.chosen) {
+    return { label: node.label, iconType: node.contentType || node.type };
+  }
+
+  const falseRest = node.scene?.kind === "falseRest";
+  if (node.requiresCompletion && (falseRest || node.contentType === "camp")) {
+    const ambush = falseRest && Boolean(node.resolvedEncounter?.items?.length);
+    return {
+      label: ambush ? "Emboscada" : "Acampamento",
+      iconType: ambush ? "normal" : "camp",
+      campUndecided: !ambush && !view.rested,
+      ambush
+    };
+  }
+  return { label: node.revealedLabel, iconType: node.contentType || node.type };
+}
+
 export function getNodeProgressPresentation(node, view) {
   if (!view.visible) return { kind: "hidden", label: "Caminho oculto", marker: null };
   if (view.completed) return { kind: "completed", label: "Encontro concluído", marker: "✓" };

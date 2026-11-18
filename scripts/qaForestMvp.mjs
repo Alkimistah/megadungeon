@@ -5,6 +5,7 @@ import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to2
 import { prepareForestExpedition, serializeForestExpedition } from "../src/forestExpedition.js";
 import { encodeSessionCode, decodeSessionCode } from "../src/sessionCode.js";
 import { formatElapsedTime } from "../src/format.js";
+import { calculateCombatND } from "../src/challenge.js";
 
 const production = process.argv.includes("--production");
 const url = process.env.QA_APP_URL || (production ? "http://localhost:4173/megadungeon/" : "http://localhost:5173/megadungeon/");
@@ -190,7 +191,8 @@ async function missionFlow() {
       credited = true;
     }
     if (node.contentType === "camp") {
-      await page.locator(".rest-choice").click();
+      if (node.type === "unknown") await page.getByRole("button", { name: "Iniciar descanso" }).click();
+      else await page.locator(".rest-choice").click();
       assert.match(await page.locator("#nodeDialog").innerText(), /Descanso registrado/);
       sinceRestMinutes = 0;
       assert.equal(await page.locator("#timeTrackerValue").innerText(), "0min");
@@ -283,7 +285,7 @@ async function bossFlow() {
 async function configurationFailure() {
   const expedition = prepareForestExpedition({ seed: "qa-config-base", profile, startFloor: 19, depth: 8, missions: [
     objective("specialHunt", "Serpe", "serpe", 1, 19),
-    objective("extermination", "Infecto", "infecto", 8)
+    objective("extermination", "Infecto", "infecto", 15)
   ] });
   const page = await pageFor(encodeSessionCode(sessionFor(expedition)));
   const before = decodeSessionCode(await exportSession(page));
@@ -334,6 +336,98 @@ async function futureAndLegacyFlow() {
   console.log("Missão futura não colide com ID atual; sessão legada preserva geração e fluxo: passaram.");
 }
 
+async function outdoorSceneFlow() {
+  let expedition;
+  let entry;
+  let scene;
+  let safeCamp;
+  for (let attempt = 0; attempt < 100 && (!scene || !safeCamp); attempt++) {
+    const candidate = prepareForestExpedition({ seed: `qa-outdoor-${attempt}`, profile, startFloor: 18, missions: [] });
+    const floor = candidate.floors[0];
+    const fake = floor.levels[0].find(node => node.scene?.kind === "falseRest");
+    const safe = floor.levels[0].find(node => node.type === "unknown" && node.contentType === "camp");
+    if (!scene && fake) {
+      expedition = candidate;
+      entry = floor;
+      scene = fake;
+    }
+    if (!safeCamp && safe) safeCamp = { expedition: candidate, node: safe };
+  }
+  assert.ok(scene, "A amostra precisa de um descanso falso na entrada do andar.");
+  assert.ok(safeCamp, "A amostra precisa de um acampamento seguro na entrada do andar.");
+  const code = encodeSessionCode(sessionFor(expedition));
+  const index = entry.levels.flat().indexOf(scene);
+  const page = await pageFor(code, { width: 768, height: 1024 });
+  const dialog = page.locator("#nodeDialog");
+  await page.locator(".node").nth(index).click();
+  assert.equal(await dialog.locator("#nodeDialogType").textContent(), "Caminho desconhecido");
+  assert.equal(await dialog.locator(".outdoor-scene").count(), 0);
+  assert.equal(await dialog.getByRole("button", { name: "Iniciar descanso" }).count(), 0);
+  await dialog.locator(".route-choice").click();
+  assert.equal(await dialog.locator(".outdoor-scene").count(), 0);
+  assert.equal(await dialog.locator("#nodeDialogType").textContent(), "Acampamento");
+  assert.match(await page.locator(".node").nth(index).getAttribute("aria-label"), /^Acampamento,/);
+  assert.equal(await dialog.locator(".rest-choice").count(), 0);
+  assert.equal(await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).count(), 0);
+  assert.equal(await page.locator(".node.is-active").count(), 0);
+  const shelter = await dialog.innerText();
+  const campIcon = await page.locator(".node").nth(index).locator(".node-icon").getAttribute("href");
+  const safePage = await pageFor(encodeSessionCode(sessionFor(safeCamp.expedition)), { width: 768, height: 1024 });
+  const safeIndex = safeCamp.expedition.floors[0].levels.flat().indexOf(safeCamp.node);
+  await safePage.locator(".node").nth(safeIndex).click();
+  await safePage.locator(".route-choice").click();
+  assert.equal(await safePage.locator("#nodeDialog").innerText(), shelter);
+  assert.equal(await safePage.locator(".node").nth(safeIndex).locator(".node-icon").getAttribute("href"), campIcon);
+  await safePage.getByRole("button", { name: "Iniciar descanso" }).click();
+  assert.match(await safePage.locator("#nodeDialog").innerText(), /Descanso registrado/);
+  assert.equal(await safePage.locator("#timeTrackerValue").innerText(), "0min");
+  await safePage.close();
+  await dialog.locator("#nodeDialogClose").click();
+  const saved = await exportSession(page);
+  await page.close();
+
+  const restored = await pageFor(saved);
+  await restored.locator(".node").nth(index).click();
+  const restoredDialog = restored.locator("#nodeDialog");
+  assert.equal(await restoredDialog.locator("#nodeDialogType").textContent(), "Acampamento");
+  const elapsed = await restored.locator("#timeTrackerValue").innerText();
+  await restoredDialog.getByRole("button", { name: "Iniciar descanso" }).click();
+  assert.equal(await restoredDialog.locator("#nodeDialogType").textContent(), "Emboscada");
+  assert.match(await restored.locator(".node").nth(index).getAttribute("aria-label"), /^Emboscada,/);
+  assert.match(await restoredDialog.locator(".outdoor-scene").innerText(), /Descanso interrompido/);
+  assert.ok(await restoredDialog.locator(".encounter-list-item.is-creature").count() > 0);
+  assert.equal(await restoredDialog.getByRole("button", { name: "Iniciar descanso" }).count(), 0);
+  assert.equal(await restored.locator("#timeTrackerValue").innerText(), elapsed);
+  assert.equal(await restored.locator(".node.is-active").count(), 0);
+  await restoredDialog.locator("#nodeDialogClose").click();
+  const ambushCode = await exportSession(restored);
+  const encounter = new Map(decodeSessionCode(ambushCode).state.resolvedEncounters).get(scene.id);
+  assert.equal(calculateCombatND(encounter.items), scene.challenge.encounter);
+  assert.equal(encounter.budget.total, scene.challenge.total);
+  await restored.close();
+
+  const ambushed = await pageFor(ambushCode);
+  await ambushed.locator(".node").nth(index).click();
+  const ambushDialog = ambushed.locator("#nodeDialog");
+  assert.equal(await ambushDialog.locator("#nodeDialogType").textContent(), "Emboscada");
+  assert.equal(await ambushDialog.getByRole("button", { name: "Iniciar descanso" }).count(), 0);
+  assert.equal(await ambushed.locator(".node.is-active").count(), 0);
+  await ambushDialog.getByText("Confirmar conclusão da emboscada", { exact: true }).click();
+  await ambushDialog.locator("#nodeDialogClose").click();
+  assert.equal(await ambushed.locator(".node.is-active").count(), scene.links.length);
+  await ambushed.close();
+
+  const avoided = await pageFor(saved);
+  await avoided.locator(".node").nth(index).click();
+  await avoided.locator(".complete-choice").click();
+  assert.equal(await avoided.getByRole("button", { name: "Iniciar descanso" }).count(), 0);
+  await avoided.locator("#nodeDialogClose").click();
+  const avoidedSession = decodeSessionCode(await exportSession(avoided));
+  assert.equal(new Map(avoidedSession.state.resolvedEncounters).has(scene.id), false);
+  await avoided.close();
+  console.log("Descanso falso, emboscada opcional, salvamento e liberação da próxima rota: passaram.");
+}
+
 async function offlineFlow() {
   const page = await browser.newPage({ viewport: { width: 1024, height: 768 }, serviceWorkers: "allow" });
   page.on("pageerror", error => errors.push(error.message));
@@ -362,6 +456,7 @@ try {
   await newSelection(0);
   await newSelection(3);
   await missionFlow();
+  await outdoorSceneFlow();
   await bossFlow();
   await configurationFailure();
   await futureAndLegacyFlow();

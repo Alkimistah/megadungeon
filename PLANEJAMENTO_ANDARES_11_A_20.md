@@ -6,16 +6,16 @@ Este documento consolida as decisões, as entregas e as pendências dos andares 
 
 ## 1. Leitura rápida: o que vem primeiro
 
-**Próximo passo indicado:** desenhar a mecânica especial da Quimera. A conferência dos relógios e do reforço manual em mesa segue como validação na [lista de entregas](#15-próximas-entregas-em-ordem).
+**Próximo passo indicado:** implementar a continuidade de terreno e clima entre nodos conectados. A mecânica especial da Quimera vem depois da continuidade, conforme a [lista de entregas](#15-próximas-entregas-em-ordem).
 
 | Ordem | Prioridade | Resultado esperado | Situação |
 |---|---|---|---|
 | 1 | P0 — missões | Missões próprias de 11–20, ligadas a nodos com conteúdo que permita cumpri-las e estado preservado | Implementado e validado para novas expedições |
 | 2 | P1 — calibragem | CDs de exploração coerentes com personagens de níveis 4–7 | Curva 20–23 confirmada e implementada |
 | 3 | P1 — regras essenciais | Revelação correta, descanso verdadeiro seguro e estados claros de resolução | Implementado, com relógios separados na floresta |
-| 4 | P1 — Quimera fixa | Mesmo encontro e mapa no andar 20; sem adições aleatórias | Arena simples implementada; mecânica especial futura é importante |
-| 5 | P2 — desconhecidos | Mais variedade com tabela temática própria e descanso falso explícito | Proposta aceita; conteúdo e distribuição ainda não implementados |
-| 6 | P3 — continuidade | Terreno e clima com transições coerentes entre nodos | Proposta aceita; implementação posterior |
+| 4 | P2 — desconhecidos | Mais variedade com tabela temática própria e descanso falso explícito | Primeira tabela implementada |
+| 5 | P3 — continuidade | Terreno e clima com transições coerentes entre nodos | Próxima implementação |
+| 6 | P1 — Quimera fixa | Mesmo encontro e mapa no andar 20; sem adições aleatórias | Arena simples implementada; mecânica especial depois da continuidade |
 | 7 | P4 — pistas de rota | Informação parcial útil, sem entregar o tipo do nodo | Intenção aceita; regras ainda precisam de desenho |
 
 **Regra de corte:** não iniciar P2–P4 enquanto o mínimo de missões não estiver validado. Não condicionar a correção das missões à construção do sistema completo de clima, terreno ou desconhecidos.
@@ -174,7 +174,7 @@ Separar identidade real da cena de sua informação visível. Evitar trocar apen
 | Hostilidade | Não sortear emboscada ou interrupção que invalide a segurança | Problema possui causa, sinais e formas de resposta |
 | Estado | Descanso seguro registrado | Descobrir/solucionar o problema é distinto de descansar |
 
-Clima danoso num abrigo desconhecido só é erro se a cena prometer descanso verdadeiro sem proteção. O tipo falso precisa ser explícito para o mestre; não deve ser uma falha acidental da geração.
+Clima danoso num abrigo desconhecido só é erro se a cena prometer descanso verdadeiro sem proteção. Ao revelar o nodo, o abrigo verdadeiro e o falso aparecem como **Acampamento**, com o mesmo ícone e as mesmas ações. O tipo só fica explícito para o mestre depois da tentativa de descanso.
 
 Na primeira entrega, preservar os acampamentos seguros existentes. O descanso falso pode aguardar a tabela P2, sem ser improvisado por sorteio de clima danoso.
 
@@ -204,9 +204,9 @@ Combate normal, combate elite, boss, desconhecido, tesouro e acampamento permane
 
 O desconhecido pode revelar os demais conteúdos comuns, cenas sem combate e descanso falso. Boss não entra no sorteio: a Quimera é exclusiva do final fixo.
 
-### Distribuição inicial proposta
+### Distribuição dos novos mapas
 
-| Tipo no sorteio inicial | Peso atual | Peso proposto |
+| Tipo no sorteio inicial | Peso anterior | Peso novo |
 |---|---:|---:|
 | Combate normal | 62 | 47 |
 | Elite | 11 | 11 |
@@ -214,9 +214,7 @@ O desconhecido pode revelar os demais conteúdos comuns, cenas sem combate e des
 | Desconhecido | 5 | 25 |
 | Tesouro | 6 | 6 |
 
-Acampamentos garantidos e boss são aplicados à parte. Esses pesos não equivalem à proporção final do mapa nem à frequência numa rota jogada. O gerador atual ainda converte convergências com três ou mais entradas em desconhecido; proposta: retirar essa conversão automática ao introduzir o peso 25, validando sua frequência real depois.
-
-Não aumentar apenas o peso enquanto o conteúdo de desconhecidos ainda tiver as inconsistências de revelação. Frequência e tabela nova devem entrar juntas.
+Acampamentos garantidos e boss são aplicados à parte. O novo gerador elimina a conversão automática de convergências em desconhecidos. Em uma amostra de 500 novas expedições com até três missões, 26.279 de 135.732 nodos eram desconhecidos, cerca de 19%. Houve 10.787 cenas externas e todas as expedições da amostra foram preparadas com sucesso. Mapas armazenados preservam a distribuição e o conteúdo com que foram criados.
 
 ### Tabela interna inicial do desconhecido
 
@@ -224,14 +222,15 @@ Não aumentar apenas o peso enquanto o conteúdo de desconhecidos ainda tiver as
 |---|---|
 | 01–25 | Combate normal |
 | 26–35 | Combate elite |
-| 36–50 | Obstáculo ou armadilha |
+| 36–45 | Armadilha |
+| 46–50 | Obstáculo sem combate |
 | 51–70 | Exploração ou encontro sem combate |
 | 71–80 | Descoberta útil ou vantagem |
-| 81–88 | Tesouro |
-| 89–94 | Acampamento seguro |
+| 81–86 | Tesouro |
+| 87–94 | Acampamento seguro |
 | 95–100 | Descanso falso |
 
-Os pesos são uma proposta inicial aceita para desenvolvimento, ainda sujeita à validação de ritmo, risco e recuperação. Não garantem um desconhecido ou cena sem combate por rota curta.
+Os pesos iniciais preservam a calibragem recente de 8% para acampamentos seguros. A validade em mesa será avaliada pelo ritmo, risco e recuperação ao longo de rotas jogadas.
 
 ### Conteúdo e consequências
 
@@ -246,7 +245,9 @@ Usar as categorias dos andares 1–10 como inspiração, não copiar portas, cor
 | Anomalia | Clareira em que a chuva não toca o chão | Chuva presente; fenômeno assumidamente sobrenatural |
 | Descanso falso | Abrigo sobre leito de enxurrada | Chuva atual/recente ou risco de cheia explicitamente gerado |
 
-Cada cena deve definir apresentação, condições ambientais, abordagens possíveis, sucesso, falha, tempo e eventual recompensa. Começar com um conjunto pequeno e completo; não exigir uma tabela para cada combinação de terreno e clima. Missões podem reutilizar essas cenas posteriormente, mas P0 deve funcionar com o ambiente atual.
+A primeira entrega inclui oito cenas de obstáculo, exploração, descoberta e descanso falso, com opções de margem, pântano e encosta e cenas de uso mais geral. A UI revela a cena, o teste e as abordagens ao escolher a rota. O mestre resolve sucesso ou falha e confirma a conclusão, que libera as saídas. O tempo segue a regra de travessia. Os efeitos e as descobertas são conduzidos em mesa. A preparação mantém essas cenas separadas dos nodos de missão.
+
+Um acampamento descoberto permite **Seguir viagem** ou **Iniciar descanso**. Até decidir, o mestre vê a mesma apresentação para o acampamento seguro e para o falso. Em um acampamento falso, iniciar o descanso muda o nome do nodo para **Emboscada** e abre a ficha de combate. As criaturas usam o ND base do nodo. O total continua incluindo clima e terreno. A emboscada interrompe o descanso, preserva os relógios e fica gravada no save. A próxima rota só é liberada depois de **Confirmar conclusão da emboscada**.
 
 ## 8. P3 — continuidade de terreno e clima
 
@@ -425,8 +426,10 @@ A expedição avançou do andar 11 ao 14 com pouca necessidade de descanso. O me
 3. **Menos acampamentos ocultos.** Implementado para novos mapas dos andares 11–20, com chance de 8% por nodo desconhecido. Fileiras com acampamentos visíveis e acampamentos extras seguem as regras existentes. Em 1.000 mapas pareados, foram 423 acampamentos ocultos antes e 171 depois entre 2.270 nodos desconhecidos. Em 1.000 rotas simuladas, os acampamentos ocultos encontrados passaram de 115 para 47 e os visíveis permaneceram em 1.080. A restauração da sessão recuperada preservou os mapas já salvos.
 4. **Tempo de exploração.** Implementado. Novas travessias com teste variam entre 30, 45 e 60 minutos. Os dois relógios persistem ao avançar, retomar e exportar. Em saves anteriores, o total é reconstruído a partir dos nodos e tentativas registrados. Quando faltam andares do histórico, o app indica **Tempo total (parcial)**.
 5. **Reforço manual por criatura.** Implementado e verificado no Chrome. Disponível na ficha de um encontro pendente, inclusive em nodos de missão. Quando a ficha representa várias criaturas, o ajuste vale para todas as daquela ficha. Os bônus são reversíveis, ficam no save e não alteram ND ou XP. A Quimera mantém a ficha fixa. Se o mestre rerrolar as criaturas, as novas fichas começam com os reforços desativados.
-6. **Mecânica especial da Quimera.** Desenhar e testar o que diferencia o combate do andar 20, partindo da composição e da arena fixas.
-7. **Cenas desconhecidas, continuidade ambiental e pistas de rota.** Expandir o conteúdo conforme P2, P3 e P4, começando por uma tabela pequena de cenas e pelo descanso falso.
+6. **Cenas dos nodos desconhecidos.** Primeira tabela de exploração, obstáculo, descoberta e descanso falso implementada. Aplica-se às novas expedições.
+7. **Continuidade de terreno e clima.** Implementar transições coerentes entre nodos conectados e verificar o impacto na preparação das missões.
+8. **Mecânica especial da Quimera.** Depois da continuidade, desenhar e testar o que diferencia o combate do andar 20, partindo da composição e da arena fixas.
+9. **Pistas de rota.** Dar informação parcial antes da escolha, preservando o mistério do conteúdo.
 
 ### Ferramenta de variações de armadilha
 

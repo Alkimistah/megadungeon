@@ -18,7 +18,7 @@ import { createMissionDialogController } from "./missions/missionDialog.js";
 import { createMissionGenerationContext, generateMissionOffers } from "./missions/missionGenerator.js";
 import { materializeMissionsForCurrentContent } from "./missions/missionProfileAdapters.js";
 import { createMissionState } from "./missions/missionState.js";
-import { canRerollNodeCreatures, rerollNodeCreatures, resolveNodeEncounter } from "./encounterResolver.js";
+import { canRerollNodeCreatures, rerollNodeCreatures, resolveForestAmbush, resolveNodeEncounter } from "./encounterResolver.js";
 import { withCreatureReinforcement } from "./creatureReinforcement.js";
 import { createNodeDialogController } from "./nodeDialog.js";
 import { decodeSessionCode, encodeSessionCode, isSessionCode } from "./sessionCode.js";
@@ -286,6 +286,18 @@ const nodeDialogController = createNodeDialogController({
     state.restAtNode(node);
     refreshExplorationDisplay();
     nodeDialogController.open(node);
+  },
+  onBeginHiddenRest: (node) => {
+    if (!isPendingForestEncounter(node)) return false;
+    if (node.scene?.kind === "falseRest") {
+      const ambush = resolveForestAmbush(node, activeFloorRange, { mapSeed: currentMapSeed });
+      if (!ambush) return false;
+      node.resolvedEncounter = ambush;
+    } else if (!state.restAtNode(node)) {
+      return false;
+    }
+    refreshExplorationDisplay();
+    return true;
   },
   state,
   titleElement: elements.nodeDialogTitle,

@@ -1,5 +1,5 @@
 import { assetUrl } from "./assetUrl.js";
-import { getNodeProgressPresentation } from "./nodeProgressPresentation.js";
+import { getNodeContentPresentation, getNodeProgressPresentation } from "./nodeProgressPresentation.js";
 
 const NODE_RADIUS = 22;
 const LEVEL_HEIGHT = 120;
@@ -14,6 +14,7 @@ const ICONS_BY_ROOM_TYPE = {
   unknown: assetUrl("/assets/icons/unknown.svg"),
   treasure: assetUrl("/assets/icons/treasure.svg"),
   camp: assetUrl("/assets/icons/camp.svg"),
+  scene: assetUrl("/assets/icons/game-icons--treasure-map.svg"),
 };
 
 function createSvgElement(tagName) {
@@ -127,7 +128,6 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
       icon.setAttribute("width", "32");
       icon.setAttribute("height", "32");
       icon.setAttribute("class", "node-icon");
-      icon.dataset.revealedIcon = ICONS_BY_ROOM_TYPE[node.contentType || node.type];
 
       group.appendChild(circle);
       group.appendChild(icon);
@@ -189,6 +189,7 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
       if (!element) return;
 
       const nodeState = state.getNodeViewState(node);
+      const content = getNodeContentPresentation(node, nodeState);
       const progress = getNodeProgressPresentation(node, nodeState);
       element.dataset.progress = progress.kind;
       const icon = element.querySelector(".node-icon");
@@ -204,16 +205,16 @@ export function createMapRenderer({ svg, onNodeOpen, hiddenNodeIcon = assetUrl("
       badge.querySelector("text").textContent = progress.marker || "";
 
       if (icon) {
-        icon.setAttribute("href", nodeState.revealed ? icon.dataset.revealedIcon : activeHiddenNodeIcon);
+        icon.setAttribute("href", nodeState.revealed ? ICONS_BY_ROOM_TYPE[content.iconType] : activeHiddenNodeIcon);
       }
       if (node.requiresCompletion && node.type === "unknown") {
-        element.querySelector(".check-label")?.setAttribute("visibility", nodeState.chosen ? "visible" : "hidden");
+        element.querySelector(".check-label")?.setAttribute("visibility", nodeState.chosen && !content.campUndecided ? "visible" : "hidden");
       }
 
       element.setAttribute("aria-disabled", String(!nodeState.canOpen));
       element.setAttribute(
         "aria-label",
-        `${nodeState.revealed ? (node.type === "unknown" && nodeState.chosen ? node.revealedLabel : node.label) : "Caminho desconhecido"}, encontro ${node.level}, coluna ${node.column + 1}, ${progress.label}${nodeState.visible && node.missionBindings?.length ? ", missão vinculada" : ""}`
+        `${content.label}, encontro ${node.level}, coluna ${node.column + 1}, ${progress.label}${nodeState.visible && node.missionBindings?.length ? ", missão vinculada" : ""}`
       );
       element.setAttribute("aria-hidden", String(!nodeState.visible));
       element.setAttribute("tabindex", nodeState.canOpen ? "0" : "-1");

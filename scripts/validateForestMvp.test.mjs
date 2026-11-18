@@ -3,7 +3,7 @@ import test from "node:test";
 import { generateMapData } from "../src/generator.js";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { createRng } from "../src/random.js";
-import { canRerollNodeCreatures, rerollNodeCreatures, resolveNodeEncounter } from "../src/encounterResolver.js";
+import { canRerollNodeCreatures, rerollNodeCreatures, resolveForestAmbush, resolveNodeEncounter } from "../src/encounterResolver.js";
 import { creatureCatalog } from "../src/creatureCatalog/index.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
 import { calculateCombatND } from "../src/challenge.js";
@@ -214,6 +214,82 @@ test("new forest maps reduce hidden camps and keep the existing visible camps an
   assert.ok(unknownCount > 500);
   assert.ok(currentCamps / unknownCount >= 0.05 && currentCamps / unknownCount <= 0.10);
   assert.ok(currentCamps < previousCamps);
+});
+
+test("new expeditions reveal outdoor scenes only after choosing the route", () => {
+  const kinds = new Set();
+  let sampled = 0;
+  let unknown = 0;
+  for (let index = 0; index < 160; index++) {
+    const levels = generateMapData(6, 21, profile, 15, createRng(`forest-scenes-${index}`), { version: 3 });
+    sampled += levels.flat().length;
+    unknown += levels.flat().filter(node => node.type === "unknown").length;
+    for (const node of levels.flat().filter(node => node.scene)) {
+      kinds.add(node.scene.kind);
+      assert.equal(node.type, "unknown");
+      assert.equal(node.contentType, "scene");
+      assert.equal(node.revealedLabel, node.scene.title);
+      assert.equal(node.creature, null);
+      assert.equal(node.trap, null);
+      assert.equal(node.challenge.creatures, 0);
+      assert.ok(node.scene.approach && node.scene.success && node.scene.failure);
+    }
+  }
+  assert.ok(unknown / sampled > 0.15);
+  assert.deepEqual([...kinds].sort(), ["discovery", "exploration", "falseRest", "obstacle"]);
+
+  const expedition = expeditionModule.prepareForestExpedition({ seed: "scene-round-trip", profile, missions: [] });
+  const sceneFloor = expedition.floors.find(floor => floor.levels.flat().some(node => node.scene?.kind === "falseRest"));
+  assert.ok(sceneFloor);
+  const state = createExplorationState();
+  state.setLevels(sceneFloor.levels);
+  const scene = sceneFloor.levels.flat().find(node => node.scene?.kind === "falseRest");
+  assert.equal(state.isNodeRevealed(scene), false);
+  state.importSessionState({ chosenByLevel: [[scene.level, scene.id]] });
+  assert.equal(state.isNodeRevealed(scene), true);
+  assert.equal(state.canRestAtNode(scene), false);
+  const snapshot = expeditionModule.serializeForestExpedition(expedition);
+  const restored = expeditionModule.restoreForestExpedition(snapshot);
+  assert.deepEqual(restored.floors.find(floor => floor.floor === sceneFloor.floor).levels.flat().find(node => node.id === scene.id).scene, scene.scene);
+});
+
+test("false rest generates one ambush with the scene's combat budget and preserves the total ND", () => {
+  let checked = 0;
+  for (let index = 0; index < 80; index++) {
+    const seed = `ambush-${index}`;
+    const levels = generateMapData(6, 21, profile, 15, createRng(seed), { version: 3 });
+    for (const node of levels.flat()) {
+      if (node.scene?.kind !== "falseRest") continue;
+      const ambush = resolveForestAmbush(node, profile, { mapSeed: seed });
+      assert.ok(ambush?.items.length);
+      assert.ok(ambush.items.every(item => item.kind === "creature"));
+      assert.equal(calculateCombatND(ambush.items), node.challenge.encounter);
+      assert.equal(ambush.budget.creatures, node.challenge.encounter);
+      assert.equal(ambush.budget.total, node.challenge.total);
+      assert.equal(node.resolvedEncounter, null);
+      assert.deepEqual(resolveForestAmbush(node, profile, { mapSeed: seed }), ambush);
+      assert.equal(resolveForestAmbush({ ...node, resolvedEncounter: ambush }, profile, { mapSeed: seed }), null);
+      checked++;
+    }
+  }
+  assert.ok(checked > 20);
+});
+
+test("an unrevealed rest stop looks the same for real and false camps", () => {
+  const { getNodeContentPresentation } = presentation;
+  const safe = { type: "unknown", contentType: "camp", requiresCompletion: true, revealedLabel: "Acampamento" };
+  const fake = {
+    type: "unknown", contentType: "scene", requiresCompletion: true, revealedLabel: "Abrigo no leito de cheia",
+    scene: { kind: "falseRest" }
+  };
+  const view = { chosen: true, revealed: true, rested: false };
+  assert.deepEqual(getNodeContentPresentation(fake, view), getNodeContentPresentation(safe, view));
+  assert.equal(getNodeContentPresentation(fake, view).label, "Acampamento");
+  assert.equal(getNodeContentPresentation(fake, view).campUndecided, true);
+  assert.equal(getNodeContentPresentation(safe, { ...view, rested: true }).campUndecided, false);
+  const ambushed = { ...fake, resolvedEncounter: { items: [{ kind: "creature" }] } };
+  assert.equal(getNodeContentPresentation(ambushed, view).label, "Emboscada");
+  assert.equal(getNodeContentPresentation(ambushed, view).iconType, "normal");
 });
 
 test("new forest maps spend 30 to 60 minutes per traversal according to weather and terrain", () => {

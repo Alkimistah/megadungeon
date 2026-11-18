@@ -3,7 +3,7 @@ import { getCreatureById } from "../creatureCatalog/index.js";
 import { createForestMissionObjective, isForestMissionEnvironmentCompatible } from "./forestMissionScenes.js";
 
 function isEligible(node, mission) {
-  if (["boss", "camp"].includes(node.contentType || node.type)) return false;
+  if (["boss", "camp", "scene"].includes(node.contentType || node.type)) return false;
   if (mission.objective?.targetType === "creature") {
     const creature = getCreatureById(mission.objective.targetId);
     return ["normal", "elite"].includes(node.contentType || node.type)

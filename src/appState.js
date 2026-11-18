@@ -201,6 +201,7 @@ export function createExplorationState() {
       completed: isNodeCompleted(node),
       explored,
       locked: !active && !chosen,
+      rested: isNodeRested(node),
       revealed,
       visible
     };

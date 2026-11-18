@@ -97,7 +97,7 @@ export function calculateCombatND(items) {
 
 export function assignChallengeRating(node, floor, profile) {
   const rules = profile.challengeRules;
-  const encounter = getEncounterChallenge(node, floor, rules);
+  const encounter = node.scene?.nd ?? getEncounterChallenge(node, floor, rules);
   const climate = node.type === "boss" ? 0 : getClimateChallenge(node, rules);
   const terrain = node.type === "boss" ? 0 : getTerrainChallenge(node, rules);
   const total = node.type === "boss"

@@ -1,5 +1,6 @@
 import { calculateCombatND, formatChallengeRating, roundToQuarter } from "./challenge.js";
 import { creatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
+import { assignCreatureProfile } from "./creatures.js";
 import { applyWeaponVariation } from "./equipment/weaponVariation.js";
 import { createRng, pickWeighted } from "./random.js";
 import { createModificationPlan, getThreatParameters, THREAT_CHALLENGE_ORDER } from "./threatCreationRules.js";
@@ -677,20 +678,7 @@ function resolveFixedComposition(fixedComposition, rng) {
   return [...creatureItems, ...trapItems];
 }
 
-export function resolveNodeEncounter(node, { mapSeed } = {}) {
-  if (!node) return null;
-  if (node.resolvedEncounter?.version === ENCOUNTER_RESOLUTION_VERSION) return node.resolvedEncounter;
-  if (node.resolvedEncounter) node.resolvedEncounter = null;
-  if (!node.creature && !node.trap && !node.fixedComposition) return null;
-
-  const seed = getEncounterSeed(node, mapSeed);
-  const rng = createRng(seed);
-  const items = node.fixedComposition
-    ? resolveFixedComposition(node.fixedComposition, rng)
-    : [...resolveCreatureGroup(node, rng), ...(node.trap ? [getTrapSummary(node.trap)] : [])];
-
-  if (items.length === 0) return null;
-
+function createResolvedEncounter(node, items, seed) {
   // Composições fixas não passam pela divisão de orçamento dos perfis, então o
   // budget é derivado dos próprios itens (ND de combate real + soma das armadilhas).
   const creaturesBudget = node.fixedComposition
@@ -702,7 +690,7 @@ export function resolveNodeEncounter(node, { mapSeed } = {}) {
       .reduce((total, item) => total + (item.challengeRating || 0) * (item.quantity || 1), 0))
     : node.challenge?.trap || 0;
 
-  node.resolvedEncounter = {
+  return {
     budget: {
       creatures: creaturesBudget,
       creaturesLabel: formatChallengeRating(creaturesBudget),
@@ -715,6 +703,46 @@ export function resolveNodeEncounter(node, { mapSeed } = {}) {
     seed,
     version: ENCOUNTER_RESOLUTION_VERSION
   };
+}
 
+export function resolveForestAmbush(node, profile, { mapSeed } = {}) {
+  if (profile.id !== "forest-11-20" || node.scene?.kind !== "falseRest" || node.resolvedEncounter) return null;
+
+  const target = node.challenge.encounter;
+  const seed = `${getEncounterSeed(node, mapSeed)}:false-rest`;
+  const rng = createRng(seed);
+  const ambushNode = {
+    ...node,
+    type: "normal",
+    challenge: { ...node.challenge, creatures: target }
+  };
+  assignCreatureProfile(ambushNode, profile, rng);
+  const items = resolveCreatureGroup(ambushNode, rng);
+  if (items.length && calculateCombatND(items) === target) return createResolvedEncounter(ambushNode, items, seed);
+
+  const creature = pickExactCreatureForChallenge({
+    type: ambushNode.creature.type,
+    targetChallenge: target,
+    terrainName: getTerrainName(node),
+    rng,
+    allowedIds: ambushNode.creature.allowedCreatureIds
+  });
+  return creature ? createResolvedEncounter(ambushNode, [getCreatureSummary(creature, 1, rng)], seed) : null;
+}
+
+export function resolveNodeEncounter(node, { mapSeed } = {}) {
+  if (!node) return null;
+  if (node.resolvedEncounter?.version === ENCOUNTER_RESOLUTION_VERSION) return node.resolvedEncounter;
+  if (node.resolvedEncounter) node.resolvedEncounter = null;
+  if (!node.creature && !node.trap && !node.fixedComposition) return null;
+
+  const seed = getEncounterSeed(node, mapSeed);
+  const rng = createRng(seed);
+  const items = node.fixedComposition
+    ? resolveFixedComposition(node.fixedComposition, rng)
+    : [...resolveCreatureGroup(node, rng), ...(node.trap ? [getTrapSummary(node.trap)] : [])];
+  if (items.length === 0) return null;
+
+  node.resolvedEncounter = createResolvedEncounter(node, items, seed);
   return node.resolvedEncounter;
 }

@@ -35,6 +35,7 @@ export const forest11to20Profile = {
   encounterRules: {
     boss: { enabled: true, finalFloorOnly: true },
     unknownCampChance: 0.08,
+    expeditionRoomTypeWeights: { normal: 47, trap: 11, unknown: 25 },
     camps: {
       fullLevelEvery: 4,
       extraNodeChance: 0.02

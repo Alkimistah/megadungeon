@@ -19,7 +19,7 @@ export function prepareForestExpedition({ seed, profile, missions, startFloor = 
     let prepared = null;
     for (let attempt = 0; attempt < 60 && !prepared; attempt++) {
       const mapSeed = `${seed}:forest:${floor}:${attempt}`;
-      const levels = generateMapData(floorDepth, floorDc, profile, floor, createRng(mapSeed), { version: 2 });
+      const levels = generateMapData(floorDepth, floorDc, profile, floor, createRng(mapSeed), { version: 3 });
       levels.flat().forEach(node => { node.encounterSeed = `${floor}:${node.encounterSeed}`; });
       try {
         const nextMissions = materializeForestFloorMissions({ floor, levels, missions: preparedMissions });
