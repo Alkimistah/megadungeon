@@ -77,7 +77,8 @@ const elements = {
   nodeDialogTitle: document.getElementById("nodeDialogTitle"),
   nodeDialogType: document.getElementById("nodeDialogType"),
   nodeDialogMeta: document.getElementById("nodeDialogMeta"),
-  nodeDialogContent: document.getElementById("nodeDialogContent")
+  nodeDialogContent: document.getElementById("nodeDialogContent"),
+  nodeDialogFooter: document.getElementById("nodeDialogFooter")
 };
 
 let activeFloorRange = FLOOR_RANGES[0];
@@ -235,6 +236,7 @@ const nodeDialogController = createNodeDialogController({
   canRerollCreatures,
   contentElement: elements.nodeDialogContent,
   dialogElement: elements.nodeDialog,
+  footerElement: elements.nodeDialogFooter,
   getActiveMissions: () => missionState.getSelected(),
   getProfileId: () => activeFloorRange.id,
   metaElement: elements.nodeDialogMeta,

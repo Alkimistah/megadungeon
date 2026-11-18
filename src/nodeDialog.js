@@ -330,13 +330,16 @@ function createEnvironmentColumns(node) {
   return columns;
 }
 
-function createModalFooter(pageToggleButton, alignment = "end", tacticalMapButton = null) {
-  const footer = document.createElement("footer");
+function renderModalFooter(footer, pageToggleButton, alignment, tacticalMapButton) {
+  if (!pageToggleButton && !tacticalMapButton) {
+    footer.replaceChildren();
+    return;
+  }
+
   const leftSlot = document.createElement("div");
   const centerSlot = document.createElement("div");
   const rightSlot = document.createElement("div");
 
-  footer.className = "modal-footer";
   leftSlot.className = "modal-footer-slot is-left";
   centerSlot.className = "modal-footer-slot is-center";
   rightSlot.className = "modal-footer-slot is-right";
@@ -346,10 +349,7 @@ function createModalFooter(pageToggleButton, alignment = "end", tacticalMapButto
   }
   if (tacticalMapButton) centerSlot.appendChild(tacticalMapButton);
 
-  footer.appendChild(leftSlot);
-  footer.appendChild(centerSlot);
-  footer.appendChild(rightSlot);
-  return footer;
+  footer.replaceChildren(leftSlot, centerSlot, rightSlot);
 }
 
 function getEncounterItemKey(item, index) {
@@ -793,6 +793,7 @@ export function createNodeDialogController({
   canRerollCreatures = () => false,
   contentElement,
   dialogElement,
+  footerElement,
   metaElement,
   onAttempt,
   onBeginHiddenRest = () => false,
@@ -890,6 +891,8 @@ export function createNodeDialogController({
       () => {
         viewModeByNode.set(node.id, isCombat ? "environment" : "combat");
         render(node);
+        contentElement.scrollTop = 0;
+        footerElement.querySelector(".modal-page-toggle")?.focus();
       }
     );
   }
@@ -1034,7 +1037,6 @@ export function createNodeDialogController({
     const viewMode = getViewMode(node);
 
     currentNode = node;
-    dialogElement.classList.toggle("is-combat-view", viewMode === "combat");
     titleElement.textContent = `Encontro ${node.level}`;
     typeElement.textContent = content.label;
     setNodeDialogMeta(metaElement, checkText, explorationText, challengeText, challenge);
@@ -1075,11 +1077,11 @@ export function createNodeDialogController({
     const pageToggleButton = canShowCombatPage(node) ? createPageToggleControl(node, viewMode) : null;
     const tacticalMapButton = createTacticalMapControl(node);
 
-    contentElement.appendChild(createDivider());
-    contentElement.appendChild(createModalFooter(pageToggleButton, viewMode === "combat" ? "start" : "end", tacticalMapButton));
+    renderModalFooter(footerElement, pageToggleButton, viewMode === "combat" ? "start" : "end", tacticalMapButton);
 
     if (!dialogElement.open) {
       dialogElement.showModal();
+      contentElement.scrollTop = 0;
     }
   }
 

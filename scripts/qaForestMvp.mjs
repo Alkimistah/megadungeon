@@ -451,12 +451,28 @@ async function creatureHealthFlow() {
   const dialog = page.locator("#nodeDialog");
   await page.locator(".node").nth(nodeIndex).click();
   await dialog.locator(".route-choice").click();
+  const environmentBounds = await dialog.boundingBox();
   await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
   const combatBounds = await dialog.boundingBox();
   await dialog.getByRole("button", { name: "Abrir mapa tático" }).click();
   const map = page.locator(".tactical-map-fullscreen-panel");
   assert.deepEqual(combatBounds, await map.boundingBox(), "A ficha de combate deve ocupar a mesma área que o mapa tático");
+  assert.deepEqual(environmentBounds, combatBounds, "A modal deve manter as dimensões ao trocar de tela");
   await map.getByRole("button", { name: "Fechar", exact: true }).click();
+  await page.setViewportSize({ width: 768, height: 600 });
+  const content = dialog.locator("#nodeDialogContent");
+  const footer = dialog.locator(".modal-footer");
+  const footerBounds = await footer.boundingBox();
+  assert.ok(footerBounds.y + footerBounds.height <= 600, "O rodapé deve estar visível antes de rolar");
+  assert.ok(await content.evaluate(element => {
+    element.scrollTop = element.scrollHeight;
+    return element.scrollTop;
+  }), "O conteúdo da ficha deve rolar");
+  assert.deepEqual(await footer.boundingBox(), footerBounds, "O rodapé deve permanecer fixo durante a rolagem");
+  await footer.getByRole("button", { name: "Mostrar clima e terreno" }).click();
+  await footer.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+  assert.equal(await content.evaluate(element => element.scrollTop), 0);
+  await page.setViewportSize({ width: 768, height: 1024 });
   assert.equal(await dialog.locator(".encounter-detail-card").evaluate(card => getComputedStyle(card).maxHeight), "none");
   const reroll = dialog.getByRole("button", { name: "Rerrolar criaturas" });
   const units = dialog.getByRole("combobox", { name: "Criatura para registrar PV" });
