@@ -595,6 +595,20 @@ async function creatureHealthFlow() {
     assert.ok(text.includes("Mosquete +12"));
     assert.ok(text.includes(`PDF p. ${pdfPage}`));
   }
+  for (const [id, book, axeBonus, pdfPage] of [
+    ["orc-mutante", "Ameaças de Arton", 20, 36],
+    ["orc-mutante-livro-basico", "Livro Básico", 11, 292]
+  ]) {
+    const label = `Orc Mutante · ${book}`;
+    await creature.selectOption(id);
+    await manual.getByRole("button", { name: "Gerar encontro", exact: true }).click();
+    assert.deepEqual(await list.locator("strong").allTextContents(), [`1 x ${label}`]);
+    const text = await detail.innerText();
+    assert.match(text, /ND 5/);
+    assert.ok(text.includes(`Machado de guerra +${axeBonus}`));
+    assert.ok(text.includes("mordida +20"));
+    assert.ok(text.includes(`PDF p. ${pdfPage}`));
+  }
   await creature.selectOption("");
   assert.equal(await budget.isEnabled(), true);
   await page.close();

@@ -19,7 +19,7 @@ export const sourceByCreatureId = {
     "rato-gigante": basicBookSource(286),
     "orc-combatente": basicBookSource(286),
     "orc-chefe": basicBookSource(286),
-    "orc-mutante": basicBookSource(286),
+    "orc-mutante-livro-basico": basicBookSource(286),
     "aranha-gigante": basicBookSource(287),
     "gargula": basicBookSource(287),
     "guerreiro-de-chifres": basicBookSource(287),

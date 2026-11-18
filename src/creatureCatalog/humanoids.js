@@ -8,8 +8,9 @@ export const orcCombatant = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 35,
         "bookPage": 33
     },
     "stats": {
@@ -84,8 +85,9 @@ export const orcChief = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 35,
         "bookPage": 33
     },
     "stats": {
@@ -309,8 +311,9 @@ export const orcMutante = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 36,
         "bookPage": 34
     },
     "stats": {
@@ -349,6 +352,27 @@ export const orcMutante = {
     "equipment": "Machado de guerra",
     "treasure": "Padrão.",
     "skillsText": null
+};
+
+const orcMutanteBasic = {
+    ...orcMutante,
+    id: "orc-mutante-livro-basico",
+    variantOf: orcMutante.id,
+    source: undefined,
+    actions: [
+        {
+            name: "Corpo a Corpo",
+            text: "Machado de guerra +11 (1d12+18, x3) e mordida +20 (1d6+18)."
+        }
+    ],
+    abilities: [
+        ...orcMutante.abilities,
+        {
+            name: "Sensibilidade à Luz",
+            timing: null,
+            text: "Luz solar ou equivalente deixa o orc ofuscado."
+        }
+    ]
 };
 
 export const bandido = {
@@ -2954,9 +2978,12 @@ export const orcMutanteSuperior = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 5,
-        "bookPage": 34
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 36,
+        "bookPage": 34,
+        "pdfPageEnd": 37,
+        "bookPageEnd": 35
     },
     "stats": {
         "initiative": 9,
@@ -3041,8 +3068,9 @@ export const orcRei = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 35,
         "bookPage": 33
     },
     "stats": {
@@ -3098,8 +3126,9 @@ export const orcVeterano = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 35,
         "bookPage": 33
     },
     "stats": {
@@ -3144,8 +3173,9 @@ export const orcXama = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p32 ate 43.pdf",
-        "pdfPage": 6,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 37,
         "bookPage": 35
     },
     "stats": {
@@ -9973,7 +10003,7 @@ export const liderMercenarioDeAslothia = {
 export const humanoidCreatures = [
     // Manuais, Livro Básico e Ameaças de Arton
     orcCombatant, orcEnfraquecido, orcChief, ogre,
-    gnollMarauder, gnollFilibuster, gnollFilibusterBasic, orcMutante, bandido,
+    gnollMarauder, gnollFilibuster, gnollFilibusterBasic, orcMutante, orcMutanteBasic, bandido,
     chefeBandido, guardaDeCidade, sargentoDaGuarda, centauroCombatente,
     centauroXama, trog, recrutaPurista, soldadoPurista,
     sargentoMor, capelaoDeGuerra, capitaoBaluarte, cavaleiroDeLeopardoSangrento,

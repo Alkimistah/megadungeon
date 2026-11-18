@@ -95,6 +95,46 @@ test("automatic resolution and reroll select one Gnoll version for each profile"
   }
 });
 
+test("Orc Mutante book variants preserve the original ID and use the preferred sheet in automatic encounters", () => {
+  const originalId = "orc-mutante";
+  const basicId = "orc-mutante-livro-basico";
+  const original = getCreatureById(originalId);
+  const basic = getCreatureById(basicId);
+  assert.ok(basic);
+  assert.deepEqual(original.sources.map(source => source.book), ["Ameaças de Arton"]);
+  assert.equal(original.source.pdfPage, 36);
+  assert.match(original.actions[0].text, /Machado de guerra \+20/);
+  assert.deepEqual(basic.sources.map(source => source.book), ["Livro Básico"]);
+  assert.equal(basic.source.bookPage, 286);
+  assert.equal(basic.source.pdfPage, 292);
+  assert.equal(basic.challengeRating, 5);
+  assert.equal(basic.stats.hitPoints, 55);
+  assert.match(basic.actions[0].text, /Machado de guerra \+11.*mordida \+20/);
+  assert.match(basic.abilities.find(ability => ability.name === "Sensibilidade à Luz")?.text || "", /ofuscado/);
+
+  const alternateProfile = {
+    ...profile,
+    creatureRules: { ...profile.creatureRules, preferredCreatureIdsByFamily: { [originalId]: basicId } }
+  };
+  function makeNode() {
+    return {
+      id: "orc-mutante-variants", encounterSeed: "orc-mutante-variants", type: "normal",
+      challenge: { creatures: 5, total: 5 },
+      creature: { type: "humanoid", targetChallenge: 5, allowedCreatureIds: [originalId, basicId] }
+    };
+  }
+
+  const originalEncounter = resolveNodeEncounter(makeNode(), { profile });
+  assert.deepEqual(originalEncounter.items.map(item => item.creatureId), [originalId]);
+  const alternateNode = makeNode();
+  const alternateEncounter = resolveNodeEncounter(alternateNode, { profile: alternateProfile });
+  assert.deepEqual(alternateEncounter.items.map(item => item.creatureId), [basicId]);
+  assert.equal(rerollNodeCreatures(alternateNode, alternateProfile), null);
+  assert.equal(resolveNodeEncounter({ ...makeNode(), resolvedEncounter: originalEncounter }, {
+    profile: alternateProfile
+  }), originalEncounter);
+});
+
 test("outdoor trap presentations use the terrain and repeat after restoring the encounter", () => {
   const node = {
     encounterSeed: "14:N2",
