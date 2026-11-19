@@ -394,11 +394,56 @@ A espiral que aparece no Raio Conspurcado da Bruxa Goblin se repete nas opções
 
 As 12 fichas da seção estão conferidas, com referências ao PDF integral e cobertas pelo teste de Duyshidakk dos andares 11–20. Nenhuma ficha teve diferença mecânica. A única divergência de papel é o Bugbear Sentinela, Lacaio no livro e Especial no catálogo, preservado conforme a decisão do Culto. Ficam para revisão de apresentação as regras gerais de Bando e Enxame, que o catálogo ainda não exibe, e a espiral sem legenda.
 
+O quarto lote e o fechamento de Duyshidakk foram publicados em `b831a4e`. Passaram os testes dos andares 1–20, com 48 casos, os das missões e o build de produção. O QA dos andares 11–20 no Chrome passou contra o site publicado, sem erros de JavaScript. O bundle publicado traz a nova referência do Sangue do Ayrrak e já não cita o recorte `ameacas de arton p80 ate 90.pdf`. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44408333570)
+
 ## Pendências e ponto de retomada
 
-1. **Dragões.** Seção concluída, com 12 fichas. As referências de todas apontam para o PDF integral, e a Aura Aterradora está completa nas sete fichas que a possuem.
-2. **Restante de Ameaças de Arton.** Duyshidakk está concluído, conforme acima. O próximo bloco do sumário é Elementais, a partir da p. 88 impressa, p. 90 do PDF integral. Inventariar a seção, renderizando as páginas para conferir os ícones de papel. Depois, seguir pelos blocos seguintes e voltar a Áreas de Tormenta, p. 18 impressa, p. 20 do PDF. As diferenças de papéis e a apresentação das regras compartilhadas dos lefeu estão registradas acima para revisão.
-3. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
-4. **Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
+Situação em 19 de novembro de 2026.
+
+### Concluído
+
+| Seção | Páginas impressas | Fichas |
+|---|---:|---:|
+| Brutos & Indomáveis | 30–41 | 21 |
+| Capangas & Bandoleiros | 42–51 | 17 |
+| Culto de Aharadak | 52–63 | 11 |
+| Dragões | 64–77 | 12 |
+| Duyshidakk | 78–87 | 12 |
+| **Total** | | **73** |
+
+As 73 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. Nenhuma ficha teve diferença mecânica que exigisse correção de regra. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote. Além delas, `gnoll-filibusteiro` já cita o PDF integral, p. 116 impressa, mas pertence à seção Gnolls e ainda não foi conferido.
+
+### O que falta em Ameaças de Arton
+
+Ainda há 261 fichas de Ameaças no catálogo apontando para recortes do PDF, como `ameacas de arton p90-103.pdf`, ou para prints enviados pelo usuário. A ordem de trabalho segue o sumário, pp. 3–5 impressas, pp. 5–7 do PDF.
+
+1. **Elementais**, p. 88 impressa, p. 90 do PDF. É o próximo bloco: o catálogo tem 14 fichas, Aquin’ne, Corgann, Namasqall, T’Peel, Rarvnaak, Hallus’tir, Pakk, Ber-baram, Serpentaar, Terrier, Pamgra, Bando de Pamgras, Tanaloom e Elemental Corrompido, todas citando o recorte `ameacas de arton p90-103.pdf`. As páginas registradas no catálogo ficam uma acima das do sumário em alguns casos, como Aquin’ne, p. 89 no catálogo e p. 88 no sumário. Confirmar cada uma no PDF integral.
+2. **Blocos seguintes, na ordem do sumário:** Ermos, p. 102; Gnolls, p. 114; Golens, p. 124; Igreja de Arsenal, p. 136; Kallyadranoch, p. 144; Império de Jade, p. 154; Império de Tauron, p. 168; Kobolds, p. 178; Familiares, p. 190; Masmorras, p. 198; Montarias, p. 210; Mascotes & Mortos-Vivos, p. 228; Mundo Perdido, p. 242; Piratas & Pistoleiros, p. 252; Povos-Trovão, p. 264; Puristas, p. 274; Reino dos Mortos, p. 284; Reinos de Moreania, p. 296; Sanguinárias, p. 306; Sob as Ondas, p. 314; Sszzaazitas, p. 326; Trolls Nobres, p. 338; Uivantes, p. 348.
+3. **Áreas de Tormenta**, p. 18 impressa, p. 20 do PDF. Fica para depois dos blocos acima. As 13 fichas citam o recorte `ameacas de arton p20 ate 31.pdf`. Conferir com a regra compartilhada dos lefeu do Livro Básico, p. 315.
+4. **Fichas vindas de prints:** `golem-de-nor-medio`, `stagh` e `soterrado-vagante` citam “prints enviados pelo usuário”. Pertencem a Uivantes e devem ganhar referência ao PDF integral quando esse bloco for auditado.
+5. **Aura Aterradora abreviada:** Avatar de Kallyadranoch, Necrodraco Lich e Tarso ainda trazem o texto curto. Completar com o texto do Livro Básico quando Kallyadranoch e Mascotes & Mortos-Vivos forem auditados, como foi feito nos Dragões.
+6. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
+
+### Revisão de apresentação, fora da auditoria
+
+Itens anotados durante os lotes que não alteram números, mas podem melhorar a ficha exibida:
+
+- As regras gerais de Bando e Enxame, p. 15 impressa, estão em `src/generalCreatureAbilities.js`, mas nenhum módulo as importa. A ficha não as mostra, e o combate não as aplica.
+- As regras compartilhadas dos lefeu e as habilidades dracônicas do Livro Básico poderiam ser expostas nas fichas que dependem delas.
+- A espiral sem legenda, que parece marcar habilidades mágicas, e os asteriscos das magias beneficiadas por itens não são reproduzidos.
+- Papéis impressos que divergem da inferência do catálogo, como o Bugbear Sentinela, ficam preservados conforme a decisão do Culto. Uma revisão futura pode decidir se o papel impresso deve prevalecer.
+
+### Depois de Ameaças
+
+**Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
+
+### Como retomar
+
+1. Os PDFs ficam em `tmp/livros/`, pasta ignorada pelo Git. Página do PDF = página impressa + 2 em Ameaças de Arton.
+2. Para extrair texto, usar `pdfjs-dist` instalado com npm numa pasta temporária, separando as duas colunas pela posição horizontal dos itens. Os títulos das fichas têm fonte de altura 11,5 ou maior.
+3. Os ícones de papel, como Solo, Lacaio, Especial, Bando e Enxame, são vetoriais e não aparecem no texto. Para conferi-los, renderizar as páginas com pdf.js no Chrome via Playwright, usando `executablePath: "/usr/bin/google-chrome"`, e olhar as imagens.
+4. Em cada lote, comparar ND, Iniciativa, Percepção, Defesa, resistências, PV, PM e atributos. Em seguida, conferir texto de ataques, habilidades, perícias, equipamento e tesouro. Atualizar `source` com `pdfFile`, `pdfPage`, `bookPage` e, se a ficha ocupar duas páginas, `pdfPageEnd` e `bookPageEnd`. Ampliar o teste da seção em `scripts/validateForestMvp.test.mjs`.
+5. Validar com `npm run -s test:floors-1-10`, `npm run -s test:missions`, `npm run -s test:floors-11-20` e `npm run -s build`. Depois do push, acompanhar o deploy com `gh run watch` e rodar `QA_APP_URL=https://alkimistah.github.io/megadungeon/ node scripts/qaForestMvp.mjs --production`.
+6. O push usa `git -c credential.helper= -c credential.helper='!gh auth git-credential' push origin main`, porque o helper padrão do WSL não tem usuário configurado.
 
 A implementação de rolagem de tesouros segue prevista para depois da auditoria. [Planejamento da rolagem de tesouros](../../../ARCHITECTURE.md#rolagem-de-tesouros)
