@@ -12,6 +12,14 @@ Usar os quatro PDFs integrais em `tmp/livros/` como referência das fichas publi
 - **Deuses de Arton.** Inventário concluído. O catálogo tem só os avatares de Aharadak e Kallyadranoch, já conferidos. As outras fichas, 18 avatares e cerca de 60 criaturas divinas, ficam anotadas para cadastro futuro. [Inventário e cadastro futuro](../plans/2026-11-19-auditoria-deuses-de-arton.md)
 - **Heróis de Arton.** Inventário concluído, sem fichas de inimigo. A varredura das 332 páginas procurou tipos de criatura, marcadores de ND, rótulos de Pontos de Vida e Iniciativa e linhas de atributos. As únicas linhas de atributos são o Melhor Amigo do Treinador, p. 20 impressa, que é um parceiro de personagem e fica fora das fichas, e exemplos de personagem na p. 288. O livro não tem fichas no catálogo nem entradas para cadastro futuro.
 
+## Ponto de retomada
+
+Situação em 19 de novembro de 2026. Ameaças de Arton, Masmorra de Práxis, Deuses de Arton e Heróis de Arton estão concluídos, e tudo está publicado. A tabela de parâmetros de ameaças foi corrigida conforme o livro.
+
+1. **Próximo passo.** Segunda passada nas 76 fichas do Livro Básico, no mesmo nível de detalhe usado em Ameaças, incluindo textos de habilidades, perícias, equipamento, tesouro e papéis impressos. [Plano do Livro Básico](../plans/2026-11-18-auditoria-livro-basico.md) · [Método e ferramentas](../plans/2026-11-18-auditoria-orcs-ameacas.md#como-retomar)
+2. **Depois da revisão.** Cadastrar os inimigos que faltam, a partir das listas de cadastro futuro de Ameaças e de Deuses. [Ameaças](../plans/2026-11-18-auditoria-orcs-ameacas.md#cadastro-futuro) · [Deuses](../plans/2026-11-19-auditoria-deuses-de-arton.md#cadastro-futuro)
+3. **Revisão de apresentação.** Regras gerais de Bando e Enxame nas fichas, marca de habilidade mágica e recontagem das divergências de papel com a tabela corrigida. [Itens anotados](../plans/2026-11-18-auditoria-orcs-ameacas.md#revisão-de-apresentação-fora-da-auditoria)
+
 ## Método
 
 A unidade de cobertura é o livro e a unidade de validação é a ficha. Um inventário por livro permite conferir se alguma ficha foi pulada, inclusive quando ela tem o mesmo nome de outra fonte. Uma auditoria por tipo de criatura acompanha melhor a divisão dos arquivos do catálogo, mas exigiria reexaminar as mesmas seções dos PDFs para provar a cobertura. Os tipos servem como filtro no relatório.
