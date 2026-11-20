@@ -790,7 +790,7 @@ export const aranhasFilhotes = {
         "Quando os casulos da matriarca se rompem, dezenas de aranhas recém-nascidas se espalham pelo chão, pelas paredes e por baixo das armaduras.",
         "Sozinhas são frágeis; juntas, viram uma massa de picadas, distração e pânico."
     ],
-    role: "minion",
+    role: "solo",
     roleSource: "custom",
     source: { book: "Masmorra de Práxis", pdfFile: "aranha_matriarca_tormenta20_v2", pdfPage: null, bookPage: null },
     stats: {

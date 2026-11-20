@@ -18,7 +18,7 @@ Entre parênteses, o valor da tabela.
 - **Aranhas Filhotes.** É o Enxame Larval de Kobolds, p. 180 impressa, adaptado, e o livro imprime aquele enxame como Solo. Os números coincidem com Solo de ND 1: Defesa 16, Reflexos 11, Fortitude 5, Vontade 0, CD 14 e PV próximos de 35. Como Lacaio, os PV ficam mais que três vezes acima da tabela. O dano automático de enxame fica abaixo dos dois papéis, como no Enxame Larval. A ficha registra que o enxame faz parte do desafio da matriarca e não rende XP próprio.
 - **Orc Enfraquecido.** É uma cópia do Zumbi do Livro Básico, ND ¼ e PV 20, e herda o desvio de PV da ficha oficial. Nenhuma mudança é sugerida.
 
-Nada foi alterado nas fichas. Papel e ND do Mímico Menor e das Aranhas Filhotes ficam para decisão do usuário.
+Por decisão do usuário, o Mímico Menor e as Aranhas Filhotes passaram a Solo, papel que corresponde aos números das fichas. ND, estatísticas e habilidades não mudaram, e as Aranhas Filhotes continuam sem XP próprio quando convocadas pela matriarca.
 
 ## Divergência da tabela de parâmetros no código
 
@@ -33,4 +33,12 @@ As colunas PV, Resistências Média e Fraca e CD coincidem.
 
 A tabela também alimenta as variantes elite geradas em `createEliteVariant`, em `src/encounterResolver.js`. O ataque, o dano médio, a Defesa e as resistências dessas variantes vêm dela. Hoje, uma variante elite Solo ou Especial recebe a Resistência Forte da tabela como bônus de ataque, e uma variante elite Lacaio recebe a Defesa do livro como dano médio e a Resistência Forte como Defesa. O erro aparece na mesa sempre que um encontro gera uma variante elite.
 
-A correção muda a geração de encontros e os papéis inferidos, por isso fica pendente de decisão. Ao aplicá-la, revisar os testes que fixam papéis atuais e as recomendações de criação e modificação de ameaças que leem a mesma tabela.
+### Correção aplicada
+
+Por decisão do usuário, as três tabelas de `THREAT_PARAMETERS` foram reescritas com os 216 valores do livro. A transcrição conserva ND, PV e CD de cada linha, que já coincidiam, e um teste dos andares 11–20 confere seis linhas de cada papel contra o livro.
+
+- **Papéis inferidos.** Os 35 papéis listados acima passaram a Lacaio. Entre as fichas cujos papéis estavam fixados em testes, só o Cão de Kally mudou, de Especial para Lacaio, que é o papel impresso.
+- **Variantes elite.** O plano de escala passa a usar os valores do livro. Um Hurobakk escalado para Solo de ND 12, por exemplo, recebe ataque +36 e Resistência Forte 26, em vez de ataque +26.
+- **Validação.** Passaram o build de produção, os testes de andares 1–10, com 13.500 encontros sem vazios ou divergências de ND, os 81 testes de andares 11–20 e os testes de missões.
+
+Muitas divergências de papel registradas na auditoria de Ameaças se resolvem com a tabela corrigida. As que restam continuam registradas nas seções de cada bloco.

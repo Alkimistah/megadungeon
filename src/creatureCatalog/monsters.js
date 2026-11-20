@@ -3243,7 +3243,7 @@ export const mimicoMenor = {
     description: [
         "Uma cria ou exemplar subnutrido de mímico, adaptado à escassez dos primeiros andares da masmorra. Imita baús, portas e móveis simples para atrair exploradores isolados."
     ],
-    role: "special",
+    role: "solo",
     roleSource: "adaptacao-nd",
     source: { book: "Masmorra de Práxis" },
     stats: {

@@ -470,7 +470,7 @@ test("creature sheets leave out player-side partner and familiar rules without c
   const roles = {
     hiena: "special", hienodonte: "special", "chibi-kabuto": "minion", "ko-kabuto": "minion", "dai-kabuto": "solo",
     "asa-assassina": "minion", aquinne: "special", terrier: "solo", "t-peel": "minion", pakk: "minion", stagh: "minion",
-    cocatriz: "solo", bulette: "solo", "cao-de-kally": "special", "kobold-bruto": "solo", "corcel-de-kally": "solo",
+    cocatriz: "solo", bulette: "solo", "cao-de-kally": "minion", "kobold-bruto": "solo", "corcel-de-kally": "solo",
     "sapo-atroz": "solo", estirge: "minion", "kobold-patrulheiro": "minion", "kobold-veterano": "minion",
     "kobold-explosivo": "minion", "kobold-xama": "special", "cocatriz-real": "solo", tigre: "special"
   };
@@ -714,6 +714,36 @@ test("every ND S and S+ sheet with Maior que a Morte states the death immunity t
     assert.doesNotMatch(ability.text, /possuem um status especial/, creature.id);
   }
   assert.equal(checked, 7);
+});
+
+test("threat parameters reproduce Ameaças de Arton Table 2-3", async () => {
+  const { getThreatParameters } = await import("../src/threatCreationRules.js");
+  // ND, ataque, dano médio, Defesa, Forte, Média, Fraca, PV, CD — Ameaças pp. 382–384
+  const rows = {
+    solo: [[0.25, 6, 8, 11, 3, 0, -2, 7, 12], [1, 9, 15, 16, 11, 5, 0, 35, 14], [4, 16, 24, 23, 16, 10, 4, 140, 18],
+      [7, 24, 62, 31, 20, 14, 7, 280, 24], [12, 36, 144, 43, 26, 20, 12, 600, 33], [20, 54, 324, 61, 34, 28, 20, 1200, 49]],
+    minion: [[0.25, 7, 9, 10, 2, 0, -1, 4, 12], [1, 11, 17, 15, 10, 5, 1, 9, 14], [5, 20, 56, 23, 16, 11, 6, 40, 20],
+      [10, 34, 105, 35, 21, 16, 11, 80, 30], [16, 47, 235, 52, 29, 24, 17, 160, 42], [20, 56, 344, 60, 33, 28, 21, 240, 49]],
+    special: [[0.25, 4, 8, 11, 3, 0, -2, 5, 14], [2, 10, 18, 17, 13, 7, 2, 49, 18], [6, 18, 56, 25, 18, 12, 6, 168, 24],
+      [11, 32, 130, 39, 24, 18, 11, 385, 33], [15, 41, 186, 48, 28, 22, 15, 525, 42], [20, 52, 324, 59, 34, 28, 20, 840, 51]]
+  };
+  for (const [role, entries] of Object.entries(rows)) {
+    for (const [nd, attack, averageDamage, defense, strong, medium, weak, hitPoints, abilityDc] of entries) {
+      const parameters = getThreatParameters(role, nd);
+      assert.deepEqual(
+        [parameters.attack, parameters.averageDamage, parameters.defense, parameters.saves.strong, parameters.saves.medium, parameters.saves.weak, parameters.hitPoints, parameters.abilityDc],
+        [attack, averageDamage, defense, strong, medium, weak, hitPoints, abilityDc],
+        `${role} ND ${nd}`
+      );
+    }
+  }
+});
+
+test("Masmorra de Práxis sheets use the roles that match their numbers", () => {
+  assert.equal(getCreatureById("mimico-menor").role, "solo");
+  assert.equal(getCreatureById("aranhas-filhotes").role, "solo");
+  assert.equal(getCreatureById("aranha-matriarca").role, "solo");
+  assert.equal(getCreatureById("orc-enfraquecido").role, "solo");
 });
 
 test("Dragão Celestial Venerável keeps the undead clause of Intervenção Divina", () => {

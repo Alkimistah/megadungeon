@@ -1000,7 +1000,7 @@ Itens anotados durante os lotes que não alteram números, mas podem melhorar a 
 - Bando, p. 14 impressa, e Enxame, p. 15 impressa, estão em `src/generalCreatureAbilities.js`. A integração com a ficha e o combate fica pendente.
 - As regras compartilhadas dos lefeu e as habilidades dracônicas do Livro Básico poderiam ser expostas nas fichas que dependem delas.
 - Exibir a marca de habilidade mágica, definida na p. 384 impressa, e os asteriscos das magias beneficiadas por itens nas fichas que os usam.
-- Papéis impressos que divergem da inferência do catálogo, como o Bugbear Sentinela, ficam preservados conforme a decisão do Culto. Uma revisão futura pode decidir se o papel impresso deve prevalecer.
+- A tabela de parâmetros do código foi corrigida em 19 de novembro de 2026, e 35 papéis inferidos passaram a Lacaio, a maioria igual ao papel impresso, como o Bugbear Sentinela. As divergências registradas nas seções anteriores refletem a tabela antiga. Uma revisão futura pode recontar as que restam e decidir se o papel impresso deve prevalecer. [Correção da tabela](2026-11-19-validacao-praxis-e-parametros.md#correção-aplicada)
 
 ### Depois de Ameaças
 
