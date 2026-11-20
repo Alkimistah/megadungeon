@@ -9,7 +9,8 @@ Usar os quatro PDFs integrais em `tmp/livros/` como referência das fichas publi
 - **Livro Básico — Jogo do Ano.** Primeira rodada publicada com 80 fichas inventariadas e referências atualizadas. O plano acompanha as diferenças entre livros e as versões já publicadas. [Plano da primeira rodada](../plans/2026-11-18-auditoria-livro-basico.md)
 - **Ameaças de Arton.** As 335 fichas de Ameaças do catálogo foram conferidas contra o PDF integral e publicadas. Os blocos de Reinos de Moreania a Trolls Nobres e 12 fichas de Uivantes não estão no catálogo e ficam anotados para cadastro futuro. Familiares fica fora do catálogo. [Relatório e cadastro futuro](../plans/2026-11-18-auditoria-orcs-ameacas.md#cadastro-futuro)
 - **Masmorra de Práxis.** As quatro fichas da campanha foram comparadas com a tabela de parâmetros por papel e ND, e o Mímico Menor e as Aranhas Filhotes passaram a Solo. A comparação revelou que a tabela do código divergia do livro. A tabela foi corrigida, o que ajustou 35 papéis inferidos e as variantes elite. [Validação e divergência da tabela](../plans/2026-11-19-validacao-praxis-e-parametros.md)
-- **Deuses de Arton e Heróis de Arton.** PDFs disponíveis. As variantes de Deuses dos avatares de Aharadak e Kallyadranoch já foram conferidas. O inventário de cada livro segue pendente.
+- **Deuses de Arton.** Inventário concluído. O catálogo tem só os avatares de Aharadak e Kallyadranoch, já conferidos. As outras fichas, 18 avatares e cerca de 60 criaturas divinas, ficam anotadas para cadastro futuro. [Inventário e cadastro futuro](../plans/2026-11-19-auditoria-deuses-de-arton.md)
+- **Heróis de Arton.** PDF disponível. O inventário segue pendente.
 
 ## Método
 
