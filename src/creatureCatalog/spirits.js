@@ -107,11 +107,6 @@ export const aquinne = {
             "name": "Redemoinho de Maresia",
             "timing": "padrão",
             "text": "O aquin’ne toca um objeto adjacente, que perde 5 PV (Ref CD 16 evita)."
-        },
-        {
-            "name": "Familiar",
-            "timing": null,
-            "text": "Um aquin’ne familiar concede deslocamento de natação 9m e permite lançar magias e respirar debaixo d’água."
         }
     ],
     "equipment": null,
@@ -170,11 +165,6 @@ export const terrier = {
             "name": "Pedregoso",
             "timing": null,
             "text": "Um terrier pode permanecer completamente imóvel. Se ele estiver assim, um personagem deve passar num teste de Percepção (CD 30) para perceber que ele é uma criatura e não um monte de pedras."
-        },
-        {
-            "name": "Familiar",
-            "timing": null,
-            "text": "Um terrier familiar concede redução de dano 2/impacto."
         }
     ],
     "equipment": null,
@@ -490,11 +480,6 @@ export const tPeel = {
             "name": "…E o Vento Levou",
             "timing": "livre",
             "text": "Quando acerta um ataque de brisa agressiva, o t’peel usa a manobra desarmar (teste +11). Se desarmar a vítima, ele prende a arma em seu redemoinho. Recuperar a arma exige vencer um teste de desarmar contra o t’peel."
-        },
-        {
-            "name": "Familiar",
-            "timing": null,
-            "text": "Um t’peel familiar pode carregar 2 espaços de itens e permite que você lance Queda Suave."
         }
     ],
     "equipment": null,
@@ -713,11 +698,6 @@ export const pakk = {
             "name": "Labareda Viva",
             "timing": null,
             "text": "No início de cada turno do pakk, todas as criaturas em alcance curto sofrem 1d4 pontos de dano de fogo."
-        },
-        {
-            "name": "Familiar",
-            "timing": null,
-            "text": "Um pakk familiar permite que você lance Explosão de Chamas. Caso aprenda novamente essa magia, seu custo diminui em –1 PM."
         }
     ],
     "equipment": null,
@@ -1164,8 +1144,7 @@ export const stagh = {
         { name: "Corpo a Corpo", text: "Duas garras +16 (1d6+4 mais 1d6 frio)." }
     ],
     abilities: [
-        { name: "Aura de Frio", timing: "passiva", text: "No início de cada turno do stagh, todas as criaturas em um raio de 9m sofrem 1d6+3 pontos de dano de frio (Fort CD 17 reduz à metade)." },
-        { name: "Familiar", timing: "passiva", text: "Um stagh concede +1 na CD de suas magias de frio." }
+        { name: "Aura de Frio", timing: "passiva", text: "No início de cada turno do stagh, todas as criaturas em um raio de 9m sofrem 1d6+3 pontos de dano de frio (Fort CD 17 reduz à metade)." }
     ],
     equipment: null,
     treasure: "1 dose de éter elemental (frio) (CD 18 para extrair).",
@@ -2022,8 +2001,9 @@ export const unicornio = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 30,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 229,
         "bookPage": 227
     },
     "stats": {

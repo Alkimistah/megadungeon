@@ -420,7 +420,7 @@ test("Ameaças kobold sheets cite the full PDF", () => {
   }
 });
 
-test("kobold sheets show the optional explosive variant and the kobold partner rule", () => {
+test("kobold sheets show the optional explosive variant", () => {
   const explosive = {
     "kobold-patrulheiro": ["4d6", 13], "enxame-larval": ["4d6", 14], "kobold-veterano": ["4d6", 16],
     "kobold-xama": ["4d6", 19], "kobold-bruto": ["4d6", 18], "patrulha-kobold": ["4d6", 18], "kobold-mae": ["8d6", 35]
@@ -433,17 +433,98 @@ test("kobold sheets show the optional explosive variant and the kobold partner r
     assert.match(text, new RegExp(`sofrem ${damage} pontos de dano de impacto \\(Ref CD ${dc} reduz à metade\\)`), id);
   }
   assert.equal(getCreatureById("kobold-explosivo").abilities.filter(ability => /^Detonação Final/.test(ability.name)).length, 1);
-
-  const partners = ["kobold-patrulheiro", "kobold-veterano", "kobold-explosivo", "kobold-xama", "kobold-bruto"];
-  for (const id of partners) {
-    const { text } = getCreatureById(id).abilities.find(ability => ability.name === "Parceiro") ?? {};
-    assert.match(text ?? "", /parceiro especial \(combatente\).*Iniciante: você recebe \+1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando.*Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas/, id);
-  }
-  for (const id of ["enxame-larval", "patrulha-kobold", "kobold-mae", "vagalhao-kobold"]) {
-    assert.equal(getCreatureById(id).abilities.some(ability => ability.name === "Parceiro"), false, id);
-  }
   assert.equal(getCreatureById("kobold-bruto").role, "solo");
   assert.equal(getCreatureById("kobold-mae").role, "solo");
+});
+
+test("Ameaças dungeon sheets cite the full PDF and keep their current roles", () => {
+  const pages = [
+    ["asa-assassina", 200, 201, "minion"], ["cocatriz", 201, null, "solo"], ["cocatriz-real", 202, null, "solo"],
+    ["harpia-saqueadora", 202, 203, "minion"], ["glop", 203, null, "solo"], ["glooop", 204, null, "solo"],
+    ["mamae-glop", 204, null, "solo"], ["mantor", 205, null, "solo"], ["mimico", 206, null, "solo"],
+    ["quimera", 206, 207, "solo"], ["slark", 208, null, "special"], ["tigre-de-hyninn", 209, null, "solo"],
+    ["tigre-de-hyninn-primordial", 209, null, "solo"], ["brawar", 210, null, "solo"]
+  ];
+  const basicBookPages = { glop: 292 };
+  for (const [id, pdfPage, pdfPageEnd, role] of pages) {
+    const creature = getCreatureById(id);
+    assert.deepEqual(creature.sources[0], {
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }, id);
+    assert.deepEqual(creature.sources.slice(1).map(source => [source.book, source.pdfPage]),
+      basicBookPages[id] ? [["Livro Básico", basicBookPages[id]]] : [], id);
+    assert.equal(creature.role, role, id);
+  }
+});
+
+test("creature sheets leave out player-side partner and familiar rules without changing roles", () => {
+  for (const creature of creatureCatalog) {
+    const names = (creature.abilities ?? []).map(ability => ability.name);
+    assert.equal(names.some(name => /^(Parceiro|Familiar)\b/.test(name)), false, creature.id);
+  }
+  const roles = {
+    hiena: "special", hienodonte: "special", "chibi-kabuto": "minion", "ko-kabuto": "minion", "dai-kabuto": "solo",
+    "asa-assassina": "minion", aquinne: "special", terrier: "solo", "t-peel": "minion", pakk: "minion", stagh: "minion",
+    cocatriz: "solo", bulette: "solo", "cao-de-kally": "special", "kobold-bruto": "solo", "corcel-de-kally": "solo",
+    "sapo-atroz": "solo", estirge: "minion", "kobold-patrulheiro": "minion", "kobold-veterano": "minion",
+    "kobold-explosivo": "minion", "kobold-xama": "special", "cocatriz-real": "solo", tigre: "special"
+  };
+  for (const [id, role] of Object.entries(roles)) assert.equal(getCreatureById(id).role, role, id);
+  assert.match(getCreatureById("pteros-ceifador").abilities.find(ability => ability.name === "Companheiros de Voo").text, /flanqueando/);
+  assert.match(getCreatureById("cavaleiro-de-kally").abilities.find(ability => ability.name === "Ginete de Corcel de Kally").text, /corcel de Kally/);
+});
+
+test("Ameaças mount sheets cite the full PDF", () => {
+  const pages = [
+    ["baleote", 213], ["capivara", 213], ["cavalo-de-carga", 214], ["cavalo-de-montaria", 214], ["cavalo-de-guerra", 214, 215],
+    ["cavalo-de-namalkah", 215], ["cavalo-glacial", 216], ["corcel-do-deserto", 217], ["dromedario", 217], ["elefante", 218],
+    ["gorlogg", 219], ["gorlogg-alfa", 219], ["leao", 220], ["pantera", 220], ["tigre", 220],
+    ["rinoceronte", 221], ["rinoceronte-lanoso", 221], ["brontoterio", 221], ["tatu-montanha", 222], ["trobo", 223],
+    ["tumarkhan", 224], ["urso-panda", 225], ["urso-pardo", 225], ["urso-das-cavernas", 226], ["warg", 227], ["unicornio", 229]
+  ];
+  for (const [id, pdfPage, pdfPageEnd] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }], id);
+  }
+});
+
+test("Gorlogg keeps the Ameaças default and has a distinct Livro Básico sheet", () => {
+  const original = getCreatureById("gorlogg");
+  const variant = getCreatureById("gorlogg-livro-basico");
+  assert.equal(variant.variantOf, "gorlogg");
+  assert.equal(original.stats.attributes.cha, -4);
+  assert.equal(variant.stats.attributes.cha, -2);
+  assert.deepEqual({ ...variant.stats.attributes, cha: -4 }, original.stats.attributes);
+  assert.deepEqual(variant.actions, original.actions);
+  assert.match(variant.abilities.find(ability => ability.name === "Agarrar Aprimorado").text, /Se o gorlogg acerta um ataque de mordida, pode usar a manobra agarrar \(teste \+13\)/);
+  assert.deepEqual(variant.sources, [{
+    book: "Livro Básico",
+    edition: "Jogo do Ano · 2ª edição, setembro de 2022",
+    pdfFile: "T20 - Livro Básico - Jogo do Ano.pdf",
+    bookPage: 291,
+    pdfPage: 297
+  }]);
+  assert.equal(formatCreatureCatalogName(original), "Gorlogg · Ameaças de Arton");
+  assert.equal(formatCreatureCatalogName(variant), "Gorlogg · Livro Básico");
+  const matchingIds = selectedProfile => getAutomaticCreatureCatalog(selectedProfile)
+    .filter(creature => creature.id === "gorlogg" || creature.variantOf === "gorlogg")
+    .map(creature => creature.id);
+  assert.deepEqual(matchingIds(profile), ["gorlogg"]);
+  assert.deepEqual(matchingIds({
+    ...profile,
+    creatureRules: { ...profile.creatureRules, preferredCreatureIdsByFamily: { gorlogg: variant.id } }
+  }), [variant.id]);
 });
 
 test("Dragão Celestial Venerável keeps the undead clause of Intervenção Divina", () => {

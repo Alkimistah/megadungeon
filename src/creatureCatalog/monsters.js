@@ -8,8 +8,9 @@ export const glop = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 203,
         "bookPage": 201
     },
     "stats": {
@@ -54,8 +55,9 @@ export const glooop = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 204,
         "bookPage": 202
     },
     "stats": {
@@ -111,8 +113,9 @@ export const mamaeGlop = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 204,
         "bookPage": 202
     },
     "stats": {
@@ -168,8 +171,9 @@ export const cockatrice = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 201,
         "bookPage": 199
     },
     "stats": {
@@ -334,11 +338,6 @@ export const bulette = {
             "name": "Espreitador das Dunas",
             "timing": null,
             "text": "Enquanto o bulette estiver “nadando” no solo, é muito difícil percebê-lo. Em vez do normal, a CD de Percepção para ouvir o bulette é 40, ou +20 em seu teste de Furtividade, o que for maior."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "O bulette é um parceiro montaria (Grande). Iniciante: seu deslocamento muda para 9m (escavação 6m) e, uma vez por rodada, você recebe +1d6 em uma rolagem de dano corpo a corpo. Veterano: o bônus em rolagens de dano muda para +1d10. Mestre: o deslocamento de escavação muda para 12m e o bônus em rolagens de dano muda para +2d8."
         }
     ],
     "equipment": null,
@@ -2122,11 +2121,6 @@ export const estirge = {
             "name": "Sangrar",
             "timing": null,
             "text": "Quando o estirge solta uma criatura de quem estava drenando sangue (por vontade própria ou não), a vítima fica sangrando."
-        },
-        {
-            "name": "Familiar",
-            "timing": null,
-            "text": "Um estirge pode ser invocado como familiar, mas isso requer uma ova de estirge. Um estirge familiar permite que você receba 1 PV temporário cumulativo (até o limite de seu nível) sempre que causa dano a uma criatura viva com uma magia."
         }
     ],
     "equipment": null,
@@ -2569,11 +2563,6 @@ export const koboldPatrulheiro = {
             "name": "Detonação Final (opcional)",
             "timing": null,
             "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando o kobold é reduzido a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 4d6 pontos de dano de impacto (Ref CD 13 reduz à metade)."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "Embora kobolds sejam normalmente considerados pestes, sob as circunstâncias certas um kobold solitário pode ser convencido a ajudar um aventureiro (Quem Não Tem Cão Caça com Kobold, p. 181). Ele serve como um parceiro especial (combatente). Iniciante: você recebe +1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando, para um total de +3 de ataque. Veterano: os bônus acima aumentam para +2. Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas."
         }
     ],
     "equipment": "Funda, lança, pedras x20",
@@ -2643,11 +2632,6 @@ export const koboldVeterano = {
             "name": "Detonação Final (opcional)",
             "timing": null,
             "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando o kobold é reduzido a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 4d6 pontos de dano de impacto (Ref CD 16 reduz à metade)."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "Embora kobolds sejam normalmente considerados pestes, sob as circunstâncias certas um kobold solitário pode ser convencido a ajudar um aventureiro (Quem Não Tem Cão Caça com Kobold, p. 181). Ele serve como um parceiro especial (combatente). Iniciante: você recebe +1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando, para um total de +3 de ataque. Veterano: os bônus acima aumentam para +2. Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas."
         }
     ],
     "equipment": "Armadura de couro, funda, lança, pedras x20",
@@ -2776,11 +2760,6 @@ export const koboldExplosivo = {
             "name": "Peste Oportunista",
             "timing": null,
             "text": "Os ataques do kobold explosivo causam +1d4 pontos de dano contra inimigos que já sofreram dano na rodada."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "Embora kobolds sejam normalmente considerados pestes, sob as circunstâncias certas um kobold solitário pode ser convencido a ajudar um aventureiro (Quem Não Tem Cão Caça com Kobold, p. 181). Ele serve como um parceiro especial (combatente). Iniciante: você recebe +1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando, para um total de +3 de ataque. Veterano: os bônus acima aumentam para +2. Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas."
         }
     ],
     "equipment": "Funda, lança, pedras x20",
@@ -2881,11 +2860,6 @@ export const koboldXama = {
             "name": "Detonação Final (opcional)",
             "timing": null,
             "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando o xamã é reduzido a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 4d6 pontos de dano de impacto (Ref CD 19 reduz à metade)."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "Embora kobolds sejam normalmente considerados pestes, sob as circunstâncias certas um kobold solitário pode ser convencido a ajudar um aventureiro (Quem Não Tem Cão Caça com Kobold, p. 181). Ele serve como um parceiro especial (combatente). Iniciante: você recebe +1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando, para um total de +3 de ataque. Veterano: os bônus acima aumentam para +2. Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas."
         }
     ],
     "equipment": "Andrajos, bálsamo restaurador, funda, gadanho, pedras x20, símbolo sagrado de Kallyadranoch",
@@ -2905,8 +2879,9 @@ export const cocatrizReal = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 202,
         "bookPage": 200
     },
     "stats": {
@@ -2962,9 +2937,12 @@ export const harpiaSaqueadora = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 3,
-        "bookPage": 200
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 202,
+        "bookPage": 200,
+        "pdfPageEnd": 203,
+        "bookPageEnd": 201
     },
     "stats": {
         "initiative": 13,
@@ -3019,8 +2997,9 @@ export const mantor = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 6,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 205,
         "bookPage": 203
     },
     "stats": {
@@ -3081,9 +3060,12 @@ export const quimera = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 7,
-        "bookPage": 204
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 206,
+        "bookPage": 204,
+        "pdfPageEnd": 207,
+        "bookPageEnd": 205
     },
     "stats": {
         "initiative": 7,
@@ -3188,8 +3170,9 @@ export const mimico = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 206,
         "bookPage": 204
     },
     "stats": {
@@ -4179,11 +4162,6 @@ export const sapoAtroz = {
             "name": "Veneno",
             "timing": null,
             "text": "Perde 1d12 PV e fica paralisado por 1 rodada; Fort CD 18 evita a paralisia e reduz a perda de vida para 1d6."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "O sapo atroz é um parceiro montaria (Grande). Iniciante: seu deslocamento muda para 9m (normal e de natação), você recebe uma ação de movimento extra por turno apenas para se deslocar e +5 em Atletismo para saltar. Veterano: você recebe +2 em testes para derrubar e desarmar. Mestre: o bônus de Atletismo muda para +10 e, uma vez por rodada, você pode gastar 1 PM para fazer uma manobra desarmar ou derrubar contra um alvo a até 3m."
         }
     ],
     "equipment": null,
@@ -6842,11 +6820,6 @@ export const corcelDeKally = {
             "name": "Sopro",
             "timing": "padrão",
             "text": "Todas as criaturas em um cone de 6m sofrem 2d8 pontos de dano de fogo e ficam em chamas (Ref CD 16 reduz à metade e evita a condição). Recarga (movimento)."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "O corcel de Kally é um parceiro montaria (Grande). Iniciante: seu deslocamento muda para 12m e, uma vez por rodada, você recebe +1d6 em uma rolagem de dano corpo a corpo. Veterano: o bônus na rolagem de dano muda para +1d8 e seu deslocamento muda para 12m (normal e de voo). Mestre: seu deslocamento normal e de voo muda para 18m e, uma vez por rodada, você pode gastar 2 PM para causar 3d8 pontos de dano de fogo em todas as criaturas em um cone de 6m (Ref CD Car reduz à metade)."
         }
     ],
     "equipment": null,
@@ -7317,11 +7290,6 @@ export const caoDeKally = {
             "name": "Sopro",
             "timing": "padrão",
             "text": "O cão de Kally cospe fogo em um cone de 9m. Criaturas na área sofrem 2d8+4 pontos de dano de fogo e ficam em chamas (Ref CD 15 reduz à metade e evita a condição). Recarga (movimento)."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "Embora seja difícil de treinar, um cão de Kally é um parceiro especial (fortão). Iniciante: uma vez por rodada, uma de suas rolagens de dano corpo a corpo causa +1d6 pontos de dano de fogo. Veterano: muda para +2d6. Mestre: além do normal, uma vez por rodada, você pode gastar 2 PM para causar 4d6 pontos de dano de fogo em um cone de 6m."
         }
     ],
     "equipment": null,
@@ -7390,11 +7358,6 @@ export const koboldBruto = {
             "name": "Detonação Final (opcional)",
             "timing": null,
             "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando o kobold bruto é reduzido a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 4d6 pontos de dano de impacto (Ref CD 18 reduz à metade)."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "Embora kobolds sejam normalmente considerados pestes, sob as circunstâncias certas um kobold solitário pode ser convencido a ajudar um aventureiro (Quem Não Tem Cão Caça com Kobold, p. 181). Ele serve como um parceiro especial (combatente). Iniciante: você recebe +1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando, para um total de +3 de ataque. Veterano: os bônus acima aumentam para +2. Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas."
         }
     ],
     "equipment": "Tacape aumentado",
@@ -7485,8 +7448,9 @@ export const corcelDoDeserto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 18,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 217,
         "bookPage": 215
     },
     "stats": {
@@ -7537,8 +7501,9 @@ export const tatuMontanha = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 23,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 222,
         "bookPage": 220
     },
     "stats": {
@@ -7594,8 +7559,9 @@ export const tigreDeHyninn = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 209,
         "bookPage": 207
     },
     "stats": {
@@ -7656,8 +7622,9 @@ export const tigreDeHyninnPrimordial = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 209,
         "bookPage": 207
     },
     "stats": {
@@ -7728,8 +7695,9 @@ export const warg = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 28,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 227,
         "bookPage": 225
     },
     "stats": {

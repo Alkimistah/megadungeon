@@ -28,7 +28,8 @@ Além das duas diferenças numéricas acima, a revisão confirmou diferenças no
 | Chefe Bandido | `chefe-bandido-livro-basico` | `3c510e1` |
 | Reishid | `reishid-livro-basico` | Lote do Culto de Aharadak |
 | Capelão de Guerra | `capelao-de-guerra-livro-basico` | Lote da Igreja de Arsenal |
+| Gorlogg | `gorlogg-livro-basico` | Lote de Montarias |
 
-As versões do Básico estão disponíveis na seleção manual. As fichas de Ameaças mantêm os IDs originais e seguem como padrão dos perfis existentes. Gorlogg segue pendente de separação por fonte. [Piloto do Gnoll Filibusteiro](2026-11-18-piloto-versoes-gnoll.md) · [Auditoria de Ameaças de Arton](2026-11-18-auditoria-orcs-ameacas.md)
+As versões do Básico estão disponíveis na seleção manual. As fichas de Ameaças mantêm os IDs originais e seguem como padrão dos perfis existentes. Não há versão pendente de separação por fonte. [Piloto do Gnoll Filibusteiro](2026-11-18-piloto-versoes-gnoll.md) · [Auditoria de Ameaças de Arton](2026-11-18-auditoria-orcs-ameacas.md)
 
 Os PDFs e o relatório detalhado ficam em `tmp/livros/`.

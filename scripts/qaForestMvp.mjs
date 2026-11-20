@@ -618,6 +618,8 @@ async function creatureHealthFlow() {
     ["golem-de-ferro-livro-basico", "Golem de Ferro", "Livro Básico", 10, 294],
     ["capelao-de-guerra", "Capelão de Guerra", "Ameaças de Arton", 4, 143],
     ["capelao-de-guerra-livro-basico", "Capelão de Guerra", "Livro Básico", 4, 301],
+    ["gorlogg", "Gorlogg", "Ameaças de Arton", 1, 219],
+    ["gorlogg-livro-basico", "Gorlogg", "Livro Básico", 1, 297],
     ["ogro", "Ogro", "Ameaças de Arton", 4, 43],
     ["ogro-livro-basico", "Ogro", "Livro Básico", 4, 299],
     ["chefe-bandido", "Chefe Bandido", "Ameaças de Arton", 1, 47],

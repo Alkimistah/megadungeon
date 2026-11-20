@@ -1529,8 +1529,9 @@ export const brawar = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 11,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 210,
         "bookPage": 208
     },
     "stats": {

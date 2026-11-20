@@ -177,8 +177,9 @@ export const gorlogg = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 20,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 219,
         "bookPage": 217
     },
     "stats": {
@@ -533,13 +534,7 @@ export const chibiKabuto = {
             "text": "Galhada +4 (1d6+2 perfuração)."
         }
     ],
-    "abilities": [
-        {
-            "name": "Familiar",
-            "timing": null,
-            "text": "Um chibi-kabuto familiar aumenta em +1 o bônus na Defesa que você recebe por suas magias."
-        }
-    ],
+    "abilities": [],
     "equipment": null,
     "treasure": "Nenhum.",
     "skillsText": null,
@@ -595,11 +590,6 @@ export const koKabuto = {
             "name": "Agarralhada",
             "timing": null,
             "text": "O ko-kabuto recebe +2 em testes para agarrar e derrubar."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "O ko-kabuto é um parceiro especial (guardião). Iniciante: você recebe visão na penumbra e +1 na Defesa. Veterano: uma vez por rodada, você recebe +1d8 em uma rolagem de dano corpo a corpo. Mestre: o bônus na Defesa muda para +2 e o bônus em rolagens de dano muda para +1d10. Alternativamente, um ko-kabuto pode ser uma montaria Pequena, adequada a criaturas Minúsculas, com as estatísticas de um dai-kabuto."
         }
     ],
     "equipment": null,
@@ -720,11 +710,6 @@ export const daiKabuto = {
             "name": "Agarrar Aprimorado",
             "timing": "livre",
             "text": "Galhada (teste +20)."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "O dai-kabuto é um parceiro montaria (Grande). Iniciante: seu deslocamento muda para 9m e você recebe +2 em testes de agarrar e derrubar e uma ação de movimento extra por turno, apenas para se deslocar. Veterano: você recebe deslocamento de voo 6m. Mestre: o bônus em agarrar se aplica a todas as manobras e você recebe +2 na Defesa."
         }
     ],
     "equipment": null,
@@ -744,9 +729,12 @@ export const asaAssassina = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 1,
-        "bookPage": 198
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 200,
+        "bookPage": 198,
+        "pdfPageEnd": 201,
+        "bookPageEnd": 199
     },
     "stats": {
         "initiative": 8,
@@ -880,11 +868,6 @@ export const hiena = {
             "name": "Oportunista",
             "timing": null,
             "text": "A hiena recebe +2 em rolagens de dano contra inimigos que tenham sofrido dano nesta rodada."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "A hiena é um parceiro especial (perseguidor). Iniciante: +2 em Furtividade e Sobrevivência. Veterano: você pode usar Oportunismo; se possuir esse poder, em vez disso seu custo diminui em –1 PM. Mestre: você pode usar Sentidos Aguçados. Alternativamente, uma hiena pode ser uma montaria Média com as estatísticas de um hienodonte."
         }
     ],
     "equipment": null,
@@ -1006,11 +989,6 @@ export const hienodonte = {
             "name": "Oportunista",
             "timing": null,
             "text": "O hienodonte recebe +2 em rolagens de dano contra inimigos que tenham sofrido dano nesta rodada."
-        },
-        {
-            "name": "Parceiro",
-            "timing": null,
-            "text": "O hienodonte é um parceiro montaria (Grande). Iniciante: seu deslocamento muda para 12m e você recebe uma ação de movimento extra por turno (apenas para se deslocar). Veterano: você pode usar Oportunismo; se possuir esse poder, em vez disso seu custo diminui em –1 PM. Mestre: quando acerta um ataque corpo a corpo, você pode fazer a manobra derrubar como uma ação livre."
         }
     ],
     "equipment": null,
@@ -1028,8 +1006,9 @@ export const baleote = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 14,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 213,
         "bookPage": 211
     },
     "stats": {
@@ -1080,8 +1059,9 @@ export const brontoterio = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 22,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 221,
         "bookPage": 219
     },
     "stats": {
@@ -1142,8 +1122,9 @@ export const capivara = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 14,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 213,
         "bookPage": 211
     },
     "stats": {
@@ -1199,8 +1180,9 @@ export const cavaloDeCarga = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 15,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 214,
         "bookPage": 212
     },
     "stats": {
@@ -1245,9 +1227,12 @@ export const cavaloDeGuerra = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 15,
-        "bookPage": 212
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 214,
+        "bookPage": 212,
+        "pdfPageEnd": 215,
+        "bookPageEnd": 213
     },
     "stats": {
         "initiative": 3,
@@ -1291,8 +1276,9 @@ export const cavaloDeMontaria = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 15,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 214,
         "bookPage": 212
     },
     "stats": {
@@ -1337,8 +1323,9 @@ export const cavaloDeNamalkah = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 16,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 215,
         "bookPage": 213
     },
     "stats": {
@@ -1383,8 +1370,9 @@ export const cavaloGlacial = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 17,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 216,
         "bookPage": 214
     },
     "stats": {
@@ -1435,8 +1423,9 @@ export const dromedario = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 18,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 217,
         "bookPage": 215
     },
     "stats": {
@@ -1492,8 +1481,9 @@ export const elefante = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 19,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 218,
         "bookPage": 216
     },
     "stats": {
@@ -1549,6 +1539,24 @@ export const elefante = {
     "skillsText": null
 };
 
+const gorloggBasic = {
+    ...gorlogg,
+    id: "gorlogg-livro-basico",
+    variantOf: gorlogg.id,
+    source: undefined,
+    stats: {
+        ...gorlogg.stats,
+        attributes: { ...gorlogg.stats.attributes, cha: -2 }
+    },
+    abilities: [
+        {
+            name: "Agarrar Aprimorado",
+            timing: "livre",
+            text: "Se o gorlogg acerta um ataque de mordida, pode usar a manobra agarrar (teste +13)."
+        }
+    ]
+};
+
 export const gorloggAlfa = {
     "id": "gorlogg-alfa",
     "name": "Gorlogg Alfa",
@@ -1559,8 +1567,9 @@ export const gorloggAlfa = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 20,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 219,
         "bookPage": 217
     },
     "stats": {
@@ -1616,8 +1625,9 @@ export const leao = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 21,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 220,
         "bookPage": 218
     },
     "stats": {
@@ -1673,8 +1683,9 @@ export const pantera = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 21,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 220,
         "bookPage": 218
     },
     "stats": {
@@ -1730,8 +1741,9 @@ export const rinoceronte = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 22,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 221,
         "bookPage": 219
     },
     "stats": {
@@ -1782,8 +1794,9 @@ export const rinoceronteLanoso = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 22,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 221,
         "bookPage": 219
     },
     "stats": {
@@ -1839,8 +1852,9 @@ export const tigre = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 21,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 220,
         "bookPage": 218
     },
     "stats": {
@@ -1901,8 +1915,9 @@ export const trobo = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 24,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 223,
         "bookPage": 221
     },
     "stats": {
@@ -1947,8 +1962,9 @@ export const tumarkhan = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 25,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 224,
         "bookPage": 222
     },
     "stats": {
@@ -1999,8 +2015,9 @@ export const ursoDasCavernas = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 27,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 226,
         "bookPage": 224
     },
     "stats": {
@@ -2061,8 +2078,9 @@ export const ursoPanda = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 26,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 225,
         "bookPage": 223
     },
     "stats": {
@@ -2113,8 +2131,9 @@ export const ursoPardo = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p200 ate 229.pdf",
-        "pdfPage": 26,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 225,
         "bookPage": 223
     },
     "stats": {
@@ -2712,7 +2731,7 @@ export const tuntram = {
 export const animalCreatures = [
     // Manuais, Livro Básico e Ameaças de Arton
     giantRat, wolf, caveWolf, aranhasFilhotes,
-    gorlogg, cascavel, jiboia, naja,
+    gorlogg, gorloggBasic, cascavel, jiboia, naja,
     sucuri, hiena, hienaRainha, hienodonte,
     lagartoPerceguidor, chibiKabuto, koKabuto, hordaDeKoKabuto,
     daiKabuto, asaAssassina, baleote, brontoterio,

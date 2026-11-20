@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. As **187 fichas auditadas** estão publicadas. O próximo bloco é Familiares. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. Das **227 fichas auditadas**, **187 estão publicadas** e **40 estão no trabalho local**. Familiares ficou registrado como fora do catálogo. O próximo bloco é Mascotes & Mortos-Vivos. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -639,9 +639,83 @@ Os 127 campos numéricos das nove fichas de criatura coincidem com o catálogo. 
 
 O Kobold Explosivo mantém só a Detonação Final da própria ficha. O Vagalhão, que é um evento, e o Cão de Kally, que não é kobold, ficam de fora.
 
-- **Parceiro.** O quadro Quem Não Tem Cão Caça com Kobold, p. 181, descreve um kobold solitário como parceiro especial (combatente). A habilidade entra nos kobolds individuais: Patrulheiro, Veterano, Explosivo, Xamã e Bruto. Enxame Larval e Patrulha Kobold representam grupos, e a Kobold-Mãe não se desloca. Por isso, essas fichas não recebem a habilidade.
+O quadro Quem Não Tem Cão Caça com Kobold, p. 181, chegou a entrar como habilidade Parceiro, mas foi retirado pela decisão sobre parceiros e familiares registrada em Montarias.
 
-As habilidades novas aparecem no fim da lista de cada ficha. Os papéis inferidos do Kobold Bruto e da Kobold-Mãe continuam Solo, e o teste dos andares 11–20 fixa os valores acima.
+A Detonação Final opcional aparece no fim da lista de cada ficha. Os papéis inferidos do Kobold Bruto e da Kobold-Mãe continuam Solo, e o teste dos andares 11–20 fixa os valores acima.
+
+## Familiares
+
+A seção Familiares, pp. 190–197 impressas, pp. 192–199 do PDF, traz dez fichas: Bogum, Escudeiro, Gambá, Fofo, Homúnculo, Kill’Bone, Tentacute, Tropa de Tentacutes, Verilêmur e Malafex. Nenhuma está no catálogo. São criaturas de ND ½ a 2 feitas para servir como familiar ou parceiro de personagens, e os recortes usados no cadastro original pulavam da p. 189 para a p. 198. Por decisão do usuário, a seção fica registrada como fora do catálogo, sem cadastro novo. A Tropa de Tentacutes, de ND 2 e com marca de Bando, é a única com uso direto como encontro, caso a seção seja revista.
+
+## Masmorras
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Asa-Assassina | 1 | Lacaio | 198–199 | 200–201 |
+| Cocatriz | 3 | Solo | 199 | 201 |
+| Cocatriz-Real | 7 | Solo | 200 | 202 |
+| Harpia Saqueadora | 4 | Lacaio | 200–201 | 202–203 |
+| Glop | ¼ | Lacaio | 201 | 203 |
+| Glooop | 2 | Solo | 202 | 204 |
+| Mamãe Glop | 2 | Solo | 202 | 204 |
+| Mantor | 5 | Solo | 203 | 205 |
+| Mímico | 6 | Solo | 204 | 206 |
+| Quimera | 8 | Solo | 204–205 | 206–207 |
+| Slark | 1 | Lacaio | 206 | 208 |
+| Tigre-de-Hyninn | 5 | Solo | 207 | 209 |
+| Tigre-de-Hyninn Primordial | 11 | Solo | 207 | 209 |
+| Brawar | 14 | Solo | 208 | 210 |
+
+Os 196 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha. A Inteligência impressa como “—” nos glops e no Brawar corresponde ao valor nulo do catálogo. Também foram cotejados tipo, subtipo, tamanho, deslocamento, sentidos, defesas, ataques, habilidades com execução e recarga, as dez opções de cabeça da Quimera, perícias, equipamento e tesouro. As 14 fichas agora citam o PDF integral. A referência duplicada da Cocatriz ao recorte `ameacas de arton variadas.pdf`, em `sources.js`, foi removida.
+
+**Glop no Livro Básico.** A ficha da p. 286 impressa, p. 292 do PDF do Livro Básico, é idêntica à de Ameaças e já constava como conferida na auditoria do Básico. A entrada única mantém as duas fontes, sem versão separada.
+
+**Parceiros e familiares.** As fichas da Asa-Assassina, da Cocatriz e da Cocatriz-Real imprimem quadros de Familiar ou Parceiro. Eles chegaram a ser acrescentados nesta conferência, mas foram retirados pela decisão registrada em Montarias.
+
+**Papéis.** Os 14 papéis do catálogo são inferidos. Glop é Lacaio no livro e Solo no catálogo, e Slark é Lacaio no livro e Especial no catálogo. Os demais coincidem. Como a quantidade de habilidades pesa na inferência, o teste dos andares 11–20 fixa os 14 papéis atuais.
+
+**Omissões e anotações de apresentação.** Entre Planos dos dois Tigres-de-Hyninn traz a marca de habilidade mágica. A lágrima pétrea da Cocatriz-Real, os ovos de cocatriz, o couro de mantor e o elixir quimérico trazem o ícone de novo item. O quadro de habilidades de raça da Harpia fica fora da ficha. O quadro de Reforços do Brawar lista criaturas de outras seções.
+
+## Montarias
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Baleote | 3 | Solo | 211 | 213 |
+| Capivara | 1 | Solo | 211 | 213 |
+| Cavalo de Carga | ½ | Solo | 212 | 214 |
+| Cavalo de Montaria | ½ | Solo | 212 | 214 |
+| Cavalo de Guerra | 1 | Solo | 212–213 | 214–215 |
+| Cavalo de Namalkah | 2 | Solo | 213 | 215 |
+| Cavalo Glacial | 2 | Solo | 214 | 216 |
+| Corcel do Deserto | 2 | Solo | 215 | 217 |
+| Dromedário | 1 | Solo | 215 | 217 |
+| Elefante | 7 | Solo | 216 | 218 |
+| Gorlogg | 1 | Solo | 217 | 219 |
+| Gorlogg Alfa | 5 | Solo | 217 | 219 |
+| Leão | 2 | Solo | 218 | 220 |
+| Pantera | 2 | Solo | 218 | 220 |
+| Tigre | 3 | Solo | 218 | 220 |
+| Rinoceronte | 4 | Solo | 219 | 221 |
+| Rinoceronte Lanoso | 6 | Solo | 219 | 221 |
+| Brontotério | 8 | Solo | 219 | 221 |
+| Tatu-Montanha | 4 | Solo | 220 | 222 |
+| Trobo | 1 | Lacaio | 221 | 223 |
+| Tumarkhân | 4 | Solo | 222 | 224 |
+| Urso Panda | 1 | Solo | 223 | 225 |
+| Urso Pardo | 3 | Solo | 223 | 225 |
+| Urso das Cavernas | 8 | Solo | 224 | 226 |
+| Warg | 3 | Solo | 225 | 227 |
+| Unicórnio | 4 | Especial | 227 | 229 |
+
+Os 364 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha. Uma primeira passada automática procurou no texto extraído as linhas de estatísticas, atributos e deslocamento, além de dados, CDs e testes das habilidades. As cinco linhas que o layout separou, nos dois cavalos de montaria e de guerra, no Tatu-Montanha, no Urso das Cavernas e no Warg, foram conferidas nas páginas renderizadas. Só o Cavalo de Guerra continua na página seguinte. As 26 fichas agora citam o PDF integral, e o recorte `ameacas de arton p200 ate 229.pdf` deixa de ser citado.
+
+**Papéis.** Pantera, Tigre e Urso Panda são Solo no livro e Especial no catálogo. Trobo é Lacaio no livro e Especial no catálogo. Os papéis atuais, todos inferidos, foram preservados.
+
+**Gorlogg no Livro Básico.** A ficha da p. 291 impressa, p. 297 do PDF do Livro Básico, tem Carisma –2, e a de Ameaças tem –4. O Básico também redige Agarrar Aprimorado por extenso. Seguindo as versões já separadas, `gorlogg` continua sendo a ficha de Ameaças e o padrão dos perfis existentes, e `gorlogg-livro-basico` traz o Carisma e o texto do Básico na seleção manual. O QA de seleção por livro passa a incluir as duas versões. Com isso, não resta versão pendente de separação entre os dois livros.
+
+**Decisão sobre parceiros e familiares.** O livro imprime quadros de Parceiro em quase todas as montarias. Por decisão do usuário, regras de parceiro e de familiar não entram nas fichas, porque descrevem criaturas controladas pelos jogadores, que usam as próprias fichas de parceiro. A decisão vale para todo o catálogo. Foram retirados 24 quadros de 23 fichas: Hiena, Hienodonte, Chibi-Kabuto, Ko-Kabuto, Dai-Kabuto, Asa-Assassina, Aquin’ne, Terrier, T’Peel, Pakk, Stagh, Cocatriz, Bulette, Cão de Kally, Kobold Bruto, Corcel de Kally, Sapo Atroz, Estirge, Kobold Patrulheiro, Kobold Veterano, Kobold Explosivo, Kobold Xamã e Cocatriz-Real. Nenhum papel mudou. Ficam as habilidades de combate que só citam companheiros ou montarias do próprio inimigo, como Companheiros de Voo do Pteros Ceifador e Ginete de Corcel de Kally do Cavaleiro de Kally. Um teste dos andares 11–20 impede que quadros de Parceiro ou Familiar voltem ao catálogo.
+
+**Anotações de apresentação.** Os quadros Treinando Montarias Selvagens e Montarias para Cavaleiros e Paladinos são regras de personagem e ficam fora das fichas.
 
 ## Pendências e ponto de retomada
 
@@ -665,24 +739,28 @@ Situação em 19 de novembro de 2026.
 | Império de Jade | 154–167 | 21 | Publicado |
 | Império de Tauron | 168–177 | 12 | Publicado |
 | Kobolds | 178–189 | 10 | Publicado |
-| **Total** | | **187** | **Publicadas** |
+| Familiares | 190–197 | 0 | Fora do catálogo |
+| Masmorras | 198–209 | 14 | Validado localmente |
+| Montarias | 210–227 | 26 | Validado localmente |
+| **Total** | | **227** | **187 publicadas e 40 locais** |
 
-As 187 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
+As 227 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
 
 Os nove blocos de Elementais a Kobolds foram publicados em `18952eb`, com as referências atualizadas, as versões do Livro Básico de Gnoll Saqueador, Gárgula, Golem de Ferro e Capelão de Guerra, a versão de Deuses de Arton do Avatar de Kallyadranoch e as regras gerais de kobold nas fichas. As fichas de Ameaças conservam seus IDs, seus papéis atuais e a preferência dos perfis existentes.
 
 Antes do push, passaram o build de produção, os testes de andares 1–10, os 65 testes de andares 11–20 e os testes de missões. O QA dos andares 11–20 no Chrome passou contra o site publicado, sem erros de JavaScript, incluindo a seleção por livro e o uso offline após o cache. O bundle publicado traz as sete Detonações Finais opcionais e já não cita os recortes de Elementais, Império de Jade e Kobolds. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44650121973)
 
+Masmorras e Montarias estão validados localmente: passaram o build de produção, os testes de andares 1–10, os 69 testes de andares 11–20, os testes de missões e o QA dos andares 11–20 no Chrome contra o build local, incluindo a seleção das duas versões do Gorlogg. A publicação está pendente.
+
 ### O que falta em Ameaças de Arton
 
-Ainda há 148 fichas de Ameaças no catálogo apontando para recortes do PDF ou para prints enviados pelo usuário. A ordem de trabalho segue o sumário, pp. 3–5 impressas, pp. 5–7 do PDF.
+Ainda há 108 fichas de Ameaças no catálogo apontando para recortes do PDF ou para prints enviados pelo usuário. A ordem de trabalho segue o sumário, pp. 3–5 impressas, pp. 5–7 do PDF.
 
-1. **Familiares**, p. 190 impressa, p. 192 do PDF. Começar pelo Bogum.
-2. **Blocos seguintes na ordem do sumário.** Masmorras, p. 198. Montarias, p. 210. Mascotes & Mortos-Vivos, p. 228. Mundo Perdido, p. 242. Piratas & Pistoleiros, p. 252. Povos-Trovão, p. 264. Puristas, p. 274. Reino dos Mortos, p. 284. Reinos de Moreania, p. 296. Sanguinárias, p. 306. Sob as Ondas, p. 314. Sszzaazitas, p. 326. Trolls Nobres, p. 338. Uivantes, p. 348.
+1. **Mascotes & Mortos-Vivos**, p. 228 impressa, p. 230 do PDF. As fichas citam o recorte `ameacas de arton p230 ate 253.pdf`.
+2. **Blocos seguintes na ordem do sumário.** Mundo Perdido, p. 242. Piratas & Pistoleiros, p. 252. Povos-Trovão, p. 264. Puristas, p. 274. Reino dos Mortos, p. 284. Reinos de Moreania, p. 296. Sanguinárias, p. 306. Sob as Ondas, p. 314. Sszzaazitas, p. 326. Trolls Nobres, p. 338. Uivantes, p. 348.
 3. **Áreas de Tormenta**, p. 18 impressa, p. 20 do PDF. Fica para depois dos blocos acima. As 13 fichas citam o recorte `ameacas de arton p20 ate 31.pdf`. Conferir com a regra compartilhada dos lefeu do Livro Básico, p. 315.
 4. **Fichas vindas de prints:** `golem-de-nor-medio`, `stagh` e `soterrado-vagante` citam “prints enviados pelo usuário”. Pertencem a Uivantes e devem ganhar referência ao PDF integral quando esse bloco for auditado.
 5. **Aura Aterradora abreviada.** Completar as fichas do Necrodraco Lich e de Tarso com o texto do Livro Básico durante a auditoria de Mascotes & Mortos-Vivos.
-6. **Versão pendente.** Comparar Gorlogg com o Livro Básico quando o lote correspondente de Ameaças for auditado. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 
 ### Revisão de apresentação, fora da auditoria
 

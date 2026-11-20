@@ -35,7 +35,7 @@ export const sourceByCreatureId = {
     "centauro-xama": basicBookSource(290),
     "gnoll-saqueador-livro-basico": basicBookSource(290),
     "gnoll-filibusteiro-livro-basico": basicBookSource(291),
-    "gorlogg": basicBookSource(291),
+    "gorlogg-livro-basico": basicBookSource(291),
     "trog": basicBookSource(291, 292),
     "lobo-das-cavernas": basicBookSource(292),
     "cao-do-inferno": basicBookSource(292),
@@ -97,7 +97,6 @@ export const sourceByCreatureId = {
     "sacerdote-de-aharadak": basicBookSource(316),
 
     // ─── Ameaças de Arton ─────────────────────────────────────────────────────
-    "cocatriz":   { book: "Ameaças de Arton", pdfFile: "ameacas de arton variadas.pdf", pdfPage: 9, bookPage: 199 }
 };
 
 
