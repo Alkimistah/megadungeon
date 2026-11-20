@@ -10,6 +10,25 @@
 
 **Spec:** `docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md`
 
+## Execução
+
+O processo segue `docs/superpowers/processo-de-trabalho.md`. Os níveis de modelo por tarefa são:
+
+| Tarefa | Implementador | Revisor |
+|---|---|---|
+| 1. Tabelas 8-1 e 8-2 | sonnet | sonnet |
+| 2. Tabelas de itens | sonnet | sonnet |
+| 3. Tabelas mágicas | sonnet | sonnet |
+| 4. Motor: dinheiro e riquezas | opus | opus |
+| 5. Motor: itens e regras especiais | opus | opus |
+| 6. Agregação | haiku | sonnet |
+| 7. Botão, modal e carregamento | sonnet | sonnet |
+| 8. Aba Rolar | sonnet | sonnet |
+| 9. Aba Consultar | sonnet | sonnet |
+| 10. Listas dos outros livros | sonnet | sonnet |
+| 11. Documentação e validação | haiku | sonnet |
+| Revisão final do branch | — | opus |
+
 ## Global Constraints
 
 - Sem dependências novas e sem framework.
@@ -109,7 +128,7 @@
 - [ ] **Step 1: Testes** com uma fonte fixa (lista de valores):
   - `8-1/7/money` com d% 70 e 2d12 = 15 dá `gains = [{ money, amount: 150, currency: "TO" }]`.
   - Metade do mesmo resultado dá 75 TO.
-  - Metade de 1d6×10 TC com total 35 dá 17 TC.
+  - Metade de uma riqueza menor de 4d4 com total 11 dá 5,5 T$, guardado como `amount: 5.5, currency: "T$"`. Valores em T$ mantêm uma casa decimal (TC), e o que ficar abaixo de 0,1 T$ é descartado.
   - Dobro gera dois estados.
   - `8-1/12/money` com d% 20, depois o d% da 8-2 informado como 85: aplica +20, limitado a 100, e consulta a linha 100 de `8-2/média`.
   - `1d3+1 riquezas menores` com contagem 3 gera três consultas à 8-2.
