@@ -2038,7 +2038,8 @@ export const unicornio = {
         {
             "name": "Chifre Mágico",
             "timing": "padrão",
-            "text": "O unicórnio toca uma criatura adjacente com seu chifre e usa um dos efeitos a seguir: Curar — a criatura recupera 8d8+8 pontos de vida; Purificar — uma condição negativa ou maldição da criatura é removida; Reviver — a criatura é revivida, desde que tenha morrido há no máximo uma semana."
+            "text": "O unicórnio toca uma criatura adjacente com seu chifre e usa um dos efeitos a seguir: Curar — a criatura recupera 8d8+8 pontos de vida; Purificar — uma condição negativa ou maldição da criatura é removida; Reviver — a criatura é revivida, desde que tenha morrido há no máximo uma semana.",
+            "magical": true
         },
         {
             "name": "Paz Encarnada",
@@ -2053,7 +2054,8 @@ export const unicornio = {
         {
             "name": "Sumir",
             "timing": "padrão",
-            "text": "O unicórnio se teletransporta para um ponto qualquer em alcance médio. Ele não precisa ver o destino para usar essa habilidade."
+            "text": "O unicórnio se teletransporta para um ponto qualquer em alcance médio. Ele não precisa ver o destino para usar essa habilidade.",
+            "magical": true
         }
     ],
     "equipment": null,

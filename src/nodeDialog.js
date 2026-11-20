@@ -7,7 +7,7 @@ import { formatCreatureCatalogName, getCreatureById } from "./creatureCatalog/in
 import { getDamageType } from "./damageTypes.js";
 import { getForestTrapPresentation } from "./forestTrapPresentation.js";
 import { getWeaponVariationLabel } from "./equipment/weaponVariation.js";
-import { GENERAL_CREATURE_ABILITIES } from "./generalCreatureAbilities.js";
+import { GENERAL_CREATURE_ABILITIES, getSharedSubtypeRules } from "./generalCreatureAbilities.js";
 import { getEncounterMissionMatches } from "./missions/missionEncounterIntegration.js";
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { openTacticalMapFullscreen } from "./tacticalMapRenderer.js";
@@ -671,7 +671,8 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
   const entries = [...(creature.actions ?? []), ...(creature.abilities ?? [])];
   const groupRules = [
     [GENERAL_CREATURE_ABILITIES.band, entries.some(entry => /^\[Bando\]/i.test(entry.text))],
-    [GENERAL_CREATURE_ABILITIES.swarm, entries.some(entry => entry.name === "Enxame")]
+    [GENERAL_CREATURE_ABILITIES.swarm, entries.some(entry => entry.name === "Enxame")],
+    ...getSharedSubtypeRules(creature).map(rule => [rule, true])
   ];
   for (const [rule, applies] of groupRules) {
     if (applies) {

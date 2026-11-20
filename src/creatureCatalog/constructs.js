@@ -1698,7 +1698,8 @@ export const carruagemDeComando = {
         {
             "name": "Evacuação de Emergência",
             "timing": "completa",
-            "text": "Se a carruagem inicia seu turno com 20 PV ou menos, o piloto é alvo da magia Teletransporte com o aprimoramento de santuário, sem custo em PM. Em seguida, a carruagem começa a emitir um alarme agudo e fica imóvel por 2 turnos — no fim do segundo turno, ela explode, causando 6d6 pontos de dano de fogo e 6d6 pontos de dano de perfuração em todas as criaturas em alcance curto (Ref CD 24 reduz à metade). Uma palavra de comando pode impedir a explosão."
+            "text": "Se a carruagem inicia seu turno com 20 PV ou menos, o piloto é alvo da magia Teletransporte com o aprimoramento de santuário, sem custo em PM. Em seguida, a carruagem começa a emitir um alarme agudo e fica imóvel por 2 turnos — no fim do segundo turno, ela explode, causando 6d6 pontos de dano de fogo e 6d6 pontos de dano de perfuração em todas as criaturas em alcance curto (Ref CD 24 reduz à metade). Uma palavra de comando pode impedir a explosão.",
+            "magical": true
         },
         {
             "name": "Pernas Mecânicas",

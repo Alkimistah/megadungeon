@@ -354,7 +354,8 @@ export const vampiro = {
         {
             "name": "Dominação Vampírica",
             "timing": "padrão",
-            "text": "O vampiro sussurra palavras de controle para um humanoide em alcance curto. A vítima fica confusa, enfeitiçada ou fascinada até o final da cena ou perde suas memórias da última hora, a escolha do vampiro (Von CD 29 evita). Uma criatura só pode ser alvo desta habilidade uma vez por cena. e"
+            "text": "O vampiro sussurra palavras de controle para um humanoide em alcance curto. A vítima fica confusa, enfeitiçada ou fascinada até o final da cena ou perde suas memórias da última hora, a escolha do vampiro (Von CD 29 evita). Uma criatura só pode ser alvo desta habilidade uma vez por cena. e",
+            "magical": true
         },
         {
             "name": "Drenar Sangue",
@@ -364,7 +365,8 @@ export const vampiro = {
         {
             "name": "Forma de Morcego",
             "timing": "padrão",
-            "text": "O vampiro se transforma em um morcego. Ele se torna Minúsculo (+5 em Furtividade e –5 em testes de manobra) e recebe deslocamento de voo 12m. Seu equipamento é absorvido (retornando quando ele volta ao normal) e suas outras estatísticas não são alteradas. A transformação dura quanto tempo ele desejar, mas termina caso faça um ataque, lance uma magia ou sofra dano. e"
+            "text": "O vampiro se transforma em um morcego. Ele se torna Minúsculo (+5 em Furtividade e –5 em testes de manobra) e recebe deslocamento de voo 12m. Seu equipamento é absorvido (retornando quando ele volta ao normal) e suas outras estatísticas não são alteradas. A transformação dura quanto tempo ele desejar, mas termina caso faça um ataque, lance uma magia ou sofra dano. e",
+            "magical": true
         },
         {
             "name": "Presença Majestosa",
@@ -1742,7 +1744,8 @@ export const mortalha = {
         {
             "name": "Maldição Mortuária",
             "timing": "padrão",
-            "text": "A mortalha profere uma maldição mortuária contra uma criatura em alcance médio (Fort CD 31 evita)."
+            "text": "A mortalha profere uma maldição mortuária contra uma criatura em alcance médio (Fort CD 31 evita).",
+            "magical": true
         },
         {
             "name": "Fraqueza Solar",
@@ -2541,7 +2544,8 @@ export const capitaoPirata = {
         {
             "name": "Salmoura",
             "timing": null,
-            "text": "Uma criatura que sofra dano de ácido de um ataque do capitão pirata sofre –2 em testes de perícia por 1 rodada."
+            "text": "Uma criatura que sofra dano de ácido de um ataque do capitão pirata sofre –2 em testes de perícia por 1 rodada.",
+            "magical": true
         },
         {
             "name": "Saque Rápido",
@@ -2873,7 +2877,8 @@ export const arquilichFerrenAsloth = {
         {
             "name": "Visão Tumular",
             "timing": null,
-            "text": "Ferren está permanentemente sob efeito da magia Visão Mística com o aprimoramento que permite enxergar criaturas e objetos invisíveis."
+            "text": "Ferren está permanentemente sob efeito da magia Visão Mística com o aprimoramento que permite enxergar criaturas e objetos invisíveis.",
+            "magical": true
         },
         {
             "name": "Magias",
@@ -3140,7 +3145,8 @@ export const lich = {
         {
             "name": "Aura de Medo",
             "timing": null,
-            "text": "Criaturas em um raio de 30m do lich ficam abaladas (Von CD 42 evita e a criatura não pode mais ser abalada por esta habilidade até o fim da cena)."
+            "text": "Criaturas em um raio de 30m do lich ficam abaladas (Von CD 42 evita e a criatura não pode mais ser abalada por esta habilidade até o fim da cena).",
+            "magical": true
         },
         {
             "name": "Drenar Vida",
@@ -3280,7 +3286,8 @@ export const lichDeAslothia = {
         {
             "name": "Aura de Medo",
             "timing": null,
-            "text": "Criaturas em um raio de 30m do lich ficam abaladas (Von CD 46 evita e a criatura não pode mais ser abalada por esta habilidade até o fim da cena)."
+            "text": "Criaturas em um raio de 30m do lich ficam abaladas (Von CD 46 evita e a criatura não pode mais ser abalada por esta habilidade até o fim da cena).",
+            "magical": true
         },
         {
             "name": "Contramágica Superior",

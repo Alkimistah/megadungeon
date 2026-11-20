@@ -233,6 +233,45 @@ export const GENERAL_CREATURE_ABILITIES = {
   }
 };
 
+// Quadros de regras compartilhadas por subtipo, exibidos no fim da ficha.
+export const SHARED_SUBTYPE_RULES = {
+  lefeu: {
+    id: "lefeu",
+    label: "Habilidades Lefeu",
+    category: "subtype",
+    subtype: "lefeu",
+    summary: "Todos os lefeu partilham as seguintes habilidades (já contabilizadas em suas fichas).",
+    notes: [
+      "Imunidades. Lefeu são imunes a acertos críticos, ácido, cansaço, eletricidade, fogo, frio, luz, paralisia, metabolismo, metamorfose, trevas e veneno.",
+      "Insanidade da Tormenta. Uma criatura que veja um ou mais lefeu deve fazer um teste de Vontade contra o lefeu de maior ND. Se falhar, perde os PM indicados (+1 PM para cada lefeu além do primeiro). Se for reduzida a 0 PM, fica confusa. Uma criatura só é afetada por esta habilidade uma vez por dia.",
+      "Percepção Temporal. Um lefeu soma sua Sabedoria em testes de ataque, Defesa e Reflexos (já contabilizado na ficha).",
+      "Visão Ampla. Um lefeu recebe +5 em Percepção e não pode ser flanqueado."
+    ],
+    source: { book: "Livro Básico", pdfFile: "T20 - Livro Básico - Jogo do Ano.pdf", pdfPage: 321, bookPage: 315 }
+  },
+  draconic: {
+    id: "draconic",
+    label: "Habilidades Dracônicas",
+    category: "subtype",
+    subtype: "dragão",
+    summary: "Todos os dragões partilham as seguintes habilidades.",
+    notes: [
+      "Aura Aterradora. Uma criatura que comece seu turno em alcance longo de um dragão adulto ou mais velho fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena (Vontade evita). Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia.",
+      "Imunidades. Dragões são imunes a efeitos de atordoamento, cansaço, dano do tipo de seu sopro, metamorfose e paralisia.",
+      "Magia Dracônica. Dragões adultos ou mais velhos podem lançar magias sem palavras mágicas, gestos ou concentração.",
+      "Metamorfose Dracônica (Completa). Dragões jovens ou mais velhos podem se transformar em outras criaturas, como a magia Metamorfose (mas sem limitação para tamanhos menores que o seu). Um dragão morto reverte à sua forma original. Habilidade mágica.",
+      "Resistência a Magia. Dragões filhotes têm resistência a magia +1. Esse bônus aumenta em +1 para cada categoria de idade acima de filhote.",
+      "Sopro (Padrão). O dragão cospe energia em uma área. A área do sopro, o tipo de energia e o dano dependem do dragão. Recarga (movimento)."
+    ],
+    source: { book: "Livro Básico", pdfFile: "T20 - Livro Básico - Jogo do Ano.pdf", pdfPage: 317, bookPage: 311 }
+  }
+};
+
+export function getSharedSubtypeRules(creature) {
+  const subtype = String(creature?.subtype ?? "").toLowerCase();
+  return Object.values(SHARED_SUBTYPE_RULES).filter(rule => rule.subtype === subtype);
+}
+
 export const generalCreatureAbilityCatalog = Object.values(GENERAL_CREATURE_ABILITIES);
 
 export function getGeneralCreatureAbility(id) {

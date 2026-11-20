@@ -1004,8 +1004,8 @@ Familiares, pp. 190–197, ficou fora do catálogo por decisão anterior, porque
 Itens anotados durante os lotes que não alteram números, mas podem melhorar a ficha exibida:
 
 - Bando, p. 14 impressa, e Enxame, p. 15 impressa, são exibidos nas fichas de combate com as marcas de grupo cadastradas.
-- As regras compartilhadas dos lefeu e as habilidades dracônicas do Livro Básico poderiam ser expostas nas fichas que dependem delas.
-- A ficha exibe a marca de habilidade mágica, definida na p. 384 impressa, para as 39 habilidades já marcadas no cadastro e os sete asteriscos identificados nas magias da Bruxa Goblin. A busca por outros símbolos continua pendente.
+- As regras compartilhadas dos lefeu e as habilidades dracônicas do Livro Básico aparecem no fim das fichas de subtipo lefeu e dragão. [Revisão de apresentação](../specs/2026-11-20-revisao-apresentacao-fichas-design.md)
+- A ficha exibe a marca de habilidade mágica, definida na p. 384 impressa, e os sete asteriscos identificados nas magias da Bruxa Goblin. A varredura da fonte `SpiralsFont` nos três livros, em 20 de novembro de 2026, conferiu todas as espirais das páginas de ficha e marcou mais 25 habilidades. O ícone de novo item ou nova magia fica fora da ficha.
 - A recontagem de 20 de novembro usou 291 papéis documentados na auditoria e 43 conferidos nas páginas renderizadas. Encontrou 50 divergências após a correção da tabela de parâmetros. O papel impresso prevalece na ficha e na geração para os 334 registros conferidos. O Vagalhão Kobold é um evento e continua com seu papel de cadastro. [Correção da tabela](2026-11-19-validacao-praxis-e-parametros.md#correção-aplicada)
 
 ### Depois de Ameaças

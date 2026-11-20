@@ -18,7 +18,7 @@ Situação local em 20 de novembro de 2026. A tabela de parâmetros de ameaças 
 
 1. **Livro Básico.** Segunda passada nas 76 fichas concluída. Os 18 papéis divergentes foram atualizados. Quando a fonte confirma o papel, ele prevalece na ficha e na geração. [Segunda passada](../plans/2026-11-18-auditoria-livro-basico.md#segunda-passada--20-de-novembro-de-2026)
 2. **Cadastro.** Os lotes de ND fixo de Ameaças estão cadastrados. Em Deuses de Arton, todas as fichas estão cadastradas, inclusive os 18 avatares. O Luminar e o Rival Espelho, de Ameaças, entraram como fichas de consulta, fora do sorteio. [Fichas sem ND numérico](2026-11-20-fichas-sem-nd-design.md) [Ameaças](../plans/2026-11-18-auditoria-orcs-ameacas.md#cadastro-futuro) · [Deuses](../plans/2026-11-19-auditoria-deuses-de-arton.md#cadastro-futuro)
-3. **Apresentação.** A ficha no combate mostra as regras gerais de Bando e Enxame quando identificadas no cadastro, além de PM, custos e marcas confirmadas de habilidades mágicas e de magias beneficiadas por item. A recontagem de Ameaças confirmou 50 diferenças nos 334 papéis impressos da auditoria anterior, já aplicadas ao catálogo local. A verificação dos demais marcadores de habilidade continua pendente. [Itens anotados](../plans/2026-11-18-auditoria-orcs-ameacas.md#revisão-de-apresentação-fora-da-auditoria)
+3. **Apresentação.** Concluída. Todas as espirais de habilidade mágica das fichas dos três livros estão marcadas. As fichas de subtipo lefeu e dragão mostram as regras compartilhadas, e as regras gerais de Bando e Enxame continuam como antes. [Revisão de apresentação](2026-11-20-revisao-apresentacao-fichas-design.md) [Itens anotados](../plans/2026-11-18-auditoria-orcs-ameacas.md#revisão-de-apresentação-fora-da-auditoria)
 
 ## Método
 

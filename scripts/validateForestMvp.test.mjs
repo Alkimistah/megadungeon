@@ -1905,6 +1905,11 @@ test("the creature sheet shows published group rules and confirmed magical abili
     assert.match(sheetText("vagalhao-kobold"), /FORT —, REF —, VON —/);
     assert.match(sheetText("luminar-deuses-de-arton"), /DEFESA\s+—, FORT —, REF —, VON —, imunidade a dano/);
     assert.match(sheetText("luminar-deuses-de-arton"), /PONTOS DE VIDA\s+—/);
+    assert.match(sheetText("uktril"), /Habilidades Lefeu.*Insanidade da Tormenta.*Percepção Temporal.*Visão Ampla/);
+    assert.doesNotMatch(sheetText("kaijin-bruto"), /Habilidades Lefeu/);
+    assert.match(sheetText("dragao-jovem"), /Habilidades Dracônicas.*Aura Aterradora.*Resistência a Magia.*Sopro/);
+    assert.match(sheetText("necrodraco-lich"), /Habilidades Dracônicas/);
+    assert.doesNotMatch(sheetText("vampiro"), /Habilidades Dracônicas|Habilidades Lefeu/);
     const rival = sheetText("rival-espelho");
     assert.doesNotMatch(rival, /INICIATIVA|DEFESA|PONTOS DE VIDA|undefined/);
     assert.match(rival, /Transferir Dor.*Mágica/);
@@ -2155,4 +2160,14 @@ test("combat ND with several special or unrated sheets never becomes NaN", () =>
   assert.equal(nd([["?"], ["S+"]]), "?");
   assert.equal(nd([["–"], [5]]), "?");
   assert.equal(nd([[3], [3]]), 5);
+});
+
+test("abilities printed with the magical spiral carry the magical mark", () => {
+  // Conferidas pela fonte SpiralsFont nos PDFs integrais em 20 de novembro de 2026.
+  const marked = [["sacerdote-de-hyninn","Forma de Macaco"],["alto-sacerdote-de-hyninn","Forma de Macaco"],["devoto-de-hyninn-manhoso","No Bolso Dói Mais"],["devoto-de-hyninn-simao","No Bolso Dói Mais"],["devoto-de-hyninn-velhaco","No Bolso Dói Mais"],["duplo","Detectar Pensamentos"],["duplo","Mudar Forma"],["sacerdote-da-agonia","Apetite por Destruição"],["aspecto-de-aharadak","Cuspir Enxame"],["fanatico-lefou","Mente Aberrante"],["lider-fanatico-lefou","Mente Aberrante"],["unicornio","Chifre Mágico"],["unicornio","Sumir"],["mortalha","Maldição Mortuária"],["capitao-pirata","Salmoura"],["carruagem-de-comando","Evacuação de Emergência"],["lich","Aura de Medo"],["lich-de-aslothia","Aura de Medo"],["arquilich-ferren-asloth","Visão Tumular"],["avatar-de-aharadak-deuses-de-arton","Percepção Perfeita"],["centauro-xama","Voz da Natureza"],["necromante","Ergam-se!"],["vampiro","Dominação Vampírica"],["vampiro","Forma de Morcego"],["dragao-jovem","Metamorfose Dracônica"]];
+  for (const [id, name] of marked) {
+    const creature = getCreatureById(id);
+    const ability = [...(creature.abilities ?? []), ...(creature.actions ?? [])].find(entry => entry.name === name);
+    assert.equal(ability?.magical, true, `${id}: ${name}`);
+  }
 });

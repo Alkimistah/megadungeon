@@ -1203,7 +1203,8 @@ export const dragaoJovem = {
         {
             "name": "Metamorfose Dracônica",
             "timing": "completa",
-            "text": "Dragões jovens ou mais velhos podem se transformar em outras criaturas, como a magia Metamorfose (mas sem limitação para tamanhos menores que o seu). Eles costumam usar esta habilidade para se infiltrar em sociedades humanoides, aprender sobre seus costumes ou apenas quando não querem ser reconhecidos. Um dragão morto reverte à sua forma original."
+            "text": "Dragões jovens ou mais velhos podem se transformar em outras criaturas, como a magia Metamorfose (mas sem limitação para tamanhos menores que o seu). Eles costumam usar esta habilidade para se infiltrar em sociedades humanoides, aprender sobre seus costumes ou apenas quando não querem ser reconhecidos. Um dragão morto reverte à sua forma original.",
+            "magical": true
         }
     ],
     equipment: null,
@@ -4575,7 +4576,8 @@ export const aspectoDeAharadak = {
         {
             "name": "Cuspir Enxame",
             "timing": "completa",
-            "text": "Sustentada. Um enxame de insetos rubros Grande surge em um ponto em alcance curto. No fim de cada um dos seus turnos, ele causa 4d12 pontos de dano de ácido a qualquer criatura em seu espaço. O aspecto pode gastar uma ação de movimento para mover o enxame com deslocamento de voo 12m e não gasta PM para sustentá-lo."
+            "text": "Sustentada. Um enxame de insetos rubros Grande surge em um ponto em alcance curto. No fim de cada um dos seus turnos, ele causa 4d12 pontos de dano de ácido a qualquer criatura em seu espaço. O aspecto pode gastar uma ação de movimento para mover o enxame com deslocamento de voo 12m e não gasta PM para sustentá-lo.",
+            "magical": true
         },
         {
             "name": "Engolir",
@@ -4784,7 +4786,8 @@ const avatarDeAharadakDivine = {
         {
             name: "Percepção Perfeita",
             timing: null,
-            text: "Está sempre sob efeito de Visão da Verdade com todos os aprimoramentos."
+            text: "Está sempre sob efeito de Visão da Verdade com todos os aprimoramentos.",
+            magical: true
         },
         {
             name: "Presentes Rubros",
@@ -4857,7 +4860,8 @@ export const fanaticoLefou = {
         {
             "name": "Mente Aberrante",
             "timing": null,
-            "text": "Quando faz um teste de Vontade para resistir a um efeito, o fanático causa 3d6 pontos de dano psíquico na criatura que gerou o efeito."
+            "text": "Quando faz um teste de Vontade para resistir a um efeito, o fanático causa 3d6 pontos de dano psíquico na criatura que gerou o efeito.",
+            "magical": true
         },
         {
             "name": "Sangue Ácido",
@@ -4920,7 +4924,8 @@ export const liderFanaticoLefou = {
         {
             "name": "Mente Aberrante",
             "timing": null,
-            "text": "Quando faz um teste de Vontade para resistir a um efeito, o fanático causa 5d6 pontos de dano psíquico na criatura que gerou o efeito."
+            "text": "Quando faz um teste de Vontade para resistir a um efeito, o fanático causa 5d6 pontos de dano psíquico na criatura que gerou o efeito.",
+            "magical": true
         },
         {
             "name": "Sangue Ácido",

@@ -744,7 +744,8 @@ export const centauroXama = {
         {
             "name": "Voz da Natureza",
             "timing": null,
-            "text": "O centauro está sempre sob efeito da magia Voz Divina, apenas para falar com animais. e"
+            "text": "O centauro está sempre sob efeito da magia Voz Divina, apenas para falar com animais. e",
+            "magical": true
         }
     ],
     equipment: "Bordão aumentado, símbolo de Allihanna",
@@ -1277,6 +1278,7 @@ export const necromante = {
             "name": "Ergam-se!",
             "timing": "completa",
             "text": "O necromante conjura seis mortos-vivos feitos de sombra em espaços desocupados em alcance curto. No turno do necromante, cada morto-vivo pode andar (deslocamento 9m) e causar dano a uma criatura adjacente (2d8 pontos de dano de trevas). Os mortos-vivos têm For 3, Des 3, Defesa 25 e todos os outros atributos nulos; eles têm 1 PV e falham automaticamente em qualquer teste de resistência ou oposto, mas são imunes a atordoamento, dano não letal, doença, encantamento, fadiga, frio, ilusão, paralisia, sono e veneno. e",
+            "magical": true,
             "cost": "5 PM"
         },
         {
@@ -3495,7 +3497,8 @@ export const altoSacerdoteDeHyninn = {
             "name": "Forma de Macaco",
             "timing": "completa",
             "cost": "2 PM",
-            "text": "O alto sacerdote se transforma em um macaco. Ele adquire tamanho Minúsculo (+5 em Furtividade e –5 em testes de manobra) e recebe deslocamento de escalada 9m. Seu equipamento desaparece (e ele perde seus benefícios) até voltar ao normal, mas suas outras estatísticas não são alteradas. A transformação dura indefinidamente, mas termina caso ele faça um ataque, lance uma magia ou sofra dano."
+            "text": "O alto sacerdote se transforma em um macaco. Ele adquire tamanho Minúsculo (+5 em Furtividade e –5 em testes de manobra) e recebe deslocamento de escalada 9m. Seu equipamento desaparece (e ele perde seus benefícios) até voltar ao normal, mas suas outras estatísticas não são alteradas. A transformação dura indefinidamente, mas termina caso ele faça um ataque, lance uma magia ou sofra dano.",
+            "magical": true
         },
         {
             "name": "Malandragem Divina",
@@ -3922,7 +3925,8 @@ export const devotoDeHyninnManhoso = {
         {
             "name": "No Bolso Dói Mais",
             "timing": null,
-            "text": "Quando acerta um ataque em corpo a corpo, para cada 1 ponto de dano causado, o devoto de Hyninn manhoso rouba T$ 1 da vítima. Mesmo que o devoto de Hyninn seja derrotado, há 50% de chance de que esses tibares tenham desaparecido para sempre, pela graça de Hyninn."
+            "text": "Quando acerta um ataque em corpo a corpo, para cada 1 ponto de dano causado, o devoto de Hyninn manhoso rouba T$ 1 da vítima. Mesmo que o devoto de Hyninn seja derrotado, há 50% de chance de que esses tibares tenham desaparecido para sempre, pela graça de Hyninn.",
+            "magical": true
         },
         {
             "name": "Truque de Espelhos",
@@ -3982,7 +3986,8 @@ export const devotoDeHyninnSimao = {
         {
             "name": "No Bolso Dói Mais",
             "timing": null,
-            "text": "Quando acerta um ataque em corpo a corpo, para cada 1 ponto de dano causado, o devoto de Hyninn simão rouba T$ 1 da vítima. Mesmo que o devoto de Hyninn seja derrotado, há 75% de chance de que esses tibares tenham desaparecido para sempre, louvado seja Hyninn."
+            "text": "Quando acerta um ataque em corpo a corpo, para cada 1 ponto de dano causado, o devoto de Hyninn simão rouba T$ 1 da vítima. Mesmo que o devoto de Hyninn seja derrotado, há 75% de chance de que esses tibares tenham desaparecido para sempre, louvado seja Hyninn.",
+            "magical": true
         },
         {
             "name": "Truque de Espelhos",
@@ -4045,7 +4050,8 @@ export const devotoDeHyninnVelhaco = {
         {
             "name": "No Bolso Dói Mais",
             "timing": null,
-            "text": "Quando acerta um ataque em corpo a corpo, para cada 1 ponto de dano causado, o devoto rouba T$ 1 da vítima. Mesmo que o devoto seja derrotado, há 90% de chance de que esses tibares tenham desaparecido para sempre, pois é grande a mão de Hyninn."
+            "text": "Quando acerta um ataque em corpo a corpo, para cada 1 ponto de dano causado, o devoto rouba T$ 1 da vítima. Mesmo que o devoto seja derrotado, há 90% de chance de que esses tibares tenham desaparecido para sempre, pois é grande a mão de Hyninn.",
+            "magical": true
         },
         {
             "name": "Truque de Espelhos",
@@ -4108,12 +4114,14 @@ export const duplo = {
         {
             "name": "Detectar Pensamentos",
             "timing": null,
-            "text": "O duplo detecta constantemente os pensamentos superficiais de todas as criaturas inteligentes em alcance curto. Ele não pode ser surpreendido por criaturas cujos pensamentos esteja detectando dessa forma, e recebe +2 na Defesa e em testes de perícia contra elas. Uma criatura ciente desta habilidade pode gastar uma ação de movimento e fazer um teste de Vontade (CD 20). Se passar, esconde seus pensamentos até o fim da cena."
+            "text": "O duplo detecta constantemente os pensamentos superficiais de todas as criaturas inteligentes em alcance curto. Ele não pode ser surpreendido por criaturas cujos pensamentos esteja detectando dessa forma, e recebe +2 na Defesa e em testes de perícia contra elas. Uma criatura ciente desta habilidade pode gastar uma ação de movimento e fazer um teste de Vontade (CD 20). Se passar, esconde seus pensamentos até o fim da cena.",
+            "magical": true
         },
         {
             "name": "Mudar Forma",
             "timing": "padrão",
-            "text": "O duplo assume a forma de qualquer humanoide de tamanho Pequeno a Grande, como no efeito da magia Metamorfose. Ele pode permanecer na forma escolhida por tempo indeterminado, mas, se morrer, reverte à forma natural."
+            "text": "O duplo assume a forma de qualquer humanoide de tamanho Pequeno a Grande, como no efeito da magia Metamorfose. Ele pode permanecer na forma escolhida por tempo indeterminado, mas, se morrer, reverte à forma natural.",
+            "magical": true
         }
     ],
     "equipment": "Duplos geralmente não usam equipamento, mas podem portar armas, ferramentas e roupas adequadas ao seu disfarce atual",
@@ -4361,7 +4369,8 @@ export const sacerdoteDeHyninn = {
             "name": "Forma de Macaco",
             "timing": "completa",
             "cost": "2 PM",
-            "text": "O sacerdote se transforma em um macaco. Ele adquire tamanho Minúsculo (+5 em Furtividade e –5 em testes de manobra). Seu equipamento desaparece (e ele perde seus benefícios) até voltar ao normal, mas suas outras estatísticas não são alteradas. A transformação dura indefinidamente, mas termina caso ele faça um ataque, lance uma magia ou sofra dano."
+            "text": "O sacerdote se transforma em um macaco. Ele adquire tamanho Minúsculo (+5 em Furtividade e –5 em testes de manobra). Seu equipamento desaparece (e ele perde seus benefícios) até voltar ao normal, mas suas outras estatísticas não são alteradas. A transformação dura indefinidamente, mas termina caso ele faça um ataque, lance uma magia ou sofra dano.",
+            "magical": true
         },
         {
             "name": "Malandragem Divina",
@@ -4524,7 +4533,8 @@ export const sacerdoteDaAgonia = {
             "name": "Apetite por Destruição",
             "timing": "completa",
             "cost": "10 PM",
-            "text": "O sacerdote da agonia suga a energia vital de todos os seres em uma esfera de 6m ao seu redor. Criaturas vivas na área sofrem 6d10 pontos de dano de trevas e o sacerdote recebe PV temporários iguais ao dano total causado."
+            "text": "O sacerdote da agonia suga a energia vital de todos os seres em uma esfera de 6m ao seu redor. Criaturas vivas na área sofrem 6d10 pontos de dano de trevas e o sacerdote recebe PV temporários iguais ao dano total causado.",
+            "magical": true
         },
         {
             "name": "Júbilo na Dor",
