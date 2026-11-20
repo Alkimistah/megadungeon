@@ -93,6 +93,60 @@ try {
   assert.equal(await panels.nth(1).isVisible(), true);
   assert.equal(await panels.nth(0).isVisible(), false);
 
+  // Aba Consultar: 8-1 ND 3 Itens -> Equipamento -> tipo 2 (arma) -> d% da 8-4 (Adaga).
+  const C = "#treasureDialog .treasure-consult-prompt";
+  const step = () => page.locator(`${C} .treasure-c-value`);
+  const apply = async v => { await step().fill(String(v)); await page.locator(`${C} .treasure-c-apply`).click(); };
+  await page.locator("#treasureDialog .treasure-c-source").selectOption("nd");
+  await page.locator("#treasureDialog .treasure-c-nd").selectOption("3");
+  await page.locator("#treasureDialog .treasure-c-column").selectOption("items");
+  assert.equal(await page.locator("#treasureDialog .treasure-c-mode").isVisible(), false, "Metade some em Itens");
+  await page.locator("#treasureDialog .treasure-c-start").click();
+  assert.match(await page.locator(`${C} .treasure-consult-step`).innerText(), /8-1/);
+  await apply(101);
+  assert.match(await page.locator(`${C} .treasure-c-error`).innerText(), /inválido/i, "101 mostra erro");
+  assert.equal(await page.locator("#treasureDialog .treasure-consult-history .treasure-step").count(), 0, "101 mantém o passo");
+  await apply("abc");
+  assert.notEqual(await page.locator(`${C} .treasure-c-error`).innerText(), "", "texto mostra erro");
+  await apply(0);
+  assert.notEqual(await page.locator(`${C} .treasure-c-error`).innerText(), "", "0 mostra erro");
+  await apply(40);
+  assert.match(await page.locator("#treasureDialog .treasure-consult-history").innerText(), /Equipamento/);
+  assert.match(await page.locator(`${C} .treasure-consult-reason`).innerText(), /Tipo do equipamento/);
+  await apply(2);
+  assert.match(await page.locator(`${C} .treasure-consult-step`).innerText(), /8-4/, "abre na 8-4 de armas");
+  await apply(1);
+  assert.equal(await page.locator(C).isVisible(), false, "cadeia terminou");
+  assert.match(await page.locator("#treasureDialog .treasure-consult-result").innerText(), /1× Adaga/);
+  await page.screenshot({ path: process.env.QA_SHOT_CONSULT || "/tmp/claude-1000/-mnt-c-Users-Arthur-OneDrive-Documentos-Mega-Dungeon/9b4a7ac4-9b92-4710-9e4c-7f73d59acc52/scratchpad/img/treasure-consultar.png" });
+  // Nova consulta reinicia. ND 4 Itens: 40 -> equipamento 2D com aviso; "rolar" em expressão.
+  await page.locator("#treasureDialog .treasure-c-reset").click();
+  assert.equal(await page.locator("#treasureDialog .treasure-consult-history .treasure-step").count(), 0);
+  await page.locator("#treasureDialog .treasure-c-nd").selectOption("4");
+  await page.locator("#treasureDialog .treasure-c-column").selectOption("items");
+  await page.locator("#treasureDialog .treasure-c-start").click();
+  await apply(40);
+  assert.equal(await page.locator(`${C} .treasure-consult-warning`).count(), 1, "aviso 2D");
+  assert.match(await page.locator(`${C} .treasure-consult-warning`).innerText(), /2D/);
+  await page.locator("#treasureDialog .treasure-c-reset").click();
+  await page.locator("#treasureDialog .treasure-c-column").selectOption("money");
+  await page.locator("#treasureDialog .treasure-c-nd").selectOption("3");
+  await page.locator("#treasureDialog .treasure-c-start").click();
+  await apply(100);
+  const expr = await page.locator(`${C} .treasure-consult-reason`).innerText();
+  if (await page.locator(`${C} .treasure-c-roll`).count()) {
+    await page.locator(`${C} .treasure-c-roll`).click();
+    const v = Number(await step().inputValue());
+    assert.ok(Number.isInteger(v) && v >= 1, `rolar preencheu valor válido (${expr})`);
+    await page.locator(`${C} .treasure-c-apply`).click();
+  }
+  assert.equal(await page.locator("#treasureDialog .treasure-c-error").count() === 0 || await page.locator("#treasureDialog .treasure-c-error").innerText() === "", true);
+  // Tabela específica (8-5 etc.) é oferecida e abre direto.
+  await page.locator("#treasureDialog .treasure-c-reset").click();
+  await page.locator("#treasureDialog .treasure-c-source").selectOption("8-4/arma");
+  await page.locator("#treasureDialog .treasure-c-start").click();
+  assert.match(await page.locator(`${C} .treasure-consult-step`).innerText(), /8-4/);
+
   await page.locator("#treasureClose").click();
   await page.locator("#treasureDialog").waitFor({ state: "hidden" });
   assert.deepEqual(errors, [], `pageerror: ${errors.join("; ")}`);
