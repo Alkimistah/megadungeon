@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. Das **335 fichas auditadas**, **319 estão publicadas** e **16 estão no trabalho local**. Todas as fichas de Ameaças do catálogo foram conferidas. Familiares ficou registrado como fora do catálogo. De Reinos de Moreania a Trolls Nobres não há fichas no catálogo, e o próximo passo depende de decisão. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. As **335 fichas auditadas** estão publicadas. Todas as fichas de Ameaças do catálogo foram conferidas. Familiares ficou registrado como fora do catálogo. De Reinos de Moreania a Trolls Nobres não há fichas no catálogo, e o próximo passo depende de decisão. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -956,9 +956,9 @@ Situação em 19 de novembro de 2026.
 | Povos-Trovão | 264–273 | 12 | Publicado |
 | Puristas | 274–283 | 11 | Publicado |
 | Reino dos Mortos | 284–295 | 10 | Publicado |
-| Uivantes | 348–357 | 3 | Validado localmente |
-| Áreas de Tormenta | 18–29 | 13 | Validado localmente |
-| **Total** | | **335** | **319 publicadas e 16 locais** |
+| Uivantes | 348–357 | 3 | Publicado |
+| Áreas de Tormenta | 18–29 | 13 | Publicado |
+| **Total** | | **335** | **Publicadas** |
 
 As 335 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
 
@@ -970,7 +970,7 @@ Masmorras, Montarias e a retirada dos quadros de parceiro e familiar foram publi
 
 Os seis blocos de Mascotes & Mortos-Vivos a Reino dos Mortos foram publicados em `b0e2361`. Antes do push, passaram o build de produção, os testes de andares 1–10, os 76 testes de andares 11–20 e os testes de missões. Depois do deploy, o QA dos andares 11–20 passou contra o site publicado, sem erros de JavaScript. O bundle publicado não cita os recortes de p. 230 a 297 e traz o Maior que a Morte completo do Arquilich. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44656288338)
 
-Uivantes e Áreas de Tormenta estão validados localmente: passaram o build de produção, os testes de andares 1–10, os 79 testes de andares 11–20, os testes de missões e, para Uivantes, o QA dos andares 11–20 no Chrome contra o build local. A publicação está pendente.
+Uivantes e Áreas de Tormenta foram publicados em `f2f691e`. Antes do push, passaram o build de produção, os testes de andares 1–10, os 79 testes de andares 11–20 e os testes de missões. Depois do deploy, o QA dos andares 11–20 passou contra o site publicado, sem erros de JavaScript. O bundle publicado não cita recortes nem prints e não tem mais o texto genérico de Maior que a Morte. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44657131468)
 
 ### O que falta em Ameaças de Arton
 
