@@ -392,6 +392,213 @@ itemTable("8-12", "Tabela 8-12: Poções", 341, TABLE_8_12.trim().split("\n").ma
   return { ...parseRange(range), result: { kind: "item", name, price: Number(price), category: "poção" } };
 }));
 
+// Tabelas 8-8 e 8-10 (PDF 342 e 345). "¹" = apenas escudos; "²" = conta como dois encantos
+// (na 8-8, "*" tem o mesmo sentido); "↗8-9"/"↗8-11" = arma/item específico, role na tabela indicada.
+const ANTICREATURE = ["animal", "construto", "espírito", "monstro", "morto-vivo", "uma raça de humanoides"];
+function enchantmentRows(text) {
+  return text.trim().split("\n").map((line) => {
+    const [range, raw] = line.trim().split("|");
+    const result = { kind: "enchantment", name: raw.replace(/[¹²*]$|↗.*$/, "") };
+    if (raw.endsWith("¹")) result.special = "shield-only";
+    if (/[²*]$/.test(raw)) result.special = "counts-as-two";
+    if (raw.includes("↗")) { result.special = "specific"; result.next = raw.split("↗")[1]; }
+    if (result.name === "Anticriatura") result.subroll = { die: "1d6", options: [...ANTICREATURE] };
+    return { ...parseRange(range), result };
+  });
+}
+
+const TABLE_8_8 = `
+01-05|Ameaçadora
+06-10|Anticriatura
+11-12|Arremesso
+13-14|Assassina
+15-16|Caçadora
+17-21|Congelante
+22-23|Conjuradora
+24-28|Corrosiva
+29-30|Dançarina
+31-34|Defensora
+35-36|Destruidora
+37-38|Dilacerante
+39-40|Drenante
+41-45|Elétrica
+46|Energética*
+47-48|Excruciante
+49-53|Flamejante
+54-63|Formidável
+64|Lancinante*
+65-72|Magnífica*
+73-74|Piedosa
+75-76|Profana
+77-78|Sagrada
+79-80|Sanguinária
+81-82|Trovejante
+83-84|Tumular
+85-88|Veloz
+89-90|Venenosa
+91-100|Arma específica↗8-9`;
+
+const TABLE_8_10 = `
+01-06|Abascante
+07-10|Abençoado
+11-12|Acrobático
+13-14|Alado
+15-16|Animado¹
+17-18|Assustador
+19-22|Cáustica
+23-32|Defensor
+33-34|Escorregadio
+35-36|Esmagador¹
+37-38|Fantasmagórico
+39-40|Fortificado
+41-44|Gélido
+45-54|Guardião²
+55-56|Hipnótico
+57-58|Ilusório
+59-62|Incandescente
+63-68|Invulnerável
+69-72|Opaco
+73-78|Protetor
+79-80|Refletor
+81-84|Relampejante
+85-86|Reluzente
+87-88|Sombrio
+89-90|Zeloso
+91-100|Item específico↗8-11`;
+
+// Tabelas de itens específicos: faixa|nome|preço em T$ (nos livros, "T$ 30.000").
+const TABLE_8_9 = `
+01-05|Azagaia dos relâmpagos|30000
+06-15|Espada baronial|30000
+16-25|Lâmina da luz|45000
+26-30|Lança animalesca|45000
+31-35|Maça do terror|45000
+36-40|Florete fugaz|50000
+41-45|Cajado da destruição|60000
+46-50|Cajado da vida|60000
+51-55|Machado silvestre|70000
+56-60|Martelo de Doherimm|70000
+61-67|Arco do poder|90000
+68-72|Língua do deserto|90000
+73-77|Besta explosiva|100000
+78-82|Punhal sszzaazita|100000
+83-87|Espada sortuda|110000
+88-92|Avalanche|140000
+93-95|Cajado do poder|180000
+96-100|Vingadora sagrada|200000`;
+
+const TABLE_8_11 = `
+01-10|Cota élfica|30000
+11-20|Couro de monstro|36000
+21-25|Escudo do conjurador|45000
+26-32|Loriga do centurião|45000
+33-42|Manto da noite|45000
+43-49|Couraça do comando|45000
+50-59|Baluarte anão|50000
+60-66|Escudo espinhoso|50000
+67-76|Escudo do leão|50000
+77-83|Carapaça demoníaca|63000
+84-88|Escudo do eclipse|70000
+89-93|Escudo de Azgher|140000
+94-100|Armadura da luz|150000`;
+
+const TABLE_8_13 = `
+01-02|Anel do sustento|3000
+03-07|Bainha mágica|3000
+08-12|Corda da escalada|3000
+13-14|Ferraduras da velocidade|3000
+15-19|Garrafa da fumaça eterna|3000
+20-24|Gema da luminosidade|3000
+25-29|Manto élfico|3000
+30-34|Mochila de carga|3000
+35-40|Brincos da sagacidade|4500
+41-46|Luvas da delicadeza|4500
+47-52|Manoplas da força do ogro|4500
+53-59|Manto da resistência|4500
+60-65|Manto do fascínio|4500
+66-71|Pingente da sensatez|4500
+72-77|Torque do vigor|4500
+78-82|Chapéu do disfarce|6000
+83-84|Flauta fantasma|6000
+85-89|Lanterna da revelação|6000
+90-96|Anel da proteção|9000
+97-98|Anel do escudo mental|9000
+99-100|Pingente da saúde|9000`;
+
+const TABLE_8_14 = `
+01-04|Anel de telecinesia|10500
+05-08|Bola de cristal|10500
+09-10|Caveira maldita|10500
+11-14|Botas aladas|15000
+15-18|Braceletes de bronze|16500
+19-24|Anel da energia|21000
+25-30|Anel da vitalidade|21000
+31-34|Anel de invisibilidade|21000
+35-38|Braçadeiras do arqueiro|21000
+39-42|Brincos de Marah|21000
+43-46|Faixas do pugilista|21000
+47-50|Manto da aranha|21000
+51-54|Vassoura voadora|21000
+55-58|Símbolo abençoado|21000
+59-64|Amuleto da robustez|25500
+65-68|Botas velozes|25500
+69-74|Cinto da força do gigante|25500
+75-80|Coroa majestosa|25500
+81-86|Estola da serenidade|25500
+87-88|Manto do morcego|25500
+89-94|Pulseiras da celeridade|25500
+95-100|Tiara da sapiência|25500`;
+
+const TABLE_8_15 = `
+01-02|Elmo do teletransporte|30000
+03-04|Gema da telepatia|30000
+05-09|Gema elemental|30000
+10-15|Manual da saúde corporal|30000
+16-21|Manual do bom exercício|30000
+22-27|Manual dos movimentos precisos|30000
+28-34|Medalhão de Lena|30000
+35-40|Tomo da compreensão|30000
+41-46|Tomo da liderança e influência|30000
+47-52|Tomo dos grandes pensamentos|30000
+53-57|Anel refletor|51000
+58-60|Cinto do campeão|51000
+61-67|Colar guardião|51000
+68-72|Estatueta animista|51000
+73-77|Anel da liberdade|60000
+78-82|Tapete voador|60000
+83-87|Braceletes de ouro|64500
+88-89|Espelho da oposição|75000
+90-94|Robe do arquimago|90000
+95-96|Orbe das tempestades|97500
+97-98|Anel da regeneração|150000
+99-100|Espelho do aprisionamento|150000`;
+
+function specificRows(text, category, tier) {
+  return text.trim().split("\n").map((line) => {
+    const [range, name, price] = line.split("|");
+    const cat = typeof category === "function" ? category(name) : category;
+    return { ...parseRange(range), result: { kind: "item", name, price: Number(price), category: cat, tier } };
+  });
+}
+
+itemTable("8-8", "Tabela 8-8: Armas Mágicas", 336, enchantmentRows(TABLE_8_8));
+itemTable("8-9", "Tabela 8-9: Armas Específicas", 337, specificRows(TABLE_8_9, "arma", "maior"));
+itemTable("8-10", "Tabela 8-10: Armaduras & Escudos Mágicos", 339, enchantmentRows(TABLE_8_10));
+itemTable("8-11", "Tabela 8-11: Armaduras & Escudos Específicos", 340, specificRows(TABLE_8_11, shield, "maior"));
+itemTable("8-13", "Tabela 8-13: Acessórios Menores", 342, specificRows(TABLE_8_13, "acessório", "menor"));
+itemTable("8-14", "Tabela 8-14: Acessórios Médios", 343, specificRows(TABLE_8_14, "acessório", "médio"));
+itemTable("8-15", "Tabela 8-15: Acessórios Maiores", 343, specificRows(TABLE_8_15, "acessório", "maior"));
+
+// Quantos encantos um item mágico recebe, por categoria.
+export const ENCHANTMENT_COUNT = Object.freeze({ menor: 1, médio: 2, maior: 3 });
+
+// Tabela 8-7 (PDF 340, p. 334): preço por quantidade de encantos e aumento na CD.
+export const ENCHANTMENT_PRICES = Object.freeze({
+  1: { price: 18000, dcIncrease: 10 },
+  2: { price: 36000, dcIncrease: 15 },
+  3: { price: 72000, dcIncrease: 20 },
+});
+
 // Falha cedo se a transcrição ficar inconsistente.
 for (const table of Object.values(BASIC_BOOK_TABLES)) {
   const errors = validateTable(table);
