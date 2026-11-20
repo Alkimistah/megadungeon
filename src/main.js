@@ -46,6 +46,8 @@ const elements = {
   installButton: document.getElementById("installButton"),
   reloadAppButton: document.getElementById("reloadAppButton"),
   missionButton: document.getElementById("missionButton"),
+  treasureButton: document.getElementById("treasureButton"),
+  treasureDialog: document.getElementById("treasureDialog"),
   missionClose: document.getElementById("missionClose"),
   missionDialog: document.getElementById("missionDialog"),
   missionDialogContent: document.getElementById("missionDialogContent"),
@@ -1066,6 +1068,21 @@ function bindEvents() {
     }
   });
 
+  elements.treasureDialog.addEventListener("click", (event) => {
+    if (event.target === elements.treasureDialog) {
+      elements.treasureDialog.close();
+    }
+  });
+
+  elements.treasureButton.addEventListener("click", async () => {
+    try {
+      const { openTreasureDialog } = await import("./treasure/treasureDialog.js");
+      openTreasureDialog(elements.treasureDialog);
+    } catch (error) {
+      console.error("Falha ao carregar o módulo de tesouros", error);
+    }
+  });
+
   elements.nodeDialog.addEventListener("close", () => {
     nodeDialogController.clearCurrent();
   });
@@ -1167,7 +1184,16 @@ function boot() {
   window.addEventListener("load", () => {
     elements.rangeDialog.showModal();
     void offerSavedExpedition();
+    prefetchTreasureModule();
   });
+}
+
+function prefetchTreasureModule() {
+  const prefetch = () => import("./treasure/treasureDialog.js").catch((error) => {
+    console.warn("Pré-carga do módulo de tesouros falhou", error);
+  });
+  if ("requestIdleCallback" in window) window.requestIdleCallback(prefetch);
+  else setTimeout(prefetch, 2000);
 }
 
 boot();
