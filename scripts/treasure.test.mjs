@@ -275,13 +275,278 @@ test("start validation", () => {
   assert.equal(nextStep(startTable("8-2", { tier: "maior" })).tableId, "8-2/maior");
 });
 
-test("items column: '—' ends the chain; other kinds are not yet supported", () => {
+test("items column: '—' ends the chain", () => {
   const [state] = startTreasure({ challengeRating: "7", column: "items", mode: "padrão" });
   assert.equal(nextStep(state).tableId, "8-1/7/items");
   const done = applyRoll(state, 10);
   assert.equal(nextStep(done), null);
   assert.deepEqual(done.gains, []);
-  assert.throws(() => applyRoll(state, 50), /ainda não/);
+});
+
+// ---------- Motor de itens (Task 5) ----------
+
+// Fração que faz randomInt(rng, 1, sides) devolver `value`.
+const face = (value, sides) => (value - 0.5) / sides;
+
+// rng que devolve as frações da lista e depois recorre a `fallback`; conta as chamadas.
+function scriptedRng(fractions, fallback = createRng("roteiro")) {
+  const queue = [...fractions];
+  const rng = () => { rng.calls++; return queue.length ? queue.shift() : fallback(); };
+  rng.calls = 0;
+  return rng;
+}
+
+const itemsChain = (nd) => startTreasure({ challengeRating: nd, column: "items", mode: "padrão" })[0];
+const itemGain = (name, category, details = {}, extra = {}) => ({ kind: "item", name, category, ...extra, details });
+
+test("diverse: d% on 8-3 gives an item without price", () => {
+  const s1 = applyRoll(itemsChain("1"), 50);
+  assert.equal(nextStep(s1).tableId, "8-3");
+  assert.equal(nextStep(s1).die, "d%");
+  const done = applyRoll(s1, 10);
+  assert.equal(nextStep(done), null);
+  assert.deepEqual(done.gains, [itemGain("Bálsamo restaurador", "diverso")]);
+  assert.equal("price" in done.gains[0], false);
+});
+
+test("equipment: type 2 (arma) and d% 40 on 8-4 gives Espada longa", () => {
+  const s1 = applyRoll(itemsChain("1"), 70);
+  const type = nextStep(s1);
+  assert.equal(type.kind, "expression");
+  assert.equal(type.die, "1d6");
+  assert.equal(type.tableId, "8-1/1/items");
+  assert.match(type.reason, /arma/);
+  const s2 = applyRoll(s1, 2);
+  assert.equal(s2.steps.at(-1).outcome.type, "arma");
+  assert.equal(nextStep(s2).tableId, "8-4/arma");
+  const done = applyRoll(s2, 40);
+  assert.equal(nextStep(done), null);
+  assert.deepEqual(done.gains, [itemGain("Espada longa", "arma")]);
+  assert.deepEqual(done.steps.map((s) => s.parentId), [null, "1", "1.1"]);
+  const armor = feed(itemsChain("1"), [70, 5, 60]);
+  assert.deepEqual(armor.gains, [itemGain("Escudo leve", "escudo")]);
+  assert.deepEqual(feed(itemsChain("1"), [70, 6, 1]).gains, [itemGain("Bolsa de pó", "esotérico")]);
+});
+
+test("superior with 2 improvements: 8-5 twice, duplicates and counts-as-two reroll as children", () => {
+  const s1 = feed(itemsChain("5"), [95, 1, 40]);
+  assert.equal(s1.pending.length, 2);
+  for (const r of s1.pending) assert.equal(r.tableId, "8-5/arma");
+  const s2 = applyRoll(s1, 14); // Certeira
+  const s3 = applyRoll(s2, 14); // Certeira de novo
+  const rejected = s3.steps.at(-1);
+  assert.equal(rejected.outcome.rejected, "repetida");
+  const reroll = nextStep(s3);
+  assert.equal(reroll.id, `${rejected.id}.1`);
+  assert.equal(reroll.tableId, "8-5/arma");
+  assert.match(reroll.reason, /repetida/);
+  const s4 = applyRoll(s3, 1); // Atroz conta como duas, mas resta 1
+  const tooBig = s4.steps.at(-1);
+  assert.equal(tooBig.outcome.rejected, "conta como duas");
+  assert.equal(nextStep(s4).id, `${tooBig.id}.1`);
+  assert.match(nextStep(s4).reason, /conta como duas/);
+  const done = applyRoll(s4, 81); // Precisa
+  assert.equal(nextStep(done), null);
+  assert.deepEqual(done.gains, [itemGain("Espada longa (certeira, precisa)", "arma", { improvements: ["Certeira", "Precisa"] })]);
+  const ids = done.steps.map((s) => s.id);
+  assert.equal(new Set(ids).size, ids.length);
+});
+
+test("superior: counts-as-two fills both slots; on a 1-improvement item it rerolls", () => {
+  const atroz = feed(itemsChain("5"), [95, 1, 40, 1]);
+  assert.equal(nextStep(atroz), null);
+  assert.deepEqual(atroz.gains, [itemGain("Espada longa (atroz)", "arma", { improvements: ["Atroz"] })]);
+  const s1 = feed(itemsChain("2"), [95, 1, 1]);
+  assert.equal(s1.pending.length, 1);
+  const s2 = applyRoll(s1, 91); // Pungente
+  assert.equal(s2.steps.at(-1).outcome.rejected, "conta como duas");
+  assert.match(nextStep(s2).reason, /conta como duas/);
+  assert.equal(nextStep(s2).tableId, "8-5/arma");
+});
+
+test("material sub-roll is a step of its own", () => {
+  const s1 = feed(itemsChain("2"), [95, 4, 11, 41]); // Completa, Material especial
+  const sub = nextStep(s1);
+  assert.equal(sub.die, "1d6");
+  assert.equal(sub.id, `${s1.steps.at(-1).id}.1`);
+  assert.match(sub.reason, /adamante/);
+  const done = applyRoll(s1, 2);
+  const step = done.steps.at(-1);
+  assert.equal(step.parentId, s1.steps.at(-1).id);
+  assert.equal(step.outcome.option, "adamante");
+  assert.deepEqual(done.gains, [itemGain("Completa (material especial: adamante)", "armadura",
+    { improvements: ["Material especial"], material: "adamante" })]);
+});
+
+test("potions: 1d3+1 with +% adds 20 to each 8-12 d%", () => {
+  const s1 = applyRoll(itemsChain("12"), 50);
+  assert.equal(nextStep(s1).kind, "expression");
+  assert.equal(nextStep(s1).die, "1d3+1");
+  const s2 = applyRoll(s1, 3);
+  assert.equal(s2.pending.length, 3);
+  for (const r of s2.pending) {
+    assert.equal(r.tableId, "8-12");
+    assert.equal(r.bonus, 20);
+  }
+  const done = feed(s2, [80, 1, 50]);
+  assert.deepEqual(done.steps.slice(-3).map((s) => s.effective), [100, 21, 70]);
+  assert.deepEqual(done.gains, [
+    itemGain("Curar Ferimentos (11d8+11 PV)", "poção", {}, { price: 3000 }),
+    itemGain("Luz (óleo)", "poção", {}, { price: 30 }),
+    itemGain("Metamorfose", "poção", {}, { price: 270 }),
+  ]);
+  const one = applyRoll(itemsChain("4"), 60); // 1 poção*
+  assert.equal(one.pending.length, 1);
+  assert.equal(nextStep(one).bonus, 20);
+  const plain = applyRoll(itemsChain("1"), 95); // 1 poção
+  assert.equal(nextStep(plain).bonus, 0);
+  assert.deepEqual(applyRoll(plain, 1).gains, [itemGain("Abençoar Alimentos (óleo)", "poção", {}, { price: 30 })]);
+});
+
+test("magic minor weapon: one enchantment on 8-8", () => {
+  const s1 = feed(itemsChain("9"), [100, 1, 40]);
+  assert.equal(s1.pending.length, 1);
+  assert.equal(nextStep(s1).tableId, "8-8");
+  const done = applyRoll(s1, 1);
+  assert.deepEqual(done.gains, [itemGain("Espada longa (ameaçadora)", "arma", { enchantments: ["Ameaçadora"] }, { tier: "menor" })]);
+  // tipo 3 = armadura, 4-6 = acessório na rolagem de mágico
+  assert.equal(nextStep(feed(itemsChain("9"), [100, 3])).tableId, "8-4/armadura");
+  assert.equal(nextStep(feed(itemsChain("9"), [100, 4])).tableId, "8-13");
+});
+
+test("magic: counts-as-two rerolls on a minor item and is accepted on a medium one", () => {
+  const s1 = feed(itemsChain("9"), [100, 1, 40, 65]); // Magnífica
+  assert.equal(s1.steps.at(-1).outcome.rejected, "conta como duas");
+  assert.match(nextStep(s1).reason, /conta como duas/);
+  assert.equal(nextStep(s1).tableId, "8-8");
+  const done = applyRoll(s1, 54);
+  assert.deepEqual(done.gains, [itemGain("Espada longa (formidável)", "arma", { enchantments: ["Formidável"] }, { tier: "menor" })]);
+  const medium = feed(itemsChain("13"), [100, 1, 40, 65]);
+  assert.equal(nextStep(medium), null);
+  assert.deepEqual(medium.gains, [itemGain("Espada longa (magnífica)", "arma", { enchantments: ["Magnífica"] }, { tier: "médio" })]);
+});
+
+test("magic: 'specific' swaps the item for 8-9 and discards enchantments", () => {
+  const s1 = feed(itemsChain("13"), [100, 1, 40, 1, 95]);
+  assert.equal(s1.pending.length, 1);
+  assert.equal(nextStep(s1).tableId, "8-9");
+  const done = applyRoll(s1, 61);
+  assert.equal(nextStep(done), null);
+  assert.deepEqual(done.gains, [itemGain("Arco do poder", "arma", { specific: true }, { price: 90000, tier: "maior" })]);
+  // específica no primeiro encanto descarta o segundo, que ainda não foi rolado
+  const first = feed(itemsChain("13"), [100, 1, 40, 95]);
+  assert.equal(first.pending.length, 1);
+  assert.equal(nextStep(first).tableId, "8-9");
+  const armor = feed(itemsChain("9"), [100, 3, 11, 95]);
+  assert.equal(nextStep(armor).tableId, "8-11");
+  assert.deepEqual(applyRoll(armor, 21).gains, [itemGain("Escudo do conjurador", "escudo", { specific: true }, { price: 45000, tier: "maior" })]);
+});
+
+test("magic armor: shield-only rerolls on armor, not on shields", () => {
+  const s1 = feed(itemsChain("9"), [100, 3, 11, 15]); // Completa, Animado
+  assert.equal(nextStep(s1).tableId, "8-10");
+  assert.equal(s1.steps.at(-1).outcome.rejected, "apenas escudos");
+  assert.match(nextStep(s1).reason, /apenas escudos/);
+  assert.deepEqual(applyRoll(s1, 1).gains, [itemGain("Completa (abascante)", "armadura", { enchantments: ["Abascante"] }, { tier: "menor" })]);
+  const shield = feed(itemsChain("9"), [100, 3, 56, 15]);
+  assert.deepEqual(shield.gains, [itemGain("Escudo leve (animado)", "escudo", { enchantments: ["Animado"] }, { tier: "menor" })]);
+});
+
+test("magic: duplicate enchantment rerolls; Anticriatura rolls the creature", () => {
+  const s1 = feed(itemsChain("17"), [100, 1, 40, 1, 1]); // maior: Ameaçadora duas vezes
+  assert.equal(s1.steps.at(-1).outcome.rejected, "repetida");
+  assert.match(nextStep(s1).reason, /repetida/);
+  const s2 = feed(s1, [6]); // Anticriatura
+  assert.equal(nextStep(s2).die, "1d6");
+  assert.match(nextStep(s2).reason, /morto-vivo/);
+  const done = feed(s2, [5, 54]);
+  assert.equal(nextStep(done), null);
+  assert.deepEqual(done.gains, [itemGain("Espada longa (ameaçadora, anticriatura: morto-vivo, formidável)", "arma",
+    { enchantments: ["Ameaçadora", "Anticriatura", "Formidável"], creature: "morto-vivo" }, { tier: "maior" })]);
+});
+
+test("magic medium accessory: d% on 8-14", () => {
+  const s1 = feed(itemsChain("13"), [100, 4]);
+  assert.equal(nextStep(s1).tableId, "8-14");
+  assert.deepEqual(applyRoll(s1, 95).gains, [itemGain("Tiara da sapiência", "acessório", {}, { price: 25500, tier: "médio" })]);
+  assert.equal(nextStep(feed(itemsChain("17"), [100, 6])).tableId, "8-15");
+});
+
+test("2D in Consultar: the GM enters the chosen die", () => {
+  const s1 = applyRoll(itemsChain("4"), 31); // Equipamento^
+  const req = nextStep(s1);
+  assert.equal(req.kind, "twoDice");
+  assert.equal(req.die, "1d6");
+  assert.match(req.reason, /2D/);
+  const snapshot = structuredClone(s1);
+  assert.throws(() => applyRoll(s1, 7), RangeError);
+  assert.throws(() => applyRoll(s1, 3, { dice: [2, 6] }), RangeError);
+  assert.throws(() => applyRoll(s1, 2, { dice: [2, 9] }), RangeError);
+  assert.deepEqual(s1, snapshot);
+  const withDice = applyRoll(s1, 6, { dice: [2, 6] });
+  assert.deepEqual(withDice.steps.at(-1).dice, [2, 6]);
+  assert.equal(withDice.steps.at(-1).chosen, 6);
+  assert.equal(nextStep(withDice).tableId, "8-4/esotérico");
+  const bare = applyRoll(s1, 4);
+  assert.equal(bare.steps.at(-1).chosen, 4);
+  assert.equal(nextStep(bare).tableId, "8-4/armadura");
+});
+
+test("2D in Rolar: equal dice need no draw; different dice pick one with equal chance", () => {
+  const s1 = applyRoll(itemsChain("4"), 31);
+  const same = scriptedRng([face(3, 6), face(3, 6), face(40, 100)]);
+  const a = resolveWithDice(s1, same);
+  assert.equal(same.calls, 3);
+  const typeStep = a.steps.find((s) => s.kind === "twoDice");
+  assert.deepEqual(typeStep.dice, [3, 3]);
+  assert.equal(typeStep.chosen, 3);
+  assert.equal(a.gains[0].category, "arma");
+  const fallback = createRng("2d");
+  let low = 0;
+  for (let i = 0; i < 1000; i++) {
+    const done = resolveWithDice(s1, scriptedRng([face(2, 6), face(6, 6)], fallback));
+    const step = done.steps.find((s) => s.kind === "twoDice");
+    assert.deepEqual(step.dice, [2, 6]);
+    assert.ok([2, 6].includes(step.chosen));
+    if (step.chosen === 2) low++;
+  }
+  assert.ok(low >= 400 && low <= 600, `${low} de 1000`);
+});
+
+test("2D on superior and magic type rolls", () => {
+  assert.equal(nextStep(applyRoll(itemsChain("4"), 90)).kind, "twoDice");
+  const magic = applyRoll(itemsChain("20"), 60);
+  assert.equal(nextStep(magic).kind, "twoDice");
+  assert.equal(nextStep(applyRoll(magic, 5, { dice: [5, 1] })).tableId, "8-15");
+});
+
+test("step rows are copies: mutating them does not touch the tables", () => {
+  const done = feed(itemsChain("1"), [70, 2, 40]);
+  done.steps.at(-1).row.result.name = "Mudado";
+  done.steps[0].row.min = 999;
+  assert.equal(row("8-4/arma", 39).result.name, "Espada longa");
+  assert.equal(BASIC_BOOK_TABLES["8-1/1/items"].rows.find((r) => r.max === 90).min, 66);
+});
+
+test("resolveWithDice resolves item chains for every ND", () => {
+  const rng = createRng("itens");
+  for (const nd of ["0.25", "0.5", ...Array.from({ length: 20 }, (_, i) => String(i + 1))]) {
+    for (let i = 0; i < 40; i++) {
+      const state = itemsChain(nd);
+      const done = resolveWithDice(state, rng);
+      assert.equal(nextStep(done), null);
+      assert.deepEqual(state.steps, []);
+      const ids = done.steps.map((s) => s.id);
+      assert.equal(new Set(ids).size, ids.length, nd);
+      for (const s of done.steps) if (s.parentId) assert.ok(ids.includes(s.parentId));
+      for (const g of done.gains) {
+        assert.equal(g.kind, "item");
+        assert.equal(typeof g.name, "string");
+        assert.ok(g.category);
+        assert.equal(typeof g.details, "object");
+      }
+    }
+  }
 });
 
 test("resolveWithDice resolves money chains with a seeded rng", () => {
@@ -303,18 +568,20 @@ test("resolveWithDice resolves money chains with a seeded rng", () => {
   assert.deepEqual(a, b);
 });
 
-test("performance: 198 ND 20 chains in Dobro under 500 ms", () => {
-  const rng = createRng("desempenho");
-  const t0 = performance.now();
-  let chains = 0;
-  for (let i = 0; i < 99; i++) {
-    for (const state of startTreasure({ challengeRating: "20", column: "money", mode: "dobro" })) {
-      resolveWithDice(state, rng);
-      chains++;
+test("performance: 198 ND 20 chains in Dobro under 500 ms, per column", () => {
+  for (const column of ["money", "items"]) {
+    const rng = createRng(`desempenho-${column}`);
+    const t0 = performance.now();
+    let chains = 0;
+    for (let i = 0; i < 99; i++) {
+      for (const state of startTreasure({ challengeRating: "20", column, mode: "dobro" })) {
+        resolveWithDice(state, rng);
+        chains++;
+      }
     }
+    const ms = performance.now() - t0;
+    console.log(`# perf ${column}: ${chains} cadeias em ${ms.toFixed(1)} ms`);
+    assert.equal(chains, 198);
+    assert.ok(ms < 500, `${column}: ${ms} ms`);
   }
-  const ms = performance.now() - t0;
-  console.log(`# perf: ${chains} cadeias em ${ms.toFixed(1)} ms`);
-  assert.equal(chains, 198);
-  assert.ok(ms < 500, `${ms} ms`);
 });
