@@ -2663,8 +2663,9 @@ export const bruxoDaTormenta = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 22,
         "bookPage": 20
     },
     stats: {

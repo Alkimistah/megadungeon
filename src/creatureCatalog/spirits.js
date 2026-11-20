@@ -1131,7 +1131,7 @@ export const stagh = {
     description: [],
     role: "minion",
     roleSource: "screenshot-review",
-    source: { book: "Ameaças de Arton", pdfFile: "prints enviados pelo usuário", pdfPage: null, bookPage: null },
+    source: { book: "Ameaças de Arton", edition: "1ª edição, novembro de 2023", pdfFile: "T20 Ameacas de Arton.pdf", pdfPage: 356, bookPage: 354 },
     stats: {
         initiative: 6, perception: 4, defense: 22, fortitude: 7, reflex: 12, will: 4,
         hitPoints: 35,
@@ -1144,7 +1144,7 @@ export const stagh = {
         { name: "Corpo a Corpo", text: "Duas garras +16 (1d6+4 mais 1d6 frio)." }
     ],
     abilities: [
-        { name: "Aura de Frio", timing: "passiva", text: "No início de cada turno do stagh, todas as criaturas em um raio de 9m sofrem 1d6+3 pontos de dano de frio (Fort CD 17 reduz à metade)." }
+        { name: "Aura de Frio", timing: null, text: "No início de cada turno do stagh, todas as criaturas em um raio de 9m sofrem 1d6+3 pontos de dano de frio (Fort CD 17 reduz à metade)." }
     ],
     equipment: null,
     treasure: "1 dose de éter elemental (frio) (CD 18 para extrair).",

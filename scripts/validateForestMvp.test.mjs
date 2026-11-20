@@ -658,6 +658,64 @@ test("Ameaças realm of the dead sheets cite the full PDF and the Arquilich deat
   assert.match(death, /perda de PV.*0 PV/);
 });
 
+test("Uivantes sheets from screenshots cite the full PDF and use the standard sheet layout", () => {
+  const pages = [["golem-de-nor-medio", 351, "solo"], ["soterrado-vagante", 355, "minion"], ["stagh", 356, "minion"]];
+  for (const [id, pdfPage, role] of pages) {
+    const creature = getCreatureById(id);
+    assert.deepEqual(creature.sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2
+    }], id);
+    assert.equal(creature.role, role, id);
+    assert.deepEqual(creature.actions.map(action => action.name), ["Corpo a Corpo"], id);
+    for (const ability of creature.abilities) {
+      assert.ok([null, "livre", "padrão", "movimento", "completa", "reação"].includes(ability.timing), `${id} ${ability.name}`);
+      assert.ok(!ability.text.startsWith(ability.name), `${id} ${ability.name}`);
+    }
+  }
+  const ability = (id, name) => getCreatureById(id).abilities.find(entry => entry.name === name);
+  assert.equal(getCreatureById("golem-de-nor-medio").subtype, null);
+  assert.equal(ability("golem-de-nor-medio", "Aura Congelante").timing, "padrão");
+  assert.equal(ability("soterrado-vagante", "Agarrar Aprimorado").timing, "livre");
+  assert.equal(ability("soterrado-vagante", "Constrição Congelante").timing, "padrão");
+  assert.match(ability("soterrado-vagante", "Constrição Congelante").text, /aumenta em \+1d6 para cada rodada consecutiva/);
+});
+
+test("Ameaças Tormenta area sheets cite the full PDF", () => {
+  const pages = [
+    ["alma-acorrentada", 20], ["bruxo-da-tormenta", 22], ["arquibruxo-da-tormenta", 22, 23], ["enxame-infernal", 24],
+    ["esmagador-coletivo", 24], ["infecto", 25], ["turba-de-infectos", 25], ["lefeu-veridak", 26], ["lefeu-hurobakk", 27],
+    ["lefeu-burodron", 28], ["lefeu-morgadrel", 28], ["lefeu-ezzayn", 29], ["gatzvalith-lorde-da-tormenta", 31]
+  ];
+  for (const [id, pdfPage, pdfPageEnd] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }], id);
+  }
+});
+
+test("every ND S and S+ sheet with Maior que a Morte states the death immunity threshold", () => {
+  const sheets = creatureCatalog.filter(creature => ["S", "S+"].includes(creature.challengeRating));
+  let checked = 0;
+  for (const creature of sheets) {
+    const ability = creature.abilities.find(entry => entry.name === "Maior que a Morte");
+    if (!ability) continue;
+    checked += 1;
+    assert.match(ability.text, /pelo menos metade dos PV.*imune a efeitos de morte instantânea/, creature.id);
+    assert.match(ability.text, /perda de PV.*0 PV/, creature.id);
+    assert.doesNotMatch(ability.text, /possuem um status especial/, creature.id);
+  }
+  assert.equal(checked, 7);
+});
+
 test("Dragão Celestial Venerável keeps the undead clause of Intervenção Divina", () => {
   const { abilities } = getCreatureById("dragao-celestial-veneravel");
   const { text } = abilities.find(ability => ability.name === "Intervenção Divina");

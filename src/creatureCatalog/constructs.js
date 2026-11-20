@@ -264,24 +264,17 @@ export const engenhoDeGuerraGoblin = {
     skillsText: null
 };
 
-const ameacasArtonSupplementalSource = {
-    book: "Ameaças de Arton",
-    pdfFile: "prints enviados pelo usuário",
-    pdfPage: null,
-    bookPage: null
-};
-
 export const golemDeNorMedio = {
     id: "golem-de-nor-medio",
     name: "Golem de Nor Médio",
     type: "construct",
-    subtype: "nor",
+    subtype: null,
     size: "Médio",
     challengeRating: 1,
     description: [],
     role: "solo",
     roleSource: "screenshot-review",
-    source: { book: "Ameaças de Arton", pdfFile: "prints enviados pelo usuário", pdfPage: null, bookPage: null },
+    source: { book: "Ameaças de Arton", edition: "1ª edição, novembro de 2023", pdfFile: "T20 Ameacas de Arton.pdf", pdfPage: 351, bookPage: 349 },
     stats: {
         initiative: 3, perception: 6, defense: 17, fortitude: 11, reflex: -1, will: 5,
         hitPoints: 35,
@@ -291,11 +284,12 @@ export const golemDeNorMedio = {
         attributes: { str: 3, dex: 0, con: 3, int: null, wis: 0, cha: -5 }
     },
     actions: [
-        { name: "Corpo a Corpo", text: "Espada longa +9 (1d8+9, 19)." },
-        { name: "Aura Congelante", text: "Aura Congelante (Padrão) Uma vez por cena, o golem de Nor recebe 25 PV temporários. Se uma criatura acertar um ataque corpo a corpo contra o golem enquanto ele tem estes PV temporários, fica enredada (Fort CD 14 evita)." }
+        { name: "Corpo a Corpo", text: "Espada longa +9 (1d8+9, 19)." }
     ],
-    abilities: [],
-    equipment: "Escudo pesado, espada longa.",
+    abilities: [
+        { name: "Aura Congelante", timing: "padrão", text: "Uma vez por cena, o golem de Nor recebe 25 PV temporários. Se uma criatura acertar um ataque corpo a corpo contra o golem enquanto ele tem estes PV temporários, fica enredada (Fort CD 14 evita)." }
+    ],
+    equipment: "Escudo pesado, espada longa",
     treasure: "Nenhum.",
     skillsText: null
 };
@@ -653,8 +647,9 @@ export const esmagadorColetivo = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 24,
         "bookPage": 22
     },
     stats: {

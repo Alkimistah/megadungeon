@@ -3362,9 +3362,12 @@ export const arquibruxoDaTormenta = {
     description: [],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 3,
-        "bookPage": 20
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 22,
+        "bookPage": 20,
+        "pdfPageEnd": 23,
+        "bookPageEnd": 21
     },
     stats: {
         "initiative": 13,
@@ -3480,8 +3483,9 @@ export const enxameInfernal = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 24,
         "bookPage": 22
     },
     stats: {
@@ -3559,8 +3563,9 @@ export const gatzvalithLordeDaTormenta = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 12,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 31,
         "bookPage": 29
     },
     stats: {
@@ -3608,7 +3613,7 @@ export const gatzvalithLordeDaTormenta = {
         {
             "name": "Maior que a Morte",
             "timing": null,
-            "text": "Criaturas de ND S e S+ possuem um status especial. Para estatísticas não listadas em suas fichas, são consideradas criaturas de ND 20; para habilidades de outras criaturas, seu ND é maior que 20, impedindo efeitos limitados pelo nível do alvo."
+            "text": "Enquanto tiver pelo menos metade dos PV, Gatzvalith é imune a efeitos de morte instantânea, inclusive os que aprisionam ou destroem seu corpo ou alma. Dano ou perda de PV ainda pode reduzi-lo a 0 PV ou menos. Como criatura de ND S+, ele conta como ND 20 para estatísticas ausentes da ficha e como ND superior a 20 para habilidades de outras criaturas."
         },
         {
             "name": "Percepção Perfeita",
@@ -3693,8 +3698,9 @@ export const lefeuBurodron = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 28,
         "bookPage": 26
     },
     stats: {
@@ -3772,8 +3778,9 @@ export const lefeuEzzayn = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 29,
         "bookPage": 27
     },
     stats: {
@@ -3865,8 +3872,9 @@ export const lefeuHurobakk = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 27,
         "bookPage": 25
     },
     stats: {
@@ -3949,8 +3957,9 @@ export const lefeuMorgadrel = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 28,
         "bookPage": 26
     },
     stats: {
@@ -4034,8 +4043,9 @@ export const lefeuVeridak = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 26,
         "bookPage": 24
     },
     stats: {
@@ -4642,7 +4652,7 @@ export const avatarDeAharadak = {
         {
             "name": "Maior que a Morte",
             "timing": null,
-            "text": "Criaturas de ND S e S+ possuem um status especial. Para estatísticas não listadas em suas fichas, são consideradas criaturas de ND 20; para habilidades de outras criaturas, seu ND é maior que 20, impedindo efeitos limitados pelo nível do alvo."
+            "text": "Enquanto tiver pelo menos metade dos PV, o Avatar de Aharadak é imune a efeitos de morte instantânea, inclusive os que aprisionam ou destroem seu corpo ou alma. Dano ou perda de PV ainda pode reduzi-lo a 0 PV ou menos. Como criatura de ND S, ele conta como ND 20 para estatísticas ausentes da ficha e como ND superior a 20 para habilidades de outras criaturas."
         },
         {
             "name": "Agarrar Aprimorado",
@@ -6387,7 +6397,7 @@ export const sckharDragaoReiDoFogo = {
         {
             "name": "Maior que a Morte",
             "timing": null,
-            "text": "Criaturas de ND S e S+ possuem um status especial. Para estatísticas não listadas em suas fichas, são consideradas criaturas de ND 20; para habilidades de outras criaturas, seu ND é maior que 20, impedindo efeitos limitados pelo nível do alvo."
+            "text": "Enquanto tiver pelo menos metade dos PV, Sckhar é imune a efeitos de morte instantânea, inclusive os que aprisionam ou destroem seu corpo ou alma. Dano ou perda de PV ainda pode reduzi-lo a 0 PV ou menos. Como criatura de ND S+, ele conta como ND 20 para estatísticas ausentes da ficha e como ND superior a 20 para habilidades de outras criaturas."
         },
         {
             "name": "Aqui Está, Aqui Pertence",

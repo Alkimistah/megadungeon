@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. As **319 fichas auditadas** estão publicadas. Familiares ficou registrado como fora do catálogo. De Reinos de Moreania a Trolls Nobres não há fichas no catálogo, e o próximo passo depende de decisão. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. Das **335 fichas auditadas**, **319 estão publicadas** e **16 estão no trabalho local**. Todas as fichas de Ameaças do catálogo foram conferidas. Familiares ficou registrado como fora do catálogo. De Reinos de Moreania a Trolls Nobres não há fichas no catálogo, e o próximo passo depende de decisão. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -881,6 +881,50 @@ Os 144 campos numéricos conferidos coincidem com o catálogo. A contagem inclui
 
 **Anotações de apresentação.** Aura de Medo do Arquilich traz a marca de habilidade mágica. Finalmente Livres do Cemitério Vivo mantém a remissão a Tormenta20, p. 298. Os quadros de Reforços listam criaturas de outras seções.
 
+## Uivantes
+
+| Ficha | ND | Papel impresso | Página impressa | Página no PDF integral |
+|---|---:|---|---:|---:|
+| Golem de Nor Médio | 1 | Solo | 349 | 351 |
+| Soterrado Vagante | 2 | Lacaio | 353 | 355 |
+| Stagh | 3 | Lacaio | 354 | 356 |
+
+O bloco Uivantes, pp. 348–357 impressas, traz 15 fichas. Só estas três estão no catálogo, cadastradas originalmente a partir de prints enviados pelo usuário. Os 42 campos numéricos conferidos coincidem com o livro, e os três papéis impressos coincidem com o catálogo. As referências agora apontam para o PDF integral, e “prints enviados pelo usuário” deixa de ser citado.
+
+**Correção de formato.** Os cadastros vindos de prints não seguiam o padrão das demais fichas. Aura Congelante do Golem e Agarrar Aprimorado e Constrição Congelante do Soterrado estavam como ataques, com nome e execução repetidos no texto. Agora são habilidades com execução padrão, livre e padrão. Aura de Frio do Stagh e Esquife de Gelo do Soterrado usavam a execução “passiva”, que não existe no livro, e passam a não ter execução, como as demais habilidades contínuas. O Golem perde o subtipo “nor”, ausente da ficha impressa, e o ponto final do equipamento. Os papéis explícitos não mudaram, e um teste dos andares 11–20 fixa referências, papéis e formato. O QA dos andares 11–20 no Chrome passou contra o build local.
+
+**Fichas do bloco fora do catálogo.** Golem de Nor Grande e Enorme, Carcaju, Mamute, Lyuba, Minotauro da Manada e sua versão de ND 6, Ogro Furioso, Keylor, Urso das Neves e os dois Vermes do Gelo não estão no catálogo. Ficam junto da decisão pendente sobre os blocos de Reinos de Moreania a Trolls Nobres.
+
+**Anotações de apresentação.** O éter elemental do Stagh traz o ícone de novo item. Os quadros Raça Variante: Soterrado e o Familiar do Stagh ficam fora das fichas.
+
+## Áreas de Tormenta
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Alma Acorrentada | 7 | Lacaio | 18 | 20 |
+| Bruxo da Tormenta | 6 | Especial | 20 | 22 |
+| Arquibruxo da Tormenta | 14 | Especial | 20–21 | 22–23 |
+| Enxame Infernal | 8 | Solo, com Enxame | 22 | 24 |
+| Esmagador Coletivo | 15 | Solo | 22 | 24 |
+| Infecto | 3 | Lacaio | 23 | 25 |
+| Turba de Infectos | 7 | Lacaio, com Bando | 23 | 25 |
+| Lefeu, Veridak | 8 | Lacaio | 24 | 26 |
+| Lefeu, Hurobakk | 9 | Solo | 25 | 27 |
+| Lefeu, Burodron | 11 | Solo | 26 | 28 |
+| Lefeu, Morgadrel | 13 | Solo | 26 | 28 |
+| Lefeu, Ezzayn | 17 | Lacaio, com Bando e Enxame | 27 | 29 |
+| Gatzvalith, Lorde da Tormenta | S+ | Solo | 29 | 31 |
+
+Os 184 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM do Bruxo e do Arquibruxo da Tormenta. Os atributos impressos como “—” correspondem ao valor nulo do catálogo. A conferência automática procurou no texto extraído as linhas de estatísticas, atributos e deslocamento, além de dados, CDs e testes das habilidades. Os PV e PM que o layout separou do rótulo, na Alma Acorrentada, no Arquibruxo, no Esmagador Coletivo, no Veridak e no Morgadrel, foram localizados logo após as respectivas linhas de Defesa. Só o Arquibruxo continua na página seguinte. As Armadilhas Vivas, p. 19 impressa, são armadilhas, sem ficha. As 13 fichas agora citam o PDF integral, e o recorte `ameacas de arton p20 ate 31.pdf` deixa de ser citado.
+
+**Regras compartilhadas.** O catálogo já aplica aos lefeu Imunidades Lefeu, Percepção Temporal, Visão Ampla e o texto completo de Insanidade da Tormenta, com os PM e a CD de cada ficha. O Gatzvalith também traz as Habilidades Lekael do quadro da p. 29. O quadro Ezzayn Especiais aparece como habilidade do Ezzayn, com as três variantes e o ND 18 para recompensas.
+
+**Maior que a Morte.** O Gatzvalith imprime a habilidade só na linha de defesas. O texto agora explicita a imunidade à morte instantânea enquanto ele tiver pelo menos metade dos PV. O mesmo texto foi completado no Avatar de Aharadak, do Culto, e em Sckhar, dos Dragões, que eram as últimas fichas com a descrição genérica. Um teste dos andares 11–20 cobre as sete fichas de ND S e S+ que têm a habilidade.
+
+**Papéis.** Infecto, Turba de Infectos, Veridak e Ezzayn são Lacaio no livro e Especial no catálogo. O Gatzvalith é Solo no livro e fica sem papel no catálogo, como as demais fichas de ND S e S+. Os papéis atuais foram preservados. Os outros oito coincidem.
+
+**Anotações de apresentação.** Cuspir Enxame, Mente Aberrante e Raio Arcano do Bruxo e Magia Acelerada e Raio Arcano do Arquibruxo trazem a marca de habilidade mágica. Momento de Tormenta e o Rompedor da Realidade trazem o ícone de nova magia ou novo item.
+
 ## Pendências e ponto de retomada
 
 Situação em 19 de novembro de 2026.
@@ -912,9 +956,11 @@ Situação em 19 de novembro de 2026.
 | Povos-Trovão | 264–273 | 12 | Publicado |
 | Puristas | 274–283 | 11 | Publicado |
 | Reino dos Mortos | 284–295 | 10 | Publicado |
-| **Total** | | **319** | **Publicadas** |
+| Uivantes | 348–357 | 3 | Validado localmente |
+| Áreas de Tormenta | 18–29 | 13 | Validado localmente |
+| **Total** | | **335** | **319 publicadas e 16 locais** |
 
-As 319 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
+As 335 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
 
 Os nove blocos de Elementais a Kobolds foram publicados em `18952eb`, com as referências atualizadas, as versões do Livro Básico de Gnoll Saqueador, Gárgula, Golem de Ferro e Capelão de Guerra, a versão de Deuses de Arton do Avatar de Kallyadranoch e as regras gerais de kobold nas fichas. As fichas de Ameaças conservam seus IDs, seus papéis atuais e a preferência dos perfis existentes.
 
@@ -924,21 +970,19 @@ Masmorras, Montarias e a retirada dos quadros de parceiro e familiar foram publi
 
 Os seis blocos de Mascotes & Mortos-Vivos a Reino dos Mortos foram publicados em `b0e2361`. Antes do push, passaram o build de produção, os testes de andares 1–10, os 76 testes de andares 11–20 e os testes de missões. Depois do deploy, o QA dos andares 11–20 passou contra o site publicado, sem erros de JavaScript. O bundle publicado não cita os recortes de p. 230 a 297 e traz o Maior que a Morte completo do Arquilich. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44656288338)
 
+Uivantes e Áreas de Tormenta estão validados localmente: passaram o build de produção, os testes de andares 1–10, os 79 testes de andares 11–20, os testes de missões e, para Uivantes, o QA dos andares 11–20 no Chrome contra o build local. A publicação está pendente.
+
 ### O que falta em Ameaças de Arton
 
-Ainda há 16 fichas de Ameaças no catálogo apontando para recortes do PDF ou para prints enviados pelo usuário. A ordem de trabalho segue o sumário, pp. 3–5 impressas, pp. 5–7 do PDF.
+Nenhuma ficha de Ameaças do catálogo cita recortes ou prints. Resta uma decisão de escopo.
 
-1. **Blocos sem fichas no catálogo.** Reinos de Moreania, p. 296, Sanguinárias, p. 306, Sob as Ondas, p. 314, Sszzaazitas, p. 326, e Trolls Nobres, p. 338, não têm nenhuma ficha de Ameaças no catálogo, e os recortes do cadastro original terminam na p. 297 impressa. Mantícora, Serpe e Otyugh, desses blocos, existem só na versão do Livro Básico, e Finntroll, Nagah e Cultista de Sszzaas são fichas próprias do Básico. Falta decidir se esses blocos entram no catálogo, como em Familiares.
-2. **Uivantes**, p. 348 impressa. Só `golem-de-nor-medio`, `stagh` e `soterrado-vagante` estão no catálogo, vindos de prints. Conferir as três com o PDF integral e decidir sobre as demais fichas do bloco.
-3. **Áreas de Tormenta**, p. 18 impressa, p. 20 do PDF. Fica para depois dos blocos acima. As 13 fichas citam o recorte `ameacas de arton p20 ate 31.pdf`. Conferir com a regra compartilhada dos lefeu do Livro Básico, p. 315.
-4. **Maior que a Morte genérico.** Sckhar, Avatar de Aharadak e Gatzvalith ainda usam a descrição geral do ND S como texto da habilidade. Completar como em Tarso e no Arquilich quando Áreas de Tormenta for auditado. Sckhar já está publicado e pode ser corrigido junto.
+1. **Blocos sem fichas no catálogo.** Reinos de Moreania, p. 296, Sanguinárias, p. 306, Sob as Ondas, p. 314, Sszzaazitas, p. 326, e Trolls Nobres, p. 338, não têm nenhuma ficha de Ameaças no catálogo, e os recortes do cadastro original terminam na p. 297 impressa. Mantícora, Serpe e Otyugh, desses blocos, existem só na versão do Livro Básico, e Finntroll, Nagah e Cultista de Sszzaas são fichas próprias do Básico. Das 15 fichas de Uivantes, só três estão no catálogo. Falta decidir se esses blocos e as demais fichas de Uivantes entram no catálogo, como em Familiares.
 
 ### Revisão de apresentação, fora da auditoria
 
 Itens anotados durante os lotes que não alteram números, mas podem melhorar a ficha exibida:
 
 - Bando, p. 14 impressa, e Enxame, p. 15 impressa, estão em `src/generalCreatureAbilities.js`. A integração com a ficha e o combate fica pendente.
-- Conferir Maior que a Morte nas demais fichas de ND S e S+ quando os respectivos lotes forem revisados. Algumas usam a descrição geral do ND como texto da habilidade.
 - As regras compartilhadas dos lefeu e as habilidades dracônicas do Livro Básico poderiam ser expostas nas fichas que dependem delas.
 - Exibir a marca de habilidade mágica, definida na p. 384 impressa, e os asteriscos das magias beneficiadas por itens nas fichas que os usam.
 - Papéis impressos que divergem da inferência do catálogo, como o Bugbear Sentinela, ficam preservados conforme a decisão do Culto. Uma revisão futura pode decidir se o papel impresso deve prevalecer.

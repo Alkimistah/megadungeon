@@ -382,13 +382,6 @@ export const vampiro = {
     skillsText: "Diplomacia +16, Enganação +16, Furtividade +25, Nobreza +13"
 };
 
-const ameacasArtonSupplementalSource = {
-    book: "Ameaças de Arton",
-    pdfFile: "prints enviados pelo usuário",
-    pdfPage: null,
-    bookPage: null
-};
-
 export const soterradoVagante = {
     id: "soterrado-vagante",
     name: "Soterrado Vagante",
@@ -399,7 +392,7 @@ export const soterradoVagante = {
     description: [],
     role: "minion",
     roleSource: "screenshot-review",
-    source: { book: "Ameaças de Arton", pdfFile: "prints enviados pelo usuário", pdfPage: null, bookPage: null },
+    source: { book: "Ameaças de Arton", edition: "1ª edição, novembro de 2023", pdfFile: "T20 Ameacas de Arton.pdf", pdfPage: 355, bookPage: 353 },
     stats: {
         initiative: 2, perception: 3, defense: 20, fortitude: 1, reflex: 5, will: 10,
         hitPoints: 21,
@@ -409,12 +402,12 @@ export const soterradoVagante = {
         attributes: { str: 5, dex: -1, con: 0, int: null, wis: 2, cha: -1 }
     },
     actions: [
-        { name: "Corpo a Corpo", text: "Dois punhos +14 (2d6+6 mais 2 frio)." },
-        { name: "Agarrar Aprimorado", text: "Agarrar Aprimorado (Livre) Punho (teste +16)." },
-        { name: "Constrição Congelante", text: "Constrição Congelante (Padrão) No início de cada um de seus turnos, o soterrado vagante causa 4d6 pontos de dano de frio em cada criatura que estiver agarrando. Esse dano aumenta em +1d6 para cada rodada consecutiva que o soterrado estiver agarrando essa criatura." }
+        { name: "Corpo a Corpo", text: "Dois punhos +14 (2d6+6 mais 2 frio)." }
     ],
     abilities: [
-        { name: "Esquife de Gelo", timing: "passiva", text: "O soterrado sofre 1 ponto de dano adicional por dado de dano de fogo." }
+        { name: "Agarrar Aprimorado", timing: "livre", text: "Punho (teste +16)." },
+        { name: "Constrição Congelante", timing: "padrão", text: "No início de cada um de seus turnos, o soterrado vagante causa 4d6 pontos de dano de frio em cada criatura que estiver agarrando. Esse dano aumenta em +1d6 para cada rodada consecutiva que o soterrado estiver agarrando essa criatura." },
+        { name: "Esquife de Gelo", timing: null, text: "O soterrado sofre 1 ponto de dano adicional por dado de dano de fogo." }
     ],
     equipment: null,
     treasure: "Nenhum.",
@@ -1034,8 +1027,9 @@ export const almaAcorrentada = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 1,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 20,
         "bookPage": 18
     },
     stats: {
@@ -1098,8 +1092,9 @@ export const infecto = {
     ],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 6,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 25,
         "bookPage": 23
     },
     stats: {
@@ -1155,8 +1150,9 @@ export const turbaDeInfectos = {
     description: [],
     source: {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p20 ate 31.pdf",
-        "pdfPage": 6,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 25,
         "bookPage": 23
     },
     stats: {
