@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. Das **187 fichas auditadas**, **73 estão publicadas** e **114 estão no trabalho local**. O próximo bloco é Familiares. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. As **187 fichas auditadas** estão publicadas. O próximo bloco é Familiares. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -656,22 +656,22 @@ Situação em 19 de novembro de 2026.
 | Culto de Aharadak | 52–63 | 11 | Publicado |
 | Dragões | 64–77 | 12 | Publicado |
 | Duyshidakk | 78–87 | 12 | Publicado |
-| Elementais | 88–101 | 14 | Validado localmente |
-| Ermos | 102–113 | 14 | Validado localmente |
-| Gnolls | 114–123 | 13 | Validado localmente |
-| Golens | 124–135 | 12 | Validado localmente |
-| Igreja de Arsenal | 136–143 | 8 | Validado localmente |
-| Igreja de Kallyadranoch | 144–153 | 10 | Validado localmente |
-| Império de Jade | 154–167 | 21 | Validado localmente |
-| Império de Tauron | 168–177 | 12 | Validado localmente |
-| Kobolds | 178–189 | 10 | Validado localmente |
-| **Total** | | **187** | **73 publicadas e 114 locais** |
+| Elementais | 88–101 | 14 | Publicado |
+| Ermos | 102–113 | 14 | Publicado |
+| Gnolls | 114–123 | 13 | Publicado |
+| Golens | 124–135 | 12 | Publicado |
+| Igreja de Arsenal | 136–143 | 8 | Publicado |
+| Igreja de Kallyadranoch | 144–153 | 10 | Publicado |
+| Império de Jade | 154–167 | 21 | Publicado |
+| Império de Tauron | 168–177 | 12 | Publicado |
+| Kobolds | 178–189 | 10 | Publicado |
+| **Total** | | **187** | **Publicadas** |
 
 As 187 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
 
-A última publicação do catálogo foi a de Duyshidakk em `b831a4e`. Os nove blocos locais incluem as referências atualizadas, as versões do Livro Básico de Gnoll Saqueador, Gárgula, Golem de Ferro e Capelão de Guerra e a versão de Deuses de Arton do Avatar de Kallyadranoch na seleção manual. As fichas de Ameaças conservam seus IDs, seus papéis atuais e a preferência dos perfis existentes. A publicação desses lotes está pendente. [Última implantação do catálogo](https://github.com/Alkimistah/megadungeon/actions/runs/44408333570)
+Os nove blocos de Elementais a Kobolds foram publicados em `18952eb`, com as referências atualizadas, as versões do Livro Básico de Gnoll Saqueador, Gárgula, Golem de Ferro e Capelão de Guerra, a versão de Deuses de Arton do Avatar de Kallyadranoch e as regras gerais de kobold nas fichas. As fichas de Ameaças conservam seus IDs, seus papéis atuais e a preferência dos perfis existentes.
 
-A validação local passou no build de produção, nos testes de andares 1–10, nos 65 testes de andares 11–20 e nos testes de missões. O QA no Chrome conferiu a seleção por livro e o fluxo offline do app.
+Antes do push, passaram o build de produção, os testes de andares 1–10, os 65 testes de andares 11–20 e os testes de missões. O QA dos andares 11–20 no Chrome passou contra o site publicado, sem erros de JavaScript, incluindo a seleção por livro e o uso offline após o cache. O bundle publicado traz as sete Detonações Finais opcionais e já não cita os recortes de Elementais, Império de Jade e Kobolds. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44650121973)
 
 ### O que falta em Ameaças de Arton
 
