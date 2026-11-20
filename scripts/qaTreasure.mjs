@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
+import { mkdirSync } from "node:fs";
+import { join } from "node:path";
 import { chromium } from "@playwright/test";
 
 const url = process.env.QA_APP_URL || "http://localhost:5173/megadungeon/";
 const browser = await chromium.launch({ headless: true, executablePath: process.env.QA_CHROME || "/usr/bin/google-chrome", args: ["--no-sandbox"] });
 const errors = [];
+const shotDir = process.env.QA_SCREENSHOT_DIR || "tmp/treasure-qa";
+mkdirSync(shotDir, { recursive: true });
+const shot = name => join(shotDir, name);
 try {
   const page = await browser.newPage({ viewport: { width: 1024, height: 768 }, serviceWorkers: "block" });
   page.on("pageerror", error => errors.push(error.message));
@@ -85,7 +90,11 @@ try {
   // Lote cheio de 11+ tesouros para a captura.
   await rowsLoc.nth(0).locator(".treasure-f-kind").selectOption("nd");
   await page.locator("#treasureDialog .treasure-roll").click();
-  await page.screenshot({ path: process.env.QA_SHOT || "/tmp/claude-1000/-mnt-c-Users-Arthur-OneDrive-Documentos-Mega-Dungeon/9b4a7ac4-9b92-4710-9e4c-7f73d59acc52/scratchpad/img/treasure-rolar.png" });
+  await page.locator("#treasurePanelRoll").evaluate(p => { p.scrollTop = p.scrollHeight; });
+  const lastBottom = await results.last().evaluate(e => e.getBoundingClientRect().bottom);
+  const stripTop = await page.locator("#treasureStrip").evaluate(e => e.getBoundingClientRect().top);
+  assert.ok(lastBottom <= stripTop + 1, `último resultado coberto pela faixa (${lastBottom} > ${stripTop})`);
+  await page.screenshot({ path: shot("treasure-rolar.png") });
 
   await tabs.nth(1).click();
   assert.equal(await tabs.nth(1).getAttribute("aria-selected"), "true");
@@ -97,7 +106,7 @@ try {
   const C = "#treasureDialog .treasure-consult-prompt";
   const step = () => page.locator(`${C} .treasure-c-value`);
   const apply = async v => { await step().fill(String(v)); await page.locator(`${C} .treasure-c-apply`).click(); };
-  await page.screenshot({ path: "/tmp/claude-1000/-mnt-c-Users-Arthur-OneDrive-Documentos-Mega-Dungeon/9b4a7ac4-9b92-4710-9e4c-7f73d59acc52/scratchpad/img/treasure-consultar-setup.png" });
+  await page.screenshot({ path: shot("treasure-consultar-setup.png") });
   const widthOf = () => page.locator("#treasureDialog").evaluate(d => Math.round(d.getBoundingClientRect().width));
   const wConsult = await widthOf();
   await tabs.nth(0).click();
@@ -126,7 +135,7 @@ try {
   await apply(1);
   assert.equal(await page.locator(C).isVisible(), false, "cadeia terminou");
   assert.match(await page.locator("#treasureDialog .treasure-consult-result").innerText(), /1× Adaga/);
-  await page.screenshot({ path: process.env.QA_SHOT_CONSULT || "/tmp/claude-1000/-mnt-c-Users-Arthur-OneDrive-Documentos-Mega-Dungeon/9b4a7ac4-9b92-4710-9e4c-7f73d59acc52/scratchpad/img/treasure-consultar.png" });
+  await page.screenshot({ path: shot("treasure-consultar.png") });
   // Nova consulta reinicia. ND 4 Itens: 40 -> equipamento 2D com aviso; "rolar" em expressão.
   await page.locator("#treasureDialog .treasure-c-reset").click();
   assert.equal(await page.locator("#treasureDialog .treasure-consult-history .treasure-step").count(), 0);

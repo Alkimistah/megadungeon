@@ -107,7 +107,7 @@ Regras:
 
 ### Interface
 
-- **Botão:** fica no cabeçalho, junto ao encontro manual e às missões, com o ícone `streamline-cyber--treasure-chest-open.svg`. Ele abre `<dialog id="treasureDialog">`, cujo módulo é carregado na primeira abertura.
+- **Botão:** fica no cabeçalho, junto ao encontro manual e às missões, com o ícone `streamline-cyber--treasure-chest-open.svg`. Ele abre `<dialog id="treasureDialog">`, cujo módulo é carregado na primeira abertura. Por decisão do PO, a modal segue a do nodo: ocupa a tela inteira (100vw × 100vh, sem bordas arredondadas), usa a moldura escura compartilhada (`var(--page)`, borda e texto claros) e mantém a mesma largura nas duas abas.
 - **Aba Rolar:** uma lista de linhas, cada uma com ND, Quantidade, Tipo (Padrão, Metade ou Dobro) e Colunas (Item + Riqueza, Só Item ou Só Riqueza). Uma linha também pode apontar para uma tabela específica, inclusive uma lista de outro livro, com quantidade. O botão “+ Adicionar rolagem” inclui uma linha, e “✕” a remove. Metade fica desativado em linhas “Só Item”.
   - **Rolar tudo:** gera o lote. Os resultados aparecem agrupados pela linha de entrada, com uma linha numerada por tesouro e a cascata de passos em cada célula. Rolar de novo substitui o lote.
 - **Aba Consultar:** começa em qualquer tabela. A 8-1 pede ND e coluna. Cada passo mostra a tabela e um campo para o valor, e o motor abre o passo seguinte já com a tabela certa.

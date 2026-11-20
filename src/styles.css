@@ -1348,7 +1348,8 @@ svg {
 }
 
 .tactical-map-fullscreen-panel,
-#nodeDialog {
+#nodeDialog,
+#treasureDialog {
   width: 100vw;
   height: 100vh;
   max-width: none;
@@ -1791,6 +1792,7 @@ svg {
 .node-progress-status[data-progress="completed"] { border-color: #98d9b5; }
 
 #nodeDialog,
+#treasureDialog,
 #missionDialog,
 #manualEncounterDialog {
   padding: 0;
@@ -1808,12 +1810,14 @@ svg {
 }
 
 #nodeDialog::backdrop,
+#treasureDialog::backdrop,
 #missionDialog::backdrop,
 #manualEncounterDialog::backdrop {
   background: rgba(10, 7, 5, 0.72);
 }
 
-#nodeDialog {
+#nodeDialog,
+#treasureDialog {
   inset: 0;
   margin: 0;
   overflow: hidden;
@@ -2441,12 +2445,15 @@ svg {
   display: none;
 }
 
-#treasureDialog {
-  width: min(960px, 94vw);
+.treasure-dialog {
+  grid-template-rows: auto auto minmax(0, 1fr);
+  min-height: 0;
 }
 
-.treasure-dialog {
-  width: 100%;
+.treasure-panel {
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 44px;
 }
 
 .treasure-tabs {
@@ -2461,7 +2468,7 @@ svg {
 }
 
 .treasure-tab[aria-selected="true"] {
-  border-color: #d8c8b7;
+  border-color: #f1d6a8;
   font-weight: 700;
 }
 
@@ -3046,7 +3053,7 @@ details.mission-run-guidance p {
 .treasure-input-row label {
   display: grid;
   gap: 4px;
-  color: #3a2f25;
+  color: #d8c8b7;
   font-size: 12px;
 }
 
@@ -3075,7 +3082,7 @@ details.mission-run-guidance p {
 }
 
 .treasure-error {
-  color: #e8806a;
+  color: #ff9b87;
 }
 
 
@@ -3126,7 +3133,7 @@ details.mission-run-guidance p {
 
 .treasure-step-table,
 .treasure-muted {
-  color: #5c4a37;
+  color: #d8c8b7;
 }
 
 .treasure-step-roll {
@@ -3136,9 +3143,10 @@ details.mission-run-guidance p {
 .treasure-footer {
   margin-top: 10px;
   padding: 10px;
-  border: 1px solid #d8c8b7;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #f6efe4;
+  background: var(--surface-alt);
+  color: #f2e6d8;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px 16px;
@@ -3149,9 +3157,10 @@ details.mission-run-guidance p {
   bottom: 0;
   margin: 8px 0 0;
   padding: 6px 10px;
-  border: 1px solid #5c4a37;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #f6efe4;
+  background: var(--surface-alt);
+  color: #f2e6d8;
   font-size: 13px;
   box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.15);
 }
@@ -3192,7 +3201,7 @@ details.mission-run-guidance p {
 .treasure-consult-setup label {
   display: grid;
   gap: 4px;
-  color: #3a2f25;
+  color: #d8c8b7;
   font-size: 12px;
 }
 
@@ -3212,10 +3221,10 @@ details.mission-run-guidance p {
 .treasure-consult-prompt {
   margin: 10px 0;
   padding: 10px;
-  border: 1px solid #5c4a37;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #f6efe4;
-  color: #3a2f25;
+  background: var(--surface-alt);
+  color: #f2e6d8;
 }
 
 .treasure-consult-prompt p {
@@ -3234,7 +3243,7 @@ details.mission-run-guidance p {
 
 .treasure-consult-warning {
   font-weight: 700;
-  color: #8a4b00;
+  color: #f1d6a8;
 }
 
 .treasure-consult-error:empty {
@@ -3242,11 +3251,11 @@ details.mission-run-guidance p {
 }
 
 .treasure-consult-error {
-  color: #a3261a;
+  color: #ff9b87;
 }
 
 .treasure-note {
-  color: #5c4a37;
+  color: #d8c8b7;
 }
 
 .treasure-consult-trail {
