@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { chromium } from "@playwright/test";
 
-// Roteiro offline: a modal de tesouros precisa abrir sem rede depois de uma recarga, ou seja,
-// com o HTML, os assets e o chunk da modal vindos do cache do service worker.
-// Roda contra o build de produção (vite preview), onde o service worker se comporta como em produção.
+// Roteiro offline: a modal de tesouros precisa abrir sem rede depois de uma recarga.
+// Segue o contrato offline de scripts/qaForestMvp.mjs (offlineFlow): controle do service worker, recarga online
+// para os assets passarem pelo SW, recarga sem rede. Roda contra o build de produção (vite preview).
 const url = process.env.QA_APP_URL || "http://localhost:4174/megadungeon/";
 const browser = await chromium.launch({ headless: true, executablePath: process.env.QA_CHROME || "/usr/bin/google-chrome", args: ["--no-sandbox"] });
 const errors = [];
@@ -20,28 +20,30 @@ try {
   const page = await context.newPage();
   page.on("pageerror", error => errors.push(error.message));
 
-  // 1) Carga online: o service worker precisa assumir a página e o cache se formar.
+  // 1) goto, controle do service worker e recarga online (contrato de qaForestMvp.offlineFlow).
   await page.goto(url);
   await passRangeDialog(page);
-  await swControls(page).catch(async () => {
-    // Na primeira visita o service worker registra sem controlar a página: uma recarga online dá o controle.
-    await page.reload();
-    await passRangeDialog(page);
-    await swControls(page);
-  });
-  // Espera o pré-carregamento em tempo ocioso e a gravação do cache.
-  await page.waitForTimeout(3000);
+  await swControls(page);
+  await page.reload();
+  const reloadRange = await page.locator("#rangeDialog[open]").waitFor({ timeout: 4000 }).then(() => true, () => false);
+  if (reloadRange) await passRangeDialog(page);
+  await page.waitForFunction(async () => {
+    const cache = await caches.open("mega-dungeon-v3");
+    const urls = (await cache.keys()).map(request => request.url);
+    return urls.some(u => /\/assets\/.*\.js$/.test(u)) && urls.some(u => /\/assets\/.*\.css$/.test(u));
+  }, null, { timeout: 10000 });
+  // 2) Espera o pré-carregamento em tempo ocioso do chunk da modal (sem espera fixa).
+  await page.waitForFunction(() => performance.getEntriesByType("resource").some(e => e.name.includes("treasureDialog")), null, { timeout: 10000 });
 
-  // 2) Sem rede, recarrega: tudo precisa vir do cache do service worker.
+  // 3) Sem rede, recarrega: HTML, assets e chunk da modal precisam vir do cache do service worker.
   await context.setOffline(true);
   await page.reload();
-  // O diálogo de faixa pode voltar na recarga; ele é opcional, então a espera curta é intencional.
-  const rangeReappeared = await page.locator("#rangeDialog[open]").waitFor({ timeout: 4000 }).then(() => true, () => false);
-  if (rangeReappeared) await passRangeDialog(page);
+  const offlineRange = await page.locator("#rangeDialog[open]").waitFor({ timeout: 4000 }).then(() => true, () => false);
+  if (offlineRange) await passRangeDialog(page);
   await swControls(page);
   assert.equal(await page.evaluate(() => Boolean(navigator.serviceWorker.controller)), true, "service worker não controla a página offline");
 
-  // 3) Abre a modal de tesouros offline.
+  // 4) Abre a modal de tesouros offline.
   await page.evaluate(() => {
     document.querySelectorAll("dialog[open]").forEach(d => d.close());
     document.getElementById("treasureButton").click();
@@ -52,7 +54,7 @@ try {
   assert.equal(await page.locator("#treasureDialog button", { hasText: "Rolar tudo" }).count() >= 1, true, "botão Rolar tudo ausente");
   assert.deepEqual(errors, [], "erros de JavaScript na página");
 
-  console.log(`OK offline: recarga sem rede, modal de tesouros abriu (service worker controlando: sim, recarga online antes do offline: ${rangeReappeared ? "faixa reapareceu e foi confirmada" : "sem faixa na recarga"}). pageerrors: 0`);
+  console.log(`OK offline: recarga sem rede, modal de tesouros abriu (service worker controlando: sim; faixa na recarga online: ${reloadRange ? "sim" : "não"}; faixa na recarga offline: ${offlineRange ? "sim" : "não"}). pageerrors: 0`);
 } catch (error) {
   console.error("FALHA offline:", error.message);
   if (errors.length) console.error("pageerrors:", errors);
