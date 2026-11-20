@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { validateTable } from "../src/treasure/tables/schema.js";
-import { BASIC_BOOK_TABLES } from "../src/treasure/tables/basicBook.js";
+import { BASIC_BOOK_TABLES, TYPE_ROLLS } from "../src/treasure/tables/basicBook.js";
 
 const row = (id, min) => BASIC_BOOK_TABLES[id].rows.find((r) => r.min === min);
 
 test("every basic book table covers its die without gaps", () => {
   const ids = Object.keys(BASIC_BOOK_TABLES);
-  assert.equal(ids.length, 22 * 2 + 3);
+  assert.equal(ids.length, 22 * 2 + 3 + 8);
   for (const id of ids) assert.deepEqual(validateTable(BASIC_BOOK_TABLES[id]), [], id);
   assert.ok(validateTable({ ...BASIC_BOOK_TABLES["8-2/menor"], rows: BASIC_BOOK_TABLES["8-2/menor"].rows.slice(1) }).length > 0);
 });
@@ -45,4 +45,38 @@ test("table 8-2 values", () => {
   assert.equal(big.result.dice, "4d12");
   assert.equal(big.result.multiplier, 10000);
   assert.equal(big.result.average, 260000);
+});
+
+test("item tables 8-3, 8-4, 8-5 and 8-12", () => {
+  const counts = { "8-3": 49, "8-4/arma": 44, "8-4/armadura": 11, "8-4/esotérico": 10,
+    "8-5/arma": 15, "8-5/armadura": 12, "8-5/esotérico": 10, "8-12": 38 };
+  for (const [id, n] of Object.entries(counts)) {
+    assert.ok(BASIC_BOOK_TABLES[id], id);
+    assert.equal(BASIC_BOOK_TABLES[id].rows.length, n, id);
+    assert.deepEqual(validateTable(BASIC_BOOK_TABLES[id]), [], id);
+  }
+  assert.deepEqual(TYPE_ROLLS, {
+    equipment: [[1, 3, "arma"], [4, 5, "armadura"], [6, 6, "esotérico"]],
+    magic: [[1, 2, "arma"], [3, 3, "armadura"], [4, 6, "acessório"]],
+  });
+  assert.deepEqual(row("8-3", 9).result, { kind: "item", name: "Bálsamo restaurador", category: "diverso" });
+  assert.equal(row("8-3", 9).max, 23);
+  assert.equal(row("8-4/arma", 99).result.name, "Virotes (20)");
+  assert.equal(row("8-4/arma", 99).result.category, "arma");
+  assert.equal(row("8-4/armadura", 56).result.category, "escudo");
+  assert.equal(row("8-4/armadura", 11).result.category, "armadura");
+  assert.equal(row("8-4/esotérico", 86).result.category, "esotérico");
+  const atroz = row("8-5/arma", 1).result;
+  assert.deepEqual(atroz, { kind: "improvement", name: "Atroz", special: "counts-as-two" });
+  assert.equal(row("8-5/arma", 91).result.special, "counts-as-two");
+  assert.equal(row("8-5/armadura", 91).result.special, "counts-as-two");
+  const mat = row("8-5/armadura", 41).result;
+  assert.deepEqual(mat, { kind: "improvement", name: "Material especial", subroll: { die: "1d6",
+    options: ["aço-rubi", "adamante", "gelo eterno", "madeira Tollon", "matéria vermelha", "mitral"] } });
+  assert.deepEqual(row("8-5/arma", 66).result.subroll.options.length, 6);
+  assert.ok(row("8-5/esotérico", 46).result.subroll);
+  assert.equal(row("8-5/esotérico", 86).result.name, "Vigilante");
+  assert.deepEqual(row("8-12", 37).result, { kind: "item", name: "Escudo da Fé (aprimoramento para duração cena)", price: 120, category: "poção" });
+  assert.deepEqual(row("8-12", 83).result, { kind: "item", name: "Curar Ferimentos (7d8+7 PV)", price: 1080, category: "poção" });
+  assert.equal(row("8-12", 97).result.price, 3000);
 });

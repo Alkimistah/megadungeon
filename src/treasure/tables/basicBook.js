@@ -143,6 +143,255 @@ for (const [nd, [pdfPage, money, items]] of Object.entries(TABLE_8_1)) {
   };
 });
 
+export const TYPE_ROLLS = {
+  equipment: [[1, 3, "arma"], [4, 5, "armadura"], [6, 6, "esotérico"]],
+  magic: [[1, 2, "arma"], [3, 3, "armadura"], [4, 6, "acessório"]],
+};
+
+// Tabelas 8-3 e 8-4 (PDF 337) trazem só o nome do item: sem preço nem espaços impressos.
+function itemRows(text, category) {
+  return text.trim().split("\n").map((line) => {
+    const [range, name] = line.trim().split("|");
+    const cat = typeof category === "function" ? category(name) : category;
+    return { ...parseRange(range), result: { kind: "item", name, category: cat } };
+  });
+}
+
+const TABLE_8_3 = `
+01-02|Ácido
+03-04|Água benta
+05|Alaúde élfico
+06|Algemas
+07-08|Baga-de-fogo
+09-23|Bálsamo restaurador
+24|Bandana
+25|Bandoleira de poções
+26-30|Bomba
+31|Botas reforçadas
+32|Camisa bufante
+33|Capa esvoaçante
+34|Capa pesada
+35|Casaco longo
+36|Chapéu arcano
+37-38|Coleção de livros
+39-40|Cosmético
+41-42|Dente-de-dragão
+43|Enfeite de elmo
+44|Elixir do amor
+45-46|Equipamento de viagem
+47-56|Essência de mana
+57|Estojo de disfarces
+58|Farrapos de ermitão
+59|Flauta mística
+60-66|Fogo alquímico
+67|Gorro de ervas
+68-69|Líquen lilás
+70|Luneta
+71|Luva de pelica
+72-73|Maleta de medicamentos
+74|Manopla
+75|Manto eclesiástico
+76-78|Mochila de aventureiro
+79-80|Musgo púrpura
+81|Organizador de pergaminhos
+82-83|Ossos de monstro
+84-85|Pó de cristal
+86-87|Pó de giz
+88|Pó do desaparecimento
+89|Robe místico
+90-91|Saco de sal
+92|Sapatos de camurça
+93-94|Seixo de âmbar
+95|Sela
+96|Tabardo
+97|Traje da corte
+98-99|Terra de cemitério
+100|Veste de seda`;
+
+const TABLE_8_4_ARMA = `
+01-03|Adaga
+04-05|Alabarda
+06-07|Alfange
+08-10|Arco curto
+11-13|Arco longo
+14-15|Azagaia
+16|Balas (20)
+17-18|Besta leve
+19-20|Besta pesada
+21-23|Bordão
+24|Chicote
+25-27|Cimitarra
+28-30|Clava
+31|Corrente de espinhos
+32-33|Espada bastarda
+34-38|Espada curta
+39-43|Espada longa
+44-46|Flechas (20)
+47-49|Florete
+50-51|Foice
+52-53|Funda
+54-55|Gadanho
+56|Katana
+57-59|Lança
+60|Lança montada
+61-63|Maça
+64-66|Machadinha
+67|Machado anão
+68-70|Machado de batalha
+71-73|Machado de guerra
+74|Machado táurico
+75-76|Mangual
+77|Marreta
+78-80|Martelo de guerra
+81-83|Montante
+84|Mosquete
+85|Pedras (20)
+86-88|Picareta
+89-90|Pique
+91-92|Pistola
+93|Rede
+94-96|Tacape
+97-98|Tridente
+99-100|Virotes (20)`;
+
+const TABLE_8_4_ARMADURA = `
+01-05|Couro
+06-10|Brunea
+11-25|Completa
+26-30|Cota de malha
+31-45|Couraça
+46-55|Couro batido
+56-65|Escudo leve
+66-80|Escudo pesado
+81-85|Gibão de peles
+86-90|Loriga segmentada
+91-100|Meia armadura`;
+
+const TABLE_8_4_ESOTERICO = `
+01-10|Bolsa de pó
+11-25|Cajado arcano
+26-35|Cetro elemental
+36-42|Costela de lich
+43-50|Dedo de ente
+51-55|Luva de ferro
+56-65|Medalhão de prata
+66-75|Orbe cristalina
+76-85|Tomo hermético
+86-100|Varinha arcana`;
+
+// Tabela 8-5 (PDF 338). "¹" = conta como duas melhorias; "²" = role 1d6 para o material.
+const MATERIALS = ["aço-rubi", "adamante", "gelo eterno", "madeira Tollon", "matéria vermelha", "mitral"];
+function improvementRows(text) {
+  return text.trim().split("\n").map((line) => {
+    const [range, raw] = line.trim().split("|");
+    const result = { kind: "improvement", name: raw.replace(/[¹²]$/, "") };
+    if (raw.endsWith("¹")) result.special = "counts-as-two";
+    if (raw.endsWith("²")) result.subroll = { die: "1d6", options: [...MATERIALS] };
+    return { ...parseRange(range), result };
+  });
+}
+
+const TABLE_8_5_ARMA = `
+01-10|Atroz¹
+11-13|Banhada a ouro
+14-23|Certeira
+24-26|Cravejada de gemas
+27-36|Cruel
+37-39|Discreta
+40-44|Equilibrada
+45-48|Harmonizada
+49-53|Injeção alquímica
+54-55|Macabra
+56-65|Maciça
+66-75|Material especial²
+76-80|Mira telescópica
+81-90|Precisa
+91-100|Pungente¹`;
+
+const TABLE_8_5_ARMADURA = `
+01-15|Ajustada
+16-19|Banhada a ouro
+20-23|Cravejada de gemas
+24-28|Delicada
+29-32|Discreta
+33-37|Espinhos
+38-40|Macabra
+41-50|Material especial²
+51-55|Polida
+56-80|Reforçada
+81-90|Selada
+91-100|Sob medida¹`;
+
+const TABLE_8_5_ESOTERICO = `
+01-04|Banhada a ouro
+05-08|Cravejada de gemas
+09-12|Discreto
+13-27|Energético
+28-42|Harmonizado
+43-45|Macabro
+46-54|Material especial²
+55-70|Poderoso
+71-85|Potencializador
+86-100|Vigilante`;
+
+// Tabela 8-12 (PDF 347): faixa|nome|preço em T$.
+const TABLE_8_12 = `
+01|Abençoar Alimentos (óleo)|30
+02-03|Área Escorregadia (granada)|30
+04-06|Arma Mágica (óleo)|30
+07|Compreensão|30
+08-15|Curar Ferimentos (2d8+2 PV)|30
+16-18|Disfarce Ilusório|30
+19-20|Escuridão (óleo)|30
+21-22|Luz (óleo)|30
+23-24|Névoa (granada)|30
+25-26|Primor Atlético|30
+27-28|Proteção Divina|30
+29-30|Resistência a Energia|30
+31-32|Sono|30
+33|Suporte Ambiental|30
+34|Tranca Arcana (óleo)|30
+35|Visão Mística|30
+36|Vitalidade Fantasma|30
+37-38|Escudo da Fé (aprimoramento para duração cena)|120
+39-40|Alterar Tamanho|270
+41-42|Aparência Perfeita|270
+43|Armamento da Natureza (óleo)|270
+44-49|Bola de Fogo (granada)|270
+50-51|Camuflagem Ilusória|270
+52-53|Concentração de Combate (aprimoramento para duração cena)|270
+54-62|Curar Ferimentos (4d8+4 PV)|270
+63-66|Físico Divino|270
+67-68|Mente Divina|270
+69-70|Metamorfose|270
+71-75|Purificação|270
+76-77|Velocidade|270
+78-79|Vestimenta da Fé (óleo)|270
+80|Voz Divina|270
+81-82|Arma Mágica (óleo; aprimoramento para bônus +3)|750
+83-88|Curar Ferimentos (7d8+7 PV)|1080
+89|Físico Divino (aprimoramento para três atributos)|1080
+90-92|Invisibilidade (aprimoramento para duração cena)|1080
+93-96|Bola de Fogo (granada; aprimoramento para 10d6 de dano)|1470
+97-100|Curar Ferimentos (11d8+11 PV)|3000`;
+
+const itemTable = (id, title, bookPage, rows) => {
+  BASIC_BOOK_TABLES[id] = { id, title, book: BOOK, bookPage, pdfPage: bookPage + 6, die: "d%", rows };
+};
+const shield = (name) => (name.startsWith("Escudo") ? "escudo" : "armadura");
+
+itemTable("8-3", "Tabela 8-3: Itens Diversos", 331, itemRows(TABLE_8_3, "diverso"));
+itemTable("8-4/arma", "Tabela 8-4: Equipamento, Arma", 331, itemRows(TABLE_8_4_ARMA, "arma"));
+itemTable("8-4/armadura", "Tabela 8-4: Equipamento, Armadura", 331, itemRows(TABLE_8_4_ARMADURA, shield));
+itemTable("8-4/esotérico", "Tabela 8-4: Equipamento, Esotérico", 331, itemRows(TABLE_8_4_ESOTERICO, "esotérico"));
+itemTable("8-5/arma", "Tabela 8-5: Itens Superiores, Armas", 332, improvementRows(TABLE_8_5_ARMA));
+itemTable("8-5/armadura", "Tabela 8-5: Itens Superiores, Armaduras/Escudos", 332, improvementRows(TABLE_8_5_ARMADURA));
+itemTable("8-5/esotérico", "Tabela 8-5: Itens Superiores, Esotéricos", 332, improvementRows(TABLE_8_5_ESOTERICO));
+itemTable("8-12", "Tabela 8-12: Poções", 341, TABLE_8_12.trim().split("\n").map((line) => {
+  const [range, name, price] = line.split("|");
+  return { ...parseRange(range), result: { kind: "item", name, price: Number(price), category: "poção" } };
+}));
+
 // Falha cedo se a transcrição ficar inconsistente.
 for (const table of Object.values(BASIC_BOOK_TABLES)) {
   const errors = validateTable(table);
