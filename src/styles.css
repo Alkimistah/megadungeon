@@ -3042,7 +3042,7 @@ details.mission-run-guidance p {
 .treasure-input-row label {
   display: grid;
   gap: 4px;
-  color: #d8c8b7;
+  color: #3a2f25;
   font-size: 12px;
 }
 
@@ -3122,7 +3122,7 @@ details.mission-run-guidance p {
 
 .treasure-step-table,
 .treasure-muted {
-  color: #9c8f80;
+  color: #5c4a37;
 }
 
 .treasure-step-roll {
@@ -3135,14 +3135,25 @@ details.mission-run-guidance p {
   border: 1px solid #d8c8b7;
   border-radius: 6px;
   background: #f6efe4;
-  position: sticky;
-  bottom: 0;
-  max-height: 26vh;
-  overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px 16px;
-  box-shadow: 0 -6px 10px rgba(0, 0, 0, 0.18);
+}
+
+.treasure-strip {
+  position: sticky;
+  bottom: 0;
+  margin: 8px 0 0;
+  padding: 6px 10px;
+  border: 1px solid #5c4a37;
+  border-radius: 6px;
+  background: #f6efe4;
+  font-size: 13px;
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.treasure-strip[hidden] {
+  display: none;
 }
 
 .treasure-footer[hidden] {

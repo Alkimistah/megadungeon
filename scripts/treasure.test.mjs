@@ -671,3 +671,12 @@ test("describeStep formats table, expression and 2D steps", () => {
   assert.match(two.roll, /escolhido 3/);
   assert.equal(describeRowResult({ kind: "item", name: "Corda", price: 1 }), "Corda (T$ 1)");
 });
+
+import { tableLabel } from "../src/treasure/treasureFormat.js";
+test("tableLabel gives readable table names", () => {
+  assert.equal(tableLabel("8-1/0.25/money"), "Tabela 8-1 · Dinheiro ND 1/4");
+  assert.equal(tableLabel("8-1/12/items"), "Tabela 8-1 · Itens ND 12");
+  assert.equal(tableLabel("8-4/esotérico"), "Tabela 8-4 · Equipamento, Esotérico");
+  assert.equal(tableLabel("8-2/média"), "Tabela 8-2 · Riquezas, coluna média");
+  assert.equal(tableLabel("8-3"), "Tabela 8-3 · Itens Diversos");
+});

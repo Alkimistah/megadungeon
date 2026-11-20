@@ -1,7 +1,7 @@
 // Casca da modal de tesouros e aba Rolar. A aba Consultar (Task 9) reusa describeStep e renderSummary.
 import { CHALLENGE_RATINGS, challengeRatingLabel } from "./treasureEngine.js";
 import { buildBatch, rollBatch, listSpecificTables, MAX_QUANTITY, MODE_LABELS } from "./treasureBatch.js";
-import { describeStep, stepDepth, formatAmount } from "./treasureFormat.js";
+import { describeStep, stepDepth, formatAmount, tableLabel } from "./treasureFormat.js";
 import { summarizeGains } from "./treasureSummary.js";
 import { createRng, createRandomSeed } from "../random.js";
 
@@ -28,7 +28,8 @@ function selectTab(dialog, tabId) {
 
 // ---------- Rodapé ----------
 
-export function renderSummary(container, gains) {
+// `strip` (opcional) recebe a linha compacta de totais, que a aba mantém fixa no fim da modal.
+export function renderSummary(container, gains, strip) {
   const summary = summarizeGains(gains);
   container.replaceChildren();
   container.dataset.totalTibars = String(summary.totalTibars);
@@ -39,6 +40,11 @@ export function renderSummary(container, gains) {
   total.append(el("strong", "", "Total: "), el("span", "treasure-total-value", `${formatAmount(summary.totalTibars)} T$`));
   const moneyBlock = el("div", "treasure-summary-block");
   moneyBlock.append(money, total);
+  strip?.replaceChildren();
+  strip?.append(el("strong", "", "Dinheiro: "), `${coins.length ? coins.join(" · ") : "nenhum"} · `,
+    el("strong", "treasure-total-value", `Total: ${formatAmount(summary.totalTibars)} T$`),
+    ` · ${summary.wealth.length} ${summary.wealth.length === 1 ? "riqueza" : "riquezas"}`,
+    ` · ${summary.items.reduce((n, i) => n + i.quantity, 0)} itens`);
 
   const wealth = el("div", "treasure-summary-block");
   wealth.append(el("strong", "", "Riquezas"));
@@ -70,7 +76,9 @@ function renderChain(state) {
     const { roll, result } = describeStep(step);
     const li = el("li", "treasure-step");
     li.style.marginLeft = `${stepDepth(step) * 14}px`;
-    li.append(el("span", "treasure-step-table", step.tableId), " ", el("span", "treasure-step-roll", roll),
+    const table = el("span", "treasure-step-table", tableLabel(step.tableId));
+    table.title = step.tableId;
+    li.append(table, " ", el("span", "treasure-step-roll", roll),
       " → ", el("span", "treasure-step-result", result));
     list.append(li);
   }
@@ -171,6 +179,9 @@ function setupRollTab(panel) {
   const footer = el("div", "treasure-footer");
   footer.id = "treasureFooter";
   footer.hidden = true;
+  const strip = el("p", "treasure-strip");
+  strip.id = "treasureStrip";
+  strip.hidden = true;
 
   const addRow = () => rowsBox.append(createRow((row) => {
     if (rowsBox.children.length > 1) row.remove();
@@ -181,15 +192,15 @@ function setupRollTab(panel) {
     try {
       const batch = rollBatch([...rowsBox.children].map((r) => r.readValue()), createRng(createRandomSeed()));
       renderResults(results, batch);
-      renderSummary(footer, batch.flatMap((g) => g.treasures.flatMap((t) => t.states.flatMap((s) => s.gains))));
-      footer.hidden = false;
+      renderSummary(footer, batch.flatMap((g) => g.treasures.flatMap((t) => t.states.flatMap((s) => s.gains))), strip);
+      footer.hidden = strip.hidden = false;
     } catch (e) {
       error.textContent = e.message;
     }
   });
   const actions = el("div", "treasure-actions");
   actions.append(add, roll);
-  panel.append(rowsBox, actions, error, results, footer);
+  panel.append(rowsBox, actions, error, results, footer, strip);
   addRow();
 }
 

@@ -1,4 +1,6 @@
 // Texto de cada passo da cadeia de tesouro. Funções puras, usadas pelas abas Rolar e Consultar.
+import { BASIC_BOOK_TABLES } from "./tables/basicBook.js";
+
 const fmt = (n) => {
   const [int, dec] = String(n).split(".");
   return int.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + (dec ? `,${dec}` : "");
@@ -60,3 +62,13 @@ export function stepDepth(step) {
 }
 
 export { fmt as formatAmount };
+
+const COLUMN_NAMES = { money: "Dinheiro", items: "Itens" };
+
+// Rótulo curto de uma tabela: "Tabela 8-1 · Dinheiro ND 1/4", "Tabela 8-4 · Equipamento, Esotérico".
+export function tableLabel(tableId) {
+  const nd = tableId.match(/^8-1\/([^/]+)\/(money|items)$/);
+  if (nd) return `Tabela 8-1 · ${COLUMN_NAMES[nd[2]]} ND ${nd[1] === "0.25" ? "1/4" : nd[1] === "0.5" ? "1/2" : nd[1]}`;
+  const title = BASIC_BOOK_TABLES[tableId]?.title;
+  return title ? title.replace(/^(Tabela [\d-]+): /, "$1 · ") : `Tabela ${tableId}`;
+}
