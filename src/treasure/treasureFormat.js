@@ -1,10 +1,13 @@
 // Texto de cada passo da cadeia de tesouro. Funções puras, usadas pelas abas Rolar e Consultar.
-import { BASIC_BOOK_TABLES } from "./tables/basicBook.js";
+import { ALL_TABLES } from "./tables/index.js";
 
 const fmt = (n) => {
   const [int, dec] = String(n).split(".");
   return int.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + (dec ? `,${dec}` : "");
 };
+
+// Preço numérico vira "T$ 1.500"; o texto impresso ("—", "+T$ 300") segue como está.
+export const formatPrice = (price) => (typeof price === "number" ? `T$ ${fmt(price)}` : price);
 
 const TIER_PLURAL = { menor: "menores", média: "médias", maior: "maiores" };
 
@@ -16,7 +19,7 @@ export function describeRowResult(result) {
     case "superior": return `Item superior (${result.improvements} ${result.improvements > 1 ? "melhorias" : "melhoria"})`;
     case "magic": return `Item mágico ${result.tier}`;
     case "potion": return `Poções: ${result.count}`;
-    case "item": return result.price !== undefined ? `${result.name} (T$ ${fmt(result.price)})` : result.name;
+    case "item": return result.price === undefined ? result.name : `${result.name} (${formatPrice(result.price)})`;
     case "improvement": return `Melhoria: ${result.name}`;
     case "enchantment": return `Encanto: ${result.name}`;
     case "money": return `${result.dice} × ${fmt(result.multiplier)} ${result.currency}`;
@@ -43,6 +46,7 @@ function rowOutcomeNote(outcome) {
 
 // { roll, result }: `roll` mostra o dado (e +%, 2D), `result` o que a tabela ou a expressão deu.
 export function describeStep(step) {
+  if (step.kind === "list") return { roll: `${step.die} ${step.value}`, result: describeRowResult({ kind: "item", ...step.item }) };
   if (step.kind === "table") {
     const bonus = step.bonus
       ? ` +${step.bonus}% = ${step.effective}`
@@ -69,6 +73,8 @@ const COLUMN_NAMES = { money: "Dinheiro", items: "Itens" };
 export function tableLabel(tableId) {
   const nd = tableId.match(/^8-1\/([^/]+)\/(money|items)$/);
   if (nd) return `Tabela 8-1 · ${COLUMN_NAMES[nd[2]]} ND ${nd[1] === "0.25" ? "1/4" : nd[1] === "0.5" ? "1/2" : nd[1]}`;
-  const title = BASIC_BOOK_TABLES[tableId]?.title;
+  const table = ALL_TABLES[tableId];
+  if (table?.kind === "list") return table.label;
+  const title = table?.title;
   return title ? title.replace(/^(Tabela [\d-]+): /, "$1 · ") : `Tabela ${tableId}`;
 }

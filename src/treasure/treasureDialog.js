@@ -2,7 +2,7 @@
 import { CHALLENGE_RATINGS, challengeRatingLabel, startTreasure, startTable, nextStep, applyRoll } from "./treasureEngine.js";
 import { rollDice, dieRange } from "./dice.js";
 import { buildBatch, rollBatch, listSpecificTables, MAX_QUANTITY, MODE_LABELS } from "./treasureBatch.js";
-import { describeStep, stepDepth, formatAmount, tableLabel } from "./treasureFormat.js";
+import { describeStep, stepDepth, formatAmount, formatPrice, tableLabel } from "./treasureFormat.js";
 import { summarizeGains } from "./treasureSummary.js";
 import { createRng, createRandomSeed } from "../random.js";
 
@@ -61,7 +61,7 @@ export function renderSummary(container, gains, strip) {
   else {
     const list = el("ul");
     for (const it of summary.items) {
-      const price = it.price !== undefined ? ` — T$ ${formatAmount(it.price)}` : "";
+      const price = it.price !== undefined ? ` — ${formatPrice(it.price)}` : "";
       list.append(el("li", "", `${it.quantity}× ${it.name}${price}`));
     }
     items.append(list);

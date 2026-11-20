@@ -8,8 +8,11 @@
 //     pela linha da tabela `tableId`. `context.action` diz o que fazer com o total.
 //   - "twoDice": rolagem de tipo 2D. `die` é "1d6" e o valor é o dado escolhido;
 //     resolve como uma expressão. Em `applyRoll`, `extra.dice` ([a, b]) é opcional.
-// Step    = { id, parentId, tableId, die, kind, reason, value, bonus, effective?, row?, outcome?,
-//             dice?, chosen? }   (`row` é uma cópia da linha; `dice`/`chosen` só em 2D)
+//   - "list": 1d<n> numa lista de itens de outro livro (Ameaças, Heróis, Deuses); o valor v
+//     (1 a n) dá o v-ésimo item na ordem impressa. Não tem bônus nem desdobramento.
+// Step    = { id, parentId, tableId, die, kind, reason, value, bonus, effective?, row?, item?, outcome?,
+//             dice?, chosen? }   (`row` é uma cópia da linha; `item` é o item da lista, só em "list";
+//             `dice`/`chosen` só em 2D)
 // Gain    = { kind: "money", amount, currency }
 //         | { kind: "wealth", tier, value, amount, currency: "T$", examples }
 //         | { kind: "item", name, category, price?, tier?, details }
@@ -25,6 +28,8 @@
 // aceitos do mesmo item; se recusar, a nova rolagem entra como filha do passo recusado.
 // Quando não resta pedido pendente com o prefixo do dono, o motor monta o `Gain`.
 import { BASIC_BOOK_TABLES, TYPE_ROLLS, ENCHANTMENT_COUNT } from "./tables/basicBook.js";
+import { ALL_TABLES } from "./tables/index.js";
+import { listDie } from "./tables/schema.js";
 import { dieRange, rollDice } from "./dice.js";
 import { randomInt } from "../random.js";
 
@@ -87,6 +92,11 @@ export function startTreasure({ challengeRating, column, mode = "padrão" } = {}
 
 export function startTable(tableId, { tier, mode = "padrão" } = {}) {
   checkMode(mode);
+  const list = ALL_TABLES[tableId];
+  if (list?.kind === "list") {
+    const request = { tableId, die: listDie(list.items.length), bonus: 0, reason: list.title, kind: "list", context: {} };
+    return createState(request, false);
+  }
   let id = tableId;
   if (tier !== undefined) {
     if (!WEALTH_TIERS.includes(tier)) throw new RangeError(`Categoria de riqueza inválida: ${tier}`);
@@ -383,6 +393,10 @@ export function applyRoll(state, value, extra) {
     resolved = handler(row, request, state.half, state);
     Object.assign(step, { effective, row: structuredClone(row) });
     if (resolved.outcome) step.outcome = resolved.outcome;
+  } else if (request.kind === "list") {
+    const item = ALL_TABLES[request.tableId].items[value - 1];
+    step.item = structuredClone(item);
+    resolved = { gains: [{ kind: "item", ...structuredClone(item), details: {} }] };
   } else if (request.kind === "expression" || request.kind === "twoDice") {
     const handler = EXPRESSION_HANDLERS[request.context?.action];
     if (!handler) throw notSupported(`expressão ${request.context?.action}`);

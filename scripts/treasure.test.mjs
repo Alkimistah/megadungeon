@@ -680,3 +680,121 @@ test("tableLabel gives readable table names", () => {
   assert.equal(tableLabel("8-2/média"), "Tabela 8-2 · Riquezas, coluna média");
   assert.equal(tableLabel("8-3"), "Tabela 8-3 · Itens Diversos");
 });
+
+// ---------- Listas dos outros livros (Task 10) ----------
+import { ALL_TABLES, LIST_TABLES } from "../src/treasure/tables/index.js";
+import { listDie, validateListTable } from "../src/treasure/tables/schema.js";
+import { listSpecificTables } from "../src/treasure/treasureBatch.js";
+
+// Contagens fixadas a partir das páginas renderizadas dos PDFs.
+const LIST_COUNTS = {
+  "ameacas/armas": 16, "ameacas/armaduras": 4, "ameacas/itens-gerais": 44, "ameacas/materiais": 3,
+  "herois/armas": 47, "herois/municoes": 5, "herois/armaduras": 14, "herois/itens-gerais": 137,
+  "herois/armas-especificas/medio": 6, "herois/armas-especificas/maior": 11,
+  "herois/armaduras-especificas/medio": 4, "herois/armaduras-especificas/maior": 6,
+  "herois/esotericos/medio": 1, "herois/esotericos/maior": 3,
+  "herois/acessorios/menor": 23, "herois/acessorios/medio": 30, "herois/acessorios/maior": 11,
+  "deuses/itens-gerais": 70, "deuses/melhorias": 5,
+};
+
+test("other-book lists have the printed item counts and valid shape", () => {
+  assert.deepEqual(Object.keys(LIST_TABLES).sort(), Object.keys(LIST_COUNTS).sort());
+  for (const [id, count] of Object.entries(LIST_COUNTS)) {
+    const list = LIST_TABLES[id];
+    assert.equal(list.items.length, count, id);
+    assert.deepEqual(validateListTable(list), [], id);
+    assert.equal(list.kind, "list");
+  }
+  assert.equal(ALL_TABLES["8-3"], BASIC_BOOK_TABLES["8-3"]);
+  assert.equal(ALL_TABLES["herois/acessorios/menor"], LIST_TABLES["herois/acessorios/menor"]);
+});
+
+test("magic lists carry their tier; non-magic lists have none; prices are numbers or printed strings", () => {
+  const tiers = { menor: "menor", medio: "médio", maior: "maior" };
+  for (const [id, list] of Object.entries(LIST_TABLES)) {
+    const suffix = id.split("/").pop();
+    const magic = /^herois\/(armas-especificas|armaduras-especificas|esotericos|acessorios)\//.test(id);
+    assert.equal(list.tier, magic ? tiers[suffix] : undefined, id);
+    for (const item of list.items) {
+      assert.equal(item.tier, list.tier, `${id}: ${item.name}`);
+      assert.ok(["number", "string", "undefined"].includes(typeof item.price), `${id}: ${item.name}`);
+    }
+  }
+  assert.equal(LIST_TABLES["deuses/melhorias"].items.every((i) => i.price === undefined && i.category === "melhoria"), true);
+  const prices = (id) => LIST_TABLES[id].items.map((i) => i.price);
+  assert.equal(prices("ameacas/materiais").every((p) => typeof p === "string"), true);
+  assert.equal(LIST_TABLES["herois/itens-gerais"].items.filter((i) => i.price === "—").length, 2);
+  assert.equal(LIST_TABLES["ameacas/armas"].items.find((i) => i.name === "Presa de serpente").price, 1000);
+  assert.deepEqual(LIST_TABLES["ameacas/armas"].items[0], { name: "Porrete", price: 2, category: "arma" });
+});
+
+test("list pages and first/last items match the book", () => {
+  const first = (id) => LIST_TABLES[id].items[0].name;
+  const last = (id) => LIST_TABLES[id].items.at(-1).name;
+  assert.equal(first("ameacas/armas"), "Porrete");
+  assert.equal(last("ameacas/armas"), "Arpão");
+  assert.equal(last("ameacas/itens-gerais"), "Traje selako");
+  assert.equal(first("herois/armas"), "Bastão lúdico");
+  assert.equal(last("herois/armas"), "Sifão cáustico");
+  assert.equal(last("herois/itens-gerais"), "Sarau informativo");
+  assert.equal(first("herois/acessorios/menor"), "Algibeira mordedora");
+  assert.equal(last("herois/acessorios/maior"), "Tomo dos companheiros");
+  assert.equal(first("deuses/itens-gerais"), "Água benta concentrada");
+  assert.equal(last("deuses/itens-gerais"), "Sacramento");
+  assert.equal(LIST_TABLES["herois/acessorios/menor"].pdfPage, 267);
+  assert.equal(LIST_TABLES["herois/acessorios/menor"].bookPage, 265);
+  assert.equal(LIST_TABLES["ameacas/armas"].pdfPage, 396);
+  assert.equal(LIST_TABLES["deuses/melhorias"].pdfPage, 56);
+  for (const list of Object.values(LIST_TABLES)) assert.equal(list.bookPage, list.pdfPage - 2, list.id);
+});
+
+test("listDie builds 1d<n> and the engine yields the v-th item", () => {
+  assert.equal(listDie(23), "1d23");
+  assert.equal(listDie(LIST_COUNTS["herois/acessorios/menor"]), "1d23");
+  const state = startTable("herois/acessorios/menor");
+  const request = nextStep(state);
+  assert.equal(request.kind, "list");
+  assert.equal(request.die, "1d23");
+  const first = applyRoll(state, 1);
+  assert.equal(nextStep(first), null);
+  assert.deepEqual(first.gains, [{ kind: "item", name: "Algibeira mordedora", category: "acessório", price: 1000, tier: "menor", details: {} }]);
+  const lastItem = applyRoll(state, 23);
+  assert.equal(lastItem.gains[0].name, LIST_TABLES["herois/acessorios/menor"].items[22].name);
+  assert.equal(lastItem.gains[0].name, "Saco dos ventos silenciosos");
+  assert.equal(first.steps[0].kind, "list");
+  assert.throws(() => applyRoll(state, 0), RangeError);
+  assert.throws(() => applyRoll(state, 24), RangeError);
+  assert.throws(() => applyRoll(state, 1.5), RangeError);
+  const melhoria = applyRoll(startTable("deuses/melhorias"), 3).gains[0];
+  assert.deepEqual(melhoria, { kind: "item", name: "Inscrito", category: "melhoria", details: {} });
+});
+
+test("resolveWithDice picks uniformly from a list and is reproducible", () => {
+  const a = resolveWithDice(startTable("herois/armas"), createRng("lista"));
+  const b = resolveWithDice(startTable("herois/armas"), createRng("lista"));
+  assert.deepEqual(a.gains, b.gains);
+  const seen = new Set();
+  const rng = createRng("cobertura");
+  for (let i = 0; i < 400; i++) seen.add(resolveWithDice(startTable("herois/municoes"), rng).gains[0].name);
+  assert.equal(seen.size, 5);
+});
+
+test("listSpecificTables offers basic book and list tables; batch and labels work with list ids", () => {
+  const ids = listSpecificTables().map((t) => t.id);
+  assert.ok(ids.includes("8-3"));
+  assert.ok(!ids.some((id) => id.startsWith("8-1/")));
+  for (const id of Object.keys(LIST_COUNTS)) assert.ok(ids.includes(id), id);
+  const batch = rollBatch([{ tableId: "herois/acessorios/maior", quantity: 3 }], createRng("lote"));
+  assert.equal(batch[0].treasures.length, 3);
+  for (const t of batch[0].treasures) assert.equal(t.states[0].gains[0].tier, "maior");
+  assert.equal(batch[0].label, "Heróis · Acessórios específicos (maiores)");
+  assert.throws(() => rollBatch([{ tableId: "herois/nao-existe", quantity: 1 }], createRng("x")), RangeError);
+  assert.equal(tableLabel("herois/acessorios/menor"), "Heróis · Acessórios específicos (menores)");
+  assert.equal(tableLabel("ameacas/armas"), "Ameaças · Novas armas");
+  assert.equal(tableLabel("deuses/melhorias"), "Deuses · Melhorias");
+  const step = applyRoll(startTable("ameacas/materiais"), 1).steps[0];
+  const text = describeStep(step);
+  assert.match(text.roll, /^1d3 1$/);
+  assert.match(text.result, /^Casco de monstro/);
+  assert.equal(describeRowResult({ kind: "item", name: "X", price: "—" }), "X (—)");
+});

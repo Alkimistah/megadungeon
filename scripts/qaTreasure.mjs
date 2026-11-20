@@ -86,6 +86,11 @@ try {
   assert.equal(await rowsLoc.nth(0).locator(".treasure-f-table").isVisible(), true);
   await page.locator("#treasureDialog .treasure-roll").click();
   assert.equal(await page.locator("#treasureDialog .treasure-error").innerText(), "");
+  // Lista de outro livro como tabela específica.
+  await rowsLoc.nth(0).locator(".treasure-f-table").selectOption("herois/acessorios/menor");
+  await page.locator("#treasureDialog .treasure-roll").click();
+  assert.equal(await page.locator("#treasureDialog .treasure-error").innerText(), "");
+  assert.match(await results.first().innerText(), /Heróis · Acessórios específicos \(menores\)/);
   await page.locator("#treasureDialog .treasure-roll").click();
   // Lote cheio de 11+ tesouros para a captura.
   await rowsLoc.nth(0).locator(".treasure-f-kind").selectOption("nd");
@@ -163,6 +168,14 @@ try {
   await page.locator("#treasureDialog .treasure-c-source").selectOption("8-4/arma");
   await page.locator("#treasureDialog .treasure-c-start").click();
   assert.match(await page.locator(`${C} .treasure-consult-step`).innerText(), /8-4/);
+  // Lista de outro livro: valor 1 dá o primeiro item.
+  await page.locator("#treasureDialog .treasure-c-reset").click();
+  await page.locator("#treasureDialog .treasure-c-source").selectOption("herois/acessorios/menor");
+  await page.locator("#treasureDialog .treasure-c-start").click();
+  assert.match(await page.locator(`${C} .treasure-consult-step`).innerText(), /Heróis · Acessórios específicos \(menores\) · 1d23/);
+  await apply(1);
+  assert.equal(await page.locator(C).isVisible(), false, "lista terminou em um passo");
+  assert.match(await page.locator("#treasureDialog .treasure-consult-result").innerText(), /1× Algibeira mordedora/);
 
   await page.locator("#treasureClose").click();
   await page.locator("#treasureDialog").waitFor({ state: "hidden" });

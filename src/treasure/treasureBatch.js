@@ -4,15 +4,16 @@
 //                ou { tableId, quantity }.
 // BatchRow = { row, treasures: [{ index, label, states: State[] }] }; `index` é global (1, 2, 3...).
 import { CHALLENGE_RATINGS, MODES, challengeRatingLabel, startTreasure, startTable, resolveWithDice } from "./treasureEngine.js";
-import { BASIC_BOOK_TABLES } from "./tables/basicBook.js";
+import { ALL_TABLES } from "./tables/index.js";
+import { tableLabel } from "./treasureFormat.js";
 
 export const MAX_QUANTITY = 99;
 const COLUMN_SETS = { both: ["money", "items"], money: ["money"], items: ["items"] };
 export const MODE_LABELS = { padrão: "Padrão", metade: "Metade", dobro: "Dobro" };
 
-// Tabelas escolhíveis em "Tabela específica". A Task 10 aponta isto para ALL_TABLES.
+// Tabelas escolhíveis em "Tabela específica": as do Livro Básico (menos as de ND) e as listas dos outros livros.
 export function listSpecificTables() {
-  return Object.values(BASIC_BOOK_TABLES).filter((t) => !t.id.startsWith("8-1/"));
+  return Object.values(ALL_TABLES).filter((t) => !t.id.startsWith("8-1/"));
 }
 
 function checkQuantity(row) {
@@ -22,7 +23,7 @@ function checkQuantity(row) {
 
 function startRow(row) {
   if (row.tableId !== undefined) {
-    return { label: `Tabela ${row.tableId}`, start: () => [startTable(row.tableId)] };
+    return { label: tableLabel(row.tableId), start: () => [startTable(row.tableId)] };
   }
   const columns = COLUMN_SETS[row.columns];
   if (!columns) throw new RangeError(`Colunas inválidas: ${row.columns}`);
@@ -37,7 +38,7 @@ export function buildBatch(rows) {
   let index = 0;
   return rows.map((row) => {
     checkQuantity(row);
-    if (row.tableId !== undefined && !BASIC_BOOK_TABLES[row.tableId]) throw new RangeError(`Tabela inexistente: ${row.tableId}`);
+    if (row.tableId !== undefined && !ALL_TABLES[row.tableId]) throw new RangeError(`Tabela inexistente: ${row.tableId}`);
     const { label, start } = startRow(row);
     const treasures = Array.from({ length: row.quantity }, () => ({ index: ++index, label, states: start() }));
     return { row, label, treasures };
