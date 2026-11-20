@@ -5,6 +5,7 @@ import { BASIC_BOOK_TABLES, TYPE_ROLLS, ENCHANTMENT_COUNT, ENCHANTMENT_PRICES } 
 import { parseDice, rollDice, dieRange } from "../src/treasure/dice.js";
 import { startTreasure, startTable, nextStep, applyRoll, resolveWithDice } from "../src/treasure/treasureEngine.js";
 import { createRng } from "../src/random.js";
+import { summarizeGains } from "../src/treasure/treasureSummary.js";
 
 const row = (id, min) => BASIC_BOOK_TABLES[id].rows.find((r) => r.min === min);
 
@@ -584,4 +585,34 @@ test("performance: 198 ND 20 chains in Dobro under 500 ms, per column", () => {
     assert.equal(chains, 198);
     assert.ok(ms < 500, `${column}: ${ms} ms`);
   }
+});
+
+test("summarizeGains totals coins, keeps wealth out of coins and groups items", () => {
+  const gains = [
+    { kind: "money", amount: 35, currency: "TC" },
+    { kind: "money", amount: 200, currency: "T$" },
+    { kind: "money", amount: 3, currency: "TO" },
+    { kind: "wealth", tier: "média", value: 50, amount: 50, currency: "T$", examples: "Ágata" },
+    { kind: "wealth", tier: "menor", value: 10, amount: 10, currency: "T$", examples: "Ônix" },
+    { kind: "item", name: "Poção", category: "poções", price: 50, details: {} },
+    { kind: "item", name: "Poção", category: "poções", price: 50, details: {} },
+  ];
+  const summary = summarizeGains(gains);
+  assert.deepEqual(summary.coins, { TC: 35, "T$": 200, TO: 3 });
+  assert.equal(summary.totalTibars, 233.5);
+  assert.deepEqual(summary.wealth, [
+    { value: 50, examples: "Ágata" },
+    { value: 10, examples: "Ônix" },
+  ]);
+  assert.deepEqual(summary.items, [{ name: "Poção", category: "poções", price: 50, quantity: 2 }]);
+});
+
+test("summarizeGains keeps undefined price for items without one", () => {
+  const summary = summarizeGains([
+    { kind: "item", name: "Corda", category: "equipamento", details: {} },
+  ]);
+  assert.equal(summary.items.length, 1);
+  assert.equal(summary.items[0].price, undefined);
+  assert.equal(summary.items[0].quantity, 1);
+  assert.equal(summary.totalTibars, 0);
 });
