@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. Das **319 fichas auditadas**, **227 estão publicadas** e **92 estão no trabalho local**. Familiares ficou registrado como fora do catálogo. De Reinos de Moreania a Trolls Nobres não há fichas no catálogo, e o próximo passo depende de decisão. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. As **319 fichas auditadas** estão publicadas. Familiares ficou registrado como fora do catálogo. De Reinos de Moreania a Trolls Nobres não há fichas no catálogo, e o próximo passo depende de decisão. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -906,13 +906,13 @@ Situação em 19 de novembro de 2026.
 | Familiares | 190–197 | 0 | Fora do catálogo |
 | Masmorras | 198–209 | 14 | Publicado |
 | Montarias | 210–227 | 26 | Publicado |
-| Mascotes & Mortos-Vivos | 228–241 | 23 | Validado localmente |
-| Mundo Perdido | 242–251 | 14 | Validado localmente |
-| Piratas & Pistoleiros | 252–263 | 22 | Validado localmente |
-| Povos-Trovão | 264–273 | 12 | Validado localmente |
-| Puristas | 274–283 | 11 | Validado localmente |
-| Reino dos Mortos | 284–295 | 10 | Validado localmente |
-| **Total** | | **319** | **227 publicadas e 92 locais** |
+| Mascotes & Mortos-Vivos | 228–241 | 23 | Publicado |
+| Mundo Perdido | 242–251 | 14 | Publicado |
+| Piratas & Pistoleiros | 252–263 | 22 | Publicado |
+| Povos-Trovão | 264–273 | 12 | Publicado |
+| Puristas | 274–283 | 11 | Publicado |
+| Reino dos Mortos | 284–295 | 10 | Publicado |
+| **Total** | | **319** | **Publicadas** |
 
 As 319 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
 
@@ -922,7 +922,7 @@ Antes do push, passaram o build de produção, os testes de andares 1–10, os 6
 
 Masmorras, Montarias e a retirada dos quadros de parceiro e familiar foram publicados em `da7c816`. Antes do push, passaram o build de produção, os testes de andares 1–10, os 69 testes de andares 11–20, os testes de missões e o QA dos andares 11–20 contra o build local. Depois do deploy, o QA passou contra o site publicado, sem erros de JavaScript. O bundle publicado traz `gorlogg-livro-basico`, não cita o recorte `ameacas de arton p200 ate 229.pdf` e não tem habilidades chamadas Parceiro ou Familiar. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44654215976)
 
-Mascotes & Mortos-Vivos, Mundo Perdido, Piratas & Pistoleiros, Povos-Trovão, Puristas e Reino dos Mortos estão validados localmente: passaram o build de produção, os testes de andares 1–10, os 76 testes de andares 11–20 e os testes de missões. A publicação está pendente.
+Os seis blocos de Mascotes & Mortos-Vivos a Reino dos Mortos foram publicados em `b0e2361`. Antes do push, passaram o build de produção, os testes de andares 1–10, os 76 testes de andares 11–20 e os testes de missões. Depois do deploy, o QA dos andares 11–20 passou contra o site publicado, sem erros de JavaScript. O bundle publicado não cita os recortes de p. 230 a 297 e traz o Maior que a Morte completo do Arquilich. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44656288338)
 
 ### O que falta em Ameaças de Arton
 
