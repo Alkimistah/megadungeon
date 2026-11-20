@@ -2468,7 +2468,8 @@ svg {
 }
 
 .treasure-tab[aria-selected="true"] {
-  border-color: #f1d6a8;
+  border-color: color-mix(in srgb, var(--action) 55%, white 45%);
+  background: var(--action-hover);
   font-weight: 700;
 }
 
@@ -3098,6 +3099,7 @@ details.mission-run-guidance p {
 }
 
 .treasure-result {
+  background: var(--surface-alt);
   display: flex;
   gap: 8px;
   padding: 8px;

@@ -179,6 +179,50 @@ try {
 
   await page.locator("#treasureClose").click();
   await page.locator("#treasureDialog").waitFor({ state: "hidden" });
+  // Tema: as cores da modal seguem o perfil do andar (variáveis --page/--surface-alt/--action-hover).
+  const themeOf = async profileIndex => {
+    const p = await browser.newPage({ viewport: { width: 1024, height: 768 }, serviceWorkers: "block" });
+    p.on("pageerror", error => errors.push(error.message));
+    await p.goto(url);
+    await p.locator("#rangeDialog[open]").waitFor();
+    const ids = await p.locator("#floorRangeInput option").evaluateAll(os => os.map(o => o.value));
+    await p.locator("#floorRangeInput").selectOption(ids[profileIndex]);
+    await p.locator("#rangeConfirm").click();
+    await p.locator("#rangeDialog").waitFor({ state: "hidden" });
+    await p.locator("#missionDialog[open]").waitFor({ timeout: 20000 }).catch(() => {});
+    await p.waitForTimeout(500);
+    await p.evaluate(() => {
+      document.querySelectorAll("dialog[open]").forEach(d => d.close());
+      document.getElementById("treasureButton").click();
+    });
+    await p.waitForTimeout(300);
+    await p.evaluate(() => { const d = document.getElementById("treasureDialog"); d.close(); d.showModal(); });
+    await p.locator("#treasureDialog .treasure-roll").click();
+    const read = await p.evaluate(() => {
+      const root = getComputedStyle(document.documentElement);
+      const d = getComputedStyle(document.getElementById("treasureDialog"));
+      const card = getComputedStyle(document.querySelector("#treasureDialog .treasure-result"));
+      const tab = getComputedStyle(document.querySelector("#treasureDialog [role=tab][aria-selected=true]"));
+      const probe = document.createElement("i");
+      const toRgb = v => { probe.style.color = v; document.body.append(probe); const r = getComputedStyle(probe).color; probe.remove(); return r; };
+      return { dialogBg: d.backgroundColor, cardBg: card.backgroundColor, tabBg: tab.backgroundColor,
+        page: toRgb(root.getPropertyValue("--page").trim()), alt: toRgb(root.getPropertyValue("--surface-alt").trim()),
+        hover: toRgb(root.getPropertyValue("--action-hover").trim()) };
+    });
+    await p.screenshot({ path: shot(`treasure-rolar-${ids[profileIndex]}.png`) });
+    await p.close();
+    return { id: ids[profileIndex], ...read };
+  };
+  const themeA = await themeOf(0);
+  const themeB = await themeOf(1);
+  for (const t of [themeA, themeB]) {
+    assert.equal(t.dialogBg, t.page, `fundo da modal = --page (${t.id})`);
+    assert.equal(t.cardBg, t.alt, `cartão = --surface-alt (${t.id})`);
+    assert.equal(t.tabBg, t.hover, `aba selecionada = --action-hover (${t.id})`);
+  }
+  assert.notEqual(themeA.dialogBg, themeB.dialogBg, "perfis diferentes têm fundos diferentes");
+  assert.notEqual(themeA.cardBg, themeB.cardBg);
+  console.log("temas:", themeA.id, themeA.dialogBg, "|", themeB.id, themeB.dialogBg);
   assert.deepEqual(errors, [], `pageerror: ${errors.join("; ")}`);
   console.log("qaTreasure OK");
 } finally {
