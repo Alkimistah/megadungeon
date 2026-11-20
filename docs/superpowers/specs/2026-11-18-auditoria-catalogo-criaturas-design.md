@@ -7,7 +7,7 @@ Usar os quatro PDFs integrais em `tmp/livros/` como referência das fichas publi
 ## Progresso por livro
 
 - **Livro Básico — Jogo do Ano.** Primeira rodada publicada com 80 fichas inventariadas e referências atualizadas. O plano acompanha as diferenças entre livros e as versões já publicadas. [Plano da primeira rodada](../plans/2026-11-18-auditoria-livro-basico.md)
-- **Ameaças de Arton.** As 335 fichas de Ameaças do catálogo foram conferidas contra o PDF integral e publicadas. Familiares fica fora do catálogo. De Reinos de Moreania a Trolls Nobres, e em 12 fichas de Uivantes, não há fichas no catálogo, e falta decidir se entram. [Relatório e ponto de retomada](../plans/2026-11-18-auditoria-orcs-ameacas.md#pendências-e-ponto-de-retomada)
+- **Ameaças de Arton.** As 335 fichas de Ameaças do catálogo foram conferidas contra o PDF integral e publicadas. Os blocos de Reinos de Moreania a Trolls Nobres e 12 fichas de Uivantes não estão no catálogo e ficam anotados para cadastro futuro. Familiares fica fora do catálogo. [Relatório e cadastro futuro](../plans/2026-11-18-auditoria-orcs-ameacas.md#cadastro-futuro)
 - **Deuses de Arton e Heróis de Arton.** PDFs disponíveis. As variantes de Deuses dos avatares de Aharadak e Kallyadranoch já foram conferidas. O inventário de cada livro segue pendente.
 
 ## Método

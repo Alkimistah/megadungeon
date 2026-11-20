@@ -974,9 +974,24 @@ Uivantes e Áreas de Tormenta foram publicados em `f2f691e`. Antes do push, pass
 
 ### O que falta em Ameaças de Arton
 
-Nenhuma ficha de Ameaças do catálogo cita recortes ou prints. Resta uma decisão de escopo.
+Nenhuma ficha de Ameaças do catálogo cita recortes ou prints. A revisão das fichas existentes está concluída.
 
-1. **Blocos sem fichas no catálogo.** Reinos de Moreania, p. 296, Sanguinárias, p. 306, Sob as Ondas, p. 314, Sszzaazitas, p. 326, e Trolls Nobres, p. 338, não têm nenhuma ficha de Ameaças no catálogo, e os recortes do cadastro original terminam na p. 297 impressa. Mantícora, Serpe e Otyugh, desses blocos, existem só na versão do Livro Básico, e Finntroll, Nagah e Cultista de Sszzaas são fichas próprias do Básico. Das 15 fichas de Uivantes, só três estão no catálogo. Falta decidir se esses blocos e as demais fichas de Uivantes entram no catálogo, como em Familiares.
+### Cadastro futuro
+
+A intenção do projeto é, depois de revisar todo o catálogo atual, cadastrar os inimigos dos livros que ainda faltam. Os grupos abaixo foram identificados durante a auditoria de Ameaças e ficam anotados para esse cadastro. Os nomes vêm do sumário e dos títulos das páginas; o número exato de fichas deve ser inventariado no momento do cadastro, como foi feito nos blocos auditados.
+
+| Bloco | Páginas impressas | Fichas a cadastrar |
+|---|---:|---|
+| Reinos de Moreania | 296–305 | Búfalo-de-Guerra, Hippossauro, Mantícora, Otyugh, Yidishan, Moreau |
+| Sanguinárias | 306–313 | Cerianthar, Grande Tachygloss, Oxxdon, Razza’Kham, Serpe, Uraghian, Kaiju |
+| Sob as Ondas | 314–325 | Canceronte, Elfo-do-Mar, Enguia Rainha, Irukanjin, Nereida, Peixe-Recife, Platan, Selako, Kraken e Pliorex |
+| Sszzaazitas | 326–337 | Adorador de Sszzaas, Elemental do Veneno, Górgona, Nagah Arcanista, Nagah Dormente, Nagah Defensor, Nagah Retalhador, Nagah Sacerdotisa, Rival Espelho, Zumbi Peçonha, Sszzaazita Celebrante e Nastarrath |
+| Trolls Nobres | 338–347 | Arcanista Finntroll, Defeituoso, Mycotann, Opressor Finntroll, Perdigueiro Troll, Protetor-Refém, Cavaleiro Finntroll, Sacerdote Finntroll |
+| Uivantes | 348–357 | Carcaju, Golem de Nor Grande, Golem de Nor Enorme, Mamute, Lyuba, as duas fichas de Minotauro da Manada, Ogro Furioso, Keylor, Urso das Neves, Verme do Gelo Larva, Verme do Gelo Adulto |
+
+Mantícora, Serpe e Otyugh já existem no catálogo na versão do Livro Básico. Ao cadastrá-las, comparar com Ameaças e separar as versões por fonte, como em Gorlogg e Capelão de Guerra. Finntroll Caçador, Finntroll Feitor, Nagah Guardião, Nagah Mística e Cultista de Sszzaas também são fichas do Básico e devem ser cotejadas com as de Ameaças do mesmo povo.
+
+Familiares, pp. 190–197, ficou fora do catálogo por decisão anterior, porque são criaturas de apoio a personagens. A Tropa de Tentacutes, de ND 2 e com marca de Bando, é a única com uso direto como encontro e pode ser reavaliada no cadastro futuro.
 
 ### Revisão de apresentação, fora da auditoria
 
