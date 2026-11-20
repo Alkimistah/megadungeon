@@ -527,6 +527,137 @@ test("Gorlogg keeps the Ameaças default and has a distinct Livro Básico sheet"
   }), [variant.id]);
 });
 
+test("Ameaças undead sheets cite the full PDF", () => {
+  const pages = [
+    ["carnical", 231], ["lacedon", 231], ["cavalo-esqueleto", 231], ["ogro-esqueleto", 231],
+    ["urso-pardo-esqueleto", 232], ["gigante-esqueleto", 232], ["mamute-esqueleto", 232],
+    ["hidra-esqueleto", 233], ["rei-tirano-esqueleto", 233], ["fantasma", 234], ["fantasma-ancestral", 234],
+    ["garra-zumbi", 236], ["garra-zumbi-ogro", 236], ["garra-zumbi-enxame", 236], ["garra-zumbi-gigante", 236],
+    ["livido", 237], ["mortalha", 238], ["mumia", 238], ["senhor-das-mumias", 239, 240],
+    ["necrodraco-esqueleto", 240], ["necrodraco-zumbi", 240, 241], ["necrodraco-lich", 241], ["tarso-dragao-rei-dos-mortos", 243]
+  ];
+  for (const [id, pdfPage, pdfPageEnd] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }], id);
+  }
+});
+
+test("Necrodraco Lich and Tarso show the complete dragon aura and Tarso the death immunity threshold", () => {
+  const ability = (id, name) => getCreatureById(id).abilities.find(entry => entry.name === name).text;
+  for (const [id, dc] of [["necrodraco-lich", 53], ["tarso-dragao-rei-dos-mortos", 55]]) {
+    const aura = ability(id, "Aura Aterradora");
+    assert.match(aura, /comece seu turno em alcance longo do dragão fica apavorada .* ou abalada .* até o fim da cena/, id);
+    assert.match(aura, /imune a esta habilidade por um dia/, id);
+    assert.match(aura, new RegExp(`Vontade CD ${dc} evita`), id);
+  }
+  assert.match(ability("tarso-dragao-rei-dos-mortos", "Aura Aterradora"), /falhar por 10 ou mais, a criatura morre automaticamente.*apenas criaturas escolhidas/);
+  const death = ability("tarso-dragao-rei-dos-mortos", "Maior que a Morte");
+  assert.match(death, /pelo menos metade dos PV.*imune a efeitos de morte instantânea/);
+  assert.match(death, /perda de PV.*0 PV/);
+});
+
+test("Ameaças lost world sheets cite the full PDF", () => {
+  const pages = [
+    ["arvore-matilha", 244], ["burafonte", 245], ["armento-de-burafontes", 245], ["deinonico", 246],
+    ["bando-de-deinonicos", 247], ["espada-da-floresta", 248], ["galhada-macho", 248], ["galhada-femea", 248],
+    ["gali-gali", 249], ["enxame-de-gali-gali", 249], ["grande-battham", 250], ["raagoran", 251], ["tuntram", 251], ["rei-tirano", 253]
+  ];
+  for (const [id, pdfPage] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2
+    }], id);
+  }
+});
+
+test("Ameaças pirate and gunslinger sheets cite the full PDF", () => {
+  const pages = [
+    ["afogado", 255], ["capitao-afogado", 255], ["armeiro-de-tenebra-devoto", 255, 256], ["armeiro-de-tenebra-clerigo", 256],
+    ["demonio-da-polvora", 257], ["goblin-de-sombreiro", 258], ["lider-goblin-de-sombreiro", 258],
+    ["homem-piranha", 259], ["homem-piranha-imediato", 259], ["homem-piranha-capitao", 259],
+    ["pirata", 261], ["imediato", 261], ["bando-pirata", 261], ["capitao-pirata", 261], ["capitao-do-conclave-pirata", 261],
+    ["capitao-da-frota-aurea", 262], ["pistoleiro", 262], ["lider-pistoleiro", 262],
+    ["sahuagin-predador", 263], ["sahuagin-metamorfo", 263], ["chapeu-preto", 264], ["lobo-do-mar", 265]
+  ];
+  for (const [id, pdfPage, pdfPageEnd] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }], id);
+  }
+});
+
+test("Ameaças thunder people sheets cite the full PDF", () => {
+  const pages = [
+    ["ceratops-guerreiro", 266], ["ceratops-chefe-da-tribo", 267], ["pteros-ceifador", 268], ["pteros-do-ceu-infinito", 268, 269],
+    ["velocis-cacador", 270], ["xama-de-sarana", 270, 271], ["voracis-cacadora", 271], ["voracis-rainha", 272],
+    ["totem-de-sarana-aspecto-de-marah", 273], ["totem-da-divina-serpente-aspecto-de-allihanna", 274],
+    ["totem-do-rei-tirano-aspecto-de-megalokk", 275], ["totem-do-pai-de-tudo-aspecto-de-azgher", 275]
+  ];
+  for (const [id, pdfPage, pdfPageEnd] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }], id);
+  }
+});
+
+test("Ameaças purist sheets cite the full PDF", () => {
+  const pages = [
+    ["arcano-de-guerra-adepto", 276], ["arcano-de-guerra-veterano", 277], ["cacador-de-impuros", 278],
+    ["corcel-de-comando", 279], ["carruagem-de-comando", 280], ["dancarino-de-guerra", 281], ["dancarino-de-guerra-veterano", 281],
+    ["purificado", 282], ["soldado-blindado", 282, 283], ["companhia-blindada-de-elite", 283], ["soldado-superior", 285]
+  ];
+  for (const [id, pdfPage, pdfPageEnd] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }], id);
+  }
+});
+
+test("Ameaças realm of the dead sheets cite the full PDF and the Arquilich death immunity threshold", () => {
+  const pages = [
+    ["alzeras", 286, 287], ["cemiterio-vivo", 288], ["chacal-zumbi", 289], ["mercenario-de-aslothia", 290],
+    ["lider-mercenario-de-aslothia", 290, 291], ["morgue-raz", 291], ["wisphago", 292, 293], ["lich", 293, 294],
+    ["lich-de-aslothia", 294, 295], ["arquilich-ferren-asloth", 296, 297]
+  ];
+  for (const [id, pdfPage, pdfPageEnd] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }], id);
+  }
+  const death = getCreatureById("arquilich-ferren-asloth").abilities.find(ability => ability.name === "Maior que a Morte").text;
+  assert.match(death, /pelo menos metade dos PV.*imune a efeitos de morte instantânea/);
+  assert.match(death, /perda de PV.*0 PV/);
+});
+
 test("Dragão Celestial Venerável keeps the undead clause of Intervenção Divina", () => {
   const { abilities } = getCreatureById("dragao-celestial-veneravel");
   const { text } = abilities.find(ability => ability.name === "Intervenção Divina");

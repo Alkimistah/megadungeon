@@ -2069,8 +2069,9 @@ export const demonioDaPolvora = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p254 ate 272.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 257,
         "bookPage": 255
     },
     "stats": {
@@ -2130,8 +2131,9 @@ export const totemDaDivinaSerpenteAspectoDeAllihanna = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p273 ate 285.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 274,
         "bookPage": 272
     },
     "stats": {
@@ -2238,8 +2240,9 @@ export const totemDeSaranaAspectoDeMarah = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p273 ate 285.pdf",
-        "pdfPage": 1,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 273,
         "bookPage": 271
     },
     "stats": {
@@ -2308,8 +2311,9 @@ export const totemDoPaiDeTudoAspectoDeAzgher = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p273 ate 285.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 275,
         "bookPage": 273
     },
     "stats": {
@@ -2375,8 +2379,9 @@ export const totemDoReiTiranoAspectoDeMegalokk = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p273 ate 285.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 275,
         "bookPage": 273
     },
     "stats": {

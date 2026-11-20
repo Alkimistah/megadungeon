@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. As **227 fichas auditadas** estão publicadas. Familiares ficou registrado como fora do catálogo. O próximo bloco é Mascotes & Mortos-Vivos. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. Das **319 fichas auditadas**, **227 estão publicadas** e **92 estão no trabalho local**. Familiares ficou registrado como fora do catálogo. De Reinos de Moreania a Trolls Nobres não há fichas no catálogo, e o próximo passo depende de decisão. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -717,6 +717,170 @@ Os 364 campos numéricos conferidos coincidem com o catálogo. A contagem inclui
 
 **Anotações de apresentação.** Os quadros Treinando Montarias Selvagens e Montarias para Cavaleiros e Paladinos são regras de personagem e ficam fora das fichas.
 
+## Mascotes & Mortos-Vivos
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Carniçal | 1 | Solo | 229 | 231 |
+| Lacedon | 2 | Solo | 229 | 231 |
+| Cavalo Esqueleto | 1 | Solo | 229 | 231 |
+| Ogro Esqueleto | 3 | Solo | 229 | 231 |
+| Urso Pardo Esqueleto | 4 | Solo | 230 | 232 |
+| Gigante Esqueleto | 5 | Solo | 230 | 232 |
+| Mamute Esqueleto | 8 | Solo | 230 | 232 |
+| Hidra Esqueleto | 11 | Solo | 231 | 233 |
+| Rei-Tirano Esqueleto | 12 | Solo | 231 | 233 |
+| Fantasma | 7 | Especial | 232 | 234 |
+| Fantasma Ancestral | 14 | Especial | 232 | 234 |
+| Garra-Zumbi | ¼ | Lacaio | 234 | 236 |
+| Garra-Zumbi Ogro | 2 | Lacaio | 234 | 236 |
+| Garra-Zumbi Enxame | 3 | Lacaio, com Enxame | 234 | 236 |
+| Garra-Zumbi Gigante | 5 | Solo | 234 | 236 |
+| Lívido | 3 | Especial | 235 | 237 |
+| Mortalha | 11 | Solo | 236 | 238 |
+| Múmia | 5 | Solo | 236 | 238 |
+| Senhor das Múmias | 15 | Especial | 237–238 | 239–240 |
+| Necrodraco Esqueleto | 12 | Solo | 238 | 240 |
+| Necrodraco Zumbi | 14 | Solo | 238–239 | 240–241 |
+| Necrodraco Lich | 20 | Solo | 239 | 241 |
+| Tarso, Dragão-Rei dos Mortos | S+ | Solo | 241 | 243 |
+
+Os 324 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM do Senhor das Múmias e do Necrodraco Lich. Os atributos impressos como “—” correspondem ao valor nulo do catálogo. A conferência automática procurou no texto extraído as linhas de estatísticas, atributos e deslocamento, além de dados, CDs e testes das habilidades. Os cinco PV que o layout separou do rótulo, no Fantasma Ancestral, na Garra-Zumbi Gigante, na Múmia e nos dois necrodracos, foram localizados logo após as respectivas linhas de Defesa. Senhor das Múmias e Necrodraco Zumbi continuam na página seguinte. As 23 fichas agora citam o PDF integral.
+
+**Aura Aterradora e Maior que a Morte.** O Necrodraco Lich e Tarso recebem o texto completo da Aura Aterradora do Livro Básico, p. 311 impressa, p. 317 do PDF, como os dragões de Ameaças, com as CDs 53 e 55 das fichas. Tarso mantém a morte automática por falha de 10 ou mais, a escolha de alvos e a marca de Medo. A ficha impressa de Tarso não traz Maior que a Morte. O catálogo acrescenta a regra geral de ND S e S+, que agora explicita a imunidade à morte instantânea enquanto ele tiver pelo menos metade dos PV, como no Kishinauros e no Avatar de Kallyadranoch.
+
+**Papéis.** Garra-Zumbi, Garra-Zumbi Ogro e Garra-Zumbi Enxame são Lacaio no livro e Especial no catálogo, e o Enxame também traz a marca de Enxame. Tarso é Solo no livro e fica sem papel no catálogo, como as demais fichas de ND S e S+. Os papéis atuais foram preservados.
+
+**Omissões e anotações de apresentação.** Aura de Podridão do Necrodraco Zumbi mantém a remissão a Tormenta20, p. 318. Os quadros de Reforços listam criaturas de outras seções. Não foi encontrada marca de habilidade mágica nas fichas do Lich e de Tarso.
+
+## Mundo Perdido
+
+| Ficha | ND | Papel impresso | Página impressa | Página no PDF integral |
+|---|---:|---|---:|---:|
+| Árvore-Matilha | 13 | Solo | 242 | 244 |
+| Burafonte | 4 | Solo | 243 | 245 |
+| Armento de Burafontes | 8 | Solo, com Bando | 243 | 245 |
+| Deinonico | 4 | Solo | 244 | 246 |
+| Bando de Deinonicos | 8 | Solo, com Bando | 245 | 247 |
+| Espada-da-Floresta | 3 | Solo | 246 | 248 |
+| Galhada Macho | 2 | Lacaio | 246 | 248 |
+| Galhada Fêmea | 2 | Lacaio | 246 | 248 |
+| Gali-Gali | ¼ | Lacaio | 247 | 249 |
+| Enxame de Gali-Gali | 1 | Solo, com Enxame | 247 | 249 |
+| Grande Battham | 12 | Solo | 248 | 250 |
+| Raagoran | 8 | Solo | 249 | 251 |
+| Tuntram | 10 | Solo | 249 | 251 |
+| Rei-Tirano | 14 | Solo | 251 | 253 |
+
+Os 196 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha. A Inteligência impressa como “—” na Árvore-Matilha corresponde ao valor nulo do catálogo. A conferência automática procurou no texto extraído as linhas de estatísticas, atributos e deslocamento, além de dados, CDs e testes das habilidades. Os quatro PV que o layout separou do rótulo, no Deinonico, nas duas Galhadas e no Grande Battham, foram localizados logo após as respectivas linhas de Defesa. Cada ficha cabe em uma página. As 14 fichas agora citam o PDF integral, e o recorte `ameacas de arton p230 ate 253.pdf` deixa de ser citado.
+
+**Papéis.** Galhada Macho e Galhada Fêmea são Lacaio no livro e Solo no catálogo, e Gali-Gali é Lacaio no livro e Especial no catálogo. Os papéis atuais foram preservados. Armento de Burafontes e Bando de Deinonicos trazem a marca de Bando, e Enxame de Gali-Gali, a de Enxame.
+
+**Anotações de apresentação.** As Galhadas imprimem quadros de Parceiro, que ficam fora das fichas pela decisão registrada em Montarias. A espada espinhenta e os frutos da espada-mãe, no tesouro do Espada-da-Floresta, trazem o ícone de novo item. Não foi encontrada marca de habilidade mágica nas páginas conferidas.
+
+## Piratas & Pistoleiros
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Afogado | 7 | Lacaio | 253 | 255 |
+| Capitão Afogado | 10 | Solo | 253 | 255 |
+| Armeiro de Tenebra Devoto | 6 | Solo | 253–254 | 255–256 |
+| Armeiro de Tenebra Clérigo | 8 | Especial | 254 | 256 |
+| Demônio da Pólvora | 12 | Solo | 255 | 257 |
+| Goblin de Sombreiro | 2 | Lacaio | 256 | 258 |
+| Líder Goblin de Sombreiro | 6 | Solo | 256 | 258 |
+| Homem-Piranha | 2 | Solo | 257 | 259 |
+| Homem-Piranha Imediato | 4 | Especial | 257 | 259 |
+| Homem-Piranha Capitão | 7 | Solo | 257 | 259 |
+| Pirata | ½ | Lacaio | 259 | 261 |
+| Imediato | 4 | Solo | 259 | 261 |
+| Bando Pirata | 6 | Lacaio, com Bando | 259 | 261 |
+| Capitão Pirata | 7 | Solo | 259 | 261 |
+| Capitão do Conclave Pirata | 8 | Solo | 259 | 261 |
+| Capitão da Frota Áurea | 10 | Solo | 260 | 262 |
+| Pistoleiro | 2 | Solo | 260 | 262 |
+| Líder Pistoleiro | 4 | Solo | 260 | 262 |
+| Sahuagin Predador | 1 | Lacaio | 261 | 263 |
+| Sahuagin Metamorfo | 3 | Solo | 261 | 263 |
+| Chapéu-Preto | 12 | Solo | 262 | 264 |
+| Lobo do Mar | 16 | Solo | 263 | 265 |
+
+Os 310 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM do Armeiro de Tenebra Clérigo e do Homem-Piranha Imediato. A conferência automática procurou no texto extraído as linhas de estatísticas, atributos e deslocamento, além de dados, CDs e testes das habilidades. Os dois PV que o layout separou do rótulo, no Líder Goblin de Sombreiro e no Pistoleiro, foram localizados logo após as respectivas linhas de Defesa. O Armeiro de Tenebra Devoto continua na página seguinte. As 22 fichas agora citam o PDF integral.
+
+**Habilidades de Piratas.** O quadro da p. 258 impressa, p. 260 do PDF, dá Correr pelo Cordame e Pernas do Mar a todas as fichas da seção Pirata. O catálogo já as aplica a Pirata, Imediato, Bando Pirata e aos três capitães, além do Lobo do Mar, cuja habilidade Pirata remete ao quadro.
+
+**Papéis.** Goblin de Sombreiro, Pirata e Sahuagin Predador são Lacaio no livro e Especial no catálogo. Chapéu-Preto e Lobo do Mar são Solo no livro e Especial no catálogo. Os papéis atuais, todos inferidos, foram preservados. Os outros 17 coincidem, e o Bando Pirata também traz a marca de Bando.
+
+**Anotações de apresentação.** Manto da Penumbra do Armeiro de Tenebra Devoto traz a marca de habilidade mágica. A mordida do diabo do Homem-Piranha Capitão traz o ícone de novo item. O quadro de Reforços da p. 263 lista criaturas de outras seções.
+
+## Povos-Trovão
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Ceratops Guerreiro | 3 | Lacaio | 264 | 266 |
+| Ceratops Chefe da Tribo | 7 | Solo | 265 | 267 |
+| Pteros Ceifador | 2 | Lacaio | 266 | 268 |
+| Pteros do Céu Infinito | 5 | Especial | 266–267 | 268–269 |
+| Velocis Caçador | 4 | Lacaio | 268 | 270 |
+| Xamã de Sarana | 6 | Especial | 268–269 | 270–271 |
+| Voracis Caçadora | 8 | Lacaio | 269 | 271 |
+| Voracis Rainha | 11 | Solo | 270 | 272 |
+| Totem de Sarana (Aspecto de Marah) | 10 | Especial | 271 | 273 |
+| Totem da Divina Serpente (Aspecto de Allihanna) | 14 | Solo | 272 | 274 |
+| Totem do Rei-Tirano (Aspecto de Megalokk) | 15 | Solo | 273 | 275 |
+| Totem do Pai-de-Tudo (Aspecto de Azgher) | 12 | Solo | 273 | 275 |
+
+Os 172 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM do Pteros do Céu Infinito, do Xamã de Sarana e dos Totens de Sarana e da Divina Serpente. A conferência automática procurou no texto extraído as linhas de estatísticas, atributos e deslocamento, além de dados, CDs e testes das habilidades. Os três PV que o layout separou do rótulo, no Ceratops Guerreiro, no Xamã de Sarana e na Voracis Rainha, foram localizados logo após as respectivas linhas de Defesa. A Defesa do Velocis Caçador, “21 (23 contra ataques à distância)”, está registrada como 21, com o valor condicional no texto de defesas. Pteros do Céu Infinito e Xamã de Sarana continuam na página seguinte. As 12 fichas agora citam o PDF integral. Os quatro Totens do Trovão saíram do recorte `ameacas de arton p273 ate 285.pdf`, e o recorte `ameacas de arton p254 ate 272.pdf` deixa de ser citado.
+
+**Papéis.** Ceratops Guerreiro e Pteros Ceifador são Lacaio no livro e Especial no catálogo. O Totem de Sarana é Especial no livro e Solo no catálogo. Os papéis atuais, todos inferidos, foram preservados. Os outros nove coincidem.
+
+**Anotações de apresentação.** Aura de Paz do Xamã de Sarana e Placidez do Totem de Sarana trazem a marca de habilidade mágica. A espada vespa atroz e a garra feroz maciça da Voracis Caçadora trazem o ícone de novo item. Os quadros de habilidades de raça de Ceratops, Pteros, Velocis e Voracis ficam fora das fichas.
+
+## Puristas
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Arcano de Guerra Adepto | 4 | Especial | 274 | 276 |
+| Arcano de Guerra Veterano | 11 | Especial | 275 | 277 |
+| Caçador de Impuros | 8 | Solo | 276 | 278 |
+| Corcel de Comando | 3 | Especial | 277 | 279 |
+| Carruagem de Comando | 5 | Especial | 278 | 280 |
+| Dançarino de Guerra | 4 | Solo | 279 | 281 |
+| Dançarino de Guerra Veterano | 6 | Solo | 279 | 281 |
+| Purificado | 2 | Lacaio | 280 | 282 |
+| Soldado Blindado | 5 | Solo | 280–281 | 282–283 |
+| Companhia Blindada de Elite | 9 | Solo, com Bando | 281 | 283 |
+| Soldado Superior | 17 | Solo | 283 | 285 |
+
+Os 156 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM dos dois Arcanos de Guerra. A Inteligência impressa como “—” no Corcel e na Carruagem de Comando corresponde ao valor nulo do catálogo. A conferência automática procurou no texto extraído as linhas de estatísticas, atributos e deslocamento, além de dados, CDs e testes das habilidades. Os PM do Arcano Adepto, o PV do Soldado Blindado e a CD 24 de Evacuação de Emergência da Carruagem, separados pelo layout, foram localizados nas respectivas fichas. Só o Soldado Blindado continua na página seguinte. O quadro O Exército Purista e o comandante Hermann Von Krauser, p. 281 impressa, são texto descritivo, sem ficha. As 11 fichas agora citam o PDF integral, e o recorte `ameacas de arton p273 ate 285.pdf` deixa de ser citado.
+
+**Papéis.** A Carruagem de Comando é Especial no livro e Solo no catálogo. Dançarino de Guerra Veterano, Soldado Blindado e Companhia Blindada de Elite são Solo no livro e Especial no catálogo. Os papéis atuais, todos inferidos, foram preservados. A Companhia também traz a marca de Bando.
+
+**Anotações de apresentação.** O Açoite Flamejante e o tomo de guerra do Arcano de Guerra Veterano trazem o ícone de nova magia ou novo item. O quadro de Reforços da p. 283 lista criaturas de outras seções.
+
+## Reino dos Mortos
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Alzeras | 11 | Especial | 284–285 | 286–287 |
+| Cemitério Vivo | 17 | Solo | 286 | 288 |
+| Chacal-Zumbi | 2 | Lacaio | 287 | 289 |
+| Mercenário de Aslothia | 3 | Lacaio | 288 | 290 |
+| Líder Mercenário de Aslothia | 5 | Solo | 288–289 | 290–291 |
+| Morgue’raz | 9 | Solo | 289 | 291 |
+| Wisphago | 8 | Solo | 290–291 | 292–293 |
+| Lich | 15 | Especial | 291–292 | 293–294 |
+| Lich de Aslothia | 18 | Especial | 292–293 | 294–295 |
+| Arquilich Ferren Asloth | S | Especial | 294–295 | 296–297 |
+
+Os 144 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM de Alzeras, dos dois Liches e do Arquilich. Os atributos impressos como “—” correspondem ao valor nulo do catálogo. A conferência automática procurou no texto extraído as linhas de estatísticas, atributos e deslocamento, além de dados, CDs e testes das habilidades. Os PV e PM que o layout separou do rótulo, em Alzeras, no Líder Mercenário, no Wisphago e no Lich de Aslothia, foram localizados nas respectivas fichas. A Vontade +24 do Cemitério Vivo, cortada no texto extraído, foi conferida na página renderizada. Seis fichas continuam na página seguinte. As 10 fichas agora citam o PDF integral, e o recorte `ameacas de arton p 286 ate 297.pdf` deixa de ser citado.
+
+**Maior que a Morte.** A ficha impressa do Arquilich Ferren Asloth não traz a habilidade. O catálogo a acrescenta pela regra geral de ND S e S+ e agora explicita a imunidade à morte instantânea enquanto ele tiver pelo menos metade dos PV, como em Tarso.
+
+**Papéis.** O Chacal-Zumbi é Lacaio no livro e Especial no catálogo. O Arquilich é Especial no livro e fica sem papel no catálogo, como as demais fichas de ND S e S+. Os papéis atuais foram preservados. Os outros oito coincidem.
+
+**Anotações de apresentação.** Aura de Medo do Arquilich traz a marca de habilidade mágica. Finalmente Livres do Cemitério Vivo mantém a remissão a Tormenta20, p. 298. Os quadros de Reforços listam criaturas de outras seções.
+
 ## Pendências e ponto de retomada
 
 Situação em 19 de novembro de 2026.
@@ -742,9 +906,15 @@ Situação em 19 de novembro de 2026.
 | Familiares | 190–197 | 0 | Fora do catálogo |
 | Masmorras | 198–209 | 14 | Publicado |
 | Montarias | 210–227 | 26 | Publicado |
-| **Total** | | **227** | **Publicadas** |
+| Mascotes & Mortos-Vivos | 228–241 | 23 | Validado localmente |
+| Mundo Perdido | 242–251 | 14 | Validado localmente |
+| Piratas & Pistoleiros | 252–263 | 22 | Validado localmente |
+| Povos-Trovão | 264–273 | 12 | Validado localmente |
+| Puristas | 274–283 | 11 | Validado localmente |
+| Reino dos Mortos | 284–295 | 10 | Validado localmente |
+| **Total** | | **319** | **227 publicadas e 92 locais** |
 
-As 227 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
+As 319 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
 
 Os nove blocos de Elementais a Kobolds foram publicados em `18952eb`, com as referências atualizadas, as versões do Livro Básico de Gnoll Saqueador, Gárgula, Golem de Ferro e Capelão de Guerra, a versão de Deuses de Arton do Avatar de Kallyadranoch e as regras gerais de kobold nas fichas. As fichas de Ameaças conservam seus IDs, seus papéis atuais e a preferência dos perfis existentes.
 
@@ -752,15 +922,16 @@ Antes do push, passaram o build de produção, os testes de andares 1–10, os 6
 
 Masmorras, Montarias e a retirada dos quadros de parceiro e familiar foram publicados em `da7c816`. Antes do push, passaram o build de produção, os testes de andares 1–10, os 69 testes de andares 11–20, os testes de missões e o QA dos andares 11–20 contra o build local. Depois do deploy, o QA passou contra o site publicado, sem erros de JavaScript. O bundle publicado traz `gorlogg-livro-basico`, não cita o recorte `ameacas de arton p200 ate 229.pdf` e não tem habilidades chamadas Parceiro ou Familiar. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44654215976)
 
+Mascotes & Mortos-Vivos, Mundo Perdido, Piratas & Pistoleiros, Povos-Trovão, Puristas e Reino dos Mortos estão validados localmente: passaram o build de produção, os testes de andares 1–10, os 76 testes de andares 11–20 e os testes de missões. A publicação está pendente.
+
 ### O que falta em Ameaças de Arton
 
-Ainda há 108 fichas de Ameaças no catálogo apontando para recortes do PDF ou para prints enviados pelo usuário. A ordem de trabalho segue o sumário, pp. 3–5 impressas, pp. 5–7 do PDF.
+Ainda há 16 fichas de Ameaças no catálogo apontando para recortes do PDF ou para prints enviados pelo usuário. A ordem de trabalho segue o sumário, pp. 3–5 impressas, pp. 5–7 do PDF.
 
-1. **Mascotes & Mortos-Vivos**, p. 228 impressa, p. 230 do PDF. As fichas citam o recorte `ameacas de arton p230 ate 253.pdf`.
-2. **Blocos seguintes na ordem do sumário.** Mundo Perdido, p. 242. Piratas & Pistoleiros, p. 252. Povos-Trovão, p. 264. Puristas, p. 274. Reino dos Mortos, p. 284. Reinos de Moreania, p. 296. Sanguinárias, p. 306. Sob as Ondas, p. 314. Sszzaazitas, p. 326. Trolls Nobres, p. 338. Uivantes, p. 348.
+1. **Blocos sem fichas no catálogo.** Reinos de Moreania, p. 296, Sanguinárias, p. 306, Sob as Ondas, p. 314, Sszzaazitas, p. 326, e Trolls Nobres, p. 338, não têm nenhuma ficha de Ameaças no catálogo, e os recortes do cadastro original terminam na p. 297 impressa. Mantícora, Serpe e Otyugh, desses blocos, existem só na versão do Livro Básico, e Finntroll, Nagah e Cultista de Sszzaas são fichas próprias do Básico. Falta decidir se esses blocos entram no catálogo, como em Familiares.
+2. **Uivantes**, p. 348 impressa. Só `golem-de-nor-medio`, `stagh` e `soterrado-vagante` estão no catálogo, vindos de prints. Conferir as três com o PDF integral e decidir sobre as demais fichas do bloco.
 3. **Áreas de Tormenta**, p. 18 impressa, p. 20 do PDF. Fica para depois dos blocos acima. As 13 fichas citam o recorte `ameacas de arton p20 ate 31.pdf`. Conferir com a regra compartilhada dos lefeu do Livro Básico, p. 315.
-4. **Fichas vindas de prints:** `golem-de-nor-medio`, `stagh` e `soterrado-vagante` citam “prints enviados pelo usuário”. Pertencem a Uivantes e devem ganhar referência ao PDF integral quando esse bloco for auditado.
-5. **Aura Aterradora abreviada.** Completar as fichas do Necrodraco Lich e de Tarso com o texto do Livro Básico durante a auditoria de Mascotes & Mortos-Vivos.
+4. **Maior que a Morte genérico.** Sckhar, Avatar de Aharadak e Gatzvalith ainda usam a descrição geral do ND S como texto da habilidade. Completar como em Tarso e no Arquilich quando Áreas de Tormenta for auditado. Sckhar já está publicado e pode ser corrigido junto.
 
 ### Revisão de apresentação, fora da auditoria
 

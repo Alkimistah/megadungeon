@@ -488,8 +488,9 @@ export const espadaDaFloresta = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 19,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 248,
         "bookPage": 246
     },
     "stats": {
@@ -550,8 +551,9 @@ export const galhadaMacho = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 19,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 248,
         "bookPage": 246
     },
     "stats": {
@@ -602,8 +604,9 @@ export const galhadaFemea = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 19,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 248,
         "bookPage": 246
     },
     "stats": {
@@ -1597,8 +1600,9 @@ export const arvoreMatilha = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 15,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 244,
         "bookPage": 242
     },
     "stats": {
@@ -1654,8 +1658,9 @@ export const carruagemDeComando = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p273 ate 285.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 280,
         "bookPage": 278
     },
     "stats": {
@@ -1726,8 +1731,9 @@ export const corcelDeComando = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p273 ate 285.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 279,
         "bookPage": 277
     },
     "stats": {

@@ -2184,8 +2184,9 @@ export const armentoDeBurafontes = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 16,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 245,
         "bookPage": 243
     },
     "stats": {
@@ -2241,8 +2242,9 @@ export const bandoDeDeinonicos = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 18,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 247,
         "bookPage": 245
     },
     "stats": {
@@ -2293,8 +2295,9 @@ export const burafonte = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 16,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 245,
         "bookPage": 243
     },
     "stats": {
@@ -2345,8 +2348,9 @@ export const deinonico = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 17,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 246,
         "bookPage": 244
     },
     "stats": {
@@ -2397,8 +2401,9 @@ export const enxameDeGaliGali = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 20,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 249,
         "bookPage": 247
     },
     "stats": {
@@ -2449,8 +2454,9 @@ export const galiGali = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 20,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 249,
         "bookPage": 247
     },
     "stats": {
@@ -2495,8 +2501,9 @@ export const grandeBattham = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 21,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 250,
         "bookPage": 248
     },
     "stats": {
@@ -2547,8 +2554,9 @@ export const raagoran = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 22,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 251,
         "bookPage": 249
     },
     "stats": {
@@ -2614,8 +2622,9 @@ export const reiTirano = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 24,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 253,
         "bookPage": 251
     },
     "stats": {
@@ -2681,8 +2690,9 @@ export const tuntram = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 22,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 251,
         "bookPage": 249
     },
     "stats": {

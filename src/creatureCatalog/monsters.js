@@ -7758,8 +7758,9 @@ export const homemPiranhaCapitao = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p254 ate 272.pdf",
-        "pdfPage": 6,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 259,
         "bookPage": 257
     },
     "stats": {
@@ -7815,8 +7816,9 @@ export const mercenarioDeAslothia = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p 286 ate 297.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 290,
         "bookPage": 288
     },
     "stats": {

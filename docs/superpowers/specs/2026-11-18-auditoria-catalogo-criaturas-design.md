@@ -7,7 +7,7 @@ Usar os quatro PDFs integrais em `tmp/livros/` como referência das fichas publi
 ## Progresso por livro
 
 - **Livro Básico — Jogo do Ano.** Primeira rodada publicada com 80 fichas inventariadas e referências atualizadas. O plano acompanha as diferenças entre livros e as versões já publicadas. [Plano da primeira rodada](../plans/2026-11-18-auditoria-livro-basico.md)
-- **Ameaças de Arton.** A auditoria avançou até Montarias, com 227 fichas conferidas e publicadas. Familiares fica fora do catálogo, e regras de parceiro e familiar não entram nas fichas. Restam 108 fichas citando recortes ou prints. O próximo bloco é Mascotes & Mortos-Vivos. [Relatório e ponto de retomada](../plans/2026-11-18-auditoria-orcs-ameacas.md#pendências-e-ponto-de-retomada)
+- **Ameaças de Arton.** A auditoria avançou até Reino dos Mortos, com 319 fichas conferidas, 227 delas publicadas. Familiares fica fora do catálogo, e regras de parceiro e familiar não entram nas fichas. Restam 16 fichas citando recortes ou prints: 13 de Áreas de Tormenta e 3 de Uivantes. De Reinos de Moreania a Trolls Nobres não há fichas no catálogo. [Relatório e ponto de retomada](../plans/2026-11-18-auditoria-orcs-ameacas.md#pendências-e-ponto-de-retomada)
 - **Deuses de Arton e Heróis de Arton.** PDFs disponíveis. As variantes de Deuses dos avatares de Aharadak e Kallyadranoch já foram conferidas. O inventário de cada livro segue pendente.
 
 ## Método

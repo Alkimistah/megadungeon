@@ -431,8 +431,9 @@ export const carnical = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 231,
         "bookPage": 229
     },
     "stats": {
@@ -488,8 +489,9 @@ export const lacedon = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 231,
         "bookPage": 229
     },
     "stats": {
@@ -550,8 +552,9 @@ export const ogroEsqueleto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 231,
         "bookPage": 229
     },
     "stats": {
@@ -607,8 +610,9 @@ export const ursoPardoEsqueleto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 232,
         "bookPage": 230
     },
     "stats": {
@@ -669,8 +673,9 @@ export const gigantEsqueleto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 232,
         "bookPage": 230
     },
     "stats": {
@@ -726,8 +731,9 @@ export const fantasma = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 234,
         "bookPage": 232
     },
     "stats": {
@@ -788,8 +794,9 @@ export const garraZumbi = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 236,
         "bookPage": 234
     },
     "stats": {
@@ -845,8 +852,9 @@ export const garraZumbiOgro = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 236,
         "bookPage": 234
     },
     "stats": {
@@ -907,8 +915,9 @@ export const garraZumbiEnxame = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 236,
         "bookPage": 234
     },
     "stats": {
@@ -959,8 +968,9 @@ export const garraZumbiGigante = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 236,
         "bookPage": 234
     },
     "stats": {
@@ -1386,8 +1396,9 @@ export const cavaloEsqueleto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 231,
         "bookPage": 229
     },
     "stats": {
@@ -1438,8 +1449,9 @@ export const fantasmaAncestral = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 234,
         "bookPage": 232
     },
     "stats": {
@@ -1510,8 +1522,9 @@ export const hidraEsqueleto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 233,
         "bookPage": 231
     },
     "stats": {
@@ -1562,8 +1575,9 @@ export const livido = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 237,
         "bookPage": 235
     },
     "stats": {
@@ -1629,8 +1643,9 @@ export const mamuteEsqueleto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 232,
         "bookPage": 230
     },
     "stats": {
@@ -1686,8 +1701,9 @@ export const mortalha = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 238,
         "bookPage": 236
     },
     "stats": {
@@ -1753,8 +1769,9 @@ export const mumia = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 238,
         "bookPage": 236
     },
     "stats": {
@@ -1810,8 +1827,9 @@ export const necrodracoEsqueleto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 11,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 240,
         "bookPage": 238
     },
     "stats": {
@@ -1867,8 +1885,9 @@ export const necrodracoLich = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 12,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 241,
         "bookPage": 239
     },
     "stats": {
@@ -1902,7 +1921,7 @@ export const necrodracoLich = {
         {
             "name": "Aura Aterradora",
             "timing": null,
-            "text": "Vontade CD 53 evita."
+            "text": "A simples visão de um dragão adulto ou mais velho amedronta o mais valente dos aventureiros. Uma criatura que comece seu turno em alcance longo do dragão fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia. Vontade CD 53 evita."
         },
         {
             "name": "Couro Necromântico",
@@ -2004,9 +2023,12 @@ export const necrodracoZumbi = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 11,
-        "bookPage": 238
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 240,
+        "bookPage": 238,
+        "pdfPageEnd": 241,
+        "bookPageEnd": 239
     },
     "stats": {
         "initiative": 14,
@@ -2071,8 +2093,9 @@ export const reiTiranoEsqueleto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 233,
         "bookPage": 231
     },
     "stats": {
@@ -2143,9 +2166,12 @@ export const senhorDasMumias = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 10,
-        "bookPage": 237
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 239,
+        "bookPage": 237,
+        "pdfPageEnd": 240,
+        "bookPageEnd": 238
     },
     "stats": {
         "initiative": 14,
@@ -2241,8 +2267,9 @@ export const tarsoDragaoReiDosMortos = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p230 ate 253.pdf",
-        "pdfPage": 14,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 243,
         "bookPage": 241
     },
     "stats": {
@@ -2280,7 +2307,7 @@ export const tarsoDragaoReiDosMortos = {
         {
             "name": "Aura Aterradora",
             "timing": null,
-            "text": "Vontade CD 55 evita (se falhar por 10 ou mais, a criatura morre automaticamente). A aura afeta apenas criaturas escolhidas. Medo."
+            "text": "A simples visão de um dragão adulto ou mais velho amedronta o mais valente dos aventureiros. Uma criatura que comece seu turno em alcance longo do dragão fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia. Vontade CD 55 evita (se falhar por 10 ou mais, a criatura morre automaticamente). A aura afeta apenas criaturas escolhidas. Medo."
         },
         {
             "name": "Conjuração Cadavérica",
@@ -2340,7 +2367,7 @@ export const tarsoDragaoReiDosMortos = {
         {
             "name": "Maior que a Morte",
             "timing": null,
-            "text": "Criaturas de ND S e S+ possuem um status especial. Para estatísticas não listadas em suas fichas, são consideradas criaturas de ND 20; para habilidades de outras criaturas, seu ND é maior que 20, impedindo efeitos limitados pelo nível do alvo."
+            "text": "Enquanto tiver pelo menos metade dos PV, Tarso é imune a efeitos de morte instantânea, inclusive os que aprisionam ou destroem seu corpo ou alma. Dano ou perda de PV ainda pode reduzi-lo a 0 PV ou menos. Como criatura de ND S+, ele conta como ND 20 para estatísticas ausentes da ficha e como ND superior a 20 para habilidades de outras criaturas."
         }
     ],
     "equipment": null,
@@ -2358,8 +2385,9 @@ export const afogado = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p254 ate 272.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 255,
         "bookPage": 253
     },
     "stats": {
@@ -2410,8 +2438,9 @@ export const capitaoAfogado = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p254 ate 272.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 255,
         "bookPage": 253
     },
     "stats": {
@@ -2467,8 +2496,9 @@ export const capitaoPirata = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p254 ate 272.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 261,
         "bookPage": 259
     },
     "stats": {
@@ -2543,8 +2573,9 @@ export const imediato = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p254 ate 272.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 261,
         "bookPage": 259
     },
     "stats": {
@@ -2605,9 +2636,12 @@ export const alzeras = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p 286 ate 297.pdf",
-        "pdfPage": 1,
-        "bookPage": 284
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 286,
+        "bookPage": 284,
+        "pdfPageEnd": 287,
+        "bookPageEnd": 285
     },
     "stats": {
         "initiative": 18,
@@ -2724,9 +2758,12 @@ export const arquilichFerrenAsloth = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p 286 ate 297.pdf",
-        "pdfPage": 11,
-        "bookPage": 294
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 296,
+        "bookPage": 294,
+        "pdfPageEnd": 297,
+        "bookPageEnd": 295
     },
     "stats": {
         "initiative": 27,
@@ -2909,7 +2946,7 @@ export const arquilichFerrenAsloth = {
         {
             "name": "Maior que a Morte",
             "timing": null,
-            "text": "Criaturas de ND S e S+ possuem um status especial. Para estatísticas não listadas em suas fichas, são consideradas criaturas de ND 20; para habilidades de outras criaturas, seu ND é maior que 20, impedindo efeitos limitados pelo nível do alvo."
+            "text": "Enquanto tiver pelo menos metade dos PV, o Arquilich Ferren Asloth é imune a efeitos de morte instantânea, inclusive os que aprisionam ou destroem seu corpo ou alma. Dano ou perda de PV ainda pode reduzi-lo a 0 PV ou menos. Como criatura de ND S, ele conta como ND 20 para estatísticas ausentes da ficha e como ND superior a 20 para habilidades de outras criaturas."
         }
     ],
     "equipment": "Amuleto do Abutre, cajado da destruição, robe do arquimago",
@@ -2927,8 +2964,9 @@ export const cemiterioVivo = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p 286 ate 297.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 288,
         "bookPage": 286
     },
     "stats": {
@@ -2999,8 +3037,9 @@ export const chacalZumbi = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p 286 ate 297.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 289,
         "bookPage": 287
     },
     "stats": {
@@ -3061,9 +3100,12 @@ export const lich = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p 286 ate 297.pdf",
-        "pdfPage": 8,
-        "bookPage": 291
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 293,
+        "bookPage": 291,
+        "pdfPageEnd": 294,
+        "bookPageEnd": 292
     },
     "stats": {
         "initiative": 14,
@@ -3198,9 +3240,12 @@ export const lichDeAslothia = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p 286 ate 297.pdf",
-        "pdfPage": 9,
-        "bookPage": 292
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 294,
+        "bookPage": 292,
+        "pdfPageEnd": 295,
+        "bookPageEnd": 293
     },
     "stats": {
         "initiative": 21,
@@ -3368,8 +3413,9 @@ export const morgueRaz = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p 286 ate 297.pdf",
-        "pdfPage": 6,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 291,
         "bookPage": 289
     },
     "stats": {
@@ -3435,9 +3481,12 @@ export const wisphago = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p 286 ate 297.pdf",
-        "pdfPage": 7,
-        "bookPage": 290
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 292,
+        "bookPage": 290,
+        "pdfPageEnd": 293,
+        "bookPageEnd": 291
     },
     "stats": {
         "initiative": 12,
