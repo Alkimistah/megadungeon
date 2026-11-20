@@ -41,4 +41,6 @@ Por decisão do usuário, as três tabelas de `THREAT_PARAMETERS` foram reescrit
 - **Variantes elite.** O plano de escala passa a usar os valores do livro. Um Hurobakk escalado para Solo de ND 12, por exemplo, recebe ataque +36 e Resistência Forte 26, em vez de ataque +26.
 - **Validação.** Passaram o build de produção, os testes de andares 1–10, com 13.500 encontros sem vazios ou divergências de ND, os 81 testes de andares 11–20 e os testes de missões.
 
+A correção foi publicada em `6bd15e7`. O QA dos andares 11–20 passou contra o build local e contra o site publicado, sem erros de JavaScript, e o bundle publicado traz a tabela do livro. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44658870319)
+
 Muitas divergências de papel registradas na auditoria de Ameaças se resolvem com a tabela corrigida. As que restam continuam registradas nas seções de cada bloco.
