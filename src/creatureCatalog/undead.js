@@ -1202,8 +1202,9 @@ export const guerreiroPerpetuo = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 13,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 141,
         "bookPage": 139
     },
     "stats": {
@@ -1259,8 +1260,9 @@ export const estouroDeFuriasDeTauron = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 173,
         "bookPage": 171
     },
     "stats": {
@@ -1321,8 +1323,9 @@ export const furiaDeTauron = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 172,
         "bookPage": 170
     },
     "stats": {

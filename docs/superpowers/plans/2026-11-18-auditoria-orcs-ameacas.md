@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. A revisão cobre as 21 fichas de Brutos & Indomáveis, as 17 de Capangas & Bandoleiros, as 11 do Culto de Aharadak, as 12 de Dragões e as 12 de Duyshidakk.
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. Das **187 fichas auditadas**, **73 estão publicadas** e **114 estão no trabalho local**. O próximo bloco é Familiares. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -294,7 +294,7 @@ A Aura Aterradora das sete fichas de Ameaças que a possuem agora traz o efeito 
 
 As páginas renderizadas confirmam o ícone Solo nas 12 fichas. A Ninhada também traz o ícone de Bando. O catálogo infere Solo para 11 fichas. Sckhar continua sem papel inferido, assim como os demais NDs S e S+. Seguindo a decisão do Culto, o papel impresso fica registrado sem alterar o comportamento de geração.
 
-Fora desta seção, o Avatar de Kallyadranoch, o Necrodraco Lich e Tarso ainda usam o texto abreviado da Aura Aterradora. A revisão deles fica para os respectivos lotes.
+O Avatar de Kallyadranoch recebeu o texto completo na auditoria da Igreja de Kallyadranoch. O Necrodraco Lich e Tarso ainda usam o texto abreviado e serão conferidos em Mascotes & Mortos-Vivos.
 
 ## Duyshidakk — inventário
 
@@ -388,54 +388,315 @@ Os 57 campos numéricos coincidem com o catálogo. A contagem inclui ND, Iniciat
 
 Corcel Duyshidakk omite a remissão à ficha do warg, p. 224, e O Mundo Como Deve Ser omite “veja ao lado”, que aponta para a ilustração da Roda do Akzath na p. 87. A lança de fogo do Atirador e a Uyzrrak Da’ukthra trazem o ícone de novo item. Nenhuma omissão altera o efeito.
 
-A espiral que aparece no Raio Conspurcado da Bruxa Goblin se repete nas opções Vida, Mudança, Fim, Morte e Início do Sangue do Ayrrak. Ignorância, Conhecimento e Continuidade, que não envolvem magia, não a trazem. O padrão sugere um marcador de habilidade mágica, mas a introdução não traz legenda para ele. O catálogo não reproduz o ícone, e o registro fica como observação para uma eventual revisão de apresentação.
+A espiral que aparece no Raio Conspurcado da Bruxa Goblin se repete nas opções Vida, Mudança, Fim, Morte e Início do Sangue do Ayrrak. A p. 384 impressa, p. 386 do PDF, confirma que a espiral marca habilidades mágicas. A exibição do marcador fica para a revisão de apresentação.
 
 ### Fechamento de Duyshidakk
 
-As 12 fichas da seção estão conferidas, com referências ao PDF integral e cobertas pelo teste de Duyshidakk dos andares 11–20. Nenhuma ficha teve diferença mecânica. A única divergência de papel é o Bugbear Sentinela, Lacaio no livro e Especial no catálogo, preservado conforme a decisão do Culto. Ficam para revisão de apresentação as regras gerais de Bando e Enxame, que o catálogo ainda não exibe, e a espiral sem legenda.
+As 12 fichas da seção estão conferidas, com referências ao PDF integral e cobertas pelo teste de Duyshidakk dos andares 11–20. A única divergência de papel é o Bugbear Sentinela, Lacaio no livro e Especial no catálogo, preservado conforme a decisão do Culto. Ficam para revisão de apresentação as regras gerais de Bando e Enxame e o marcador de habilidades mágicas.
 
 O quarto lote e o fechamento de Duyshidakk foram publicados em `b831a4e`. Passaram os testes dos andares 1–20, com 48 casos, os das missões e o build de produção. O QA dos andares 11–20 no Chrome passou contra o site publicado, sem erros de JavaScript. O bundle publicado traz a nova referência do Sangue do Ayrrak e já não cita o recorte `ameacas de arton p80 ate 90.pdf`. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44408333570)
+
+## Elementais
+
+| Grupo | Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---|---:|---|---:|---:|
+| Água | Aquin’ne | 2 | Lacaio | 89 | 91 |
+| Água | Corgann | 8 | Lacaio | 89–90 | 91–92 |
+| Água | Namasqall | 14 | Solo | 91 | 93 |
+| Ar | T’Peel | 1 | Lacaio | 92 | 94 |
+| Ar | Rarvnaak | 7 | Solo | 92–93 | 94–95 |
+| Ar | Hallus’tir | 15 | Solo | 94 | 96 |
+| Fogo | Pakk | 1 | Lacaio | 94–95 | 96–97 |
+| Fogo | Ber-baram | 8 | Solo | 95 | 97 |
+| Fogo | Serpentaar | 14 | Solo | 96 | 98 |
+| Terra | Terrier | 1 | Solo | 97 | 99 |
+| Terra | Pamgra | 7 | Solo | 98 | 100 |
+| Terra | Bando de Pamgras | 11 | Solo, com Bando | 98 | 100 |
+| Terra | Tanaloom | 13 | Solo | 99 | 101 |
+| Corrompido | Elemental Corrompido | 16 | Solo | 101 | 103 |
+
+Os 196 campos numéricos conferidos coincidem com as fichas. Foram cotejados ND, Iniciativa, Percepção, Defesa, resistências, PV e atributos, além de ataques, habilidades, execução, recargas, perícias, familiares e tesouros. O índice por ND confirma as páginas iniciais das fichas. O sumário aponta para o início de cada descrição, que pode estar em uma página anterior.
+
+Corgann, Rarvnaak e Pakk têm continuação na página seguinte. Aquin’ne, Terrier e Pamgra tinham referências duplicadas ao recorte `elementais e ermos.pdf`. As 14 fichas agora apontam para o PDF integral. O Cardume de Aquin’ne aparece em Como Criar Bandos, p. 389 impressa, p. 391 do PDF.
+
+Os ícones mostram Aquin’ne como Lacaio, Rarvnaak como Solo e Bando de Pamgras como Solo, com a marca de Bando. O catálogo usa, respectivamente, Especial, Especial e Lacaio. Esses papéis foram preservados para manter a geração atual. Engolfar do Elemental Corrompido omite a referência a Sufocamento no Livro Básico, p. 319, e Abalo Sísmico corrige uma preposição ausente na edição impressa. Os tesouros preservam quantidades e CDs de extração. O ícone de novo item fica para a revisão de apresentação.
+
+## Ermos
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Bulette | 7 | Solo | 103 | 105 |
+| Carrasco de Lena | 6 | Solo | 104 | 106 |
+| Centauro Chefe | 8 | Solo | 105 | 107 |
+| Centauro Xamã de Megalokk | 10 | Especial | 105–106 | 107–108 |
+| Ente | 8 | Solo | 106–107 | 108–109 |
+| Estirge | 1 | Lacaio | 107–108 | 109–110 |
+| Enxame Estirge | 5 | Lacaio, com Enxame | 108 | 110 |
+| Nuvem de Estirges | 16 | Lacaio, com Enxame | 108 | 110 |
+| Fera-Vassalo | 3 | Lacaio | 108–109 | 110–111 |
+| Fera-Líder | 5 | Solo | 109 | 111 |
+| Fera-Mãe | 13 | Solo | 109 | 111 |
+| Lagarto Perseguidor | 2 | Lacaio | 110 | 112 |
+| Tendrículo | 6 | Solo | 111 | 113 |
+| Rhandomm | 20 | Solo | 113 | 115 |
+
+Os 197 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, resistências, PV, os seis atributos de cada ficha e os 70 PM do Xamã de Megalokk. Também foram conferidos ataques, habilidades, magias, execução, custos, recargas, opções de Árvore Ancestral do Ente, fraquezas de Rhandomm, perícias, equipamento e tesouro. As referências duplicadas de Bulette e Tendrículo ao recorte `elementais e ermos.pdf` foram removidas.
+
+Carrasco de Lena e Nuvem de Estirges aparecem como Especiais no catálogo. Os papéis foram preservados para manter a geração atual. O Enxame Estirge e a Nuvem de Estirges trazem o ícone da habilidade geral Enxame, definida na p. 15 impressa. Suas fichas no app já exibem os efeitos próprios. A exibição da regra geral segue registrada para revisão. O índice chama a ficha Enxame Estirge de “Enxame de estirges”.
+
+Ira Coletiva, Voz dos Monstros e Magias do Xamã de Megalokk trazem a espiral de habilidade mágica, definida na p. 384 impressa. A marca indica que seus efeitos estão sujeitos a regras que afetam habilidades mágicas, como Campo Antimagia. A representação dessa marcação está pendente no catálogo.
+
+O tesouro da Bulette remete ao couro de bulette no Bazar Monstruoso, p. 399 impressa. Sentidos Titânicos do Rhandomm remete às magias simuladas, p. 376 impressa, e Titânico explicita que o pisoteio ocorre ao atravessar o espaço do alvo. As remissões e essa explicação ficam registradas para a revisão de apresentação.
+
+## Gnolls
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Gnoll Caçador de Cabeças | 8 | Solo | 114–115 | 116–117 |
+| Gnoll Capanga | ½ | Lacaio | 115–116 | 117–118 |
+| Gnoll Saqueador | 1 | Lacaio | 116 | 118 |
+| Gnoll Filibusteiro | 2 | Solo | 116 | 118 |
+| Gnoll Líder de Alcateia | 5 | Solo | 117 | 119 |
+| Gnoll Xamã de Allihanna | 2 | Especial | 118 | 120 |
+| Gnoll Xamã de Megalokk | 5 | Especial | 119 | 121 |
+| Gnoll Xamã de Marah | 6 | Especial | 119 | 121 |
+| Hiena | 1 | Lacaio | 120 | 122 |
+| Hiena Rainha | 2 | Solo | 120 | 122 |
+| Hienodonte | 3 | Lacaio | 120 | 122 |
+| Matrona Gnoll | 11 | Especial | 121 | 123 |
+| Gnoll Vuul’rak | 16 | Solo | 122 | 124 |
+
+Os 185 campos numéricos conferidos coincidem com o catálogo, incluindo os PM dos três xamãs. Foram cotejados ataques, habilidades, magias, custos, perícias, equipamentos, parceiros e tesouros. O Caçador e o Capanga têm continuação na página seguinte. O Filibusteiro já citava o PDF integral e teve a referência confirmada. Os quadros de raça e de Totens Risonhos ficam fora das fichas individuais.
+
+**Livro Básico.** O Saqueador coincide em ND, estatísticas, ações, equipamento e tesouro nas duas fontes. `gnoll-saqueador-livro-basico` cita a p. 290 impressa, p. 296 do PDF, e fica disponível na seleção manual com o livro identificado. A ficha de Ameaças conserva o ID `gnoll-saqueador` e segue como padrão dos perfis existentes. O Filibusteiro de Ameaças tem Reflexos +7 e 20 balas. Sua variante do Básico, já cadastrada, tem Reflexos +11 e 10 balas na p. 291 impressa, p. 297 do PDF.
+
+**Papéis e revisão de apresentação.** Capanga, Saqueador, Hiena e Hienodonte aparecem como Especiais no catálogo, e o Xamã de Megalokk aparece como Solo. Os papéis atuais foram preservados para manter a geração. A espiral marca Voz dos Monstros de Megalokk, Aura de Paz e Símbolo Sagrado Energizado de Marah como habilidades mágicas. A ficha de Marah imprime “7d8+7 PM” no efeito de Curar Ferimentos, tal como consta no catálogo. A ocorrência fica registrada como provável erro editorial, pois a magia cura PV.
+
+## Golens
+
+| Ficha | ND | Papel impresso | Página impressa | Página no PDF integral |
+|---|---:|---|---:|---:|
+| Gárgula | 2 | Solo | 125 | 127 |
+| Gárgula Assassina | 4 | Solo | 125 | 127 |
+| Golem de Barro | 10 | Solo | 126 | 128 |
+| Golem de Bronze | 9 | Solo | 127 | 129 |
+| Golem de Carne | 7 | Solo | 127 | 129 |
+| Golem de Espelhos | 9 | Solo | 128 | 130 |
+| Golem de Ferro | 10 | Solo | 130 | 132 |
+| Golem de Ferro Superior | 15 | Solo | 130 | 132 |
+| Golem de Matéria Vermelha | 18 | Solo | 131 | 133 |
+| Golem de Pedra | 12 | Solo | 132 | 134 |
+| Soldado Mecânico | 3 | Lacaio | 133 | 135 |
+| Instrumento Divino | 7 | Solo | 133 | 135 |
+
+Conferidos 168 campos de ND e estatísticas, incluindo os atributos sem valor impresso. Também foram cotejados ataques, defesas, habilidades, execução, recargas, perícias, equipamentos e tesouros. Todas as fichas cabem em uma página. A seção Golens Despertos, pp. 134–135 impressas, contém regras de personagem. O quadro do Golem de Norla, na p. 129, remete à ficha de um indivíduo de Só Aventuras.
+
+**Livro Básico.** Gárgula e Golem de Ferro coincidem em ND e valores. A variante `gargula-livro-basico` preserva a menção à condição petrificado da p. 287 impressa, p. 293 do PDF. A variante `golem-de-ferro-livro-basico` mantém a indicação explícita de que o cubo de Sopro tem 3 m de lado, na p. 288 impressa, p. 294 do PDF. O seletor manual distingue os livros. Os IDs originais e os padrões de geração dos perfis continuam associados às fichas de Ameaças.
+
+O Golem de Matéria Vermelha aparece como Especial no catálogo e como Solo no livro. O papel atual foi preservado para manter a geração. O tesouro do Golem de Barro conserva a quantidade e a CD do corrosivo mineral. O ícone de novo item continua pendente na revisão de apresentação.
+
+## Igreja de Arsenal
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Coletor de Arsenal | 10 | Especial | 137 | 139 |
+| Forjador Litúrgico | 9 | Especial | 137 | 139 |
+| Concílio Forjador | 13 | Especial, com Bando | 138 | 140 |
+| Guerreiro Perpétuo | 7 | Solo | 139 | 141 |
+| Kishin | 13 | Solo | 140 | 142 |
+| Capelão de Guerra | 4 | Especial | 141 | 143 |
+| Bispo de Guerra | 8 | Especial | 141 | 143 |
+| Kishinauros | S | Solo | 142–143 | 144–145 |
+
+Os 115 campos de ND, atributos e estatísticas conferidos coincidem com o catálogo, incluindo os PM do Coletor, do Capelão e do Bispo. Também foram cotejados ataques, resistências, recargas, habilidades, perícias, equipamentos e tesouros. As oito fichas citam o PDF integral. A descrição do Coletor começa na p. 136 e a do Kishin na p. 139, ambas anteriores à ficha.
+
+**Capelão de Guerra.** A versão `capelao-de-guerra-livro-basico` cita a p. 295 impressa, p. 301 do PDF. As versões têm os mesmos ND e estatísticas. A ficha de Ameaças aplica Ódio Puro, identifica Arsenal e o limite de 5 PM em Magias e especifica que Arma Mágica afeta uma arma adjacente até o fim da cena. O dano do Soco de Arsenal é 5d6+4 em Ameaças e 5d6+5 no Básico. O seletor manual identifica os dois livros. O ID `capelao-de-guerra` continua associado ao padrão de geração dos perfis existentes.
+
+**Kishinauros.** O texto de Maior que a Morte agora explicita a imunidade à morte instantânea enquanto tiver pelo menos metade dos PV, conforme a regra geral de criaturas de ND S e S+ e a definição da habilidade nas pp. 376 e 17 impressas, pp. 378 e 19 do PDF. Titânico passa a indicar que ele atravessa o espaço do alvo ao pisoteá-lo. Vingadora e Impérvio resume o efeito da reflexão sem enumerar os exemplos de características preservadas da magia, como a CD. O livro indica Solo para o Kishinauros. A atribuição desse papel no app fica para a revisão geral de papéis.
+
+**Anotações de apresentação.** A Marca da Oferenda do Coletor conserva a correção de “tempo de Arsenal” para “templo de Arsenal”. O texto de Armamento Sagrado do Forjador e do Concílio resume a regra e omite a remissão às tabelas de tesouro do Livro Básico. O Concílio mantém a indicação de Bando no ataque. Os ícones de item novo no grilhão de descrença do Guerreiro e de habilidade mágica no Símbolo Sagrado Energizado do Bispo ficam registrados para a revisão de apresentação. Em Deuses de Arton, Forjador Litúrgico é uma distinção de personagem e a menção ao Kishinauros remete à ficha de Ameaças.
+
+## Igreja de Kallyadranoch
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Cavaleiro de Kally | 8 | Solo | 144–145 | 146–147 |
+| Acólito de Kally | 3 | Especial | 146 | 148 |
+| Clérigo de Kally | 8 | Especial | 146 | 148 |
+| Alto Clérigo de Kally | 13 | Especial | 146–147 | 148–149 |
+| Corcel de Kally | 2 | Solo | 148 | 150 |
+| Dracomante | 5 | Especial | 149 | 151 |
+| Dracomante Superior | 14 | Especial | 149 | 151 |
+| Kallyanach Bárbaro | 6 | Solo | 150 | 152 |
+| Kallyanach Morte Glacial | 9 | Solo | 150 | 152 |
+| Avatar de Kallyadranoch | S | Solo | 153 | 155 |
+
+Os 145 campos de ND, atributos e estatísticas conferem com o catálogo, incluindo os PM dos três clérigos e dos dois dracomantes. A revisão cobriu ataques, defesas, habilidades, magias, custos, recargas, perícias, equipamentos e tesouros. As referências do Cavaleiro e do Alto Clérigo incluem a continuação das fichas. A ficha do Avatar ocupa só a p. 153 impressa. A p. 152 contém o texto descritivo e a ilustração.
+
+**Avatar de Ameaças de Arton.** Aura Aterradora agora inclui o gatilho no início do turno, o alcance longo, os efeitos por nível e a imunidade por um dia após passar no teste, com a CD 51 da ficha. A regra é a do quadro Habilidades Dracônicas do Livro Básico, p. 311 impressa, p. 317 do PDF. Maior que a Morte agora explica a imunidade à morte instantânea enquanto o Avatar tiver pelo menos metade dos PV, conforme as pp. 17 e 376 impressas de Ameaças. O livro indica Solo para o Avatar e o Cavaleiro. O app atualmente deixa o Avatar sem papel e classifica o Cavaleiro como Especial. Esses casos ficam registrados para a revisão geral de papéis.
+
+**Avatar de Deuses de Arton.** A ficha homônima da p. 171 impressa, p. 173 do PDF da 1ª edição v1.1, foi conferida e cadastrada como `avatar-de-kallyadranoch-deuses-de-arton`. É um espírito (dragão) Médio, Solo, de ND 20, com 1.405 PV e Defesa 50. Lança magias arcanas, tem Aura Aterradora CD 50 e causa 42d12 com Sopro Supremo. A ficha de Ameaças é um monstro (dragão) Colossal de ND S, com 2.500 PV, Defesa 65, magias divinas e Sopro Supremo de 48d12. O seletor e o combate identificam os dois livros pelo nome da fonte. O ID original `avatar-de-kallyadranoch` segue como padrão dos perfis existentes. A versão de Deuses conserva a divergência impressa de voo “18m (16q)” no texto da ficha.
+
+**Apresentação e referências cruzadas.** O catálogo já traz Dracomancia Elemental para as duas fichas de Dracomante, a partir do quadro da p. 148 impressa. Aura de Medo e Servos do Dragão nas três fichas clericais e Raio Arcano nos dois dracomantes têm a marca impressa de habilidade mágica. A variante do Avatar em Deuses usa a mesma marca em Ajoelhem-se Perante Mim, Metamorfose Dracônica, Servos de Kallyadranoch e Tomar Poder. A exibição dessas marcas fica na pendência geral. O tesouro do Corcel cita couro de dragão com CD 17 e omite a remissão ao Livro Básico, p. 312. Em Heróis de Arton, Dracomante Real é uma distinção de personagem nas pp. 151–153 impressas.
+
+## Império de Jade
+
+| Ficha | ND | Papel impresso | Páginas impressas | Páginas no PDF integral |
+|---|---:|---|---:|---:|
+| Chibi-Kabuto | ¼ | Solo | 154 | 156 |
+| Ko-Kabuto | 1 | Solo | 154–155 | 156–157 |
+| Horda de Ko-Kabuto | 3 | Solo, com Bando | 155 | 157 |
+| Dai-Kabuto | 4 | Solo | 155 | 157 |
+| Kaijin Capanga | 6 | Lacaio | 156 | 158 |
+| Kaijin Bruto | 11 | Solo | 157 | 159 |
+| Kaijin Ninja | 13 | Especial | 157–158 | 159–160 |
+| Kappa Brigão | 1 | Solo | 159 | 161 |
+| Kappa Yokozuna | 3 | Solo | 159 | 161 |
+| Mashin Monge | 3 | Solo | 160 | 162 |
+| Mashin Samurai | 5 | Solo | 160 | 162 |
+| Nezumi Capanga | 1 | Lacaio | 161 | 163 |
+| Nezumi Ninja | 3 | Especial | 161 | 163 |
+| Nezumi Brutamontes | 4 | Solo | 162 | 164 |
+| Oni | 5 | Solo | 162 | 164 |
+| Aka Oni | 9 | Solo | 163 | 165 |
+| Tengu Bandoleiro | 6 | Lacaio | 164 | 166 |
+| Daitengu | 8 | Especial | 164–165 | 166–167 |
+| Dragão Celestial Jovem | 10 | Solo | 165 | 167 |
+| Dragão Celestial Adulto | 15 | Solo | 166 | 168 |
+| Dragão Celestial Venerável | 20 | Solo | 166–167 | 168–169 |
+
+Os 299 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM do Kaijin Ninja, do Daitengu e dos três dragões celestiais. Também foram cotejados tipo, subtipo, tamanho, deslocamento, sentidos, defesas, ataques, habilidades com execução e custo, mutações rubras, magias simuladas, perícias, equipamento, parceiros e tesouro. Ko-Kabuto, Kaijin Ninja, Daitengu e Dragão Celestial Venerável continuam na página seguinte. As 21 fichas agora citam o PDF integral, e o recorte `ameacas de arton p156 ate 169.pdf` deixa de ser citado.
+
+**Papéis.** A legenda da p. 12 impressa, p. 14 do PDF, associa a cabeça de fera a Solo, as garras a Lacaio e o olho a Especial. Chibi-Kabuto, Ko-Kabuto e Horda de Ko-Kabuto são Solo no livro e Lacaio no catálogo. O Kaijin Capanga é Lacaio no livro e Especial no catálogo. Os papéis atuais foram preservados para manter a geração. A Horda também traz a marca de Bando, que o catálogo registra no ataque.
+
+**Correção de texto.** Intervenção Divina do Dragão Celestial Venerável omitia que o efeito cura mortos-vivos, em vez de causar dano. O trecho foi restaurado, porque altera o resultado contra mortos-vivos.
+
+**Habilidades compartilhadas.** As três fichas de dragão celestial incluem Imunidades, Magia Celestial e Metamorfose Celestial do quadro Habilidades de Dragões Celestiais, p. 167 impressa, p. 169 do PDF. As fichas Adulto e Venerável trazem a Presença Celestial completa, com a CD de cada ficha. O quadro omite no catálogo apenas o exemplo “como cavaleiros e paladinos” e a frase descritiva sobre dragões curiosos, sem efeito.
+
+**Omissões e anotações de apresentação.** Truques Ninjas do Kaijin Ninja omite a remissão às magias simuladas, p. 376, e Doença do Oni omite a remissão ao calafrio diabólico, Tormenta20 p. 318. O Aka Oni recebe no catálogo as regras compartilhadas dos lefeu, que a ficha impressa não repete. A ficha do Daitengu imprime “Pontos de Magia” no lugar de Pontos de Mana. Katana Celestial traz o ícone de nova magia, descrita no Capítulo 3. Não foi encontrada marca de habilidade mágica nas fichas da seção. Os quadros de habilidades de raça de Kaijin, Kappa, Mashin, Nezumi e Tengu ficam fora das fichas individuais.
+
+## Império de Tauron
+
+| Ficha | ND | Papel impresso | Página impressa | Página no PDF integral |
+|---|---:|---|---:|---:|
+| Arqueiro Escravo | 5 | Lacaio | 168 | 170 |
+| Centurião | 3 | Solo | 170 | 172 |
+| Centurião de Elite | 7 | Solo | 170 | 172 |
+| Fúria de Tauron | 4 | Lacaio | 170 | 172 |
+| Estouro de Fúrias de Tauron | 8 | Lacaio, com Bando | 171 | 173 |
+| Gladiador Táurico | 10 | Solo | 172 | 174 |
+| Legionário | 1 | Lacaio | 173 | 175 |
+| Decúria | 5 | Lacaio, com Bando | 173 | 175 |
+| Legionário Insano | 8 | Lacaio | 174 | 176 |
+| Minauro Arcanista | 3 | Especial | 175 | 177 |
+| Minauro Ladino | 6 | Especial | 175 | 177 |
+| Governador Corrupto | 6 | Especial | 177 | 179 |
+
+Os 169 campos numéricos conferidos coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM do Minauro Arcanista. A Força das duas fichas de Fúria de Tauron, impressa como “–”, corresponde ao valor nulo do catálogo. Também foram cotejados tipo, subtipo, tamanho, deslocamento, sentidos, defesas, ataques, habilidades com execução e custo, magias, perícias, equipamento e tesouro. Cada ficha cabe em uma página. As 12 fichas agora citam o PDF integral.
+
+**Papéis.** Legionário, Decúria e Legionário Insano são Lacaio no livro e, respectivamente, Solo, Especial e Especial no catálogo. Os papéis atuais foram preservados para manter a geração. Estouro de Fúrias e Decúria trazem a marca de Bando, que o catálogo registra nos ataques. Os demais papéis impressos coincidem com o catálogo.
+
+**Habilidades compartilhadas.** O quadro Medo de Altura, p. 170 impressa, p. 172 do PDF, vale para todos os minotauros. O catálogo o aplica às sete fichas de minotauro, inclusive Centurião, Centurião de Elite, Gladiador e Legionário Insano, que não o repetem na ficha impressa. Legionário, Decúria e Governador o imprimem com o nome da própria criatura, e o catálogo usa “o minotauro”, sem efeito.
+
+**Omissões e anotações de apresentação.** Bombardeiro Veloz do Minauro Ladino omite a remissão à bomba de fumaça, p. 396, e Guarda Pessoal do Governador omite a remissão aos legionários, p. 172. Incitar resume “ordena (ou xinga, ou chicoteia…)” como lista, sem efeito. A bomba de fumaça do Minauro Ladino traz o ícone de novo item. Não foi encontrada marca de habilidade mágica nas fichas da seção. O quadro de habilidades de raça do Minauro fica fora das fichas individuais.
+
+## Kobolds
+
+| Ficha | ND | Papel impresso | Página impressa | Página no PDF integral |
+|---|---:|---|---:|---:|
+| Cão de Kally | 2 | Lacaio | 179 | 181 |
+| Enxame Larval | 1 | Solo, com Enxame | 180 | 182 |
+| Kobold Patrulheiro | ½ | Lacaio | 181 | 183 |
+| Kobold Veterano | 2 | Lacaio | 181 | 183 |
+| Patrulha Kobold | 4 | Lacaio, com Bando | 181 | 183 |
+| Kobold Bruto | 4 | Solo | 184 | 186 |
+| Kobold Explosivo | 1 | Lacaio | 185 | 187 |
+| Kobold Xamã | 3 | Especial | 186 | 188 |
+| Kobold-Mãe | 12 | Especial | 187 | 189 |
+| Vagalhão Kobold | 17 | Sem papel, evento | 189 | 191 |
+
+Os 127 campos numéricos das nove fichas de criatura coincidem com o catálogo. A contagem inclui ND, Iniciativa, Percepção, Defesa, Fortitude, Reflexos, Vontade, PV e os seis atributos de cada ficha, além dos PM do Kobold Xamã. Também foram cotejados tipo, subtipo, tamanho, deslocamento, sentidos, defesas, ataques, habilidades com execução e custo, magias, perícias, equipamento, parceiros e tesouro. Cada ficha cabe em uma página. As 10 entradas agora citam o PDF integral, e o recorte `ameacas de arton p170 ate 191.pdf` deixa de ser citado.
+
+**Vagalhão Kobold.** O livro o apresenta como evento, com Objetivo, Efeito e ações dos personagens, sem bloco de estatísticas nem ícone de papel. O catálogo o registra como evento de ND 17 e reproduz duração, CD 40+1d10 de Fortitude, 12d12 de corte, +2d12 sem armadura, roubo de itens por 1d6, 1d4 ou 1d10, Defesa 50, limite de 600 de dano por rodada, CD 35 das perícias e 4d12 por ataque corpo a corpo errado. O papel Especial do catálogo foi preservado. A p. 188 impressa é ilustração e não entra na referência.
+
+**Papéis.** Cão de Kally é Lacaio no livro e Especial no catálogo. Enxame Larval é Solo, com a marca de Enxame, e o catálogo usa Lacaio. Kobold-Mãe é Especial no livro e Solo no catálogo. Os papéis atuais foram preservados para manter a geração. A Patrulha Kobold traz a marca de Bando, registrada nos ataques. Os demais papéis impressos coincidem com o catálogo.
+
+**Omissões e anotações de apresentação.** Distração do Enxame Larval omite “veja abaixo”, e Ajudar do Vagalhão omite a remissão a Tormenta20, p. 221. Aura de Medo e Símbolo Sagrado Energizado do Kobold Xamã trazem a marca de habilidade mágica. Os quadros Armadilhas Kobolds e Conjurando Kobolds ficam fora das fichas. O primeiro descreve armadilhas, e o segundo é um aprimoramento da magia Conjurar Monstro usado por personagens.
+
+**Regras gerais aplicadas às fichas.** Por decisão do usuário, os quadros que valem para qualquer kobold passaram a aparecer como habilidades nas fichas, sem mudar ND, papel ou geração de encontros.
+
+- **Detonação Final (opcional).** O quadro Qualquer Kobold Pode Explodir, p. 185, permite dar Detonação Final a qualquer ficha de kobold. Sete fichas recebem a habilidade como variante opcional, com o aviso de que o ND aumenta em +1 apenas para experiência. O dano é 4d6, mais 2d6 por patamar acima de iniciante. A CD é o Efeito Padrão das Tabelas 2-3 A a C, pp. 382–384 impressas, pp. 384–386 do PDF, conforme o papel impresso e o ND. A tabela reproduz a CD 14 já impressa no Kobold Explosivo, Lacaio de ND 1.
+
+| Ficha | Papel impresso e ND | Dano | CD |
+|---|---|---:|---:|
+| Kobold Patrulheiro | Lacaio, ½ | 4d6 | 13 |
+| Enxame Larval | Solo, 1 | 4d6 | 14 |
+| Kobold Veterano | Lacaio, 2 | 4d6 | 16 |
+| Kobold Xamã | Especial, 3 | 4d6 | 19 |
+| Kobold Bruto | Solo, 4 | 4d6 | 18 |
+| Patrulha Kobold | Lacaio, 4 | 4d6 | 18 |
+| Kobold-Mãe | Especial, 12 | 8d6 | 35 |
+
+O Kobold Explosivo mantém só a Detonação Final da própria ficha. O Vagalhão, que é um evento, e o Cão de Kally, que não é kobold, ficam de fora.
+
+- **Parceiro.** O quadro Quem Não Tem Cão Caça com Kobold, p. 181, descreve um kobold solitário como parceiro especial (combatente). A habilidade entra nos kobolds individuais: Patrulheiro, Veterano, Explosivo, Xamã e Bruto. Enxame Larval e Patrulha Kobold representam grupos, e a Kobold-Mãe não se desloca. Por isso, essas fichas não recebem a habilidade.
+
+As habilidades novas aparecem no fim da lista de cada ficha. Os papéis inferidos do Kobold Bruto e da Kobold-Mãe continuam Solo, e o teste dos andares 11–20 fixa os valores acima.
 
 ## Pendências e ponto de retomada
 
 Situação em 19 de novembro de 2026.
 
-### Concluído
+### Auditoria concluída por bloco
 
-| Seção | Páginas impressas | Fichas |
-|---|---:|---:|
-| Brutos & Indomáveis | 30–41 | 21 |
-| Capangas & Bandoleiros | 42–51 | 17 |
-| Culto de Aharadak | 52–63 | 11 |
-| Dragões | 64–77 | 12 |
-| Duyshidakk | 78–87 | 12 |
-| **Total** | | **73** |
+| Seção | Páginas impressas | Fichas | Situação |
+|---|---:|---:|---|
+| Brutos & Indomáveis | 30–41 | 21 | Publicado |
+| Capangas & Bandoleiros | 42–51 | 17 | Publicado |
+| Culto de Aharadak | 52–63 | 11 | Publicado |
+| Dragões | 64–77 | 12 | Publicado |
+| Duyshidakk | 78–87 | 12 | Publicado |
+| Elementais | 88–101 | 14 | Validado localmente |
+| Ermos | 102–113 | 14 | Validado localmente |
+| Gnolls | 114–123 | 13 | Validado localmente |
+| Golens | 124–135 | 12 | Validado localmente |
+| Igreja de Arsenal | 136–143 | 8 | Validado localmente |
+| Igreja de Kallyadranoch | 144–153 | 10 | Validado localmente |
+| Império de Jade | 154–167 | 21 | Validado localmente |
+| Império de Tauron | 168–177 | 12 | Validado localmente |
+| Kobolds | 178–189 | 10 | Validado localmente |
+| **Total** | | **187** | **73 publicadas e 114 locais** |
 
-As 73 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. Nenhuma ficha teve diferença mecânica que exigisse correção de regra. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote. Além delas, `gnoll-filibusteiro` já cita o PDF integral, p. 116 impressa, mas pertence à seção Gnolls e ainda não foi conferido.
+As 187 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
+
+A última publicação do catálogo foi a de Duyshidakk em `b831a4e`. Os nove blocos locais incluem as referências atualizadas, as versões do Livro Básico de Gnoll Saqueador, Gárgula, Golem de Ferro e Capelão de Guerra e a versão de Deuses de Arton do Avatar de Kallyadranoch na seleção manual. As fichas de Ameaças conservam seus IDs, seus papéis atuais e a preferência dos perfis existentes. A publicação desses lotes está pendente. [Última implantação do catálogo](https://github.com/Alkimistah/megadungeon/actions/runs/44408333570)
+
+A validação local passou no build de produção, nos testes de andares 1–10, nos 65 testes de andares 11–20 e nos testes de missões. O QA no Chrome conferiu a seleção por livro e o fluxo offline do app.
 
 ### O que falta em Ameaças de Arton
 
-Ainda há 261 fichas de Ameaças no catálogo apontando para recortes do PDF, como `ameacas de arton p90-103.pdf`, ou para prints enviados pelo usuário. A ordem de trabalho segue o sumário, pp. 3–5 impressas, pp. 5–7 do PDF.
+Ainda há 148 fichas de Ameaças no catálogo apontando para recortes do PDF ou para prints enviados pelo usuário. A ordem de trabalho segue o sumário, pp. 3–5 impressas, pp. 5–7 do PDF.
 
-1. **Elementais**, p. 88 impressa, p. 90 do PDF. É o próximo bloco: o catálogo tem 14 fichas, Aquin’ne, Corgann, Namasqall, T’Peel, Rarvnaak, Hallus’tir, Pakk, Ber-baram, Serpentaar, Terrier, Pamgra, Bando de Pamgras, Tanaloom e Elemental Corrompido, todas citando o recorte `ameacas de arton p90-103.pdf`. As páginas registradas no catálogo ficam uma acima das do sumário em alguns casos, como Aquin’ne, p. 89 no catálogo e p. 88 no sumário. Confirmar cada uma no PDF integral.
-2. **Blocos seguintes, na ordem do sumário:** Ermos, p. 102; Gnolls, p. 114; Golens, p. 124; Igreja de Arsenal, p. 136; Kallyadranoch, p. 144; Império de Jade, p. 154; Império de Tauron, p. 168; Kobolds, p. 178; Familiares, p. 190; Masmorras, p. 198; Montarias, p. 210; Mascotes & Mortos-Vivos, p. 228; Mundo Perdido, p. 242; Piratas & Pistoleiros, p. 252; Povos-Trovão, p. 264; Puristas, p. 274; Reino dos Mortos, p. 284; Reinos de Moreania, p. 296; Sanguinárias, p. 306; Sob as Ondas, p. 314; Sszzaazitas, p. 326; Trolls Nobres, p. 338; Uivantes, p. 348.
+1. **Familiares**, p. 190 impressa, p. 192 do PDF. Começar pelo Bogum.
+2. **Blocos seguintes na ordem do sumário.** Masmorras, p. 198. Montarias, p. 210. Mascotes & Mortos-Vivos, p. 228. Mundo Perdido, p. 242. Piratas & Pistoleiros, p. 252. Povos-Trovão, p. 264. Puristas, p. 274. Reino dos Mortos, p. 284. Reinos de Moreania, p. 296. Sanguinárias, p. 306. Sob as Ondas, p. 314. Sszzaazitas, p. 326. Trolls Nobres, p. 338. Uivantes, p. 348.
 3. **Áreas de Tormenta**, p. 18 impressa, p. 20 do PDF. Fica para depois dos blocos acima. As 13 fichas citam o recorte `ameacas de arton p20 ate 31.pdf`. Conferir com a regra compartilhada dos lefeu do Livro Básico, p. 315.
 4. **Fichas vindas de prints:** `golem-de-nor-medio`, `stagh` e `soterrado-vagante` citam “prints enviados pelo usuário”. Pertencem a Uivantes e devem ganhar referência ao PDF integral quando esse bloco for auditado.
-5. **Aura Aterradora abreviada:** Avatar de Kallyadranoch, Necrodraco Lich e Tarso ainda trazem o texto curto. Completar com o texto do Livro Básico quando Kallyadranoch e Mascotes & Mortos-Vivos forem auditados, como foi feito nos Dragões.
-6. **Versões pendentes.** Comparar Gorlogg e Capelão de Guerra com o Livro Básico quando os respectivos lotes de Ameaças forem auditados. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
+5. **Aura Aterradora abreviada.** Completar as fichas do Necrodraco Lich e de Tarso com o texto do Livro Básico durante a auditoria de Mascotes & Mortos-Vivos.
+6. **Versão pendente.** Comparar Gorlogg com o Livro Básico quando o lote correspondente de Ameaças for auditado. [Plano do Livro Básico](2026-11-18-auditoria-livro-basico.md#versões-por-fonte)
 
 ### Revisão de apresentação, fora da auditoria
 
 Itens anotados durante os lotes que não alteram números, mas podem melhorar a ficha exibida:
 
-- As regras gerais de Bando e Enxame, p. 15 impressa, estão em `src/generalCreatureAbilities.js`, mas nenhum módulo as importa. A ficha não as mostra, e o combate não as aplica.
+- Bando, p. 14 impressa, e Enxame, p. 15 impressa, estão em `src/generalCreatureAbilities.js`. A integração com a ficha e o combate fica pendente.
+- Conferir Maior que a Morte nas demais fichas de ND S e S+ quando os respectivos lotes forem revisados. Algumas usam a descrição geral do ND como texto da habilidade.
 - As regras compartilhadas dos lefeu e as habilidades dracônicas do Livro Básico poderiam ser expostas nas fichas que dependem delas.
-- A espiral sem legenda, que parece marcar habilidades mágicas, e os asteriscos das magias beneficiadas por itens não são reproduzidos.
+- Exibir a marca de habilidade mágica, definida na p. 384 impressa, e os asteriscos das magias beneficiadas por itens nas fichas que os usam.
 - Papéis impressos que divergem da inferência do catálogo, como o Bugbear Sentinela, ficam preservados conforme a decisão do Culto. Uma revisão futura pode decidir se o papel impresso deve prevalecer.
 
 ### Depois de Ameaças
 
-**Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. O Avatar de Aharadak já está cadastrado nas duas versões.
+**Deuses de Arton e Heróis de Arton.** Inventariar as fichas de cada livro e dar sequência à auditoria por fonte. As fichas de Deuses dos avatares de Aharadak e Kallyadranoch já foram conferidas como variantes.
 
 ### Como retomar
 

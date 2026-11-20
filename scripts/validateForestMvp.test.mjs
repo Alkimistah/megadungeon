@@ -4,7 +4,7 @@ import { generateMapData } from "../src/generator.js";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { createRng } from "../src/random.js";
 import { canRerollNodeCreatures, rerollNodeCreatures, resolveForestAmbush, resolveNodeEncounter } from "../src/encounterResolver.js";
-import { creatureCatalog, getCreatureById, getAutomaticCreatureCatalog } from "../src/creatureCatalog/index.js";
+import { creatureCatalog, getCreatureById, getAutomaticCreatureCatalog, formatCreatureCatalogName } from "../src/creatureCatalog/index.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
 import { calculateCombatND } from "../src/challenge.js";
 import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
@@ -94,8 +94,413 @@ test("Duyshidakk sheets cite the full Ameaças PDF", () => {
   }
 });
 
+test("Ameaças elemental sheets cite the full PDF without redundant excerpts", () => {
+  const pages = {
+    aquinne: [91, 89],
+    corgann: [91, 89, 92, 90],
+    namasqall: [93, 91],
+    "t-peel": [94, 92],
+    rarvnaak: [94, 92, 95, 93],
+    "hallus-tir": [96, 94],
+    pakk: [96, 94, 97, 95],
+    "ber-baram": [97, 95],
+    serpentaar: [98, 96],
+    terrier: [99, 97],
+    pamgra: [100, 98],
+    "bando-de-pamgras": [100, 98],
+    tanaloom: [101, 99],
+    "elemental-corrompido": [103, 101]
+  };
+  for (const [id, [pdfPage, bookPage, pdfPageEnd, bookPageEnd]] of Object.entries(pages)) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd } : {})
+    }], id);
+  }
+});
+
+test("Ameaças wilderness sheets cite the full PDF without redundant excerpts", () => {
+  const pages = {
+    bulette: [105, 103],
+    "carrasco-de-lena": [106, 104],
+    "centauro-chefe": [107, 105],
+    "xama-de-megalokk": [107, 105, 108, 106],
+    ente: [108, 106, 109, 107],
+    estirge: [109, 107, 110, 108],
+    "enxame-estirge": [110, 108],
+    "nuvem-de-estirges": [110, 108],
+    "fera-vassalo": [110, 108, 111, 109],
+    "fera-lider": [111, 109],
+    "fera-mae": [111, 109],
+    "lagarto-perseguidor": [112, 110],
+    tendriculo: [113, 111],
+    rhandomm: [115, 113]
+  };
+  for (const [id, [pdfPage, bookPage, pdfPageEnd, bookPageEnd]] of Object.entries(pages)) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd } : {})
+    }], id);
+  }
+});
+
+test("Ameaças gnoll sheets cite the full PDF without redundant excerpts", () => {
+  const pages = {
+    "gnoll-cacador-de-cabecas": [116, 114, 117, 115],
+    "gnoll-capanga": [117, 115, 118, 116],
+    "gnoll-saqueador": [118, 116],
+    "gnoll-filibusteiro": [118, 116],
+    "gnoll-lider-de-alcateia": [119, 117],
+    "gnoll-xama-de-allihanna": [120, 118],
+    "gnoll-xama-de-megalokk": [121, 119],
+    "gnoll-xama-de-marah": [121, 119],
+    hiena: [122, 120],
+    "hiena-rainha": [122, 120],
+    hienodonte: [122, 120],
+    "matrona-gnoll": [123, 121],
+    "gnoll-vuul-rak": [124, 122]
+  };
+  for (const [id, [pdfPage, bookPage, pdfPageEnd, bookPageEnd]] of Object.entries(pages)) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd } : {})
+    }], id);
+  }
+});
+
+test("Gnoll Saqueador keeps its original default and has a distinct Livro Básico sheet", () => {
+  const original = getCreatureById("gnoll-saqueador");
+  const variant = getCreatureById("gnoll-saqueador-livro-basico");
+  assert.ok(variant);
+  assert.equal(variant.variantOf, original.id);
+  assert.deepEqual(variant.stats, original.stats);
+  assert.deepEqual(variant.actions, original.actions);
+  assert.equal(variant.equipment, original.equipment);
+  assert.deepEqual(variant.sources, [{
+    book: "Livro Básico",
+    edition: "Jogo do Ano · 2ª edição, setembro de 2022",
+    pdfFile: "T20 - Livro Básico - Jogo do Ano.pdf",
+    bookPage: 290,
+    pdfPage: 296
+  }]);
+  assert.equal(formatCreatureCatalogName(original), "Gnoll Saqueador · Ameaças de Arton");
+  assert.equal(formatCreatureCatalogName(variant), "Gnoll Saqueador · Livro Básico");
+  const matchingIds = selectedProfile => getAutomaticCreatureCatalog(selectedProfile)
+    .filter(creature => creature.id === original.id || creature.variantOf === original.id)
+    .map(creature => creature.id);
+  assert.deepEqual(matchingIds(profile), [original.id]);
+  assert.deepEqual(matchingIds({
+    ...profile,
+    creatureRules: { ...profile.creatureRules, preferredCreatureIdsByFamily: { [original.id]: variant.id } }
+  }), [variant.id]);
+});
+
+test("Ameaças golem sheets cite the full PDF without redundant excerpts", () => {
+  const pages = {
+    gargula: 127,
+    "gargula-assassina": 127,
+    "golem-de-barro": 128,
+    "golem-de-bronze": 129,
+    "golem-de-carne": 129,
+    "golem-de-espelhos": 130,
+    "golem-de-ferro": 132,
+    "golem-de-ferro-superior": 132,
+    "golem-de-materia-vermelha": 133,
+    "golem-de-pedra": 134,
+    "soldado-mecanico": 135,
+    "instrumento-divino": 135
+  };
+  for (const [id, pdfPage] of Object.entries(pages)) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2
+    }], id);
+  }
+});
+
+test("Gárgula and Golem de Ferro keep their original defaults and separate Livro Básico versions", () => {
+  const variants = [["gargula", 287], ["golem-de-ferro", 288]];
+  for (const [id, bookPage] of variants) {
+    const original = getCreatureById(id);
+    const variant = getCreatureById(`${id}-livro-basico`);
+    assert.ok(variant, id);
+    assert.equal(variant.variantOf, id);
+    assert.equal(variant.challengeRating, original.challengeRating);
+    assert.deepEqual(variant.actions, original.actions);
+    assert.deepEqual(variant.stats.attributes, original.stats.attributes);
+    assert.deepEqual(variant.sources, [{
+      book: "Livro Básico",
+      edition: "Jogo do Ano · 2ª edição, setembro de 2022",
+      pdfFile: "T20 - Livro Básico - Jogo do Ano.pdf",
+      bookPage,
+      pdfPage: bookPage + 6
+    }]);
+    assert.equal(formatCreatureCatalogName(original), `${original.name} · Ameaças de Arton`);
+    assert.equal(formatCreatureCatalogName(variant), `${original.name} · Livro Básico`);
+    const matchingIds = selectedProfile => getAutomaticCreatureCatalog(selectedProfile)
+      .filter(creature => creature.id === id || creature.variantOf === id)
+      .map(creature => creature.id);
+    assert.deepEqual(matchingIds(profile), [id]);
+    assert.deepEqual(matchingIds({
+      ...profile,
+      creatureRules: { ...profile.creatureRules, preferredCreatureIdsByFamily: { [id]: variant.id } }
+    }), [variant.id]);
+  }
+  assert.match(getCreatureById("gargula-livro-basico").stats.defensesText, /condição petrificado/);
+  const basicIronGolem = getCreatureById("golem-de-ferro-livro-basico");
+  assert.match(basicIronGolem.abilities.find(ability => ability.name === "Sopro").text, /cubo de 3m de lado/);
+});
+
+test("Ameaças Arsenal sheets cite the full PDF and their complete page ranges", () => {
+  const pages = [
+    ["coletor-de-arsenal", 139], ["forjador-liturgico", 139],
+    ["concilio-forjador", 140], ["guerreiro-perpetuo", 141],
+    ["kishin", 142], ["capelao-de-guerra", 143], ["bispo-de-guerra", 143],
+    ["kishinauros", 144, 145]
+  ];
+  for (const [id, pdfPage, pdfPageEnd] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }], id);
+  }
+});
+
+test("Capelão de Guerra versions preserve source-specific abilities and the automatic default", () => {
+  const original = getCreatureById("capelao-de-guerra");
+  const basic = getCreatureById("capelao-de-guerra-livro-basico");
+  assert.ok(basic);
+  assert.equal(basic.variantOf, original.id);
+  assert.equal(basic.challengeRating, original.challengeRating);
+  assert.deepEqual(basic.stats, original.stats);
+  assert.deepEqual(basic.actions, original.actions);
+  assert.deepEqual(basic.sources, [{
+    book: "Livro Básico",
+    edition: "Jogo do Ano · 2ª edição, setembro de 2022",
+    pdfFile: "T20 - Livro Básico - Jogo do Ano.pdf",
+    bookPage: 295,
+    pdfPage: 301
+  }]);
+  assert.equal(formatCreatureCatalogName(original), "Capelão de Guerra · Ameaças de Arton");
+  assert.equal(formatCreatureCatalogName(basic), "Capelão de Guerra · Livro Básico");
+  const ability = (creature, name) => creature.abilities.find(item => item.name === name);
+  assert.ok(ability(original, "Ódio Puro"));
+  assert.equal(ability(basic, "Ódio Puro"), undefined);
+  assert.match(ability(original, "Magias").text, /de Arsenal.*limite de PM 5/);
+  assert.match(ability(basic, "Magias").text, /clérigo de 5º nível \(CD 18\)\./);
+  assert.match(ability(original, "Arma Mágica").text, /Até o fim da cena, uma arma adjacente/);
+  assert.match(ability(basic, "Arma Mágica").text, /Uma arma do capelão/);
+  assert.match(ability(original, "Soco de Arsenal").text, /5d6\+4/);
+  assert.match(ability(basic, "Soco de Arsenal").text, /5d6\+5/);
+  const familyIds = selectedProfile => getAutomaticCreatureCatalog(selectedProfile)
+    .filter(creature => creature.id === original.id || creature.variantOf === original.id)
+    .map(creature => creature.id);
+  assert.deepEqual(familyIds(profile), [original.id]);
+  assert.deepEqual(familyIds({
+    ...profile,
+    creatureRules: { ...profile.creatureRules, preferredCreatureIdsByFamily: { [original.id]: basic.id } }
+  }), [basic.id]);
+});
+
+test("Kishinauros includes the death immunity threshold and the space crossed by its trample", () => {
+  const { abilities } = getCreatureById("kishinauros");
+  const text = name => abilities.find(ability => ability.name === name).text;
+  assert.match(text("Maior que a Morte"), /pelo menos metade dos PV.*imune a efeitos de morte instantânea/);
+  assert.match(text("Maior que a Morte"), /perda de PV.*0 PV/);
+  assert.match(text("Titânico"), /atravessando seu espaço/);
+});
+
+test("Ameaças Kallyadranoch sheets cite the full PDF and their complete page ranges", () => {
+  const pages = [
+    ["cavaleiro-de-kally", 146, 147],
+    ["acolito-de-kally", 148], ["clerigo-de-kally", 148], ["alto-clerigo-de-kally", 148, 149],
+    ["corcel-de-kally", 150],
+    ["dracomante", 151], ["dracomante-superior", 151],
+    ["kallyanach-barbaro", 152], ["kallyanach-morte-glacial", 152],
+    ["avatar-de-kallyadranoch", 155]
+  ];
+  for (const [id, pdfPage, pdfPageEnd] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }], id);
+  }
+});
+
+test("Ameaças Avatar de Kallyadranoch shows the complete dragon aura and death immunity", () => {
+  const avatar = getCreatureById("avatar-de-kallyadranoch");
+  const { text: aura } = avatar.abilities.find(ability => ability.name === "Aura Aterradora");
+  assert.match(aura, /comece seu turno em alcance longo.*apavorada.*4 níveis ou menos.*abalada.*5 níveis ou mais.*fim da cena/);
+  assert.match(aura, /imune a esta habilidade por um dia/);
+  assert.match(aura, /Vontade CD 51 evita/);
+  const { text: greaterThanDeath } = avatar.abilities.find(ability => ability.name === "Maior que a Morte");
+  assert.match(greaterThanDeath, /pelo menos metade dos PV.*imune a efeitos de morte instantânea/);
+  assert.match(greaterThanDeath, /perda de PV.*0 PV/);
+});
+
+test("Ameaças Império de Jade sheets cite the full PDF and their complete page ranges", () => {
+  const pages = [
+    ["chibi-kabuto", 156], ["ko-kabuto", 156, 157], ["horda-de-ko-kabuto", 157], ["dai-kabuto", 157],
+    ["kaijin-capanga", 158], ["kaijin-bruto", 159], ["kaijin-ninja", 159, 160],
+    ["kappa-brigao", 161], ["kappa-yokozuna", 161],
+    ["mashin-monge", 162], ["mashin-samurai", 162],
+    ["nezumi-capanga", 163], ["nezumi-ninja", 163], ["nezumi-brutamontes", 164],
+    ["oni", 164], ["aka-oni", 165],
+    ["tengu-bandoleiro", 166], ["daitengu", 166, 167],
+    ["dragao-celestial-jovem", 167], ["dragao-celestial-adulto", 168], ["dragao-celestial-veneravel", 168, 169]
+  ];
+  for (const [id, pdfPage, pdfPageEnd] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2,
+      ...(pdfPageEnd ? { pdfPageEnd, bookPageEnd: pdfPageEnd - 2 } : {})
+    }], id);
+  }
+});
+
+test("Ameaças Império de Tauron sheets cite the full PDF", () => {
+  const pages = [
+    ["arqueiro-escravo", 170],
+    ["centuriao", 172], ["centuriao-de-elite", 172], ["furia-de-tauron", 172], ["estouro-de-furias-de-tauron", 173],
+    ["gladiador-taurico", 174], ["legionario", 175], ["decuria", 175], ["legionario-insano", 176],
+    ["minauro-arcanista", 177], ["minauro-ladino", 177], ["governador-corrupto", 179]
+  ];
+  for (const [id, pdfPage] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2
+    }], id);
+  }
+});
+
+test("Ameaças kobold sheets cite the full PDF", () => {
+  const pages = [
+    ["cao-de-kally", 181], ["enxame-larval", 182],
+    ["kobold-patrulheiro", 183], ["kobold-veterano", 183], ["patrulha-kobold", 183],
+    ["kobold-bruto", 186], ["kobold-explosivo", 187], ["kobold-xama", 188], ["kobold-mae", 189],
+    ["vagalhao-kobold", 191]
+  ];
+  for (const [id, pdfPage] of pages) {
+    assert.deepEqual(getCreatureById(id).sources, [{
+      book: "Ameaças de Arton",
+      edition: "1ª edição, novembro de 2023",
+      pdfFile: "T20 Ameacas de Arton.pdf",
+      pdfPage,
+      bookPage: pdfPage - 2
+    }], id);
+  }
+});
+
+test("kobold sheets show the optional explosive variant and the kobold partner rule", () => {
+  const explosive = {
+    "kobold-patrulheiro": ["4d6", 13], "enxame-larval": ["4d6", 14], "kobold-veterano": ["4d6", 16],
+    "kobold-xama": ["4d6", 19], "kobold-bruto": ["4d6", 18], "patrulha-kobold": ["4d6", 18], "kobold-mae": ["8d6", 35]
+  };
+  for (const [id, [damage, dc]] of Object.entries(explosive)) {
+    const { text } = getCreatureById(id).abilities.find(ability => ability.name === "Detonação Final (opcional)") ?? {};
+    assert.ok(text, id);
+    assert.match(text, /Qualquer Kobold Pode Explodir, p\. 185/, id);
+    assert.match(text, /ND aumenta em \+1 apenas para efeitos de experiência/, id);
+    assert.match(text, new RegExp(`sofrem ${damage} pontos de dano de impacto \\(Ref CD ${dc} reduz à metade\\)`), id);
+  }
+  assert.equal(getCreatureById("kobold-explosivo").abilities.filter(ability => /^Detonação Final/.test(ability.name)).length, 1);
+
+  const partners = ["kobold-patrulheiro", "kobold-veterano", "kobold-explosivo", "kobold-xama", "kobold-bruto"];
+  for (const id of partners) {
+    const { text } = getCreatureById(id).abilities.find(ability => ability.name === "Parceiro") ?? {};
+    assert.match(text ?? "", /parceiro especial \(combatente\).*Iniciante: você recebe \+1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando.*Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas/, id);
+  }
+  for (const id of ["enxame-larval", "patrulha-kobold", "kobold-mae", "vagalhao-kobold"]) {
+    assert.equal(getCreatureById(id).abilities.some(ability => ability.name === "Parceiro"), false, id);
+  }
+  assert.equal(getCreatureById("kobold-bruto").role, "solo");
+  assert.equal(getCreatureById("kobold-mae").role, "solo");
+});
+
+test("Dragão Celestial Venerável keeps the undead clause of Intervenção Divina", () => {
+  const { abilities } = getCreatureById("dragao-celestial-veneravel");
+  const { text } = abilities.find(ability => ability.name === "Intervenção Divina");
+  assert.match(text, /cura mortos-vivos, em vez de causar dano/);
+});
+
+test("Avatar de Kallyadranoch variants preserve distinct sheets, encounters and profile defaults", () => {
+  const original = getCreatureById("avatar-de-kallyadranoch");
+  const divine = getCreatureById("avatar-de-kallyadranoch-deuses-de-arton");
+  assert.ok(divine);
+  assert.equal(divine.variantOf, original.id);
+  assert.deepEqual(divine.sources, [{
+    book: "Deuses de Arton",
+    edition: "1ª edição, maio de 2025 (v1.1)",
+    pdfFile: "T20 Deuses de Arton.pdf",
+    pdfPage: 173,
+    bookPage: 171
+  }]);
+  assert.equal(formatCreatureCatalogName(original), "Avatar de Kallyadranoch · Ameaças de Arton");
+  assert.equal(formatCreatureCatalogName(divine), "Avatar de Kallyadranoch · Deuses de Arton");
+  assert.equal(original.challengeRating, "S");
+  assert.equal(original.stats.hitPoints, 2500);
+  assert.equal(divine.challengeRating, 20);
+  assert.equal(divine.stats.hitPoints, 1405);
+  assert.equal(divine.type, "spirit");
+  assert.equal(divine.role, "solo");
+  assert.match(divine.actions[0].text, /Mordida \+52.*garras \+50/);
+  const ability = name => divine.abilities.find(item => item.name === name);
+  assert.match(ability("Aura Aterradora").text, /comece seu turno em alcance longo.*Vontade CD 50 evita/);
+  assert.match(ability("Centelha Divina").text, /magia arcana.*CD 50.*imunidade a medo/);
+  assert.match(ability("Sopro Supremo").text, /42d12 no total.*CD 50.*Recarga \(movimento\)/);
+  assert.equal(ability("Maior que a Morte"), undefined);
+  const familyIds = selectedProfile => getAutomaticCreatureCatalog(selectedProfile)
+    .filter(creature => creature.id === original.id || creature.variantOf === original.id)
+    .map(creature => creature.id);
+  const alternate = {
+    ...profile,
+    creatureRules: { ...profile.creatureRules, preferredCreatureIdsByFamily: { [original.id]: divine.id } }
+  };
+  assert.deepEqual(familyIds(profile), [original.id]);
+  assert.deepEqual(familyIds(alternate), [divine.id]);
+  for (const [creature, selectedProfile] of [[original, alternate], [divine, profile]]) {
+    const encounter = resolveNodeEncounter({
+      id: creature.id,
+      type: "normal",
+      challenge: { total: creature.challengeRating },
+      fixedComposition: { creatures: [{ id: creature.id, quantity: 1 }], useWeaponVariation: false }
+    }, { profile: selectedProfile });
+    assert.deepEqual(encounter.items.map(item => item.creatureId), [creature.id]);
+    assert.equal(encounter.budget.creatures, creature.challengeRating);
+  }
+});
+
 test("an exact encounter with a single special creature preserves its challenge rating", () => {
-  for (const id of ["avatar-de-aharadak", "sckhar-dragao-rei-do-fogo"]) {
+  for (const id of ["avatar-de-aharadak", "sckhar-dragao-rei-do-fogo", "kishinauros"]) {
     const creature = getCreatureById(id);
     assert.ok(creature);
     assert.match(creature.challengeRating, /^S\+?$/);

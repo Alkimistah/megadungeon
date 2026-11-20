@@ -8,8 +8,9 @@ export const gargoyle = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 127,
         "bookPage": 125
     },
     "stats": {
@@ -50,6 +51,17 @@ export const gargoyle = {
     "skillsText": null
 };
 
+const gargoyleBasic = {
+    ...gargoyle,
+    id: "gargula-livro-basico",
+    variantOf: gargoyle.id,
+    source: undefined,
+    stats: {
+        ...gargoyle.stats,
+        defensesText: "imunidade à condição petrificado; redução de dano 5"
+    }
+};
+
 export const golemDeHierro = {
     "id": "golem-de-ferro",
     "name": "Golem de Ferro",
@@ -60,8 +72,9 @@ export const golemDeHierro = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 132,
         "bookPage": 130
     },
     "stats": {
@@ -105,6 +118,19 @@ export const golemDeHierro = {
     "equipment": null,
     "treasure": "Nenhum.",
     "skillsText": null
+};
+
+const golemDeFerroBasic = {
+    ...golemDeHierro,
+    id: "golem-de-ferro-livro-basico",
+    variantOf: golemDeHierro.id,
+    source: undefined,
+    abilities: golemDeHierro.abilities.map(ability => ability.name === "Sopro"
+        ? {
+            ...ability,
+            text: "O golem de ferro expele uma nuvem de gás venenoso que preenche um cubo de 3m de lado. Criaturas na área perdem 6d12 pontos de vida e ficam enjoadas (Fortitude CD 30 reduz à metade e evita a condição). Recarga (movimento). Veneno."
+        }
+        : ability)
 };
 
 export const colossoSupremo = {
@@ -284,8 +310,9 @@ export const gargulaAssassina = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 127,
         "bookPage": 125
     },
     "stats": {
@@ -341,8 +368,9 @@ export const golemDeCarne = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 129,
         "bookPage": 127
     },
     "stats": {
@@ -398,8 +426,9 @@ export const soldadoMecanico = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 135,
         "bookPage": 133
     },
     "stats": {
@@ -698,8 +727,9 @@ export const golemDeBarro = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 128,
         "bookPage": 126
     },
     "stats": {
@@ -769,8 +799,9 @@ export const golemDeBronze = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 129,
         "bookPage": 127
     },
     "stats": {
@@ -826,8 +857,9 @@ export const golemDeEspelhos = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 130,
         "bookPage": 128
     },
     "stats": {
@@ -888,8 +920,9 @@ export const golemDeFerroSuperior = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 132,
         "bookPage": 130
     },
     "stats": {
@@ -950,8 +983,9 @@ export const golemDeMateriaVermelha = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 133,
         "bookPage": 131
     },
     "stats": {
@@ -1022,8 +1056,9 @@ export const golemDePedra = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 134,
         "bookPage": 132
     },
     "stats": {
@@ -1079,8 +1114,9 @@ export const instrumentoDivino = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 135,
         "bookPage": 133
     },
     "stats": {
@@ -1141,8 +1177,9 @@ export const kishin = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 14,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 142,
         "bookPage": 140
     },
     "stats": {
@@ -1218,9 +1255,12 @@ export const kishinauros = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p126 ate 145.pdf",
-        "pdfPage": 16,
-        "bookPage": 142
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 144,
+        "pdfPageEnd": 145,
+        "bookPage": 142,
+        "bookPageEnd": 143
     },
     "stats": {
         "initiative": 25,
@@ -1256,7 +1296,7 @@ export const kishinauros = {
         {
             "name": "Maior que a Morte",
             "timing": null,
-            "text": "Criaturas de ND S e S+ possuem um status especial. Para estatísticas não listadas em suas fichas, são consideradas criaturas de ND 20; para habilidades de outras criaturas, seu ND é maior que 20, impedindo efeitos limitados pelo nível do alvo."
+            "text": "Enquanto tiver pelo menos metade dos PV, o Kishinauros é imune a efeitos de morte instantânea, inclusive os que aprisionam ou destroem seu corpo ou alma. Dano ou perda de PV ainda pode reduzi-lo a 0 PV ou menos. Como criatura de ND S, ele conta como ND 20 para estatísticas ausentes da ficha e como ND superior a 20 para habilidades de outras criaturas."
         },
         {
             "name": "Armamento Adaptativo",
@@ -1336,7 +1376,7 @@ export const kishinauros = {
         {
             "name": "Titânico",
             "timing": null,
-            "text": "O Kishinauros é imune a manobras de combate, não pode ser flanqueado e sofre metade do dano de ataques que não sejam de outra criatura Titânica. Quando se move, pisoteia qualquer criatura ou objeto Enorme ou menor em seu caminho, causando 20d6 pontos de dano de impacto (uma vez por rodada por criatura, Ref CD 51 reduz à metade). Além disso, seus ataques ignoram redução de dano e atingem todas as criaturas em um quadrado de 6m; para cada ataque, ele faz um único teste de ataque e compara o resultado com a Defesa de cada inimigo na área."
+            "text": "O Kishinauros é imune a manobras de combate, não pode ser flanqueado e sofre metade do dano de ataques que não sejam de outra criatura Titânica. Quando se move, pisoteia qualquer criatura ou objeto Enorme ou menor em seu caminho (atravessando seu espaço), causando 20d6 pontos de dano de impacto (uma vez por rodada por criatura, Ref CD 51 reduz à metade). Além disso, seus ataques ignoram redução de dano e atingem todas as criaturas em um quadrado de 6m; para cada ataque, ele faz um único teste de ataque e compara o resultado com a Defesa de cada inimigo na área."
         },
         {
             "name": "Sobrecarga",
@@ -1364,8 +1404,9 @@ export const mashinMonge = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 162,
         "bookPage": 160
     },
     "stats": {
@@ -1425,8 +1466,9 @@ export const mashinSamurai = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 162,
         "bookPage": 160
     },
     "stats": {
@@ -1742,7 +1784,7 @@ export const corcelDeComando = {
 
 export const constructCreatures = [
     // Manuais, Livro Básico e Ameaças de Arton
-    gargoyle, golemDeHierro, colossoSupremo, engenhoDeGuerraGoblin,
+    gargoyle, gargoyleBasic, golemDeHierro, golemDeFerroBasic, colossoSupremo, engenhoDeGuerraGoblin,
     mashinMonge, mashinSamurai, golemDeBarro, golemDeBronze,
     golemDeEspelhos, golemDeFerroSuperior, golemDeMateriaVermelha, golemDePedra,
     instrumentoDivino, kishin, kishinauros, esmagadorColetivo,

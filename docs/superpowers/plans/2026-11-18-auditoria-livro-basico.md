@@ -20,11 +20,15 @@ Além das duas diferenças numéricas acima, a revisão confirmou diferenças no
 | Ficha | ID do Livro Básico | Commit |
 |---|---|---|
 | Gnoll Filibusteiro | `gnoll-filibusteiro-livro-basico` | `7ca2fd8` |
+| Gnoll Saqueador | `gnoll-saqueador-livro-basico` | Lote de Gnolls |
+| Gárgula | `gargula-livro-basico` | Lote de Golens |
+| Golem de Ferro | `golem-de-ferro-livro-basico` | Lote de Golens |
 | Orc Mutante | `orc-mutante-livro-basico` | `78d85bf` |
 | Ogro | `ogro-livro-basico` | `3c510e1` |
 | Chefe Bandido | `chefe-bandido-livro-basico` | `3c510e1` |
 | Reishid | `reishid-livro-basico` | Lote do Culto de Aharadak |
+| Capelão de Guerra | `capelao-de-guerra-livro-basico` | Lote da Igreja de Arsenal |
 
-As versões do Básico estão disponíveis na seleção manual. As fichas de Ameaças mantêm os IDs originais e seguem como padrão dos perfis existentes. Gorlogg e Capelão de Guerra seguem pendentes de separação por fonte. [Piloto do Gnoll Filibusteiro](2026-11-18-piloto-versoes-gnoll.md) · [Auditoria de Ameaças de Arton](2026-11-18-auditoria-orcs-ameacas.md)
+As versões do Básico estão disponíveis na seleção manual. As fichas de Ameaças mantêm os IDs originais e seguem como padrão dos perfis existentes. Gorlogg segue pendente de separação por fonte. [Piloto do Gnoll Filibusteiro](2026-11-18-piloto-versoes-gnoll.md) · [Auditoria de Ameaças de Arton](2026-11-18-auditoria-orcs-ameacas.md)
 
 Os PDFs e o relatório detalhado ficam em `tmp/livros/`.

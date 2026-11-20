@@ -8,8 +8,9 @@ export const vagalhaoKobold = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 22,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 191,
         "bookPage": 189
     },
     "stats": {

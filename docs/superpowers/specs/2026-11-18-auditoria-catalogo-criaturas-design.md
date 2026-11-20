@@ -7,8 +7,8 @@ Usar os quatro PDFs integrais em `tmp/livros/` como referência das fichas publi
 ## Progresso por livro
 
 - **Livro Básico — Jogo do Ano.** Primeira rodada publicada com 80 fichas inventariadas e referências atualizadas. O plano acompanha as diferenças entre livros e as versões já publicadas. [Plano da primeira rodada](../plans/2026-11-18-auditoria-livro-basico.md)
-- **Ameaças de Arton.** Brutos & Indomáveis, Capangas & Bandoleiros, Culto de Aharadak, Dragões e Duyshidakk auditados, com 73 fichas conferidas. Restam 261 fichas citando recortes ou prints. O próximo bloco do sumário é Elementais. [Relatório e ponto de retomada](../plans/2026-11-18-auditoria-orcs-ameacas.md#pendências-e-ponto-de-retomada)
-- **Deuses de Arton e Heróis de Arton.** PDFs disponíveis. O inventário das fichas de cada livro segue pendente.
+- **Ameaças de Arton.** A auditoria avançou até Kobolds, com 187 fichas conferidas. Restam 148 fichas citando recortes ou prints. O próximo bloco é Familiares. [Relatório e ponto de retomada](../plans/2026-11-18-auditoria-orcs-ameacas.md#pendências-e-ponto-de-retomada)
+- **Deuses de Arton e Heróis de Arton.** PDFs disponíveis. As variantes de Deuses dos avatares de Aharadak e Kallyadranoch já foram conferidas. O inventário de cada livro segue pendente.
 
 ## Método
 

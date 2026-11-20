@@ -610,6 +610,14 @@ async function creatureHealthFlow() {
     assert.ok(text.includes(`PDF p. ${pdfPage}`));
   }
   for (const [id, name, book, nd, pdfPage] of [
+    ["gnoll-saqueador", "Gnoll Saqueador", "Ameaças de Arton", 1, 118],
+    ["gnoll-saqueador-livro-basico", "Gnoll Saqueador", "Livro Básico", 1, 296],
+    ["gargula", "Gárgula", "Ameaças de Arton", 2, 127],
+    ["gargula-livro-basico", "Gárgula", "Livro Básico", 2, 293],
+    ["golem-de-ferro", "Golem de Ferro", "Ameaças de Arton", 10, 132],
+    ["golem-de-ferro-livro-basico", "Golem de Ferro", "Livro Básico", 10, 294],
+    ["capelao-de-guerra", "Capelão de Guerra", "Ameaças de Arton", 4, 143],
+    ["capelao-de-guerra-livro-basico", "Capelão de Guerra", "Livro Básico", 4, 301],
     ["ogro", "Ogro", "Ameaças de Arton", 4, 43],
     ["ogro-livro-basico", "Ogro", "Livro Básico", 4, 299],
     ["chefe-bandido", "Chefe Bandido", "Ameaças de Arton", 1, 47],
@@ -629,7 +637,9 @@ async function creatureHealthFlow() {
     ["Reishid", "Ameaças de Arton", 8, "58", /alcance natural que esteja desprevenido/],
     ["Reishid", "Livro Básico", 8, "320–321", /alvo adjacente que esteja desprevenido/],
     ["Avatar de Aharadak", "Ameaças de Arton", "S", "64", /Quatro tentáculos \+58/],
-    ["Avatar de Aharadak", "Deuses de Arton", "S", "153", /Sete garras \+67/]
+    ["Avatar de Aharadak", "Deuses de Arton", "S", "153", /Sete garras \+67/],
+    ["Avatar de Kallyadranoch", "Ameaças de Arton", "S", "155", /Duas garras \+58/],
+    ["Avatar de Kallyadranoch", "Deuses de Arton", 20, "173", /Mordida \+52/]
   ]) {
     const label = `${name} · ${book}`;
     await creature.selectOption({ label });

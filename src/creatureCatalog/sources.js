@@ -21,11 +21,11 @@ export const sourceByCreatureId = {
     "orc-chefe": basicBookSource(286),
     "orc-mutante-livro-basico": basicBookSource(286),
     "aranha-gigante": basicBookSource(287),
-    "gargula": basicBookSource(287),
+    "gargula-livro-basico": basicBookSource(287),
     "guerreiro-de-chifres": basicBookSource(287),
     "manticora": basicBookSource(287),
     "centopeia-dragao": basicBookSource(287, 288),
-    "golem-de-ferro": basicBookSource(288),
+    "golem-de-ferro-livro-basico": basicBookSource(288),
     "bandido": basicBookSource(289),
     "chefe-bandido-livro-basico": basicBookSource(289),
     "guarda-de-cidade": basicBookSource(289),
@@ -33,7 +33,7 @@ export const sourceByCreatureId = {
     "lobo": basicBookSource(290),
     "centauro-combatente": basicBookSource(290),
     "centauro-xama": basicBookSource(290),
-    "gnoll-saqueador": basicBookSource(290),
+    "gnoll-saqueador-livro-basico": basicBookSource(290),
     "gnoll-filibusteiro-livro-basico": basicBookSource(291),
     "gorlogg": basicBookSource(291),
     "trog": basicBookSource(291, 292),
@@ -47,7 +47,7 @@ export const sourceByCreatureId = {
     "recruta-purista": basicBookSource(294),
     "soldado-purista": basicBookSource(294),
     "sargento-mor": basicBookSource(294),
-    "capelao-de-guerra": basicBookSource(295),
+    "capelao-de-guerra-livro-basico": basicBookSource(295),
     "capitao-baluarte": basicBookSource(295),
     "cavaleiro-do-leopardo-sangrento": basicBookSource(295),
     "colosso-supremo": basicBookSource(296),
@@ -97,12 +97,7 @@ export const sourceByCreatureId = {
     "sacerdote-de-aharadak": basicBookSource(316),
 
     // ─── Ameaças de Arton ─────────────────────────────────────────────────────
-    "terrier":    { book: "Ameaças de Arton", pdfFile: "elementais e ermos.pdf", pdfPage: 10, bookPage: 97 },
-    "pamgra":     { book: "Ameaças de Arton", pdfFile: "elementais e ermos.pdf", pdfPage: 11, bookPage: 98 },
-    "bulette":    { book: "Ameaças de Arton", pdfFile: "elementais e ermos.pdf", pdfPage: 16, bookPage: null },
-    "tendriculo": { book: "Ameaças de Arton", pdfFile: "elementais e ermos.pdf", pdfPage: 24, bookPage: 111 },
-    "cocatriz":   { book: "Ameaças de Arton", pdfFile: "ameacas de arton variadas.pdf", pdfPage: 9, bookPage: 199 },
-    "aquinne":    { book: "Ameaças de Arton", pdfFile: "elementais e ermos.pdf", pdfPage: 2, bookPage: 89 }
+    "cocatriz":   { book: "Ameaças de Arton", pdfFile: "ameacas de arton variadas.pdf", pdfPage: 9, bookPage: 199 }
 };
 
 

@@ -283,8 +283,9 @@ export const bulette = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 105,
         "bookPage": 103
     },
     "stats": {
@@ -355,8 +356,9 @@ export const tendriculo = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 113,
         "bookPage": 111
     },
     "stats": {
@@ -1917,8 +1919,9 @@ export const carrascoDeLeena = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 106,
         "bookPage": 104
     },
     "stats": {
@@ -1981,9 +1984,12 @@ export const ente = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 5,
-        "bookPage": 106
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 108,
+        "bookPage": 106,
+        "pdfPageEnd": 109,
+        "bookPageEnd": 107
     },
     "stats": {
         "initiative": 7,
@@ -2068,9 +2074,12 @@ export const estirge = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 6,
-        "bookPage": 107
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 109,
+        "bookPage": 107,
+        "pdfPageEnd": 110,
+        "bookPageEnd": 108
     },
     "stats": {
         "initiative": 7,
@@ -2135,8 +2144,9 @@ export const enxameEstirge = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 110,
         "bookPage": 108
     },
     "stats": {
@@ -2192,8 +2202,9 @@ export const nuvemDeEstirges = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 110,
         "bookPage": 108
     },
     "stats": {
@@ -2254,9 +2265,12 @@ export const feraVassalo = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 7,
-        "bookPage": 108
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 110,
+        "bookPage": 108,
+        "pdfPageEnd": 111,
+        "bookPageEnd": 109
     },
     "stats": {
         "initiative": 3,
@@ -2320,8 +2334,9 @@ export const feraLider = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 111,
         "bookPage": 109
     },
     "stats": {
@@ -2386,8 +2401,9 @@ export const feraMae = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 111,
         "bookPage": 109
     },
     "stats": {
@@ -2443,8 +2459,9 @@ export const enxameLarval = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 13,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 182,
         "bookPage": 180
     },
     "stats": {
@@ -2483,6 +2500,11 @@ export const enxameLarval = {
             "name": "Entrar nas Roupas",
             "timing": null,
             "text": "Quando uma criatura sai do espaço do enxame, algumas larvas ficam dentro de suas roupas. Se falhou no teste de resistência, a criatura continua sofrendo os efeitos de Distração até gastar uma ação padrão para se livrar das larvas."
+        },
+        {
+            "name": "Detonação Final (opcional)",
+            "timing": null,
+            "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando o enxame é reduzido a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 4d6 pontos de dano de impacto (Ref CD 14 reduz à metade)."
         }
     ],
     "equipment": null,
@@ -2502,8 +2524,9 @@ export const koboldPatrulheiro = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 14,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 183,
         "bookPage": 181
     },
     "stats": {
@@ -2541,6 +2564,16 @@ export const koboldPatrulheiro = {
             "name": "Peste Oportunista",
             "timing": null,
             "text": "Os ataques do kobold patrulheiro causam +1d4 pontos de dano contra inimigos que já sofreram dano na rodada."
+        },
+        {
+            "name": "Detonação Final (opcional)",
+            "timing": null,
+            "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando o kobold é reduzido a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 4d6 pontos de dano de impacto (Ref CD 13 reduz à metade)."
+        },
+        {
+            "name": "Parceiro",
+            "timing": null,
+            "text": "Embora kobolds sejam normalmente considerados pestes, sob as circunstâncias certas um kobold solitário pode ser convencido a ajudar um aventureiro (Quem Não Tem Cão Caça com Kobold, p. 181). Ele serve como um parceiro especial (combatente). Iniciante: você recebe +1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando, para um total de +3 de ataque. Veterano: os bônus acima aumentam para +2. Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas."
         }
     ],
     "equipment": "Funda, lança, pedras x20",
@@ -2560,8 +2593,9 @@ export const koboldVeterano = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 14,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 183,
         "bookPage": 181
     },
     "stats": {
@@ -2604,6 +2638,16 @@ export const koboldVeterano = {
             "name": "Peste Oportunista",
             "timing": null,
             "text": "Os ataques do kobold causam +1d4 pontos de dano contra inimigos que já sofreram dano na rodada."
+        },
+        {
+            "name": "Detonação Final (opcional)",
+            "timing": null,
+            "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando o kobold é reduzido a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 4d6 pontos de dano de impacto (Ref CD 16 reduz à metade)."
+        },
+        {
+            "name": "Parceiro",
+            "timing": null,
+            "text": "Embora kobolds sejam normalmente considerados pestes, sob as circunstâncias certas um kobold solitário pode ser convencido a ajudar um aventureiro (Quem Não Tem Cão Caça com Kobold, p. 181). Ele serve como um parceiro especial (combatente). Iniciante: você recebe +1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando, para um total de +3 de ataque. Veterano: os bônus acima aumentam para +2. Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas."
         }
     ],
     "equipment": "Armadura de couro, funda, lança, pedras x20",
@@ -2623,8 +2667,9 @@ export const patrulhaKobold = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 14,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 183,
         "bookPage": 181
     },
     "stats": {
@@ -2662,6 +2707,11 @@ export const patrulhaKobold = {
             "name": "Peste Oportunista",
             "timing": null,
             "text": "Os ataques da patrulha kobold causam +1d4 pontos de dano contra inimigos que já sofreram dano na rodada."
+        },
+        {
+            "name": "Detonação Final (opcional)",
+            "timing": null,
+            "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando a patrulha é reduzida a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 4d6 pontos de dano de impacto (Ref CD 18 reduz à metade)."
         }
     ],
     "equipment": "Funda, lança, pedras x20 (1d8 de cada)",
@@ -2681,8 +2731,9 @@ export const koboldExplosivo = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 18,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 187,
         "bookPage": 185
     },
     "stats": {
@@ -2725,6 +2776,11 @@ export const koboldExplosivo = {
             "name": "Peste Oportunista",
             "timing": null,
             "text": "Os ataques do kobold explosivo causam +1d4 pontos de dano contra inimigos que já sofreram dano na rodada."
+        },
+        {
+            "name": "Parceiro",
+            "timing": null,
+            "text": "Embora kobolds sejam normalmente considerados pestes, sob as circunstâncias certas um kobold solitário pode ser convencido a ajudar um aventureiro (Quem Não Tem Cão Caça com Kobold, p. 181). Ele serve como um parceiro especial (combatente). Iniciante: você recebe +1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando, para um total de +3 de ataque. Veterano: os bônus acima aumentam para +2. Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas."
         }
     ],
     "equipment": "Funda, lança, pedras x20",
@@ -2744,8 +2800,9 @@ export const koboldXama = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 19,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 188,
         "bookPage": 186
     },
     "stats": {
@@ -2819,6 +2876,16 @@ export const koboldXama = {
             "timing": "padrão",
             "cost": "1 PM",
             "text": "Criaturas escolhidas em alcance curto sofrem –1 em testes de ataque e rolagens de dano até o fim da cena."
+        },
+        {
+            "name": "Detonação Final (opcional)",
+            "timing": null,
+            "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando o xamã é reduzido a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 4d6 pontos de dano de impacto (Ref CD 19 reduz à metade)."
+        },
+        {
+            "name": "Parceiro",
+            "timing": null,
+            "text": "Embora kobolds sejam normalmente considerados pestes, sob as circunstâncias certas um kobold solitário pode ser convencido a ajudar um aventureiro (Quem Não Tem Cão Caça com Kobold, p. 181). Ele serve como um parceiro especial (combatente). Iniciante: você recebe +1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando, para um total de +3 de ataque. Veterano: os bônus acima aumentam para +2. Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas."
         }
     ],
     "equipment": "Andrajos, bálsamo restaurador, funda, gadanho, pedras x20, símbolo sagrado de Kallyadranoch",
@@ -6509,9 +6576,12 @@ export const altoClerigoDeKally = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p146 ate 155.pdf",
-        "pdfPage": 3,
-        "bookPage": 146
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 148,
+        "pdfPageEnd": 149,
+        "bookPage": 146,
+        "bookPageEnd": 147
     },
     "stats": {
         "initiative": 10,
@@ -6638,8 +6708,9 @@ export const avatarDeKallyadranoch = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p146 ate 155.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 155,
         "bookPage": 153
     },
     "stats": {
@@ -6672,12 +6743,12 @@ export const avatarDeKallyadranoch = {
         {
             "name": "Maior que a Morte",
             "timing": null,
-            "text": "Criaturas de ND S e S+ possuem um status especial. Para estatísticas não listadas em suas fichas, são consideradas criaturas de ND 20; para habilidades de outras criaturas, seu ND é maior que 20, impedindo efeitos limitados pelo nível do alvo."
+            "text": "Enquanto tiver pelo menos metade dos PV, o Avatar de Kallyadranoch é imune a efeitos de morte instantânea, inclusive os que aprisionam ou destroem seu corpo ou alma. Dano ou perda de PV ainda pode reduzi-lo a 0 PV ou menos. Como criatura de ND S, ele conta como ND 20 para estatísticas ausentes da ficha e como ND superior a 20 para habilidades de outras criaturas."
         },
         {
             "name": "Aura Aterradora",
             "timing": null,
-            "text": "Vontade CD 51 evita."
+            "text": "A simples visão de um dragão adulto ou mais velho amedronta o mais valente dos aventureiros. Uma criatura que comece seu turno em alcance longo do dragão fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Uma criatura que passe no teste de resistência fica imune a esta habilidade por um dia. Vontade CD 51 evita."
         },
         {
             "name": "Centelha Divina",
@@ -6730,8 +6801,9 @@ export const corcelDeKally = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p146 ate 155.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 150,
         "bookPage": 148
     },
     "stats": {
@@ -6792,8 +6864,9 @@ export const kallyanachBarbaro = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p146 ate 155.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 152,
         "bookPage": 150
     },
     "stats": {
@@ -6844,8 +6917,9 @@ export const kallyanachMorteGlacial = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p146 ate 155.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 152,
         "bookPage": 150
     },
     "stats": {
@@ -6906,8 +6980,9 @@ export const kaijinBruto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 159,
         "bookPage": 157
     },
     "stats": {
@@ -7003,8 +7078,9 @@ export const kaijinCapanga = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 3,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 158,
         "bookPage": 156
     },
     "stats": {
@@ -7090,9 +7166,12 @@ export const kaijinNinja = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 4,
-        "bookPage": 157
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 159,
+        "bookPage": 157,
+        "pdfPageEnd": 160,
+        "bookPageEnd": 158
     },
     "stats": {
         "initiative": 17,
@@ -7197,8 +7276,9 @@ export const caoDeKally = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 12,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 181,
         "bookPage": 179
     },
     "stats": {
@@ -7259,8 +7339,9 @@ export const koboldBruto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 17,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 186,
         "bookPage": 184
     },
     "stats": {
@@ -7304,6 +7385,16 @@ export const koboldBruto = {
             "name": "Cabecinha",
             "timing": null,
             "text": "A habilidade Escamas de Kally não se aplica a acertos críticos e ataques contra a cabeça diminuta do kobold (Defesa 33)."
+        },
+        {
+            "name": "Detonação Final (opcional)",
+            "timing": null,
+            "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando o kobold bruto é reduzido a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 4d6 pontos de dano de impacto (Ref CD 18 reduz à metade)."
+        },
+        {
+            "name": "Parceiro",
+            "timing": null,
+            "text": "Embora kobolds sejam normalmente considerados pestes, sob as circunstâncias certas um kobold solitário pode ser convencido a ajudar um aventureiro (Quem Não Tem Cão Caça com Kobold, p. 181). Ele serve como um parceiro especial (combatente). Iniciante: você recebe +1 em testes de ataque e rolagens de dano contra inimigos que esteja flanqueando, para um total de +3 de ataque. Veterano: os bônus acima aumentam para +2. Mestre: você pode flanquear mesmo criaturas que não podem ser flanqueadas."
         }
     ],
     "equipment": "Tacape aumentado",
@@ -7321,8 +7412,9 @@ export const koboldMae = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p170 ate 191.pdf",
-        "pdfPage": 20,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 189,
         "bookPage": 187
     },
     "stats": {
@@ -7371,6 +7463,11 @@ export const koboldMae = {
             "name": "Queridinho da Mamãe",
             "timing": "padrão",
             "text": "A kobold-mãe aponta para outro kobold em alcance curto. Por 1 rodada, esse kobold fica imune a efeitos de movimento e recebe +5 em testes de perícia e rolagens de dano."
+        },
+        {
+            "name": "Detonação Final (opcional)",
+            "timing": null,
+            "text": "Variante opcional (Qualquer Kobold Pode Explodir, p. 185). Se o mestre usar a versão explosiva desta ficha, o ND aumenta em +1 apenas para efeitos de experiência. Quando a kobold-mãe é reduzida a 0 PV, role 1d6: com um resultado 1 ou 2, ocorre uma explosão. Todas as criaturas a até 3m sofrem 8d6 pontos de dano de impacto (Ref CD 35 reduz à metade)."
         }
     ],
     "equipment": null,

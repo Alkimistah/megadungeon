@@ -443,8 +443,9 @@ export const lagartoPerceguidor = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 112,
         "bookPage": 110
     },
     "stats": {
@@ -501,8 +502,9 @@ export const chibiKabuto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 1,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 156,
         "bookPage": 154
     },
     "stats": {
@@ -555,9 +557,12 @@ export const koKabuto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 1,
-        "bookPage": 154
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 156,
+        "bookPage": 154,
+        "pdfPageEnd": 157,
+        "bookPageEnd": 155
     },
     "stats": {
         "initiative": 4,
@@ -614,8 +619,9 @@ export const hordaDeKoKabuto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 157,
         "bookPage": 155
     },
     "stats": {
@@ -673,8 +679,9 @@ export const daiKabuto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 157,
         "bookPage": 155
     },
     "stats": {
@@ -832,8 +839,9 @@ export const hiena = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 19,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 122,
         "bookPage": 120
     },
     "stats": {
@@ -894,8 +902,9 @@ export const hienaRainha = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 19,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 122,
         "bookPage": 120
     },
     "stats": {
@@ -956,8 +965,9 @@ export const hienodonte = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 19,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 122,
         "bookPage": 120
     },
     "stats": {

@@ -61,8 +61,9 @@ export const aquinne = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 2,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 91,
         "bookPage": 89
     },
     "stats": {
@@ -128,8 +129,9 @@ export const terrier = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 99,
         "bookPage": 97
     },
     "stats": {
@@ -190,8 +192,9 @@ export const pamgra = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 11,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 100,
         "bookPage": 98
     },
     "stats": {
@@ -300,9 +303,12 @@ export const corgann = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 2,
-        "bookPage": 89
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 91,
+        "bookPage": 89,
+        "pdfPageEnd": 92,
+        "bookPageEnd": 90
     },
     "stats": {
         "initiative": 14,
@@ -364,8 +370,9 @@ export const namasqall = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 4,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 93,
         "bookPage": 91
     },
     "stats": {
@@ -438,8 +445,9 @@ export const tPeel = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 5,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 94,
         "bookPage": 92
     },
     "stats": {
@@ -506,9 +514,12 @@ export const rarvnaak = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 5,
-        "bookPage": 92
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 94,
+        "bookPage": 92,
+        "pdfPageEnd": 95,
+        "bookPageEnd": 93
     },
     "stats": {
         "initiative": 14,
@@ -575,8 +586,9 @@ export const hallusTir = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 7,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 96,
         "bookPage": 94
     },
     "stats": {
@@ -658,9 +670,12 @@ export const pakk = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 7,
-        "bookPage": 94
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 96,
+        "bookPage": 94,
+        "pdfPageEnd": 97,
+        "bookPageEnd": 95
     },
     "stats": {
         "initiative": 7,
@@ -722,8 +737,9 @@ export const berBaram = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 8,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 97,
         "bookPage": 95
     },
     "stats": {
@@ -786,8 +802,9 @@ export const serpentaar = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 98,
         "bookPage": 96
     },
     "stats": {
@@ -855,8 +872,9 @@ export const bandoDePamgras = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 11,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 100,
         "bookPage": 98
     },
     "stats": {
@@ -919,8 +937,9 @@ export const tanaloom = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 12,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 101,
         "bookPage": 99
     },
     "stats": {
@@ -992,8 +1011,9 @@ export const elementalCorrompido = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p90-103.pdf",
-        "pdfPage": 14,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 103,
         "bookPage": 101
     },
     "stats": {
@@ -1066,8 +1086,9 @@ export const oni = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 9,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 164,
         "bookPage": 162
     },
     "stats": {
@@ -1161,8 +1182,9 @@ export const rhandomm = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p104 ate 124.pdf",
-        "pdfPage": 12,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 115,
         "bookPage": 113
     },
     "stats": {
@@ -1257,8 +1279,9 @@ export const akaOni = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 10,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 165,
         "bookPage": 163
     },
     "stats": {
@@ -1339,9 +1362,12 @@ export const daitengu = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 11,
-        "bookPage": 164
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 166,
+        "bookPage": 164,
+        "pdfPageEnd": 167,
+        "bookPageEnd": 165
     },
     "stats": {
         "initiative": 14,
@@ -1431,8 +1457,9 @@ export const dragaoCelestialAdulto = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 13,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 168,
         "bookPage": 166
     },
     "stats": {
@@ -1546,8 +1573,9 @@ export const dragaoCelestialJovem = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 12,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 167,
         "bookPage": 165
     },
     "stats": {
@@ -1644,9 +1672,12 @@ export const dragaoCelestialVeneravel = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 13,
-        "bookPage": 166
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 168,
+        "bookPage": 166,
+        "pdfPageEnd": 169,
+        "bookPageEnd": 167
     },
     "stats": {
         "initiative": 20,
@@ -1730,7 +1761,7 @@ export const dragaoCelestialVeneravel = {
             "name": "Intervenção Divina",
             "timing": "padrão",
             "cost": "15 PM",
-            "text": "O dragão pede para Lin-Wu interceder diretamente. Pode curar todos os PV e condições de até 10 criaturas em alcance longo, dissipar os efeitos de qualquer magia de 4º círculo ou menor ou produzir algo ainda mais poderoso; nesse último caso, exige o sacrifício de 2 PM."
+            "text": "O dragão pede para Lin-Wu interceder diretamente. Pode curar todos os PV e condições de até 10 criaturas em alcance longo (este efeito cura mortos-vivos, em vez de causar dano), dissipar os efeitos de qualquer magia de 4º círculo ou menor ou produzir algo ainda mais poderoso; nesse último caso, exige o sacrifício de 2 PM."
         },
         {
             "name": "Katana Celestial",
@@ -1787,8 +1818,9 @@ export const kappaBrigao = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 6,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 161,
         "bookPage": 159
     },
     "stats": {
@@ -1854,8 +1886,9 @@ export const kappaYokozuna = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 6,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 161,
         "bookPage": 159
     },
     "stats": {
@@ -1926,8 +1959,9 @@ export const tenguBandoleiro = {
     "description": [],
     "source": {
         "book": "Ameaças de Arton",
-        "pdfFile": "ameacas de arton p156 ate 169.pdf",
-        "pdfPage": 11,
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "pdfPage": 166,
         "bookPage": 164
     },
     "stats": {
@@ -2418,6 +2452,102 @@ export const totemDoReiTiranoAspectoDeMegalokk = {
     "skillsText": "Atletismo +30, Intimidação +30"
 };
 
+const avatarDeKallyadranochDivine = {
+    id: "avatar-de-kallyadranoch-deuses-de-arton",
+    name: "Avatar de Kallyadranoch",
+    variantOf: "avatar-de-kallyadranoch",
+    type: "spirit",
+    subtype: "dragão",
+    size: "Médio",
+    challengeRating: 20,
+    role: "solo",
+    roleSource: "pdf-review",
+    description: [],
+    source: {
+        book: "Deuses de Arton",
+        edition: "1ª edição, maio de 2025 (v1.1)",
+        pdfFile: "T20 Deuses de Arton.pdf",
+        pdfPage: 173,
+        bookPage: 171
+    },
+    stats: {
+        initiative: 20,
+        perception: 18,
+        defense: 50,
+        fortitude: 20,
+        reflex: 28,
+        will: 35,
+        hitPoints: 1405,
+        speedText: "9m (6q), voo 18m (16q)",
+        senses: "percepção às cegas, visão no escuro",
+        defensesText: "imunidade a ácido, atordoamento, cansaço, dano de luz, eletricidade, essência, fogo, frio, metamorfose, paralisia, trevas e veneno, redução de dano 50, resistência a magia +5",
+        attributes: {
+            str: 13,
+            dex: 8,
+            con: 12,
+            int: 14,
+            wis: 6,
+            cha: 19
+        }
+    },
+    actions: [
+        {
+            name: "Corpo a Corpo",
+            text: "Mordida +52 (5d12+50, 17/x3) e duas garras +50 (4d10+35, 19/x2)."
+        }
+    ],
+    abilities: [
+        {
+            name: "Ajoelhem-se Perante Mim",
+            timing: "padrão",
+            text: "Criaturas escolhidas pelo Avatar em alcance curto ficam caídas e não podem agir de forma hostil contra ele por 1 rodada. Com sucesso em Fortitude CD 50, elas sofrem apenas –5 em testes contra o Avatar por 1 rodada."
+        },
+        {
+            name: "Aura Aterradora",
+            timing: null,
+            text: "Uma criatura que comece seu turno em alcance longo do Avatar fica apavorada (se tiver 4 níveis ou menos) ou abalada (se tiver 5 níveis ou mais) até o fim da cena. Vontade CD 50 evita. Quem passa no teste fica imune a esta habilidade por um dia."
+        },
+        {
+            name: "Cálice",
+            timing: "livre",
+            text: "Uma vez por rodada, o Avatar ignora todas as penalidades e restrições de uma condição ou efeito."
+        },
+        {
+            name: "Centelha Divina",
+            timing: null,
+            text: "O Avatar pode lançar qualquer magia arcana como um mago de 20º nível (CD 50, limite de PM 20), sem gastar PM. Uma criatura que falhe na resistência a uma magia dele fica abalada. A condição se acumula e ignora imunidade a medo."
+        },
+        {
+            name: "Majestade Altiva",
+            timing: null,
+            text: "No início de cada turno do Avatar, todas as criaturas apavoradas em alcance médio ficam fascinadas. Vontade CD 50 evita e deixa a criatura imune a esta habilidade até o fim do dia."
+        },
+        {
+            name: "Metamorfose Dracônica",
+            timing: "completa",
+            text: "O Avatar assume a forma de outra criatura como na magia Metamorfose, sem limitação para tamanhos menores que o seu. Se morrer, volta à forma original."
+        },
+        {
+            name: "Servos de Kallyadranoch",
+            timing: "livre",
+            text: "Uma vez por cena, o Avatar invoca seis capangas dragões campeões em espaços livres em alcance longo, um por tipo de dano entre ácido, eletricidade, fogo, frio, luz e trevas. Eles agem no início da rodada seguinte do Avatar e voam 18m. Com uma ação padrão, cada um pode soprar em um cone de 9m e causar 6d12 pontos de dano de seu tipo. São Grandes, têm For 5, Des 1, 110 PV, Defesa 32, imunidades de dragão e ao dano de seu tipo. Usam os valores do Avatar com –5 em testes opostos e de resistência e desaparecem quando mortos ou ao fim da cena."
+        },
+        {
+            name: "Sopro Supremo",
+            timing: "padrão",
+            text: "Criaturas em um cone de 30m sofrem 7d12 pontos de dano de cada tipo entre ácido, eletricidade, fogo, frio, luz e trevas (42d12 no total, Ref CD 50 reduz à metade). Cada 12 em um dado de dano acrescenta 1d12 do mesmo tipo. O sopro ignora RD e a imunidade ao tipo de dano o reduz à metade. Recarga (movimento)."
+        },
+        {
+            name: "Tomar Poder",
+            timing: "padrão",
+            text: "O Avatar faz um teste de Misticismo e dissipa magias com CD igual ou inferior ao resultado numa área de 9m de raio em alcance médio. Ele recebe os benefícios das magias que escolher entre as dissipadas por 1d4+1 rodadas."
+        }
+    ],
+    equipment: null,
+    treasure: "Triplo.",
+    skillsText: "Conhecimento +35, Diplomacia +37, Enganação +37, Intimidação +40, Misticismo +40, Nobreza +40, Ofício (escriba) +35, Religião +27"
+};
+
 export const spiritCreatures = [
     // Manuais, Livro Básico e Ameaças de Arton
     hellHound, aquinne, terrier, pamgra,
@@ -2428,5 +2558,5 @@ export const spiritCreatures = [
     berBaram, serpentaar, bandoDePamgras, tanaloom,
     elementalCorrompido, oni, stagh, unicornio,
     demonioDaPolvora, totemDaDivinaSerpenteAspectoDeAllihanna, totemDeSaranaAspectoDeMarah, totemDoPaiDeTudoAspectoDeAzgher,
-    totemDoReiTiranoAspectoDeMegalokk
+    totemDoReiTiranoAspectoDeMegalokk, avatarDeKallyadranochDivine
 ];
