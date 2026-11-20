@@ -995,7 +995,7 @@ Os seis blocos foram conferidos contra as fichas do PDF. O catálogo recebeu tod
 
 Finntroll Caçador, Finntroll Feitor, Nagah Mística e Cultista de Sszzaas receberam versões próprias de Ameaças. Os identificadores e as preferências anteriores do Livro Básico foram conservados. O Nagah Guardião do Básico e o Nagah Defensor de Ameaças são fichas distintas.
 
-**Rival Espelho, p. 335.** A ficha tem ND `?` e copia as estatísticas do personagem. O fluxo atual calcula encontros a partir de um ND fixo por criatura. O cadastro depende de modelar a cópia de ficha e a resolução do ND no encontro. O quadro Troll Montaria, p. 344, contém regras de parceiro e não tem ficha própria.
+**Rival Espelho, p. 335.** A ficha tem ND `?` e copia as estatísticas do personagem. Está cadastrada como consulta com o ID `rival-espelho`. Ela traz só o que o livro imprime, sem linhas de estatística e sem papel, abre pela escolha exata de ficha e fica fora do sorteio. O mestre aplica a cópia na mesa. [Fichas sem ND numérico](../specs/2026-11-20-fichas-sem-nd-design.md) O quadro Troll Montaria, p. 344, contém regras de parceiro e não tem ficha própria.
 
 Familiares, pp. 190–197, ficou fora do catálogo por decisão anterior, porque são criaturas de apoio a personagens. A Tropa de Tentacutes, de ND 2 e com marca de Bando, é a única com uso direto como encontro e pode ser reavaliada no cadastro futuro.
 

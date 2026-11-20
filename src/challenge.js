@@ -6,13 +6,16 @@ const CHALLENGE_LABELS = new Map([
 ]);
 
 const SPECIAL_CHALLENGE_RATINGS = new Set(["S", "S+"]);
+// ND impressos sem valor: consulta pela escolha exata de ficha, fora do sorteio.
+const UNRATED_CHALLENGE_RATINGS = new Set(["–", "?"]);
 
 export function isSpecialChallengeRating(value) {
-  return SPECIAL_CHALLENGE_RATINGS.has(value);
+  return SPECIAL_CHALLENGE_RATINGS.has(value) || UNRATED_CHALLENGE_RATINGS.has(value);
 }
 
 export function getChallengeRatingForStatistics(value) {
-  return isSpecialChallengeRating(value) ? 20 : value;
+  if (UNRATED_CHALLENGE_RATINGS.has(value)) return null;
+  return SPECIAL_CHALLENGE_RATINGS.has(value) ? 20 : value;
 }
 
 export function roundToQuarter(value) {
@@ -80,7 +83,13 @@ export function calculateCombatND(items) {
     Array(quantity).fill(challengeRating)
   );
   const count = allCRs.length;
-  if (count === 1 && isSpecialChallengeRating(allCRs[0])) return allCRs[0];
+  const specials = allCRs.filter(isSpecialChallengeRating);
+  if (specials.length) {
+    // Sem regra de soma para ND especial: sem ND domina, depois o maior entre S+ e S.
+    const unrated = specials.filter(cr => UNRATED_CHALLENGE_RATINGS.has(cr));
+    if (unrated.length) return unrated.length === count && unrated.every(cr => cr === "–") ? "–" : "?";
+    return specials.includes("S+") ? "S+" : "S";
+  }
 
   const total = allCRs.reduce((s, cr) => s + cr, 0);
 

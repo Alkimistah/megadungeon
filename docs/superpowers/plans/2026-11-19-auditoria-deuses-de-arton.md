@@ -13,7 +13,7 @@ As duas fichas foram conferidas como variantes de Deuses durante a auditoria de 
 
 ## Cadastro futuro
 
-As fichas abaixo foram anotadas para o cadastro de inimigos que faltavam, depois da revisão do catálogo atual. O cadastro está concluído, exceto pelo Luminar.
+As fichas abaixo foram anotadas para o cadastro de inimigos que faltavam, depois da revisão do catálogo atual. O cadastro está concluído.
 
 **Avatares**, pp. 155–227 impressas. Os 18 avatares estão cadastrados. Veja [Avatares cadastrados](#avatares-cadastrados).
 
@@ -23,13 +23,13 @@ As fichas abaixo foram anotadas para o cadastro de inimigos que faltavam, depois
 |---|---:|---|
 | Abissais | 253–263 | 10 fichas cadastradas. Aucharai, Trio de Carvarel, Diabrete, Diabrete Negociante, Jhumariel, Margharon, Rhayrivel, Súcubo, Abahddon e Lamashtu. |
 | Aspectos | 265–273 | Seis fichas cadastradas. Allihanna, Kallyadranoch, Khalmyr, Lin-Wu, Marah e Valkaria. |
-| Celestiais | 274–284 | Oito fichas cadastradas. Pilly, Protetor, Shiradi, Pégaso, Pégaso de Khalmyr, Muhir, Orel e Fúria Extrema. Luminar pendente. |
+| Celestiais | 274–284 | Nove fichas cadastradas. Pilly, Luminar, Protetor, Shiradi, Pégaso, Pégaso de Khalmyr, Muhir, Orel e Fúria Extrema. |
 | Inevitáveis | 278–279 | Três fichas cadastradas. Fado, Probo e Parcus. |
 | Fadas e espíritos da natureza | 286–297 | 12 fichas cadastradas. Dríade, Duende Menor, Duende Maior, Dragonete, Náiade, Ninfa, Sátiro Arqueiro, Sílfide Travessa, Sílfide Encantadora, Velha Bruxa, Eiradaan Guardião e Eiradaan Nobre. |
 | Gênios | 299–305 | Seis fichas cadastradas. Yazzu, Jairuan, Gizzehi, Allaraz, Kemooz e Dabbus. |
 | Gigantes | 307–315 | Dez fichas cadastradas. Galokk Capanga, Galokk Guarda-Costas, Gigante Bicéfalo, Gigante das Colinas, Gigante do Fogo, Gigante das Rochas, Gigante do Gelo, Gigante dos Mares, Gigante Real e Gigante Máximo. |
 
-O Luminar, p. 275 impressa, p. 277 do PDF, tem ND, PV, Defesa e resistências impressos como traços. Dano de trevas o destrói. A ficha fica pendente de suporte a consulta sem orçamento de encontro. Vento Abrasador, Pântano Amaldiçoado e Cataclismo, pp. 316–317 impressas, são perigos, sem ficha de criatura.
+O Luminar, p. 275 impressa, p. 277 do PDF, tem ND, PV, Defesa e resistências impressos como traços. Dano de trevas o destrói. A ficha está cadastrada como consulta, com ND “–” e papel Especial. Ela abre só pela escolha exata de ficha e fica fora do sorteio. [Fichas sem ND numérico](../specs/2026-11-20-fichas-sem-nd-design.md) Vento Abrasador, Pântano Amaldiçoado e Cataclismo, pp. 316–317 impressas, são perigos, sem ficha de criatura.
 
 Os quadros Invocando Aspectos, Habilidades de Gênios e Habilidades de Inevitáveis trazem regras compartilhadas para as fichas. Quadros de raça, parceiro e familiar descrevem opções de personagem e ficam fora das fichas de combate, conforme a decisão registrada em Montarias, na auditoria de Ameaças.
 

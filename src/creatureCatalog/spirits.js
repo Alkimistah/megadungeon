@@ -7316,7 +7316,75 @@ const avatarDeWynnaDeusesDeArton = {
     "roleSource": "pdf-review"
 };
 
+const luminar = {
+    "id": "luminar-deuses-de-arton",
+    "name": "Luminar",
+    "type": "spirit",
+    "subtype": "celestial",
+    "size": "Minúsculo",
+    "challengeRating": "–",
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 275,
+        "pdfPage": 277
+    },
+    "stats": {
+        "initiative": 12,
+        "perception": 8,
+        "defense": null,
+        "fortitude": null,
+        "reflex": null,
+        "will": null,
+        "hitPoints": null,
+        "hitPointsText": "—",
+        "speedText": "voo 9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a dano (exceto trevas) e a efeitos de sentidos",
+        "attributes": {
+            "str": null,
+            "dex": 5,
+            "con": null,
+            "int": -2,
+            "wis": 1,
+            "cha": 1
+        }
+    },
+    "actions": [],
+    "abilities": [
+        {
+            "name": "Abençoar",
+            "timing": "padrão",
+            "text": "Criaturas à escolha do luminar em alcance curto recebem +1 em testes de ataque e de resistência até o fim da cena.",
+            "magical": true
+        },
+        {
+            "name": "Aliviar",
+            "timing": "padrão",
+            "text": "O luminar emite uma luz suave que cura 2d8+2 PV de uma criatura em alcance curto.",
+            "magical": true
+        },
+        {
+            "name": "Sacrifício",
+            "timing": "completa",
+            "text": "O luminar se transforma em uma luz forte que aquece um raio de 9m. Criaturas escolhidas pelo luminar nessa área curam 6d8+6 pontos de vida. Após usar esta habilidade, o luminar desaparece para sempre."
+        },
+        {
+            "name": "Ser de Luz",
+            "timing": null,
+            "text": "O luminar não tem corpo físico e sua manifestação no plano material é apenas uma luz que varia de intensidade, mas que ilumina um raio de 9m. Ele é imune a todos os tipos de dano, exceto trevas, e é destruído quando sofre dano desse tipo."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Diplomacia +8, Intuição +8.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
 export const spiritCreatures = [
+    luminar,
     avatarDoOceanoDeusesDeArton, avatarDeSszzaasDeusesDeArton, avatarDeTannaTohDeusesDeArton,
     avatarDeNimbDeusesDeArton, avatarDeThyatisDeusesDeArton, avatarDeValkariaDeusesDeArton, avatarDeWynnaDeusesDeArton,
     avatarDeLenaDeusesDeArton, avatarDeLinWuDeusesDeArton, avatarDeMarahDeusesDeArton,

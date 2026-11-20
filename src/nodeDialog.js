@@ -142,7 +142,7 @@ function createDetailLine(label, value) {
 }
 
 function formatModifier(value) {
-  if (value === null || value === undefined) return "?";
+  if (value === null || value === undefined) return "—";
   return value > 0 ? `+${value}` : String(value);
 }
 
@@ -595,7 +595,7 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
   challenge.textContent = `ND ${item.challengeLabel}`;
   subtitle.className = "creature-sheet-subtitle";
   const roleLabel = creature.roleMetadata?.label || item.roleLabel;
-  subtitle.textContent = `${typeText} ${creature.size || ""} · ${roleLabel} · ${item.quantity} no encontro`;
+  subtitle.textContent = `${[typeText, creature.size].filter(Boolean).join(" ")} · ${roleLabel} · ${item.quantity} no encontro`;
 
   header.appendChild(title);
   if (item.generated) {
@@ -616,12 +616,20 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
   const initiative = Number.isFinite(stats.initiative) ? stats.initiative + reinforcement.initiative : stats.initiative;
   const initiativeNote = reinforcement.initiative ? ` (reforço +${reinforcement.initiative})` : "";
   const perceptionText = [formatModifier(stats.perception), stats.senses].filter(Boolean).join(", ");
-  section.appendChild(createSheetLine("INICIATIVA", `${formatModifier(initiative)}${initiativeNote},`, " PERCEPÇÃO", `${perceptionText}`));
-  section.appendChild(createSheetLine("DEFESA", `${stats.defense ?? "?"}, FORT ${formatModifier(stats.fortitude)}, REF ${formatModifier(stats.reflex)}, VON ${formatModifier(stats.will)}${stats.defensesText ? `, ${stats.defensesText}` : ""}`));
+  const hasValue = value => value !== null && value !== undefined && value !== "";
+  // Linhas sem nenhum valor impresso são omitidas, como no Rival Espelho.
+  if ([stats.initiative, stats.perception, stats.senses].some(hasValue)) {
+    section.appendChild(createSheetLine("INICIATIVA", `${formatModifier(initiative)}${initiativeNote},`, " PERCEPÇÃO", `${perceptionText}`));
+  }
+  if ([stats.defense, stats.fortitude, stats.reflex, stats.will, stats.defensesText].some(hasValue)) {
+    section.appendChild(createSheetLine("DEFESA", `${stats.defense ?? "—"}, FORT ${formatModifier(stats.fortitude)}, REF ${formatModifier(stats.reflex)}, VON ${formatModifier(stats.will)}${stats.defensesText ? `, ${stats.defensesText}` : ""}`));
+  }
   const hitPointsText = reinforcement.hitPoints
     ? `${stats.hitPoints + reinforcement.hitPoints} (reforço +${reinforcement.hitPoints})`
-    : String(stats.hitPoints ?? stats.hitPointsText ?? "?");
-  section.appendChild(createSheetLine("PONTOS DE VIDA", hitPointsText));
+    : String(stats.hitPoints ?? stats.hitPointsText ?? "—");
+  if ([stats.hitPoints, stats.hitPointsText].some(hasValue)) {
+    section.appendChild(createSheetLine("PONTOS DE VIDA", hitPointsText));
+  }
   if (reinforcement.hitPoints) {
     section.appendChild(createSheetLine(
       "REFORÇO DE PV",
@@ -671,7 +679,7 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
     }
   }
 
-  if (stats.attributes) {
+  if (stats.attributes && Object.values(stats.attributes).some(value => value !== null && value !== undefined)) {
     section.appendChild(createDivider());
     section.appendChild(createSheetLine("", formatAttributes(stats.attributes)));
   }

@@ -1902,6 +1902,12 @@ test("the creature sheet shows published group rules and confirmed magical abili
     assert.match(sheetText("bruxa-goblin"), /Raio Conspurcado.*Mágica/);
     assert.match(sheetText("bruxa-goblin"), /Tentáculos de Trevas\*/);
     assert.match(sheetText("gigante-maximo"), /PONTOS DE VIDA\s+Especial \(veja Grande Demais\)/);
+    assert.match(sheetText("vagalhao-kobold"), /FORT —, REF —, VON —/);
+    assert.match(sheetText("luminar-deuses-de-arton"), /DEFESA\s+—, FORT —, REF —, VON —, imunidade a dano/);
+    assert.match(sheetText("luminar-deuses-de-arton"), /PONTOS DE VIDA\s+—/);
+    const rival = sheetText("rival-espelho");
+    assert.doesNotMatch(rival, /INICIATIVA|DEFESA|PONTOS DE VIDA|undefined/);
+    assert.match(rival, /Transferir Dor.*Mágica/);
   } finally {
     globalThis.document = previousDocument;
   }
@@ -2102,4 +2108,51 @@ test("Deuses avatars retain their printed roles, ND and full PDF references", ()
   assert.match(thwor.abilities.find(a => a.name === "Encarnação do Mundo Como Deve Ser").text, /Início \(Padrão\).*Habilidade mágica.*Vida\. O Avatar recebe cura acelerada 20\. Habilidade mágica\./);
   const wynna = getCreatureById("avatar-de-wynna-deuses-de-arton");
   assert.equal(wynna.abilities.filter(a => a.magical).length, 5);
+});
+
+test("unrated ND sheets are special and never drawn", async () => {
+  const { isSpecialChallengeRating, getChallengeRatingForStatistics } = await import("../src/challenge.js");
+  for (const nd of ["–", "?"]) {
+    assert.equal(isSpecialChallengeRating(nd), true, nd);
+    assert.equal(calculateCombatND([{ challengeRating: nd, quantity: 1 }]), nd);
+    assert.equal(getChallengeRatingForStatistics(nd), null, nd);
+  }
+  assert.equal(getChallengeRatingForStatistics("S+"), 20);
+  const unrated = ["luminar-deuses-de-arton", "rival-espelho"];
+  for (const id of unrated) assert.ok(getCreatureById(id), id);
+  const drawn = new Set();
+  for (let floor = 11; floor <= 20; floor++) {
+    for (let index = 0; index < 5; index++) {
+      const seed = `unrated-${floor}-${index}`;
+      for (const node of map(floor, seed).flat()) {
+        resolveNodeEncounter(node, { mapSeed: seed, profile });
+        for (const item of node.resolvedEncounter?.items ?? []) drawn.add(item.creatureId);
+      }
+    }
+  }
+  assert.ok(drawn.size > 20);
+  for (const id of unrated) assert.equal(drawn.has(id), false, id);
+});
+
+test("Luminar and Rival Espelho keep their printed ND and references", () => {
+  const luminar = getCreatureById("luminar-deuses-de-arton");
+  assert.deepEqual([luminar.challengeRating, luminar.role, luminar.type, luminar.subtype, luminar.size], ["–", "special", "spirit", "celestial", "Minúsculo"]);
+  assert.deepEqual([luminar.source.pdfFile, luminar.source.bookPage, luminar.source.pdfPage], ["T20 Deuses de Arton.pdf", 275, 277]);
+  assert.deepEqual([luminar.stats.hitPoints, luminar.stats.hitPointsText, luminar.stats.initiative, luminar.stats.perception], [null, "—", 12, 8]);
+  assert.deepEqual(luminar.abilities.filter(a => a.magical).map(a => a.name), ["Abençoar", "Aliviar"]);
+  const rival = getCreatureById("rival-espelho");
+  assert.deepEqual([rival.challengeRating, rival.role, rival.type, rival.size, rival.treasure], ["?", null, "???", null, "Nenhum."]);
+  assert.deepEqual([rival.source.pdfFile, rival.source.bookPage, rival.source.pdfPage], ["T20 Ameacas de Arton.pdf", 335, 337]);
+  assert.ok(rival.abilities.find(a => a.name === "Transferir Dor").magical);
+});
+
+test("combat ND with several special or unrated sheets never becomes NaN", () => {
+  const nd = items => calculateCombatND(items.map(([challengeRating, quantity = 1]) => ({ challengeRating, quantity })));
+  assert.equal(nd([["S", 2]]), "S");
+  assert.equal(nd([["S"], [3]]), "S");
+  assert.equal(nd([["S"], ["S+"]]), "S+");
+  assert.equal(nd([["–", 2]]), "–");
+  assert.equal(nd([["?"], ["S+"]]), "?");
+  assert.equal(nd([["–"], [5]]), "?");
+  assert.equal(nd([[3], [3]]), 5);
 });

@@ -10729,7 +10729,56 @@ const avatarDeMegalokkDeusesDeArton = {
     "roleSource": "pdf-review"
 };
 
+const rivalEspelho = {
+    "id": "rival-espelho",
+    "name": "Rival Espelho",
+    "type": "???",
+    "subtype": null,
+    "size": null,
+    "challengeRating": "?",
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 335,
+        "pdfPage": 337
+    },
+    "stats": {
+        "initiative": null,
+        "perception": null,
+        "defense": null,
+        "fortitude": null,
+        "reflex": null,
+        "will": null,
+        "hitPoints": null,
+        "speedText": null,
+        "senses": null,
+        "defensesText": null,
+        "attributes": null
+    },
+    "actions": [],
+    "abilities": [
+        {
+            "name": "???",
+            "timing": null,
+            "text": "Um rival espelho possui as características e o ND do personagem que está copiando."
+        },
+        {
+            "name": "Transferir Dor",
+            "timing": null,
+            "text": "Todo dano que o rival espelho sofre, bem como efeitos adicionais desse dano, é aplicado ao personagem que ele está copiando e não ao rival. Se o personagem copiado for reduzido a 0 PV ou menos, o rival desaparece após 1 rodada.",
+            "magical": true
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": null,
+    "role": null,
+    "roleSource": "pdf-review"
+};
+
 export const monsterCreatures = [
+    rivalEspelho,
     avatarDeMegalokkDeusesDeArton,
     ...divineAspects.filter(aspect => aspect.type === "monster"),
     vermeDoGeloLarva, vermeDoGeloAdulto,
