@@ -91,6 +91,9 @@ try {
   await page.locator("#treasureDialog .treasure-roll").click();
   assert.equal(await page.locator("#treasureDialog .treasure-error").innerText(), "");
   assert.match(await results.first().innerText(), /Heróis · Acessórios específicos \(menores\)/);
+  const itemLine = await page.locator("#treasureFooter .treasure-summary-block li").last().innerText();
+  assert.match(itemLine, /^\d+× .+ \(.+\) — .*p\. \d+$/, `item do rodapé com categoria e página: ${itemLine}`);
+  assert.match(await page.locator("#treasureFooter").innerText(), /Total em dinheiro/);
   await page.locator("#treasureDialog .treasure-roll").click();
   // Lote cheio de 11+ tesouros para a captura.
   await rowsLoc.nth(0).locator(".treasure-f-kind").selectOption("nd");
@@ -215,14 +218,17 @@ try {
   };
   const themeA = await themeOf(0);
   const themeB = await themeOf(1);
-  for (const t of [themeA, themeB]) {
+  const themeC = await themeOf(2);
+  for (const t of [themeA, themeB, themeC]) {
     assert.equal(t.dialogBg, t.page, `fundo da modal = --page (${t.id})`);
     assert.equal(t.cardBg, t.alt, `cartão = --surface-alt (${t.id})`);
     assert.equal(t.tabBg, t.hover, `aba selecionada = --action-hover (${t.id})`);
   }
   assert.notEqual(themeA.dialogBg, themeB.dialogBg, "perfis diferentes têm fundos diferentes");
   assert.notEqual(themeA.cardBg, themeB.cardBg);
-  console.log("temas:", themeA.id, themeA.dialogBg, "|", themeB.id, themeB.dialogBg);
+  assert.notEqual(themeC.dialogBg, themeB.dialogBg, "arquipélago difere dos demais");
+  assert.notEqual(themeC.dialogBg, themeA.dialogBg, "arquipélago difere dos demais");
+  console.log("temas:", themeA.id, themeA.dialogBg, "|", themeB.id, themeB.dialogBg, "|", themeC.id, themeC.dialogBg);
   assert.deepEqual(errors, [], `pageerror: ${errors.join("; ")}`);
   console.log("qaTreasure OK");
 } finally {

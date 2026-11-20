@@ -9,6 +9,7 @@ import { tableLabel } from "./treasureFormat.js";
 
 export const MAX_QUANTITY = 99;
 const COLUMN_SETS = { both: ["money", "items"], money: ["money"], items: ["items"] };
+export const COLUMN_LABELS = { both: "Item + Riqueza", items: "Só Item", money: "Só Riqueza" };
 export const MODE_LABELS = { padrão: "Padrão", metade: "Metade", dobro: "Dobro" };
 
 // Tabelas escolhíveis em "Tabela específica": as do Livro Básico (menos as de ND) e as listas dos outros livros.
@@ -30,7 +31,8 @@ function startRow(row) {
   if (!MODES.includes(row.mode)) throw new RangeError(`Tipo de tesouro inválido: ${row.mode}`);
   if (!CHALLENGE_RATINGS.includes(String(row.challengeRating))) throw new RangeError(`ND inválido: ${row.challengeRating}`);
   if (row.mode === "metade" && row.columns === "items") throw new RangeError("Metade não vale para a coluna Itens.");
-  const label = `ND ${challengeRatingLabel(String(row.challengeRating))}, ${MODE_LABELS[row.mode]}`;
+  const column = row.columns === "both" ? "" : `, ${COLUMN_LABELS[row.columns]}`;
+  const label = `ND ${challengeRatingLabel(String(row.challengeRating))}, ${MODE_LABELS[row.mode]}${column}`;
   return { label, start: () => columns.flatMap((column) => startTreasure({ challengeRating: row.challengeRating, column, mode: row.mode })) };
 }
 

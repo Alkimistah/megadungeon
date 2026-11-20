@@ -1,15 +1,14 @@
 // Casca da modal de tesouros e abas Rolar e Consultar.
 import { CHALLENGE_RATINGS, challengeRatingLabel, startTreasure, startTable, nextStep, applyRoll } from "./treasureEngine.js";
 import { rollDice, dieRange } from "./dice.js";
-import { buildBatch, rollBatch, listSpecificTables, MAX_QUANTITY, MODE_LABELS } from "./treasureBatch.js";
-import { describeStep, stepDepth, formatAmount, formatPrice, tableLabel } from "./treasureFormat.js";
+import { buildBatch, rollBatch, listSpecificTables, MAX_QUANTITY, MODE_LABELS, COLUMN_LABELS } from "./treasureBatch.js";
+import { describeStep, stepDepth, formatAmount, formatItemLine, parseTypedValue, tableLabel } from "./treasureFormat.js";
 import { summarizeGains } from "./treasureSummary.js";
 import { createRng, createRandomSeed } from "../random.js";
 
 export { buildBatch };
 
 const wired = new WeakSet();
-const COLUMN_LABELS = { both: "Item + Riqueza", items: "Só Item", money: "Só Riqueza" };
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -38,12 +37,12 @@ export function renderSummary(container, gains, strip) {
   const money = el("p", "treasure-summary-line");
   money.append(el("strong", "", "Dinheiro: "), coins.length ? coins.join(" · ") : "nenhum");
   const total = el("p", "treasure-summary-line treasure-total");
-  total.append(el("strong", "", "Total: "), el("span", "treasure-total-value", `${formatAmount(summary.totalTibars)} T$`));
+  total.append(el("strong", "", "Total em dinheiro: "), el("span", "treasure-total-value", `${formatAmount(summary.totalTibars)} T$`));
   const moneyBlock = el("div", "treasure-summary-block");
   moneyBlock.append(money, total);
   strip?.replaceChildren();
   strip?.append(el("strong", "", "Dinheiro: "), `${coins.length ? coins.join(" · ") : "nenhum"} · `,
-    el("strong", "treasure-total-value", `Total: ${formatAmount(summary.totalTibars)} T$`),
+    el("strong", "treasure-total-value", `Total em dinheiro: ${formatAmount(summary.totalTibars)} T$`),
     ` · ${summary.wealth.length} ${summary.wealth.length === 1 ? "riqueza" : "riquezas"}`,
     ` · ${summary.items.reduce((n, i) => n + i.quantity, 0)} itens`);
 
@@ -61,8 +60,7 @@ export function renderSummary(container, gains, strip) {
   else {
     const list = el("ul");
     for (const it of summary.items) {
-      const price = it.price !== undefined ? ` — ${formatPrice(it.price)}` : "";
-      list.append(el("li", "", `${it.quantity}× ${it.name}${price}`));
+      list.append(el("li", "", formatItemLine(it)));
     }
     items.append(list);
   }
@@ -320,7 +318,7 @@ function setupConsultTab(panel) {
     prompt.onsubmit = (event) => {
       event.preventDefault();
       const text = input.value.trim();
-      const value = /^-?\d+$/.test(text) ? Number(text) : NaN;
+      const value = parseTypedValue(text, request.die);
       try {
         const next = applyRoll(state, value);
         const step = next.steps[next.steps.length - 1];
@@ -346,6 +344,7 @@ function setupConsultTab(panel) {
     state = null;
     notes = new Map();
     render();
+    source.focus();
   });
   panel.append(setup, history, prompt, result, restart);
   sync();

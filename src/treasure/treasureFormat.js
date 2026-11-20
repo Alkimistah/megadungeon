@@ -78,3 +78,26 @@ export function tableLabel(tableId) {
   const title = table?.title;
   return title ? title.replace(/^(Tabela [\d-]+): /, "$1 · ") : `Tabela ${tableId}`;
 }
+
+// "Livro p. N" da tabela de origem; vazio quando a tabela não tem livro/página.
+export function bookReference(tableId) {
+  const table = ALL_TABLES[tableId];
+  if (!table?.book) return "";
+  return table.bookPage ? `${table.book} p. ${table.bookPage}` : table.book;
+}
+
+// "2× Nome (categoria) — T$ X — Livro p. N"; preço e referência são omitidos quando ausentes.
+export function formatItemLine(item) {
+  const parts = [`${item.quantity}× ${item.name}${item.category ? ` (${item.category})` : ""}`];
+  if (item.price !== undefined) parts.push(formatPrice(item.price));
+  const ref = item.source ? bookReference(item.source) : "";
+  if (ref) parts.push(ref);
+  return parts.join(" — ");
+}
+
+// Valor digitado numa consulta; "00" vale 100 no d%. Texto inválido vira NaN.
+export function parseTypedValue(text, die) {
+  const t = text.trim();
+  if (die === "d%" && t === "00") return 100;
+  return /^-?\d+$/.test(t) ? Number(t) : NaN;
+}

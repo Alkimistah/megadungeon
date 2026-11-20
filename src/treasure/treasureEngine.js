@@ -160,7 +160,7 @@ function typeRequest(tableId, rolls, build, twoDice) {
 
 function itemGainFrom(result, tableId) {
   return {
-    kind: "item", name: result.name, category: result.category,
+    kind: "item", name: result.name, category: result.category, source: tableId,
     ...(result.price !== undefined ? { price: result.price } : {}),
     ...(result.tier !== undefined ? { tier: result.tier } : {}),
     details: SPECIFIC_TABLES.includes(tableId) ? { specific: true } : {},
@@ -244,6 +244,7 @@ function buildItemGain(steps, itemId) {
   });
   return {
     kind: "item", name: `${base.row.result.name} (${segments.join(", ")})`, category: base.row.result.category,
+    source: base.tableId,
     ...(build.kind === "magic" ? { tier: build.tier } : {}),
     details,
   };
@@ -396,7 +397,7 @@ export function applyRoll(state, value, extra) {
   } else if (request.kind === "list") {
     const item = ALL_TABLES[request.tableId].items[value - 1];
     step.item = structuredClone(item);
-    resolved = { gains: [{ kind: "item", ...structuredClone(item), details: {} }] };
+    resolved = { gains: [{ kind: "item", ...structuredClone(item), source: request.tableId, details: {} }] };
   } else if (request.kind === "expression" || request.kind === "twoDice") {
     const handler = EXPRESSION_HANDLERS[request.context?.action];
     if (!handler) throw notSupported(`expressão ${request.context?.action}`);

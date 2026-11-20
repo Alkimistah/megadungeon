@@ -52,6 +52,9 @@ try {
   await page.locator("#treasureDialog button", { hasText: "Rolar tudo" }).first().waitFor({ timeout: 5000 });
   assert.equal(await page.locator("#treasureDialog").evaluate(d => d.open), true, "#treasureDialog não abriu");
   assert.equal(await page.locator("#treasureDialog button", { hasText: "Rolar tudo" }).count() >= 1, true, "botão Rolar tudo ausente");
+  await page.evaluate(() => document.querySelector("#treasureDialog .treasure-roll").click());
+  await page.locator("#treasureDialog .treasure-result").first().waitFor({ timeout: 5000 });
+  assert.equal(await page.locator("#treasureDialog .treasure-result").count() >= 1, true, "Rolar tudo offline não gerou resultado");
   assert.deepEqual(errors, [], "erros de JavaScript na página");
 
   console.log(`OK offline: recarga sem rede, modal de tesouros abriu (service worker controlando: sim; faixa na recarga online: ${reloadRange ? "sim" : "não"}; faixa na recarga offline: ${offlineRange ? "sim" : "não"}). pageerrors: 0`);

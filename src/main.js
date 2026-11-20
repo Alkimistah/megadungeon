@@ -1074,12 +1074,24 @@ function bindEvents() {
     }
   });
 
+  const showTreasureLoadError = () => {
+    document.getElementById("treasureLoadError")?.remove();
+    const notice = document.createElement("p");
+    notice.id = "treasureLoadError";
+    notice.setAttribute("role", "alert");
+    notice.textContent = "Não foi possível carregar os tesouros. Verifique a conexão e tente de novo.";
+    notice.style.cssText = "position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:1000;margin:0;padding:10px 14px;max-width:90vw;border-radius:8px;background:var(--surface-alt,#222);color:var(--text,#fff);border:1px solid currentColor;";
+    document.body.append(notice);
+    setTimeout(() => notice.remove(), 6000);
+  };
+
   elements.treasureButton.addEventListener("click", async () => {
     try {
       const { openTreasureDialog } = await import("./treasure/treasureDialog.js");
       openTreasureDialog(elements.treasureDialog);
     } catch (error) {
       console.error("Falha ao carregar o módulo de tesouros", error);
+      showTreasureLoadError();
     }
   });
 
