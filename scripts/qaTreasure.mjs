@@ -97,6 +97,12 @@ try {
   const C = "#treasureDialog .treasure-consult-prompt";
   const step = () => page.locator(`${C} .treasure-c-value`);
   const apply = async v => { await step().fill(String(v)); await page.locator(`${C} .treasure-c-apply`).click(); };
+  await page.screenshot({ path: "/tmp/claude-1000/-mnt-c-Users-Arthur-OneDrive-Documentos-Mega-Dungeon/9b4a7ac4-9b92-4710-9e4c-7f73d59acc52/scratchpad/img/treasure-consultar-setup.png" });
+  const widthOf = () => page.locator("#treasureDialog").evaluate(d => Math.round(d.getBoundingClientRect().width));
+  const wConsult = await widthOf();
+  await tabs.nth(0).click();
+  assert.equal(await widthOf(), wConsult, "modal tem a mesma largura nas duas abas");
+  await tabs.nth(1).click();
   await page.locator("#treasureDialog .treasure-c-source").selectOption("nd");
   await page.locator("#treasureDialog .treasure-c-nd").selectOption("3");
   await page.locator("#treasureDialog .treasure-c-column").selectOption("items");
@@ -106,6 +112,8 @@ try {
   await apply(101);
   assert.match(await page.locator(`${C} .treasure-c-error`).innerText(), /inválido/i, "101 mostra erro");
   assert.equal(await page.locator("#treasureDialog .treasure-consult-history .treasure-step").count(), 0, "101 mantém o passo");
+  await step().fill("1");
+  assert.equal(await page.locator(`${C} .treasure-c-error`).innerText(), "", "erro some ao digitar");
   await apply("abc");
   assert.notEqual(await page.locator(`${C} .treasure-c-error`).innerText(), "", "texto mostra erro");
   await apply(0);

@@ -295,6 +295,7 @@ function setupConsultTab(panel) {
     submit.type = "submit";
     const error = el("p", "treasure-consult-error treasure-c-error");
     error.setAttribute("role", "alert");
+    input.addEventListener("input", () => { error.textContent = ""; });
     const head = el("p", "treasure-consult-step");
     head.append(el("strong", "", `${tableLabel(request.tableId)} · ${request.die}`));
     const bonus = request.bonus ? ` (+${request.bonus}% será somado)` : "";

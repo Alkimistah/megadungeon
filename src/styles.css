@@ -2441,6 +2441,10 @@ svg {
   display: none;
 }
 
+#treasureDialog {
+  width: min(960px, 94vw);
+}
+
 .treasure-dialog {
   width: 100%;
 }
@@ -3179,7 +3183,7 @@ details.mission-run-guidance p {
 
 .treasure-consult-setup {
   display: grid;
-  grid-template-columns: 2fr 0.8fr 1fr 1fr auto;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 8px;
   align-items: end;
   margin-bottom: 8px;
@@ -3202,7 +3206,7 @@ details.mission-run-guidance p {
 }
 
 .treasure-consult-setup .treasure-table-field {
-  grid-column: auto;
+  grid-column: 1 / -1;
 }
 
 .treasure-consult-prompt {
@@ -3212,10 +3216,6 @@ details.mission-run-guidance p {
   border-radius: 6px;
   background: #f6efe4;
   color: #3a2f25;
-}
-
-.treasure-consult-prompt[hidden] {
-  display: none;
 }
 
 .treasure-consult-prompt p {
@@ -3259,10 +3259,6 @@ details.mission-run-guidance p {
 }
 
 @media (max-width: 800px) {
-  .treasure-consult-setup {
-    grid-template-columns: 1fr 1fr;
-  }
-
   .treasure-input-row {
     grid-template-columns: 1fr 1fr;
   }
