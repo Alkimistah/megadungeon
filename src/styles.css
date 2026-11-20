@@ -3030,3 +3030,154 @@ details.mission-run-guidance p {
     right: 24px;
   }
 }
+
+.treasure-input-row {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr 1fr 0.8fr 1fr 1.2fr auto;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
+.treasure-input-row label {
+  display: grid;
+  gap: 4px;
+  color: #d8c8b7;
+  font-size: 12px;
+}
+
+.treasure-input-row label[hidden] {
+  display: none;
+}
+
+.treasure-input-row select,
+.treasure-input-row input {
+  width: 100%;
+  min-width: 0;
+}
+
+.treasure-table-field {
+  grid-column: span 3;
+}
+
+.treasure-actions {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.treasure-error:empty {
+  display: none;
+}
+
+.treasure-error {
+  color: #e8806a;
+}
+
+
+.treasure-group h3 {
+  margin: 12px 0 6px;
+  font-size: 14px;
+}
+
+.treasure-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.treasure-result {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  margin-bottom: 6px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+}
+
+.treasure-index {
+  font-weight: 700;
+  min-width: 2.2em;
+}
+
+.treasure-cells {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.treasure-cascade {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.treasure-step {
+  padding: 1px 0;
+}
+
+.treasure-step-table,
+.treasure-muted {
+  color: #9c8f80;
+}
+
+.treasure-step-roll {
+  font-weight: 700;
+}
+
+.treasure-footer {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #d8c8b7;
+  border-radius: 6px;
+  background: #f6efe4;
+  position: sticky;
+  bottom: 0;
+  max-height: 26vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px 16px;
+  box-shadow: 0 -6px 10px rgba(0, 0, 0, 0.18);
+}
+
+.treasure-footer[hidden] {
+  display: none;
+}
+
+.treasure-summary-line {
+  margin: 0 0 2px;
+}
+
+.treasure-summary-block {
+  font-size: 13px;
+}
+
+.treasure-summary-block p {
+  margin: 2px 0;
+}
+
+.treasure-summary-block ul {
+  margin: 2px 0;
+  padding-left: 18px;
+}
+
+@media (max-width: 800px) {
+  .treasure-input-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .treasure-table-field {
+    grid-column: 1 / -1;
+  }
+
+  .treasure-footer {
+    grid-template-columns: 1fr;
+  }
+
+
+}

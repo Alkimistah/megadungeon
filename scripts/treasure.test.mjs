@@ -616,3 +616,58 @@ test("summarizeGains keeps undefined price for items without one", () => {
   assert.equal(summary.items[0].quantity, 1);
   assert.equal(summary.totalTibars, 0);
 });
+
+// ---------- Task 8: lote e formatação ----------
+import { buildBatch, rollBatch } from "../src/treasure/treasureBatch.js";
+import { describeStep, describeRowResult } from "../src/treasure/treasureFormat.js";
+
+const specBatch = () => [
+  { challengeRating: "0.25", quantity: 3, mode: "padrão", columns: "both" },
+  { challengeRating: "0.25", quantity: 5, mode: "metade", columns: "both" },
+  { challengeRating: "3", quantity: 2, mode: "padrão", columns: "both" },
+  { challengeRating: "3", quantity: 1, mode: "padrão", columns: "items" },
+];
+
+test("buildBatch generates 11 treasures and 21 chains for the spec batch", () => {
+  const batch = buildBatch(specBatch());
+  const treasures = batch.flatMap((b) => b.treasures);
+  assert.equal(treasures.length, 11);
+  assert.deepEqual(treasures.map((t) => t.index), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+  assert.equal(treasures.reduce((n, t) => n + t.states.length, 0), 21);
+});
+
+test("buildBatch handles Dobro, money-only and specific tables; rejects bad rows", () => {
+  const dobro = buildBatch([{ challengeRating: "5", quantity: 1, mode: "dobro", columns: "both" }]);
+  assert.equal(dobro[0].treasures[0].states.length, 4);
+  const table = buildBatch([{ tableId: "8-12", quantity: 2 }]);
+  assert.equal(table[0].treasures.length, 2);
+  assert.equal(table[0].treasures[0].states.length, 1);
+  assert.throws(() => buildBatch([{ challengeRating: "3", quantity: 1, mode: "metade", columns: "items" }]), RangeError);
+  assert.throws(() => buildBatch([{ challengeRating: "3", quantity: 0, mode: "padrão", columns: "both" }]), RangeError);
+  assert.throws(() => buildBatch([{ challengeRating: "3", quantity: 100, mode: "padrão", columns: "both" }]), RangeError);
+  assert.throws(() => buildBatch([{ challengeRating: "99", quantity: 1, mode: "padrão", columns: "both" }]), RangeError);
+});
+
+test("rollBatch resolves every chain", () => {
+  const batch = rollBatch(specBatch(), createRng("t8"));
+  for (const t of batch.flatMap((b) => b.treasures)) for (const s of t.states) assert.equal(nextStep(s), null);
+});
+
+test("describeStep formats table, expression and 2D steps", () => {
+  const state = resolveWithDice(startTable("8-1/7/money"), createRng("fmt"));
+  const first = describeStep(state.steps[0]);
+  assert.match(first.roll, /^d% \d+/);
+  assert.ok(first.result.length > 0);
+  const plus = describeStep({ kind: "table", tableId: "8-2/média", die: "d%", value: 90, bonus: 20, effective: 100, row: { min: 96, max: 100, result: { kind: "none" } } });
+  assert.match(plus.roll, /90/);
+  assert.match(plus.roll, /\+20%/);
+  assert.match(plus.roll, /100/);
+  const expr = describeStep({ kind: "expression", tableId: "8-1/7/money", die: "2d12", value: 14, bonus: 0,
+    outcome: { raw: 140, amount: 140, currency: "TO" } });
+  assert.equal(expr.roll, "2d12 = 14");
+  assert.match(expr.result, /140 TO/);
+  const two = describeStep({ kind: "twoDice", tableId: "8-1/20/items", die: "1d6", value: 3, bonus: 0, dice: [5, 3], chosen: 3, outcome: { type: "arma" } });
+  assert.match(two.roll, /5 e 3/);
+  assert.match(two.roll, /escolhido 3/);
+  assert.equal(describeRowResult({ kind: "item", name: "Corda", price: 1 }), "Corda (T$ 1)");
+});
