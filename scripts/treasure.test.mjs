@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { validateTable } from "../src/treasure/tables/schema.js";
 import { BASIC_BOOK_TABLES, TYPE_ROLLS, ENCHANTMENT_COUNT, ENCHANTMENT_PRICES } from "../src/treasure/tables/basicBook.js";
+import { parseDice, rollDice, dieRange } from "../src/treasure/dice.js";
+import { startTreasure, startTable, nextStep, applyRoll, resolveWithDice } from "../src/treasure/treasureEngine.js";
+import { createRng } from "../src/random.js";
 
 const row = (id, min) => BASIC_BOOK_TABLES[id].rows.find((r) => r.min === min);
 
@@ -109,4 +112,209 @@ test("magic item tables 8-8 to 8-15", () => {
   assert.deepEqual(row("8-13", 99).result, { kind: "item", name: "Pingente da saúde", price: 9000, category: "acessório", tier: "menor" });
   assert.deepEqual(row("8-14", 95).result, { kind: "item", name: "Tiara da sapiência", price: 25500, category: "acessório", tier: "médio" });
   assert.deepEqual(row("8-15", 99).result, { kind: "item", name: "Espelho do aprisionamento", price: 150000, category: "acessório", tier: "maior" });
+});
+
+// ---------- Motor de tesouros (Task 4) ----------
+
+// Fonte fixa: aplica cada valor da lista ao pedido seguinte.
+function feed(state, values) {
+  return values.reduce((s, v) => applyRoll(s, v), state);
+}
+
+test("dice helpers", () => {
+  assert.deepEqual(parseDice("2d6+1"), { count: 2, sides: 6, bonus: 1 });
+  assert.deepEqual(parseDice("1d3"), { count: 1, sides: 3, bonus: 0 });
+  assert.deepEqual(parseDice("d%"), { count: 1, sides: 100, bonus: 0 });
+  assert.deepEqual(parseDice("4d6-2"), { count: 4, sides: 6, bonus: -2 });
+  assert.throws(() => parseDice("2x6"));
+  assert.throws(() => parseDice("0d6"));
+  assert.deepEqual(dieRange("d%"), [1, 100]);
+  assert.deepEqual(dieRange("1d6"), [1, 6]);
+  assert.deepEqual(dieRange("2d12"), [2, 24]);
+  assert.deepEqual(dieRange("1d3+1"), [2, 4]);
+  const rng = createRng("dados");
+  for (let i = 0; i < 500; i++) {
+    const { total, rolls } = rollDice("2d6+1", rng);
+    assert.equal(rolls.length, 2);
+    for (const r of rolls) assert.ok(r >= 1 && r <= 6);
+    assert.equal(total, rolls[0] + rolls[1] + 1);
+  }
+});
+
+test("money: ND 7, d% 70 and 2d12 = 15 gives 150 TO", () => {
+  const [state] = startTreasure({ challengeRating: "7", column: "money", mode: "padrão" });
+  const first = nextStep(state);
+  assert.equal(first.tableId, "8-1/7/money");
+  assert.equal(first.die, "d%");
+  assert.equal(first.kind, "table");
+  assert.equal(first.bonus, 0);
+  assert.equal(typeof first.reason, "string");
+  const afterTable = applyRoll(state, 70);
+  const amountStep = nextStep(afterTable);
+  assert.equal(amountStep.kind, "expression");
+  assert.equal(amountStep.die, "2d12");
+  assert.equal(amountStep.tableId, "8-1/7/money");
+  const done = applyRoll(afterTable, 15);
+  assert.equal(nextStep(done), null);
+  assert.deepEqual(done.gains, [{ kind: "money", amount: 150, currency: "TO" }]);
+  assert.equal(done.steps.length, 2);
+  assert.equal(done.steps[0].value, 70);
+  assert.equal(done.steps[1].parentId, done.steps[0].id);
+});
+
+test("Metade halves coins within their currency", () => {
+  const [state] = startTreasure({ challengeRating: "7", column: "money", mode: "metade" });
+  assert.deepEqual(feed(state, [70, 15]).gains, [{ kind: "money", amount: 75, currency: "TO" }]);
+  const [tc] = startTreasure({ challengeRating: "0.25", column: "money", mode: "metade" });
+  assert.deepEqual(feed(tc, [50, 3]).gains, [{ kind: "money", amount: 15, currency: "TC" }]);
+});
+
+test("Metade halves a wealth value with one decimal in T$", () => {
+  const state = startTable("8-2", { tier: "menor", mode: "metade" });
+  assert.equal(nextStep(state).tableId, "8-2/menor");
+  const done = feed(state, [10, 11]);
+  assert.equal(nextStep(done), null);
+  assert.equal(done.gains.length, 1);
+  const gain = done.gains[0];
+  assert.equal(gain.kind, "wealth");
+  assert.equal(gain.amount, 5.5);
+  assert.equal(gain.value, 5.5);
+  assert.equal(gain.currency, "T$");
+  assert.match(gain.examples, /^Ágata/);
+  const full = feed(startTable("8-2/menor"), [10, 11]);
+  assert.equal(full.gains[0].amount, 11);
+});
+
+test("Dobro creates two independent states", () => {
+  const states = startTreasure({ challengeRating: "7", column: "money", mode: "dobro" });
+  assert.equal(states.length, 2);
+  assert.notEqual(states[0], states[1]);
+  const a = feed(states[0], [70, 15]);
+  assert.deepEqual(a.gains, [{ kind: "money", amount: 150, currency: "TO" }]);
+  assert.deepEqual(states[1].gains, []);
+  assert.equal(nextStep(states[1]).tableId, "8-1/7/money");
+  assert.equal(startTreasure({ challengeRating: "7", column: "money", mode: "padrão" }).length, 1);
+});
+
+test("+% adds 20 to the next 8-2 d%, capped at 100", () => {
+  const [state] = startTreasure({ challengeRating: "12", column: "money", mode: "padrão" });
+  const s1 = applyRoll(state, 20);
+  const req = nextStep(s1);
+  assert.equal(req.tableId, "8-2/média");
+  assert.equal(req.kind, "table");
+  assert.equal(req.bonus, 20);
+  const s2 = applyRoll(s1, 85);
+  const step = s2.steps.at(-1);
+  assert.equal(step.value, 85);
+  assert.equal(step.effective, 100);
+  assert.equal(step.row.min, 100);
+  assert.equal(step.row.result.dice, "6d8");
+  const value = nextStep(s2);
+  assert.equal(value.die, "6d8");
+  assert.equal(value.bonus, 0);
+  const done = applyRoll(s2, 27);
+  assert.equal(done.gains[0].amount, 27000);
+});
+
+test("wealth counts: 1d3+1 = 3 asks 8-2 three times", () => {
+  const [state] = startTreasure({ challengeRating: "6", column: "money", mode: "padrão" });
+  const s1 = applyRoll(state, 95);
+  const count = nextStep(s1);
+  assert.equal(count.kind, "expression");
+  assert.equal(count.die, "1d3+1");
+  const s2 = applyRoll(s1, 3);
+  assert.equal(s2.pending.length, 3);
+  for (const r of s2.pending) {
+    assert.equal(r.tableId, "8-2/menor");
+    assert.equal(r.bonus, 0);
+  }
+  assert.equal(new Set(s2.pending.map((r) => r.id)).size, 3);
+  // tipo e valor de cada riqueza, em profundidade
+  const done = feed(s2, [10, 8, 30, 2, 100, 20]);
+  assert.equal(nextStep(done), null);
+  assert.deepEqual(done.gains.map((g) => g.amount), [8, 20, 2000]);
+  assert.ok(done.gains.every((g) => g.kind === "wealth" && g.currency === "T$"));
+});
+
+test("+% applies to each of the N wealth rolls; Metade keeps the count", () => {
+  const [state] = startTreasure({ challengeRating: "20", column: "money", mode: "metade" });
+  const s1 = applyRoll(applyRoll(state, 80), 4);
+  assert.equal(s1.pending.length, 4);
+  for (const r of s1.pending) assert.equal(r.bonus, 20);
+  // d% 1 + 20 = 21 -> maior 16-25 (2d8 x 100); d% 81 + 20 -> 100 (4d12 x 10.000)
+  const done = feed(s1, [1, 2, 1, 2, 1, 2, 81, 4]);
+  assert.equal(done.gains.length, 4);
+  assert.deepEqual(done.gains.map((g) => g.amount), [100, 100, 100, 20000]);
+});
+
+test("applyRoll rejects invalid values and leaves the state untouched", () => {
+  const [state] = startTreasure({ challengeRating: "7", column: "money", mode: "padrão" });
+  const snapshot = structuredClone(state);
+  for (const bad of [0, 101, 5.5, NaN, "50", undefined]) {
+    assert.throws(() => applyRoll(state, bad), RangeError, String(bad));
+  }
+  assert.deepEqual(state, snapshot);
+  const s1 = applyRoll(state, 70);
+  const snap1 = structuredClone(s1);
+  assert.throws(() => applyRoll(s1, 1), RangeError);
+  assert.throws(() => applyRoll(s1, 25), RangeError);
+  assert.deepEqual(s1, snap1);
+  assert.deepEqual(state, snapshot);
+  const done = applyRoll(s1, 24);
+  assert.throws(() => applyRoll(done, 10), Error);
+});
+
+test("start validation", () => {
+  assert.throws(() => startTreasure({ challengeRating: "21", column: "money", mode: "padrão" }), RangeError);
+  assert.throws(() => startTreasure({ challengeRating: "0.75", column: "money", mode: "padrão" }), RangeError);
+  assert.throws(() => startTreasure({ challengeRating: "7", column: "both", mode: "padrão" }), RangeError);
+  assert.throws(() => startTreasure({ challengeRating: "7", column: "money", mode: "triplo" }), RangeError);
+  assert.throws(() => startTable("8-99"), RangeError);
+  assert.throws(() => startTable("8-2", { tier: "enorme" }), RangeError);
+  assert.equal(startTreasure({ challengeRating: 0.25, column: "money", mode: "padrão" })[0].pending[0].tableId, "8-1/0.25/money");
+  assert.equal(nextStep(startTable("8-2", { tier: "maior" })).tableId, "8-2/maior");
+});
+
+test("items column: '—' ends the chain; other kinds are not yet supported", () => {
+  const [state] = startTreasure({ challengeRating: "7", column: "items", mode: "padrão" });
+  assert.equal(nextStep(state).tableId, "8-1/7/items");
+  const done = applyRoll(state, 10);
+  assert.equal(nextStep(done), null);
+  assert.deepEqual(done.gains, []);
+  assert.throws(() => applyRoll(state, 50), /ainda não/);
+});
+
+test("resolveWithDice resolves money chains with a seeded rng", () => {
+  const rng = createRng("tesouro");
+  for (const nd of ["0.25", "0.5", ...Array.from({ length: 20 }, (_, i) => String(i + 1))]) {
+    for (let i = 0; i < 30; i++) {
+      const [state] = startTreasure({ challengeRating: nd, column: "money", mode: "padrão" });
+      const done = resolveWithDice(state, rng);
+      assert.equal(nextStep(done), null);
+      assert.deepEqual(state.steps, []);
+      for (const g of done.gains) {
+        assert.ok(["money", "wealth"].includes(g.kind));
+        assert.ok(g.amount > 0);
+      }
+    }
+  }
+  const a = resolveWithDice(startTable("8-2/maior"), createRng("x"));
+  const b = resolveWithDice(startTable("8-2/maior"), createRng("x"));
+  assert.deepEqual(a, b);
+});
+
+test("performance: 198 ND 20 chains in Dobro under 500 ms", () => {
+  const rng = createRng("desempenho");
+  const t0 = performance.now();
+  let chains = 0;
+  for (let i = 0; i < 99; i++) {
+    for (const state of startTreasure({ challengeRating: "20", column: "money", mode: "dobro" })) {
+      resolveWithDice(state, rng);
+      chains++;
+    }
+  }
+  const ms = performance.now() - t0;
+  console.log(`# perf: ${chains} cadeias em ${ms.toFixed(1)} ms`);
+  assert.equal(chains, 198);
+  assert.ok(ms < 500, `${ms} ms`);
 });
