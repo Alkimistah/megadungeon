@@ -5,7 +5,7 @@ import { monsterCreatures } from "./monsters.js";
 import { spiritCreatures } from "./spirits.js";
 import { undeadCreatures } from "./undead.js";
 import { eventCreatures } from "./events.js";
-import { sourceByCreatureId } from "./sources.js";
+import { basicBookRoleByCreatureId, sourceByCreatureId, threatsBookRoleByCreatureId } from "./sources.js";
 import { inferThreatRole, getThreatRole } from "../threatCreationRules.js";
 export { animalCreatures } from "./animals.js";
 export { constructCreatures } from "./constructs.js";
@@ -69,8 +69,14 @@ function dedupeById(creatures) {
   });
 }
 
+const printedRolesByBook = {
+  "Livro Básico": basicBookRoleByCreatureId,
+  "Ameaças de Arton": threatsBookRoleByCreatureId
+};
+
 function withThreatRoleMetadata(creature) {
-  const inference = inferThreatRole(creature);
+  const printedRole = printedRolesByBook[creature.source?.book]?.[creature.id];
+  const inference = inferThreatRole(printedRole ? { ...creature, role: printedRole, roleSource: "pdf-review" } : creature);
   const roleMetadata = inference.role ? getThreatRole(inference.role) : null;
 
   return {

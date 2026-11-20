@@ -7,6 +7,7 @@ import { formatCreatureCatalogName, getCreatureById } from "./creatureCatalog/in
 import { getDamageType } from "./damageTypes.js";
 import { getForestTrapPresentation } from "./forestTrapPresentation.js";
 import { getWeaponVariationLabel } from "./equipment/weaponVariation.js";
+import { GENERAL_CREATURE_ABILITIES } from "./generalCreatureAbilities.js";
 import { getEncounterMissionMatches } from "./missions/missionEncounterIntegration.js";
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { openTacticalMapFullscreen } from "./tacticalMapRenderer.js";
@@ -467,11 +468,11 @@ function formatTiming(timing) {
 function formatEntryLabel(entry) {
   if (!entry?.name) return null;
 
-  const timing = formatTiming(entry.timing);
-
-  if (!timing || entry.name.includes("(")) return entry.name;
-
-  return `${entry.name} (${timing})`;
+  const timing = entry.name.includes("(") ? null : formatTiming(entry.timing);
+  const details = [timing, entry.cost].filter(Boolean).join(", ");
+  const name = entry.itemEnhanced ? `${entry.name}*` : entry.name;
+  const label = details ? `${name} (${details})` : name;
+  return entry.magical ? `${label} · Mágica` : label;
 }
 
 function removeRepeatedLabel(text, label) {
@@ -593,7 +594,8 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
   title.textContent = formatCreatureCatalogName(creature, item.name);
   challenge.textContent = `ND ${item.challengeLabel}`;
   subtitle.className = "creature-sheet-subtitle";
-  subtitle.textContent = `${typeText} ${creature.size || ""} · ${item.roleLabel} · ${item.quantity} no encontro`;
+  const roleLabel = creature.roleMetadata?.label || item.roleLabel;
+  subtitle.textContent = `${typeText} ${creature.size || ""} · ${roleLabel} · ${item.quantity} no encontro`;
 
   header.appendChild(title);
   if (item.generated) {
@@ -618,7 +620,7 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
   section.appendChild(createSheetLine("DEFESA", `${stats.defense ?? "?"}, FORT ${formatModifier(stats.fortitude)}, REF ${formatModifier(stats.reflex)}, VON ${formatModifier(stats.will)}${stats.defensesText ? `, ${stats.defensesText}` : ""}`));
   const hitPointsText = reinforcement.hitPoints
     ? `${stats.hitPoints + reinforcement.hitPoints} (reforço +${reinforcement.hitPoints})`
-    : String(stats.hitPoints ?? "?");
+    : String(stats.hitPoints ?? stats.hitPointsText ?? "?");
   section.appendChild(createSheetLine("PONTOS DE VIDA", hitPointsText));
   if (reinforcement.hitPoints) {
     section.appendChild(createSheetLine(
@@ -629,6 +631,9 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
 
   if (stats.speedText) {
     section.appendChild(createSheetLine("DESLOCAMENTO", stats.speedText));
+  }
+  if (Number.isFinite(stats.manaPoints)) {
+    section.appendChild(createSheetLine("PONTOS DE MANA", String(stats.manaPoints)));
   }
 
   section.appendChild(createDivider());
@@ -654,6 +659,16 @@ export function createCreatureDetail(item, missions = [], onAdjustMissionProgres
     }
     const abilities = chimeraBoss ? creature.abilities.filter(ability => ability.name === "Mente Tripla") : creature.abilities;
     appendCreatureSheetAbilities(section, abilities, { preferEntryName: true });
+  }
+  const entries = [...(creature.actions ?? []), ...(creature.abilities ?? [])];
+  const groupRules = [
+    [GENERAL_CREATURE_ABILITIES.band, entries.some(entry => /^\[Bando\]/i.test(entry.text))],
+    [GENERAL_CREATURE_ABILITIES.swarm, entries.some(entry => entry.name === "Enxame")]
+  ];
+  for (const [rule, applies] of groupRules) {
+    if (applies) {
+      section.appendChild(createSheetAbilityLine(rule.label, [rule.summary, ...rule.notes].join(" ")));
+    }
   }
 
   if (stats.attributes) {

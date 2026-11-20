@@ -1,3 +1,5 @@
+import { divineAspects } from "./divineAspects.js";
+
 export const glop = {
     "id": "glop",
     "name": "Glop",
@@ -2818,6 +2820,7 @@ export const koboldXama = {
     "abilities": [
         {
             "name": "Aura de Medo",
+            "magical": true,
             "timing": "livre",
             "cost": "2 PM",
             "text": "O xamã gera uma aura de medo de 9m de raio e duração cena. Todos os inimigos que entram na aura ficam abalados até o fim da cena (Von CD 19 evita) e a criatura não pode mais ser abalada por esta habilidade por um dia."
@@ -2829,6 +2832,7 @@ export const koboldXama = {
         },
         {
             "name": "Símbolo Sagrado Energizado",
+            "magical": true,
             "timing": "movimento",
             "cost": "1 PM",
             "text": "O xamã energiza seu símbolo sagrado. Até o fim da cena, ele emite uma luz avermelhada que ilumina como uma tocha e, enquanto estiver sendo empunhado pelo xamã, reduz o custo de magias divinas em –1 PM."
@@ -3409,6 +3413,7 @@ export const arquibruxoDaTormenta = {
         },
         {
             "name": "Magia Acelerada",
+            "magical": true,
             "timing": "livre",
             "cost": "+4 PM",
             "text": "Uma vez por rodada, quando usa Raio Arcano ou lança uma magia com execução de ação completa ou menor, o arquibruxo muda a execução desta ação para livre."
@@ -3420,6 +3425,7 @@ export const arquibruxoDaTormenta = {
         },
         {
             "name": "Raio Arcano",
+            "magical": true,
             "timing": "padrão",
             "cost": "1 PM",
             "text": "Uma criatura em alcance médio sofre 4d12+7 pontos de dano de trevas e não pode recuperar PV por 1 rodada (Ref CD 40 reduz à metade e evita a restrição de cura)."
@@ -6605,6 +6611,7 @@ export const altoClerigoDeKally = {
     "abilities": [
         {
             "name": "Aura de Medo",
+            "magical": true,
             "timing": "livre",
             "cost": "2 PM",
             "text": "O alto clérigo de Kally gera uma aura de medo de 9m de raio que dura até o fim da cena. Todos os inimigos que entrem na aura ficam abalados até o fim da cena (Von CD 37 evita e a criatura fica imune a esta habilidade por um dia)."
@@ -6623,6 +6630,7 @@ export const altoClerigoDeKally = {
         },
         {
             "name": "Servos do Dragão",
+            "magical": true,
             "timing": "completa",
             "cost": "2 PM",
             "text": "O alto clérigo invoca 2d6+2 kobolds (veja Acólito de Kally)."
@@ -7608,6 +7616,7 @@ export const tigreDeHyninn = {
         },
         {
             "name": "Entre Planos",
+            "magical": true,
             "timing": "movimento",
             "text": "Até o próximo turno do tigre, a chance de falha de seu Borrão aumenta para 50%."
         },
@@ -7671,6 +7680,7 @@ export const tigreDeHyninnPrimordial = {
         },
         {
             "name": "Entre Planos",
+            "magical": true,
             "timing": "movimento",
             "text": "Até o próximo turno do tigre, a chance de falha de seu Borrão aumenta para 50%."
         },
@@ -7869,7 +7879,2865 @@ export const mercenarioDeAslothia = {
     "skillsText": "Atletismo +6, Intimidação +5"
 };
 
+const manticoraAmeacasDeArton = {
+    "id": "manticora-ameacas-de-arton",
+    "name": "Mantícora",
+    "type": "monster",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 298,
+        "pdfPage": 300
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 8,
+        "defense": 26,
+        "fortitude": 18,
+        "reflex": 7,
+        "will": 12,
+        "hitPoints": 240,
+        "speedText": "9m (6q), voo 15m (10q)",
+        "senses": "faro, visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 7,
+            "dex": 2,
+            "con": 5,
+            "int": -2,
+            "wis": 1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +18 (1d10+12) e duas garras +18 (1d8+12)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Espinhos",
+            "timing": "movimento",
+            "text": "Dispara 1d4 espinhos. Cada um atinge uma criatura em alcance médio e causa 1d8+7 de perfuração (Ref CD 22 reduz à metade). Recarga (movimento)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Padrão mais espinhos (CD 21 para extrair, valem T$ 150 para fabricar flechas superiores).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review",
+    "variantOf": "manticora"
+};
+
+const manticoraPrimal = {
+    "id": "manticora-primal",
+    "name": "Mantícora Primal",
+    "type": "monster",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 14,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 298,
+        "pdfPage": 300
+    },
+    "stats": {
+        "initiative": 14,
+        "perception": 16,
+        "defense": 44,
+        "fortitude": 28,
+        "reflex": 14,
+        "will": 22,
+        "hitPoints": 655,
+        "speedText": "9m (6q), voo 18m (12q)",
+        "senses": "faro, visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 8,
+            "dex": 3,
+            "con": 5,
+            "int": -3,
+            "wis": 3,
+            "cha": -3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +40 (3d10+25) e duas garras +40 (2d8+25)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Crueldade",
+            "timing": null,
+            "text": "Se acertar as duas garras no mesmo turno, pode continuar atacando com garras até errar, com penalidade cumulativa de –5 por ataque adicional."
+        },
+        {
+            "name": "Espinhos",
+            "timing": "movimento",
+            "text": "Dispara 2d4 espinhos. Cada um atinge uma criatura em alcance médio e causa 2d8+8 de perfuração (Ref CD 38 reduz à metade). Recarga (movimento)."
+        },
+        {
+            "name": "Ressentimento",
+            "timing": "movimento",
+            "text": "Criaturas em alcance curto ficam imóveis por 1 rodada e sofrem 8d8 de dano psíquico (Von CD 38 reduz à metade e evita a condição). Cada criatura pode ser afetada pela mesma mantícora uma vez por cena."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Padrão mais espinhos (CD 29 para extrair, valem T$ 300 para fabricar flechas superiores).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const otyughAmeacasDeArton = {
+    "id": "otyugh-ameacas-de-arton",
+    "name": "Otyugh",
+    "type": "monster",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 5,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 299,
+        "pdfPage": 301
+    },
+    "stats": {
+        "initiative": 3,
+        "perception": 10,
+        "defense": 24,
+        "fortitude": 17,
+        "reflex": 11,
+        "will": 5,
+        "hitPoints": 213,
+        "speedText": "6m (4q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a doenças e veneno, redução de dano 5",
+        "attributes": {
+            "str": 5,
+            "dex": -1,
+            "con": 4,
+            "int": -2,
+            "wis": 1,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Dois tentáculos +17 (1d8+9, alcance 4,5m) e mordida +17 (1d6+9 mais doença)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Tentáculo (teste +19)."
+        },
+        {
+            "name": "Constrição",
+            "timing": "livre",
+            "text": "No início de cada turno do otyugh, cada criatura agarrada por ele sofre 1d8+9 de impacto."
+        },
+        {
+            "name": "Doença",
+            "timing": null,
+            "text": "A mordida expõe a vítima à infecção do esgoto (Livro Básico, p. 318)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Padrão.",
+    "skillsText": "Furtividade +3 (+13 em seu refúgio).",
+    "role": "solo",
+    "roleSource": "pdf-review",
+    "variantOf": "otyugh"
+};
+
+const hordaDeOtyughs = {
+    "id": "horda-de-otyughs",
+    "name": "Horda de Otyughs",
+    "type": "monster",
+    "subtype": null,
+    "size": "Colossal",
+    "challengeRating": 16,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 299,
+        "pdfPage": 301
+    },
+    "stats": {
+        "initiative": 10,
+        "perception": 14,
+        "defense": 53,
+        "fortitude": 30,
+        "reflex": 24,
+        "will": 16,
+        "hitPoints": 800,
+        "speedText": "12m (8q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a doenças e veneno, redução de dano 20",
+        "attributes": {
+            "str": 6,
+            "dex": -1,
+            "con": 4,
+            "int": -2,
+            "wis": 1,
+            "cha": -3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "[Bando] Dois tentáculos +44 (4d8+18, alcance 4,5m) e mordida +44 (4d6+18 mais doença)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Tentáculo (teste +54). Pode manter até cinco criaturas Grandes ou menores agarradas sem ocupar os tentáculos."
+        },
+        {
+            "name": "Chuva de Tentáculos",
+            "timing": "completa",
+            "text": "Faz um ataque de tentáculo contra cada criatura em seu alcance."
+        },
+        {
+            "name": "Constrição",
+            "timing": "livre",
+            "text": "No início de cada turno da horda, cada criatura agarrada por ela sofre 2d8+18 de impacto."
+        },
+        {
+            "name": "Doença",
+            "timing": null,
+            "text": "Uma criatura mordida ou que comece o turno adjacente à horda é exposta à infecção do esgoto (Livro Básico, p. 318), com CD 42."
+        },
+        {
+            "name": "Mar de Tentáculos",
+            "timing": null,
+            "text": "Criaturas a até 4,5m ficam enredadas."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Padrão.",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const cerianthar = {
+    "id": "cerianthar",
+    "name": "Cerianthar",
+    "type": "monster",
+    "subtype": null,
+    "size": "Médio",
+    "challengeRating": 4,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 307,
+        "pdfPage": 309
+    },
+    "stats": {
+        "initiative": 9,
+        "perception": 5,
+        "defense": 22,
+        "fortitude": 15,
+        "reflex": 5,
+        "will": 10,
+        "hitPoints": 140,
+        "speedText": "9m (6q)",
+        "senses": "percepção às cegas",
+        "defensesText": null,
+        "attributes": {
+            "str": 3,
+            "dex": 2,
+            "con": 2,
+            "int": -4,
+            "wis": 1,
+            "cha": 0
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Quatro tentáculos +16 (1d6+4, alcance 3m)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Tentáculo (teste +16)."
+        },
+        {
+            "name": "Constrição",
+            "timing": "livre",
+            "text": "No início de cada turno, causa 2d6+4 de corte a cada criatura agarrada."
+        },
+        {
+            "name": "Imobilidade",
+            "timing": null,
+            "text": "Pode ficar imóvel. Um personagem precisa passar em Percepção CD 35 para distingui-lo da paisagem."
+        },
+        {
+            "name": "Muitos Tentáculos",
+            "timing": null,
+            "text": "Tem oito tentáculos. Usa no máximo quatro para atacar ao mesmo tempo e pode usar os outros para manter criaturas agarradas."
+        },
+        {
+            "name": "Tentáculos Decepáveis",
+            "timing": null,
+            "text": "Cada tentáculo tem Defesa 24 e é cortado se sofrer 10 ou mais de corte em um único ataque direto. Uma criatura agarrada pelo tentáculo cortado é solta."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Furtividade +9.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const grandeTachygloss = {
+    "id": "grande-tachygloss",
+    "name": "Grande Tachygloss",
+    "type": "monster",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 16,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 308,
+        "pdfPage": 310
+    },
+    "stats": {
+        "initiative": 14,
+        "perception": 16,
+        "defense": 53,
+        "fortitude": 30,
+        "reflex": 24,
+        "will": 16,
+        "hitPoints": 800,
+        "speedText": "12m (8q), escalada 12m (8q)",
+        "senses": "visão no escuro",
+        "defensesText": "redução de dano 20",
+        "attributes": {
+            "str": 7,
+            "dex": 0,
+            "con": 8,
+            "int": -4,
+            "wis": 2,
+            "cha": -3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Duas garras +43 (3d8+23 mais 6d6 perfuração) e cauda +43 (2d10+23, x3, mais 6d6 perfuração)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Acúleos",
+            "timing": null,
+            "text": "O dano de perfuração que causa ignora redução de dano."
+        },
+        {
+            "name": "Armadura de Espinhos",
+            "timing": null,
+            "text": "Ao sofrer dano de um ataque corpo a corpo adjacente, causa 6d6 de perfuração ao atacante."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Acúleos de tachygloss (CD 31 para extrair, valem T$ 1.000 para fabricar uma arma com a melhoria penetrante).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const oxxdon = {
+    "id": "oxxdon",
+    "name": "Oxxdon",
+    "type": "monster",
+    "subtype": null,
+    "size": "Médio",
+    "challengeRating": 2,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 308,
+        "pdfPage": 310,
+        "bookPageEnd": 309,
+        "pdfPageEnd": 311
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 4,
+        "defense": 20,
+        "fortitude": 7,
+        "reflex": 9,
+        "will": 4,
+        "hitPoints": 72,
+        "speedText": "12m (8q)",
+        "senses": "faro, visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 0,
+            "dex": 4,
+            "con": 2,
+            "int": -4,
+            "wis": 1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Antena +12 (ferrugem) e mordida +12 (1d8+4)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Ferrugem",
+            "timing": null,
+            "text": "A antena destrói objetos de metal atingidos. Uma arma de metal que cause dano à criatura também é destruída. Itens mágicos podem fazer Fortitude CD 17 para evitar. Contra uma criatura de metal, a antena a deixa fatigada, então exausta, então paralisada, mesmo se imune (Fort CD 17 evita). Remover cada condição exige 1 hora, T$ 50 em materiais e Ofício (artesão) CD 20."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const oxxdonImenso = {
+    "id": "oxxdon-imenso",
+    "name": "Oxxdon Imenso",
+    "type": "monster",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 10,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 309,
+        "pdfPage": 311
+    },
+    "stats": {
+        "initiative": 18,
+        "perception": 10,
+        "defense": 36,
+        "fortitude": 13,
+        "reflex": 24,
+        "will": 11,
+        "hitPoints": 400,
+        "speedText": "12m (8q)",
+        "senses": "faro, visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 2,
+            "dex": 6,
+            "con": 3,
+            "int": -4,
+            "wis": 1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Duas antenas +29 (1d8+10 mais ferrugem) e mordida +29 (3d8+10)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Aura Oxidante",
+            "timing": null,
+            "text": "Objetos soltos e criaturas que comecem o turno em um raio de 9m sofrem 4d6+10 de essência e ficam fatigados por 1 rodada."
+        },
+        {
+            "name": "Ferrugem",
+            "timing": null,
+            "text": "A antena destrói objetos de metal atingidos. Uma arma de metal que cause dano à criatura também é destruída. Itens mágicos podem fazer Fortitude CD 30 para evitar. Contra uma criatura de metal, a antena a deixa fatigada, então exausta, então paralisada, mesmo se imune (Fort CD 30 evita). Remover cada condição exige 1 hora, T$ 50 em materiais e Ofício (artesão) CD 20."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const razzaKham = {
+    "id": "razza-kham",
+    "name": "Razza’Kham",
+    "type": "monster",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 17,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 309,
+        "pdfPage": 311
+    },
+    "stats": {
+        "initiative": 16,
+        "perception": 21,
+        "defense": 54,
+        "fortitude": 30,
+        "reflex": 24,
+        "will": 17,
+        "hitPoints": 1010,
+        "speedText": "15m (10q)",
+        "senses": "faro, percepção às cegas, visão no escuro",
+        "defensesText": "redução de dano 15, redução de ácido, eletricidade, fogo e frio 20",
+        "attributes": {
+            "str": 14,
+            "dex": 2,
+            "con": 7,
+            "int": -5,
+            "wis": 2,
+            "cha": 0
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Duas garras +47 (6d10+36, 18) e mordida +47 (10d10+36, x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Brutalidade Incontida",
+            "timing": null,
+            "text": "Para cada resultado máximo em um dado de dano, rola um dado extra de dano do mesmo tipo."
+        },
+        {
+            "name": "Dilacerar",
+            "timing": null,
+            "text": "Se acertar as duas garras numa criatura no mesmo turno, causa mais 8d6 de dano."
+        },
+        {
+            "name": "Varrer",
+            "timing": "livre",
+            "text": "Uma vez por rodada, ao reduzir um alvo a 0 PV ou menos com um ataque corpo a corpo, pode fazer um ataque adicional contra outra criatura em seu alcance."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Três peças de quitina razza (CD 32 para extrair).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const serpeAmeacasDeArton = {
+    "id": "serpe-ameacas-de-arton",
+    "name": "Serpe",
+    "type": "monster",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 5,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 310,
+        "pdfPage": 312
+    },
+    "stats": {
+        "initiative": 5,
+        "perception": 7,
+        "defense": 24,
+        "fortitude": 10,
+        "reflex": 16,
+        "will": 5,
+        "hitPoints": 200,
+        "speedText": "9m (6q), voo 18m (12q)",
+        "senses": "faro, visão no escuro",
+        "defensesText": "imunidade a paralisia",
+        "attributes": {
+            "str": 6,
+            "dex": 1,
+            "con": 6,
+            "int": -2,
+            "wis": 1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +17 (2d6+12) e ferrão +17 (1d8+12 mais veneno)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +19)."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Peçonha concentrada. Perde 1d12 PV por rodada durante 3 rodadas (Fort CD 20 reduz para 1 rodada)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "1d4 doses de peçonha concentrada (CD 20 para extrair).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review",
+    "variantOf": "serpe"
+};
+
+const serpeAncia = {
+    "id": "serpe-ancia",
+    "name": "Serpe Anciã",
+    "type": "monster",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 8,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 310,
+        "pdfPage": 312,
+        "bookPageEnd": 311,
+        "pdfPageEnd": 313
+    },
+    "stats": {
+        "initiative": 8,
+        "perception": 7,
+        "defense": 33,
+        "fortitude": 15,
+        "reflex": 21,
+        "will": 8,
+        "hitPoints": 320,
+        "speedText": "9m (6q), voo 18m (12q)",
+        "senses": "faro, visão no escuro",
+        "defensesText": "imunidade a paralisia e veneno",
+        "attributes": {
+            "str": 7,
+            "dex": 1,
+            "con": 6,
+            "int": -2,
+            "wis": 1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +26 (3d6+15) e ferrão +26 (2d12+15 mais veneno)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +31)."
+        },
+        {
+            "name": "Jato de Podridão",
+            "timing": "padrão",
+            "text": "Dispara veneno em uma linha de 18m, ignorando imunidade. Criaturas na área perdem 6d12 PV (Fort CD 26 reduz à metade). Recarga (movimento)."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Peçonha anciã. Perde 3d12 PV por rodada durante 3 rodadas, ignorando imunidade a veneno (Fort CD 26 reduz para 1 rodada)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "1d4 doses de peçonha anciã (CD 23 para extrair).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const uraghianJovem = {
+    "id": "uraghian-jovem",
+    "name": "Uraghian Jovem",
+    "type": "monster",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 5,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 311,
+        "pdfPage": 313
+    },
+    "stats": {
+        "initiative": 3,
+        "perception": 5,
+        "defense": 24,
+        "fortitude": 17,
+        "reflex": 5,
+        "will": 11,
+        "hitPoints": 200,
+        "speedText": "9m (6q)",
+        "senses": "faro, visão na penumbra",
+        "defensesText": "redução de fogo 20",
+        "attributes": {
+            "str": 6,
+            "dex": -1,
+            "con": 5,
+            "int": -5,
+            "wis": 1,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +17 (2d8+10 mais 6d6 fogo)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Couraça Cáustica",
+            "timing": null,
+            "text": "Quem causa dano ao uraghian com ataque corpo a corpo sofre 6d6 de fogo. Criaturas com alcance natural maior que 1,5m ficam isentas."
+        },
+        {
+            "name": "Rajada Flamejante",
+            "timing": "padrão",
+            "text": "Cospe óleo flamejante em um cone de 12m. Criaturas na área sofrem 6d6+12 de fogo e ficam em chamas (Ref CD 20 reduz à metade e evita a condição). Recarga (movimento)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Óleo de besouro x1d4 (CD 20 para extrair).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const uraghianAdulto = {
+    "id": "uraghian-adulto",
+    "name": "Uraghian Adulto",
+    "type": "monster",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 8,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 311,
+        "pdfPage": 313
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 10,
+        "defense": 33,
+        "fortitude": 21,
+        "reflex": 8,
+        "will": 15,
+        "hitPoints": 330,
+        "speedText": "9m (6q)",
+        "senses": "faro, visão na penumbra",
+        "defensesText": "redução de fogo 20",
+        "attributes": {
+            "str": 8,
+            "dex": -1,
+            "con": 6,
+            "int": -5,
+            "wis": 2,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +26 (2d12+35 mais 6d6 fogo)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Couraça Cáustica",
+            "timing": null,
+            "text": "Quem causa dano ao uraghian com ataque corpo a corpo sofre 6d6 de fogo. Criaturas com alcance natural maior que 1,5m ficam isentas."
+        },
+        {
+            "name": "Rajada Flamejante",
+            "timing": "padrão",
+            "text": "Cospe óleo flamejante em um cone de 18m. Criaturas na área sofrem 10d6+20 de fogo e ficam em chamas (Ref CD 26 reduz à metade e evita a condição). Recarga (movimento)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Óleo de besouro x1d6 (CD 23 para extrair) e casulos de seda x2d4 (CD 23 para extrair, cada casulo vale T$ 100 para fabricar um vestuário superior).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const kaiju = {
+    "id": "kaiju",
+    "name": "Kaiju",
+    "type": "monster",
+    "subtype": "kaiju",
+    "size": "Colossal",
+    "challengeRating": 20,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 313,
+        "pdfPage": 315
+    },
+    "stats": {
+        "initiative": 22,
+        "perception": 16,
+        "defense": 62,
+        "fortitude": 34,
+        "reflex": 28,
+        "will": 20,
+        "hitPoints": 1500,
+        "speedText": "15m (10q), mais um entre escalada 9m (6q), natação 36m (24q) ou voo 36m (24q)",
+        "senses": "faro, visão no escuro",
+        "defensesText": "cura acelerada 50/kaiju, fortificação 75%, imunidade a efeitos de metabolismo e mentais, medo, metamorfose, paralisia e veneno, redução de dano 30",
+        "attributes": {
+            "str": 20,
+            "dex": 0,
+            "con": 15,
+            "int": -3,
+            "wis": 2,
+            "cha": -3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Duas garras +55 (2d20+50), mordida +55 (2d20+50) e cauda +55 (2d20+50)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +60)."
+        },
+        {
+            "name": "Arsenal Titânico",
+            "timing": null,
+            "text": "Escolha dois dos nove poderes titânicos a seguir para este kaiju."
+        },
+        {
+            "name": "Arremessar Montanha",
+            "timing": "padrão",
+            "text": "Arremessa uma rocha contra uma criatura em alcance longo. O alvo e criaturas em alcance curto dele sofrem 10d12 de impacto e ficam soterrados (Ref CD 50 reduz à metade e evita o soterramento). Soterrados ficam imóveis e sofrem 2d12 de impacto no início de seus turnos. Libertar a si ou um aliado exige ação completa e Força CD 28, com ajuda permitida. Recarga (movimento)."
+        },
+        {
+            "name": "Fúria Retalhadora",
+            "timing": null,
+            "text": "Uma vez por rodada, ao sofrer dano, recebe +5 nos ataques e +1d20 no dano até o fim do próximo turno."
+        },
+        {
+            "name": "Ferrão Peçonhento",
+            "timing": null,
+            "text": "O ferrão substitui a cauda. Usa as mesmas estatísticas, com dano de perfuração mais veneno."
+        },
+        {
+            "name": "Poeira dos Sonhos",
+            "timing": "movimento",
+            "text": "Criaturas em alcance médio ficam inconscientes e caídas. Em combate, ficam exaustas em vez disso (Von CD 50 muda para fatigada e dá imunidade à habilidade até o fim da cena). Recarga (movimento)."
+        },
+        {
+            "name": "Rugido Aterrador",
+            "timing": "padrão",
+            "text": "Criaturas em alcance longo sofrem 16d12 de impacto e ficam apavoradas e surdas (Fort CD 50 reduz à metade, evita surdez e troca apavorada por abalada). Recarga (movimento)."
+        },
+        {
+            "name": "Sopro Corrosivo",
+            "timing": "padrão",
+            "text": "Num cone de 12m, criaturas sofrem 12d20 de ácido e ficam vulneráveis (Ref CD 50 reduz à metade e evita a condição). Recarga (movimento)."
+        },
+        {
+            "name": "Tempestade de Ferrões",
+            "timing": "completa",
+            "text": "Criaturas em alcance médio sofrem 6d12 de perfuração e são expostas à peçonha kaiju (Ref CD 50 reduz à metade e evita o veneno). Recarga (padrão)."
+        },
+        {
+            "name": "Terremoto da Ira",
+            "timing": "completa",
+            "text": "Criaturas em alcance médio em contato com o solo sofrem 14d12 de dano e ficam caídas (Ref CD 50 reduz à metade e evita a condição). Recarga (ser reduzido a 800 PV)."
+        },
+        {
+            "name": "Ventos Bravios",
+            "timing": null,
+            "text": "Ao voar, arremessa criaturas em alcance médio 15m para longe (Fort CD 50 evita). Quem é arremessado fica caído e, se bater em obstáculo, sofre 1d6 de impacto por 1,5m arremessado. Requer deslocamento de voo."
+        },
+        {
+            "name": "Engolir",
+            "timing": "livre",
+            "text": "No início de cada turno do kaiju, cada vítima engolida sofre 2d20+50 de impacto e 2d20+50 de ácido. Pode escapar causando ao todo 200 de dano por dentro (Defesa 25, fortificação 25%, RD 0). Cabe uma criatura Enorme ou até dez Grandes ou menores."
+        },
+        {
+            "name": "Maior que a Vida",
+            "timing": null,
+            "text": "Se falhar em resistência contra efeito com duração maior que instantânea, pode repetir o teste contra a CD original no início dos turnos até o fim do efeito. Ao voltar a 1 PV pela cura acelerada após cair a 0 PV ou menos, abandona a luta e volta à terra de origem."
+        },
+        {
+            "name": "Titânico",
+            "timing": null,
+            "text": "Imune a manobras e a flanqueamento, sofre metade do dano de ataques de criaturas sem Titânico. Ao se mover pelo espaço de uma criatura ou objeto Enorme ou menor, causa 20d6 de impacto (Ref CD 50 reduz à metade, uma vez por rodada por criatura). Seus ataques ignoram RD e atingem todas as criaturas em um quadrado de 6m, usando uma só jogada de ataque por ataque."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Peçonha kaiju. Perde 5d12 PV por rodada durante 10 rodadas (Fort CD 50 reduz para 1 rodada)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Padrão mais 6 peças de couraça de kaiju (CD 35 para extrair).",
+    "skillsText": "Atletismo +35, Intimidação +35.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const canceronteDeGuerra = {
+    "id": "canceronte-de-guerra",
+    "name": "Canceronte de Guerra",
+    "type": "monster",
+    "subtype": null,
+    "size": "Colossal",
+    "challengeRating": 16,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 315,
+        "pdfPage": 317
+    },
+    "stats": {
+        "initiative": 10,
+        "perception": 11,
+        "defense": 53,
+        "fortitude": 30,
+        "reflex": 24,
+        "will": 16,
+        "hitPoints": 825,
+        "speedText": "12m (8q), natação 18m (12q)",
+        "senses": "visão na penumbra",
+        "defensesText": "fortificação 25%, imunidade a encantamento, redução de dano 15",
+        "attributes": {
+            "str": 10,
+            "dex": 0,
+            "con": 8,
+            "int": -4,
+            "wis": 0,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Quatro garras +45 (4d10+25)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Abordagem",
+            "timing": null,
+            "text": "Um personagem pode gastar uma ação de movimento e fazer um teste de Atletismo (CD 30) para escalar o canceronte de guerra. Se falhar por 5 ou mais, cai na frente do monstro e sofre 4d6 pontos de dano da queda. Se passar em três desses testes, chega na escotilha em sua barriga. Abrir a escotilha exige um teste de Ladinagem ou Força (CD 30). Cada canceronte possui uma equipe de cinco sahuagin (ataque +35, 3d6+25 pontos de dano de perfuração, Defesa 28, 60 PV e usa os testes de resistência do canceronte) em seu interior, para impedir que intrusos cheguem à concha de comando. Na concha de comando está o capitão (ataque +36, 3d8+25 pontos de dano de perfuração, Defesa 30, 100 PV e usa os testes de resistência do canceronte). Uma vez que o capitão seja morto, o canceronte para de lutar."
+        },
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Garra (teste +55)."
+        },
+        {
+            "name": "Atropelamento",
+            "timing": "completa",
+            "text": "O canceronte percorre até o dobro de seu deslocamento. Ele pode passar pelo espaço ocupado de quaisquer inimigos menores que ele, mas não pode passar duas vezes pelo mesmo espaço. Criaturas atropeladas desta forma sofrem 10d10+50 pontos de dano de impacto e ficam caídas (Ref CD 42 reduz à metade e evita a condição). Recarga (movimento)."
+        },
+        {
+            "name": "Autotomia",
+            "timing": "livre",
+            "text": "O canceronte pode sacrificar uma de suas garras para se livrar de um perigo maior. Quando faz isso, ele automaticamente passa em um teste para evitar uma condição de movimento (como um teste de ataque para se libertar de um agarramento), mas perde um de seus ataques de garra. Uma garra sacrificada desta forma se regenera em um mês."
+        },
+        {
+            "name": "Guilhotinar",
+            "timing": "padrão",
+            "text": "Se o canceronte começar seu turno agarrando uma criatura menor que ele, poderá fazer um teste de agarrar contra ela. Se vencer, a criatura sofre 8d10+50 pontos de dano de impacto e fica debilitada (ou inconsciente, se já estiver debilitada)."
+        },
+        {
+            "name": "Máquina de Cerco",
+            "timing": null,
+            "text": "O canceronte recebe +2 em testes de ataque para quebrar (teste total +57) e seus ataques ignoram redução de dano de objetos."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Metade mais 2d4 postas de canceronte (CD 31 para extrair; cada posta vale T$ 12 para preparar um banquete de canceronte).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const enguiaRainha = {
+    "id": "enguia-rainha",
+    "name": "Enguia Rainha",
+    "type": "monster",
+    "subtype": null,
+    "size": "Colossal",
+    "challengeRating": 19,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 317,
+        "pdfPage": 319,
+        "bookPageEnd": 318,
+        "pdfPageEnd": 320
+    },
+    "stats": {
+        "initiative": 23,
+        "perception": 19,
+        "defense": 54,
+        "fortitude": 32,
+        "reflex": 26,
+        "will": 19,
+        "hitPoints": 1150,
+        "speedText": "Natação 12m (8q)",
+        "senses": "visão no escuro",
+        "defensesText": "redução de dano 15",
+        "attributes": {
+            "str": 12,
+            "dex": 4,
+            "con": 11,
+            "int": -4,
+            "wis": 3,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +52 (4d12+46, 19) e cauda x2 +52 (3d12+32)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +62)."
+        },
+        {
+            "name": "Constrição",
+            "timing": "livre",
+            "text": "No início de cada um de seus turnos, a Enguia Rainha causa 6d12+32 pontos de dano de impacto em cada criatura que esteja agarrando."
+        },
+        {
+            "name": "Engolir",
+            "timing": "padrão",
+            "text": "No início de cada um dos turnos da Enguia, a criatura engolida sofre 4d12+20 pontos de dano de impacto mais 4d12+20 pontos de dano de ácido. Ela pode escapar causando um total de 200 pontos de dano a ela (Defesa 25, redução de dano 5)."
+        },
+        {
+            "name": "Majestade Elétrica",
+            "timing": "padrão",
+            "text": "A Enguia se cobre com eletricidade natural. Criaturas agarradas sofrem 10d8 pontos de dano de eletricidade (Fort CD 47 reduz à metade). Além disso, até a próxima rodada, qualquer criatura que faça um ataque corpo a corpo contra a Enguia sofre 6d8 pontos de dano de eletricidade."
+        },
+        {
+            "name": "Sopro",
+            "timing": "padrão",
+            "text": "A Enguia sopra vapor fervente em um cone de 18m. Cada criatura nessa área sofre 12d12 pontos de dano, metade fogo e metade ácido, e é recoberta por uma substância corrosiva que causa 4d12 pontos de dano de ácido pelas próximas 1d4 rodadas (Ref CD 47 reduz o dano à metade e evita a substância). Recarga (movimento)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Padrão mais suco gástrico (CD 34 para extrair, vale T$ 2.000 para fabricar itens que causem dano de ácido).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const kraken = {
+    "id": "kraken",
+    "name": "Kraken",
+    "type": "monster",
+    "subtype": null,
+    "size": "Colossal",
+    "challengeRating": 19,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 325,
+        "pdfPage": 327
+    },
+    "stats": {
+        "initiative": 22,
+        "perception": 20,
+        "defense": 59,
+        "fortitude": 32,
+        "reflex": 19,
+        "will": 26,
+        "hitPoints": 1145,
+        "speedText": "9m (6q), natação 24m (16q)",
+        "senses": "visão no escuro",
+        "defensesText": "redução de dano 20, resistência a magia +5",
+        "attributes": {
+            "str": 15,
+            "dex": 5,
+            "con": 12,
+            "int": 10,
+            "wis": 4,
+            "cha": 7
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Oito tentáculos +50 (2d10+30) e mordida +50 (2d12+23)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Tentáculo +60."
+        },
+        {
+            "name": "Chamado do Mar",
+            "timing": "padrão",
+            "text": "O kraken pode dominar até 10 criaturas em alcance longo, como o efeito básico da magia Legião (Von CD 47 evita). Esta habilidade não tem efeito sobre criaturas em terra firme (mas afeta alvos que estejam em embarcações ou outras superfícies sobre o mar). Uma criatura que passe no teste de Vontade se torna imune a esta habilidade até o fim da cena.",
+            "magical": true
+        },
+        {
+            "name": "Constrição",
+            "timing": "livre",
+            "text": "No início de cada um de seus turnos, o kraken causa 4d10+30 pontos de dano de impacto em cada criatura que estiver agarrando."
+        },
+        {
+            "name": "Dominar as Marés",
+            "timing": "completa",
+            "text": "O kraken pode alterar o clima em uma esfera de 2km ao seu redor (como o efeito básico da magia Controlar o Clima). Esta habilidade não afeta o clima sobre terra firme.",
+            "magical": true
+        },
+        {
+            "name": "Nuvem de Tinta",
+            "timing": "movimento",
+            "text": "O kraken expele uma nuvem de tinta num cone de 30m. Criaturas a até 1,5m têm camuflagem leve e criaturas a partir de 3m têm camuflagem total. Dentro da nuvem, criaturas têm seu deslocamento reduzido para 3m (independente de seu deslocamento normal) e sofrem –5 em testes de ataque e rolagens de dano. O kraken é imune aos efeitos da nuvem."
+        },
+        {
+            "name": "Terror do Mar Profundo",
+            "timing": null,
+            "text": "O kraken começa o combate submerso, usando apenas quatro tentáculos para atacar. Cada tentáculo conta como uma criatura separada, com 115 PV, Defesa 54, imunidade a efeitos mentais e medo e demais características iguais às do kraken. Enquanto está submerso, o kraken não pode ser afetado por nenhum efeito, habilidade ou ataque. Quando os quatro tentáculos são destruídos, o kraken perde esta habilidade e emerge. Ele continua atacando usando seus outros quatro tentáculos e sua mordida."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Dobro, 1d6 peças de pena de kraken (CD 34 para extrair) e 2d4 postas de kraken (CD 34 para extrair, cada posta vale T$ 20 para preparar um sashimi de kraken).",
+    "skillsText": "Atletismo +35, Diplomacia +27, Enganação +27, Intimidação +27.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const iniciadaDeSszzaas = {
+    "id": "iniciada-de-sszzaas",
+    "name": "Iniciada de Sszzaas",
+    "type": "monster",
+    "subtype": "medusa",
+    "size": "Médio",
+    "challengeRating": 3,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 326,
+        "pdfPage": 328,
+        "bookPageEnd": 327,
+        "pdfPageEnd": 329
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 7,
+        "defense": 19,
+        "fortitude": 3,
+        "reflex": 9,
+        "will": 15,
+        "hitPoints": 69,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "resistência a veneno +5",
+        "attributes": {
+            "str": 0,
+            "dex": 2,
+            "con": 0,
+            "int": 4,
+            "wis": 3,
+            "cha": 4
+        },
+        "manaPoints": 19
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Adaga +12 (1d4+3, 19, mais veneno)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Ataque Furtivo",
+            "timing": null,
+            "text": "+2d6."
+        },
+        {
+            "name": "Falso Amigo",
+            "timing": null,
+            "text": "Médico iniciante. Sob essa identidade, pode atuar como o parceiro indicado e recebe +10 em Enganação para manter o disfarce e em Vontade contra efeitos que possam revelar sua identidade. Veja Ameaças de Arton, p. 327."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como uma clériga de Sszzaas de 3º nível (CD 19)."
+        },
+        {
+            "name": "Arma Mágica",
+            "timing": "padrão",
+            "text": "Até o fim da cena, uma arma adjacente se torna mágica, fornecendo +1 nos testes de ataque e rolagens de dano e +1d6 pontos de dano de fogo. A iniciada usa Sabedoria em vez de Força nos testes de ataque com ela (ataque total +16).",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Comando",
+            "timing": "padrão",
+            "text": "No início do seu próximo turno, uma criatura em alcance curto fica pasma por 1 rodada (Von evita). Este efeito só pode ser usado uma vez por cena contra uma mesma criatura.",
+            "cost": "2 PM"
+        },
+        {
+            "name": "Curar Ferimentos",
+            "timing": "padrão",
+            "text": "Uma criatura adjacente cura 4d8+4 PV.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Escuridão",
+            "timing": "padrão",
+            "text": "Até o fim da cena, um objeto em alcance curto emana escuridão total em um raio de 6m, bloqueando a visão na área e através dela.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Olhar Atordoante",
+            "timing": "movimento",
+            "text": "Uma criatura em alcance curto fica atordoada por 1 rodada (apenas uma vez por cena; Fort CD 19 evita)."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Perde 1d12 pontos de vida."
+        }
+    ],
+    "equipment": "Adaga, couro batido, símbolo sagrado de Sszzaas.",
+    "treasure": "Padrão.",
+    "skillsText": "Enganação +20, Intuição +20, Religião +17.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const cultistaDeSszzaasAmeacasDeArton = {
+    "variantOf": "cultista-de-sszzaas",
+    "id": "cultista-de-sszzaas-ameacas-de-arton",
+    "name": "Cultista de Sszzaas",
+    "type": "monster",
+    "subtype": "medusa",
+    "size": "Médio",
+    "challengeRating": 7,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 327,
+        "pdfPage": 329
+    },
+    "stats": {
+        "initiative": 11,
+        "perception": 12,
+        "defense": 29,
+        "fortitude": 7,
+        "reflex": 14,
+        "will": 20,
+        "hitPoints": 160,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "resistência a veneno +5",
+        "attributes": {
+            "str": 0,
+            "dex": 2,
+            "con": 0,
+            "int": 4,
+            "wis": 4,
+            "cha": 5
+        },
+        "manaPoints": 40
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Adaga +22 (1d4+4, 19, mais veneno)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Ataque Furtivo",
+            "timing": null,
+            "text": "+5d6."
+        },
+        {
+            "name": "Falso Amigo",
+            "timing": null,
+            "text": "Médico veterano. Sob essa identidade, pode atuar como o parceiro indicado e recebe +10 em Enganação para manter o disfarce e em Vontade contra efeitos que possam revelar sua identidade. Veja Ameaças de Arton, p. 327."
+        },
+        {
+            "name": "Olhar Atordoante",
+            "timing": "movimento",
+            "text": "Uma criatura em alcance curto fica atordoada por 1 rodada (apenas uma vez por cena; Fort CD 26 evita)."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Perde 2d12 pontos de vida durante 3 rodadas (Fort CD 26 reduz para 1 rodada)."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como uma clériga de Sszzaas de 7º nível (CD 26)."
+        },
+        {
+            "name": "Arma Mágica",
+            "timing": "padrão",
+            "text": "Até o fim da cena, uma arma adjacente se torna mágica, fornecendo +2 nos testes de ataque e rolagens de dano e +1d6 pontos de dano de fogo. A cultista usa Sabedoria em vez de Força nos testes de ataque com ela (ataque total +28).",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Comando",
+            "timing": "padrão",
+            "text": "No início do seu próximo turno, três criatura em alcance curto ficam pasmas por 1 rodada (Von evita). Este efeito só pode ser usado uma vez por cena contra uma mesma criatura.",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Curar Ferimentos",
+            "timing": "padrão",
+            "text": "Uma criatura adjacente cura 8d8+8 PV.",
+            "cost": "7 PM"
+        },
+        {
+            "name": "Escuridão",
+            "timing": "padrão",
+            "text": "Até o fim da cena, um objeto em alcance curto emana escuridão total em um raio de 6m, bloqueando a visão na área e através dela.",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Enxame de Pestes",
+            "timing": "completa",
+            "text": "Um enxame de pequenos animais surge em alcance médio e ocupa um quadrado de 1,5m. No fim de cada um dos turnos da cultista, o enxame causa 4d12 pontos de dano de corte a qualquer criatura em seu espaço (Fort reduz à metade). A cultista pode gastar uma ação de movimento para mover o enxame 12m.",
+            "cost": "7 PM, sustentada"
+        },
+        {
+            "name": "Miasma Mefítico",
+            "timing": "padrão",
+            "text": "Cria uma nuvem com 6m de raio; criaturas na área sofrem 7d6 pontos de dano de ácido e ficam enjoadas por 1 rodada (Fort reduz à metade e evita a condição).",
+            "cost": "7 PM"
+        }
+    ],
+    "equipment": "Adaga certeira, couraça, escudo leve, símbolo sagrado de Sszzaas.",
+    "treasure": "Padrão.",
+    "skillsText": "Enganação +20, Intuição +20, Religião +17.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const gorgona = {
+    "id": "gorgona",
+    "name": "Górgona",
+    "type": "monster",
+    "subtype": "medusa",
+    "size": "Médio",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 329,
+        "pdfPage": 331,
+        "bookPageEnd": 330,
+        "pdfPageEnd": 332
+    },
+    "stats": {
+        "initiative": 16,
+        "perception": 9,
+        "defense": 26,
+        "fortitude": 13,
+        "reflex": 19,
+        "will": 8,
+        "hitPoints": 231,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "resistência a veneno +5",
+        "attributes": {
+            "str": 0,
+            "dex": 4,
+            "con": 1,
+            "int": 1,
+            "wis": 2,
+            "cha": 3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Espada curta +20 (1d6+15, 19, mais veneno)."
+        },
+        {
+            "name": "À Distância",
+            "text": "Arco longo +20 x2 (1d12+15, x3, mais veneno)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Disparo Preciso",
+            "timing": null,
+            "text": "A górgona pode fazer ataques à distância contra oponentes envolvidos em combate corpo a corpo sem sofrer a penalidade de –5 no teste de ataque."
+        },
+        {
+            "name": "Olhar Petrificante",
+            "timing": null,
+            "text": "No início de seu turno, cada personagem em alcance curto da górgona deve fazer um teste de Reflexos (CD 22). Se passar, desvia o olhar. Se falhar, fica lento. Se já estiver lento, fica petrificado permanentemente. Um personagem pode fechar os olhos como uma reação para ficar imune a esta habilidade, mas sofrerá os efeitos de estar cego por 1 rodada. Efeitos que removem paralisia revertem a petrificação. Metamorfose."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Peçonha concentrada (perde 1d12 pontos de vida por rodada durante 3 rodadas, Fort CD 22 reduz para 1 rodada)."
+        }
+    ],
+    "equipment": "Arco longo certeiro, espada curta, flechas x20.",
+    "treasure": "Padrão mais 1d4 doses de peçonha concentrada.",
+    "skillsText": "Enganação +13, Furtividade +14.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const gorgonaMatriarca = {
+    "id": "gorgona-matriarca",
+    "name": "Górgona Matriarca",
+    "type": "monster",
+    "subtype": "medusa",
+    "size": "Médio",
+    "challengeRating": 14,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 330,
+        "pdfPage": 332
+    },
+    "stats": {
+        "initiative": 22,
+        "perception": 19,
+        "defense": 43,
+        "fortitude": 14,
+        "reflex": 25,
+        "will": 25,
+        "hitPoints": 498,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade às condições atordoada e enfeitiçada, resistência a magia +2, resistência a veneno +5",
+        "attributes": {
+            "str": 0,
+            "dex": 4,
+            "con": 3,
+            "int": 2,
+            "wis": 6,
+            "cha": 4
+        },
+        "manaPoints": 89
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Espada curta +36 (1d6+20, 19, mais veneno)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Magia Acelerada",
+            "timing": "livre",
+            "text": "Uma vez por rodada, quando lança uma magia com execução de ação completa ou menor, a górgona matriarca muda a execução dela para livre.",
+            "cost": "+4 PM"
+        },
+        {
+            "name": "Olhar Petrificante",
+            "timing": null,
+            "text": "Como a górgona (veja acima), mas com CD 38."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como uma clériga de Sszzaas de 14º nível (CD 38)."
+        },
+        {
+            "name": "Miasma Mefítico",
+            "timing": "padrão",
+            "text": "Criaturas em um raio de 6m em alcance médio sofrem 8d6 pontos de dano de ácido e ficam enjoadas por 1 rodada (Fort reduz o dano à metade e evita a condição).",
+            "cost": "9 PM"
+        },
+        {
+            "name": "Rogar Maldição",
+            "timing": "padrão",
+            "text": "A matriarca amaldiçoa uma criatura em alcance curto. O alvo fica esmorecido e não pode se comunicar ou lançar magias permanentemente (Fort reduz para 1 rodada).",
+            "cost": "10 PM"
+        },
+        {
+            "name": "Toque Vampírico",
+            "timing": "padrão",
+            "text": "A matriarca faz um ataque corpo a corpo. Se acertar, além do dano normal, causa 14d6 pontos de dano de trevas e recupera pontos de vida iguais à metade desse dano de trevas.",
+            "cost": "13 PM"
+        },
+        {
+            "name": "Visão da Verdade",
+            "timing": "padrão",
+            "text": "Até o fim da cena, a matriarca pode ver através de camuflagem e escuridão (normais e mágicas) e de efeitos de ilusão e transmutação (enxergando a verdade como formas translúcidas ou sobrepostas) e recebe +10 em testes de Intuição e Percepção.",
+            "cost": "9 PM"
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Beladona (paralisado por 3 rodadas, Fort CD 43 reduz para lento por 3 rodadas)."
+        }
+    ],
+    "equipment": "Espada curta certeira.",
+    "treasure": "Padrão mais 1d4 doses de beladona.",
+    "skillsText": "Enganação +20, Furtividade +20, Intuição +19, Misticismo +15, Religião +19.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const arcanistaFinntroll = {
+    "id": "arcanista-finntroll",
+    "name": "Arcanista Finntroll",
+    "type": "monster",
+    "subtype": "finntroll",
+    "size": "Médio",
+    "challengeRating": 14,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 338,
+        "pdfPage": 340,
+        "bookPageEnd": 339,
+        "pdfPageEnd": 341
+    },
+    "stats": {
+        "initiative": 17,
+        "perception": 13,
+        "defense": 43,
+        "fortitude": 24,
+        "reflex": 16,
+        "will": 30,
+        "hitPoints": 423,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a ofuscado",
+        "attributes": {
+            "str": -2,
+            "dex": 4,
+            "con": 3,
+            "int": 8,
+            "wis": 2,
+            "cha": 3
+        },
+        "manaPoints": 90
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Açoite finntroll +35 (1d8+2)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Conjurar Trolloides",
+            "timing": "padrão",
+            "text": "O arcanista finntroll invoca 2d4+1 trolloides em espaços desocupados em alcance curto. Os trolloides agem a partir da próxima rodada do arcanista e têm deslocamento 9m, For 5, Des 2, Defesa 25, 1 PV, são imunes a dano, exceto de ácido ou fogo, e falham automaticamente em qualquer teste de resistência ou oposto. O arcanista pode gastar uma ação de movimento para dar um dos seguintes comandos a qualquer número de trolloides. Eles desaparecem quando morrem ou no fim da cena e não agem sem receber uma ordem. Recarga (todos os trolloides foram destruídos). • Andar. Cada trolloide se move até 9m (6q). • Canalizar. A próxima magia que o arcanista lança tem como ponto de origem um trolloide a sua escolha, que é destruído após a magia ser lançada. • Esmagar. Cada trolloide causa 6d12 pontos de dano de impacto a uma criatura adjacente (Ref CD 40 reduz à metade). • Proteger. Cada trolloide adjacente ao arcanista fornece +2 nos testes de resistência e de manobras de combate dele neste turno.",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Contramágica Nobre",
+            "timing": "reação",
+            "text": "Uma vez por rodada, quando vê uma magia ser conjurada, o arcanista faz uma contramágica. Se usar Dissipar Magia para isso, ele rola dois dados e usa o melhor resultado."
+        },
+        {
+            "name": "Servidão Arcana",
+            "timing": null,
+            "text": "Quando o arcanista lança uma magia, todas as criaturas em alcance médio sofrem dano de essência igual ao dobro dos pontos de mana gastos na magia (Fort CD 40 reduz à metade). Para cada criatura que falhar neste teste, o arcanista recupera 3 PM (limitado ao custo da magia)."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como um mago de 17º nível (CD 40, limite de PM 25)."
+        },
+        {
+            "name": "Campo de Força",
+            "timing": "reação",
+            "text": "Quando sofre dano, o arcanista recebe RD 50 contra esse dano.",
+            "cost": "7 PM"
+        },
+        {
+            "name": "Controlar a Gravidade",
+            "timing": "padrão",
+            "text": "O arcanista controla os efeitos da gravidade em um cubo de 12m em alcance médio (veja Tormenta20, p. 186).",
+            "cost": "10 PM, sustentada"
+        },
+        {
+            "name": "Dissipar Magia",
+            "timing": "padrão",
+            "text": "O arcanista escolhe uma criatura, objeto ou esfera de 3m em alcance médio e faz um teste de Misticismo. Todas as magias nesse alvo com CD igual ou menor que o resultado do teste são dissipadas.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Marionete",
+            "timing": "padrão",
+            "text": "O arcanista controla as ações físicas de uma criatura em alcance médio. Ao sofrer a magia, e no início de cada um de seus turnos, a vítima faz um teste de Fortitude. Se passar, a magia é anulada.",
+            "cost": "10 PM, sustentada"
+        },
+        {
+            "name": "Raio do Enfraquecimento",
+            "timing": "padrão",
+            "text": "Criaturas escolhidas em alcance curto ficam exaustas (Fort muda para fatigado).",
+            "cost": "8 PM"
+        },
+        {
+            "name": "Pele de Pedra",
+            "timing": "padrão",
+            "text": "Uma criatura adjacente é transformada em uma estátua de pedra sem consciência por 1d4 rodadas (Fort evita).",
+            "cost": "10 PM"
+        },
+        {
+            "name": "Toque da Morte",
+            "timing": "padrão",
+            "text": "Uma criatura em alcance curto sofre 10d8+10 pontos de dano de trevas. Se estiver com menos da metade de seus PV, em vez disso ela deve fazer um teste de Fortitude; se passar sofre o dano normal, caso contrário seus PV são reduzidos a –10.",
+            "cost": "17 PM"
+        },
+        {
+            "name": "Corpo Vegetal",
+            "timing": null,
+            "text": "O finntroll possui visão no escuro, cura acelerada 5/ácido ou fogo e natureza vegetal."
+        },
+        {
+            "name": "Presença Arcana",
+            "timing": null,
+            "text": "O finntroll recebe +2 em Misticismo (já contabilizado) e resistência a magia +2."
+        },
+        {
+            "name": "Intolerância a Luz",
+            "timing": null,
+            "text": "O finntroll possui sensibilidade a luz e perde acesso à cura acelerada quando exposto à luz do sol ou similar."
+        }
+    ],
+    "equipment": "Açoite finntroll, bolsa de pó poderosa canalizadora, essência de mana x4, manto pesado, robe do arquimago.",
+    "treasure": "Dobro.",
+    "skillsText": "Conhecimento +19, Intimidação +14, Misticismo +21.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const defeituoso = {
+    "id": "defeituoso",
+    "name": "Defeituoso",
+    "type": "monster",
+    "subtype": null,
+    "size": "Médio",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 340,
+        "pdfPage": 342
+    },
+    "stats": {
+        "initiative": 8,
+        "perception": 3,
+        "defense": 26,
+        "fortitude": 18,
+        "reflex": 12,
+        "will": 6,
+        "hitPoints": 235,
+        "speedText": "6m (4q)",
+        "senses": "visão no escuro",
+        "defensesText": "cura acelerada 15/especial",
+        "attributes": {
+            "str": 5,
+            "dex": 3,
+            "con": 2,
+            "int": -3,
+            "wis": 0,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +19 (3d6+16)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Enxertos",
+            "timing": null,
+            "text": "Cada defeituoso possui três enxertos, modificações resultantes de experimentos. Para cada enxerto, role 1d6 na tabela abaixo (enxertos iguais são cumulativos). 1) Cabeça Extra. O defeituoso recebe um ataque de mordida extra e +5 em Percepção e Vontade. 2) Carapaça. O defeituoso recebe RD 5 e +2 na Defesa. 3) Garra. O defeituoso recebe um ataque de garra (ataque +19, dano 2d10+12). Se receber um segundo ataque de garra, recebe também Dilacerar (se acerta os dois ataques de garra em uma mesma criatura no mesmo turno, causa mais 1d10+6 pontos de dano). 4) Músculos Enxertados. O defeituoso recebe +2 em testes de ataque e rolagens de dano. 5) Pólipos (Movimento). Uma vez por cena, o defeituoso expele uma nuvem de pólipos venenosos. Criaturas em um raio de 9m ao redor dele perdem 4d12 PV e ficam enjoadas por veneno por 1 rodada (Fort CD 22 reduz a perda de vida à metade e evita a condição). Cada enxerto adicional permite usar esta habilidade mais uma vez na mesma cena. 6) Sumidouro Místico. O defeituoso recebe resistência a magia +2 e, sempre que ele acerta um ataque corpo a corpo, a vítima perde 2 PM."
+        },
+        {
+            "name": "Recordações de Dor",
+            "timing": "reação",
+            "text": "Quando sofre dano pela primeira vez em cada rodada, o defeituoso faz um ataque de mordida contra um oponente adjacente."
+        },
+        {
+            "name": "Regeneração Experimental",
+            "timing": null,
+            "text": "Cada defeituoso é suscetível a um tipo específico de energia, contra a qual sua cura acelerada não funciona. Role 1d6 para determinar essa energia: 1) ácido; 2) eletricidade; 3) fogo; 4) frio; 5) luz; 6) trevas. A cada enxerto de cabeça extra, role um tipo de energia adicional."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Sobrevivência +6.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const mycotannLabutador = {
+    "id": "mycotann-labutador",
+    "name": "Mycotann Labutador",
+    "type": "monster",
+    "subtype": "mycotann",
+    "size": "Médio",
+    "challengeRating": 2,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 341,
+        "pdfPage": 343
+    },
+    "stats": {
+        "initiative": 2,
+        "perception": 7,
+        "defense": 17,
+        "fortitude": 13,
+        "reflex": 7,
+        "will": 2,
+        "hitPoints": 15,
+        "speedText": "6m (4q)",
+        "senses": "visão no escuro",
+        "defensesText": "natureza vegetal",
+        "attributes": {
+            "str": 1,
+            "dex": 0,
+            "con": 3,
+            "int": 0,
+            "wis": -1,
+            "cha": 1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Duas pancadas +12 (1d6+6)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Esporos",
+            "timing": "padrão",
+            "text": "O mycotann labutador dispara uma nuvem de esporos em uma criatura em alcance curto. O alvo fica enredado ou, se já estiver enredado por este efeito, fica paralisado por 1 rodada (Fort CD 16 evita)."
+        },
+        {
+            "name": "Telepatia",
+            "timing": null,
+            "text": "O mycotann pode se comunicar telepaticamente com qualquer criatura viva em alcance médio."
+        }
+    ],
+    "equipment": null,
+    "treasure": "1d4 doses de esporos de cogumelo (CD 17 para extrair).",
+    "skillsText": null,
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const mycotannDruida = {
+    "id": "mycotann-druida",
+    "name": "Mycotann Druida",
+    "type": "monster",
+    "subtype": "mycotann",
+    "size": "Médio",
+    "challengeRating": 5,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 341,
+        "pdfPage": 343
+    },
+    "stats": {
+        "initiative": 10,
+        "perception": 15,
+        "defense": 22,
+        "fortitude": 11,
+        "reflex": 5,
+        "will": 17,
+        "hitPoints": 143,
+        "speedText": "6m (4q)",
+        "senses": "visão no escuro",
+        "defensesText": "natureza vegetal",
+        "attributes": {
+            "str": 1,
+            "dex": 0,
+            "con": 3,
+            "int": 0,
+            "wis": 4,
+            "cha": 1
+        },
+        "manaPoints": 28
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Duas pancadas +15 (1d6+8)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Esporos",
+            "timing": "padrão",
+            "text": "O mycotann druida dispara uma nuvem de esporos que atinge uma criatura em alcance curto. O alvo fica enredado ou, se já estiver enredado por este efeito, em vez disso fica paralisado (Fort CD 22 evita). Veneno."
+        },
+        {
+            "name": "Telepatia",
+            "timing": null,
+            "text": "O mycotann pode se comunicar telepaticamente com qualquer criatura viva em alcance médio."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como um druida de Allihanna de 5º nível (CD 22), sem precisar falar."
+        },
+        {
+            "name": "Controlar Plantas",
+            "timing": "padrão",
+            "text": "Um quadrado de 9m de vegetação em alcance curto se torna terreno difícil. Criaturas na área quando a magia é lançada ou no início de seus próprios turnos ficam enredadas e imóveis (Fort evita). Uma vítima pode se libertar com uma ação padrão e um teste de Acrobacia ou Atletismo.",
+            "cost": "2 PM"
+        },
+        {
+            "name": "Curar Ferimentos",
+            "timing": "padrão",
+            "text": "Uma criatura adjacente cura 6d8+6 PV.",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Raio Solar",
+            "timing": "padrão",
+            "text": "Criaturas em uma linha de 30m sofrem 5d8 pontos de dano de luz (ou 5d12, se forem mortos-vivos) e ficam ofuscadas por 1 rodada (Ref reduz à metade e evita a condição).",
+            "cost": "5 PM"
+        }
+    ],
+    "equipment": "Símbolo sagrado de Allihanna.",
+    "treasure": "Metade mais 1d4 doses de esporos de cogumelo (CD 20 para extrair).",
+    "skillsText": "Religião +8, Sobrevivência +10.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const hordaMycotann = {
+    "id": "horda-mycotann",
+    "name": "Horda Mycotann",
+    "type": "monster",
+    "subtype": "mycotann",
+    "size": "Enorme",
+    "challengeRating": 12,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 341,
+        "pdfPage": 343
+    },
+    "stats": {
+        "initiative": 14,
+        "perception": 17,
+        "defense": 33,
+        "fortitude": 23,
+        "reflex": 14,
+        "will": 13,
+        "hitPoints": 612,
+        "speedText": "6m (4q)",
+        "senses": "visão no escuro",
+        "defensesText": "natureza vegetal",
+        "attributes": {
+            "str": 2,
+            "dex": -1,
+            "con": 3,
+            "int": 1,
+            "wis": 0,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Enxame",
+            "text": "8d12 pontos de dano de impacto."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Esporos",
+            "timing": "padrão",
+            "text": "A horda dispara esporos em uma nuvem de 3m de raio em alcance médio. Criaturas na área ficam paralisadas por 1d4 rodadas (apenas uma vez por cena) e perdem 6d6 PV (Fort CD 32 reduz à metade e evita a condição)."
+        },
+        {
+            "name": "Telepatia",
+            "timing": null,
+            "text": "A horda pode se comunicar telepaticamente com qualquer criatura viva em alcance médio."
+        },
+        {
+            "name": "Véu de Esporos",
+            "timing": null,
+            "text": "Uma criatura que comece seu turno dentro do espaço ocupado pela horda fica enjoada e enredada (Fort CD 32 evita). Veneno."
+        }
+    ],
+    "equipment": null,
+    "treasure": "2d4 doses de esporos de cogumelo (CD 27 para extrair).",
+    "skillsText": "Atletismo +15.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const finntrollCacadorAmeacasDeArton = {
+    "variantOf": "finntroll-cacador",
+    "id": "finntroll-cacador-ameacas-de-arton",
+    "name": "Finntroll Caçador",
+    "type": "monster",
+    "subtype": "finntroll",
+    "size": "Médio",
+    "challengeRating": 2,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 342,
+        "pdfPage": 344
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 7,
+        "defense": 19,
+        "fortitude": 6,
+        "reflex": 12,
+        "will": 4,
+        "hitPoints": 65,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 2,
+            "dex": 3,
+            "con": 3,
+            "int": 2,
+            "wis": 2,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Duas cimitarras +12 (1d6+5, 18)."
+        },
+        {
+            "name": "À Distância",
+            "text": "Besta pesada +12 (1d12+4, 19) ou rede +12 (agarrar)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Marca da Presa",
+            "timing": "movimento",
+            "text": "O finntroll caçador analisa uma criatura em alcance curto. Até o fim da cena, recebe +1d8 em rolagens de dano contra essa criatura (esse bônus é dobrado se a criatura for um anão, elfo ou humano)."
+        },
+        {
+            "name": "Corpo Vegetal",
+            "timing": null,
+            "text": "O finntroll possui visão no escuro, cura acelerada 5/ácido ou fogo e natureza vegetal."
+        },
+        {
+            "name": "Presença Arcana",
+            "timing": null,
+            "text": "O finntroll recebe +2 em Misticismo (já contabilizado) e resistência a magia +2."
+        },
+        {
+            "name": "Intolerância a Luz",
+            "timing": null,
+            "text": "O finntroll possui sensibilidade a luz e perde acesso à cura acelerada quando exposto à luz do sol ou similar."
+        }
+    ],
+    "equipment": "Besta pesada, cimitarra x2, rede, virotes x20.",
+    "treasure": "Padrão.",
+    "skillsText": "Furtividade +8, Sobrevivência +7.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const finntrollFeitorAmeacasDeArton = {
+    "variantOf": "finntroll-feitor",
+    "id": "finntroll-feitor-ameacas-de-arton",
+    "name": "Finntroll Feitor",
+    "type": "monster",
+    "subtype": "finntroll",
+    "size": "Médio",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 342,
+        "pdfPage": 344
+    },
+    "stats": {
+        "initiative": 9,
+        "perception": 5,
+        "defense": 20,
+        "fortitude": 8,
+        "reflex": 12,
+        "will": 16,
+        "hitPoints": 155,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 0,
+            "dex": 3,
+            "con": 3,
+            "int": 4,
+            "wis": 0,
+            "cha": 2
+        },
+        "manaPoints": 35
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Chicote +18 (1d3+10, 19)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Açoitar",
+            "timing": "padrão",
+            "text": "No próximo turno de cada aliado do finntroll em alcance médio, esse aliado recebe uma ação de movimento extra e +2 em testes de ataque e rolagens de dano."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como um mago de 6º nível (CD 26, 28 para encantamento*, limite de PM 6)."
+        },
+        {
+            "name": "Adaga Mental*",
+            "timing": "padrão",
+            "text": "Uma criatura em alcance curto sofre 4d6 pontos de dano psíquico e fica atordoada por 1 rodada (Von reduz o dano à metade e evita a condição). Uma criatura só pode ser atordoada por esta magia uma vez por cena.",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Armadura Arcana",
+            "timing": "padrão",
+            "text": "O finntroll recebe +5 na Defesa por um dia.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Armadura Arcana",
+            "timing": "reação",
+            "text": "Quando sofre um ataque, o finntroll recebe +5 na Defesa contra este ataque.",
+            "cost": "2 PM"
+        },
+        {
+            "name": "Desespero Esmagador*",
+            "timing": "padrão",
+            "text": "O finntroll projeta uma onda de desespero em um cone de 6m. Criaturas na área ficam fracas e frustradas até o fim da cena (Von reduz para 1 rodada).",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Enfeitiçar*",
+            "timing": "padrão",
+            "text": "Cada humanoide em alcance curto fica enfeitiçado pelo finntroll, ou até o finntroll ou um de seus aliados tomar uma ação hostil contra a criatura.",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Marca da Obediência*",
+            "timing": "padrão",
+            "text": "O finntroll ordena que uma criatura adjacente não ataque a ele ou a seus aliados até o fim da cena (Von evita). A criatura pode repetir o teste de Vontade em cada um de seus turnos subsequentes.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Relâmpago",
+            "timing": "padrão",
+            "text": "O finntroll causa 8d6 pontos de dano de eletricidade em todas as criaturas em uma linha de 30m (Ref reduz à metade).",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Corpo Vegetal",
+            "timing": null,
+            "text": "O finntroll possui visão no escuro, cura acelerada 5/ácido ou fogo e natureza vegetal."
+        },
+        {
+            "name": "Presença Arcana",
+            "timing": null,
+            "text": "O finntroll recebe +2 em Misticismo (já contabilizado) e resistência a magia +2."
+        },
+        {
+            "name": "Intolerância a Luz",
+            "timing": null,
+            "text": "O finntroll possui sensibilidade a luz e perde acesso à cura acelerada quando exposto à luz do sol ou similar."
+        }
+    ],
+    "equipment": "Chicote cruel.",
+    "treasure": "Dobro.",
+    "skillsText": "Intimidação +9, Misticismo +11.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const finntrollSenhorDeEstabulo = {
+    "id": "finntroll-senhor-de-estabulo",
+    "name": "Finntroll Senhor de Estábulo",
+    "type": "monster",
+    "subtype": "finntroll",
+    "size": "Médio",
+    "challengeRating": 12,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 342,
+        "pdfPage": 344,
+        "bookPageEnd": 343,
+        "pdfPageEnd": 345
+    },
+    "stats": {
+        "initiative": 12,
+        "perception": 10,
+        "defense": 39,
+        "fortitude": 20,
+        "reflex": 14,
+        "will": 24,
+        "hitPoints": 380,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 0,
+            "dex": 2,
+            "con": 3,
+            "int": 5,
+            "wis": 0,
+            "cha": 4
+        },
+        "manaPoints": 68
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Açoite finntroll +33 (1d8+12, 19)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Abrir os Viveiros",
+            "timing": "completa",
+            "text": "O finntroll senhor de estábulo convoca 1d3+1 trolls (veja Tormenta20, p. 308), que surgem em espaços desocupados em alcance curto. Os trolls estão sob controle do finntroll, agem no turno dele a partir da rodada seguinte e não rendem recompensas se forem derrotados.",
+            "magical": true
+        },
+        {
+            "name": "Aura de Superioridade",
+            "timing": "reação",
+            "text": "Sempre que uma criatura inteligente tentar uma ação hostil contra o finntroll, deve fazer um teste de Vontade (CD 35). Caso falhe, a criatura perde a ação. O finntroll só pode usar esta habilidade uma vez por cena contra cada criatura."
+        },
+        {
+            "name": "Palavras de Humilhação",
+            "timing": "movimento",
+            "text": "O finntroll faz um teste de Intimidação oposto ao teste de Vontade de uma criatura que ele tenha atingido com seu açoite neste turno. Se vencer, causa 8d6 pontos de dano psíquico não letal à criatura."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como um mago de 9º nível (CD 35)."
+        },
+        {
+            "name": "Concentração de Combate",
+            "timing": "padrão",
+            "text": "Até o fim da cena, sempre que faz um ataque, o finntroll rola dois dados e usa o melhor resultado.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Dissipar Magia",
+            "timing": "padrão",
+            "text": "O finntroll escolhe uma criatura, objeto ou esfera de 3m em alcance médio e faz um teste de Misticismo. Todas as magias nesse alvo com CD igual ou menor que o resultado do teste são dissipadas.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Enfeitiçar*",
+            "timing": "padrão",
+            "text": "Cada humanoide em alcance curto fica enfeitiçado pelo finntroll até o fim da cena, ou até o finntroll ou um de seus aliados tomar uma ação hostil contra a criatura.",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Pele de Pedra",
+            "timing": "padrão",
+            "text": "O finntroll recebe redução de dano 5 até o fim da cena.",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Toque Chocante",
+            "timing": "padrão",
+            "text": "O finntroll faz um ataque corpo a corpo. Se acertar, além do dano normal, causa 8d8+8 pontos de dano de eletricidade.",
+            "cost": "9 PM"
+        },
+        {
+            "name": "Velocidade",
+            "timing": "padrão",
+            "text": "O finntroll pode executar uma ação padrão adicional por turno, que não pode ser usada para lançar magias.",
+            "cost": "3 PM, sustentada"
+        },
+        {
+            "name": "Corpo Vegetal",
+            "timing": null,
+            "text": "O finntroll possui visão no escuro, cura acelerada 5/ácido ou fogo e natureza vegetal."
+        },
+        {
+            "name": "Presença Arcana",
+            "timing": null,
+            "text": "O finntroll recebe +2 em Misticismo (já contabilizado) e resistência a magia +2."
+        },
+        {
+            "name": "Intolerância a Luz",
+            "timing": null,
+            "text": "O finntroll possui sensibilidade a luz e perde acesso à cura acelerada quando exposto à luz do sol ou similar."
+        }
+    ],
+    "equipment": "Açoite finntroll macabro, manto pesado.",
+    "treasure": "Dobro.",
+    "skillsText": "Intimidação +18, Intuição +12, Misticismo +17.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const cavaleiroFinntroll = {
+    "id": "cavaleiro-finntroll",
+    "name": "Cavaleiro Finntroll",
+    "type": "monster",
+    "subtype": "finntroll",
+    "size": "Médio",
+    "challengeRating": 7,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 345,
+        "pdfPage": 347
+    },
+    "stats": {
+        "initiative": 9,
+        "perception": 7,
+        "defense": 30,
+        "fortitude": 14,
+        "reflex": 7,
+        "will": 20,
+        "hitPoints": 252,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 1,
+            "dex": 2,
+            "con": 3,
+            "int": 4,
+            "wis": 0,
+            "cha": 2
+        },
+        "manaPoints": 39
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Açoite finntroll +22 (4d4+12, 19)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Corcel Troll",
+            "timing": null,
+            "text": "O cavaleiro finntroll cavalga um troll treinado, um parceiro montaria Grande. Enquanto estiver montado, seu deslocamento se torna 12m, ele recebe uma ação de movimento extra (apenas para se deslocar), os seguintes ataques (em adição ao seu açoite) e Dilacerar. • Corpo a Corpo. Mordida +22 (1d8+12) e duas garras +22 (2d6+12). • Dilacerar. Se o cavaleiro acerta os dois ataques de garra em uma mesma criatura no mesmo turno, causa mais 4d6+12 pontos de dano."
+        },
+        {
+            "name": "Investida Atroz",
+            "timing": "completa",
+            "text": "O cavaleiro faz uma investida e ataca com seu açoite e todos os ataques de sua montaria. Todos os ataques recebem o bônus de +2 da investida, mas devem ser feitos contra o mesmo personagem."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como um mago de 7º nível (CD 26). Ele pode lançar magias enquanto montado sem precisar de testes de concentração."
+        },
+        {
+            "name": "Amedrontar",
+            "timing": "padrão",
+            "text": "Um animal ou humanoide em alcance curto fica apavorado por 1d4+1 rodadas e depois abalado (Von reduz para abalado por 1d4 rodadas).",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Concentração de Combate",
+            "timing": "padrão",
+            "text": "Até o fim da cena, sempre que faz um ataque, o cavaleiro rola dois dados e usa o melhor resultado.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Desespero Esmagador",
+            "timing": "padrão",
+            "text": "Criaturas num cone de 6m ficam fracas e frustradas (Von reduz para 1 rodada).",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Primor Atlético",
+            "timing": "movimento",
+            "text": "O cavaleiro salta e pousa em alcance corpo a corpo de uma criatura em alcance curto. Se fizer um ataque corpo a corpo contra essa criatura no mesmo turno, recebe os benefícios e penalidades de uma investida e causa um dado extra de dano do mesmo tipo com este ataque.",
+            "cost": "2 PM"
+        },
+        {
+            "name": "Corpo Vegetal",
+            "timing": null,
+            "text": "O finntroll possui visão no escuro, cura acelerada 5/ácido ou fogo e natureza vegetal."
+        },
+        {
+            "name": "Presença Arcana",
+            "timing": null,
+            "text": "O finntroll recebe +2 em Misticismo (já contabilizado) e resistência a magia +2."
+        },
+        {
+            "name": "Intolerância a Luz",
+            "timing": null,
+            "text": "O finntroll possui sensibilidade a luz e perde acesso à cura acelerada quando exposto à luz do sol ou similar."
+        }
+    ],
+    "equipment": "Açoite finntroll cruel, couraça, essência de mana x2, sela aprimorada.",
+    "treasure": "Padrão.",
+    "skillsText": "Cavalgar +12, Intimidação +11, Misticismo +13.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const sacerdoteFinntroll = {
+    "id": "sacerdote-finntroll",
+    "name": "Sacerdote Finntroll",
+    "type": "monster",
+    "subtype": "finntroll",
+    "size": "Médio",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 347,
+        "pdfPage": 349
+    },
+    "stats": {
+        "initiative": 9,
+        "perception": 9,
+        "defense": 25,
+        "fortitude": 13,
+        "reflex": 8,
+        "will": 19,
+        "hitPoints": 162,
+        "speedText": "6m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": -1,
+            "dex": 2,
+            "con": 5,
+            "int": 2,
+            "wis": 4,
+            "cha": 1
+        },
+        "manaPoints": 49
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Açoite finntroll +18 (1d8+6)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Urro Divino",
+            "timing": "livre",
+            "text": "Quando faz um ataque ou lança uma magia, o sacerdote finntroll soma sua Constituição à rolagem de dano desse ataque ou magia.",
+            "cost": "1 PM"
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como um clérigo de Megalokk de 9º nível (CD 24, limite de PM 9)."
+        },
+        {
+            "name": "Curar Ferimentos",
+            "timing": "padrão",
+            "text": "Uma criatura adjacente cura 10d8+10 PV ou criaturas escolhidas em alcance curto curam 5d8+5.",
+            "cost": "9 PM"
+        },
+        {
+            "name": "Comando",
+            "timing": "padrão",
+            "text": "No início do seu próximo turno, duas criaturas em alcance curto largam os itens que estão segurando e não podem pegá-los novamente até o início de seu turno seguinte (Von evita).",
+            "cost": "4 PM"
+        },
+        {
+            "name": "Enxame de Pestes",
+            "timing": "completa",
+            "text": "Dois enxames de ratos surgem em alcance médio e ocupam um quadrado de 1,5m cada. No fim de cada um dos turnos do sacerdote, cada enxame causa 2d12 pontos de dano de corte a qualquer criatura em seu espaço (Fort reduz à metade). O sacerdote pode gastar uma ação de movimento para mover cada enxame 12m.",
+            "cost": "8 PM, sustentada"
+        },
+        {
+            "name": "Miasma Mefítico",
+            "timing": "padrão",
+            "text": "Uma nuvem de 6m de raio se forma em alcance médio. Criaturas na área sofrem 6d6 pontos de dano de ácido e ficam enjoadas por 1 rodada (Fort reduz o dano à metade e evita a condição).",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Perdição",
+            "timing": "padrão",
+            "text": "Criaturas escolhidas em alcance curto sofrem –3 em testes de ataque e rolagens de dano até o fim da cena.",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Profanar",
+            "timing": "padrão",
+            "text": "Uma esfera de 9m em alcance longo se enche com energia negativa por 1 dia. Dentro dela, todo dano de trevas é maximizado.",
+            "cost": "1 PM"
+        },
+        {
+            "name": "Corpo Vegetal",
+            "timing": null,
+            "text": "O finntroll possui visão no escuro, cura acelerada 5/ácido ou fogo e natureza vegetal."
+        },
+        {
+            "name": "Presença Arcana",
+            "timing": null,
+            "text": "O finntroll recebe +2 em Misticismo (já contabilizado) e resistência a magia +2."
+        },
+        {
+            "name": "Intolerância a Luz",
+            "timing": null,
+            "text": "O finntroll possui sensibilidade a luz e perde acesso à cura acelerada quando exposto à luz do sol ou similar."
+        }
+    ],
+    "equipment": "Açoite finntroll, manto pesado, meia armadura, símbolo sagrado de Megalokk.",
+    "treasure": "Padrão.",
+    "skillsText": "Atletismo +4, Intimidação +11, Religião +11.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const altoSacerdoteFinntroll = {
+    "id": "alto-sacerdote-finntroll",
+    "name": "Alto Sacerdote Finntroll",
+    "type": "monster",
+    "subtype": "finntroll",
+    "size": "Médio",
+    "challengeRating": 12,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 347,
+        "pdfPage": 349
+    },
+    "stats": {
+        "initiative": 18,
+        "perception": 17,
+        "defense": 39,
+        "fortitude": 19,
+        "reflex": 11,
+        "will": 27,
+        "hitPoints": 413,
+        "speedText": "6m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a magia de adivinhação e encantamento, redução de dano 5",
+        "attributes": {
+            "str": -1,
+            "dex": 3,
+            "con": 6,
+            "int": 2,
+            "wis": 5,
+            "cha": 1
+        },
+        "manaPoints": 77
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Adaga +27 (1d4+6)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Arrogância Divina",
+            "timing": null,
+            "text": "O alto sacerdote finntroll se considera a representação suprema da maior obra dos deuses. Criaturas que falhem em testes de resistência contra suas magias ficam frustradas."
+        },
+        {
+            "name": "Magia Acelerada",
+            "timing": "livre",
+            "text": "Uma vez por rodada, quando lança uma magia com execução de ação completa ou menor, o alto sacerdote muda a execução dela para livre.",
+            "cost": "+4 PM"
+        },
+        {
+            "name": "Trevas Insidiosas",
+            "timing": null,
+            "text": "O alto sacerdote soma sua Sabedoria em suas rolagens de dano de magias de trevas (já contabilizado)."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como um clérigo de Tenebra de 15º nível (CD 35, limite de PM 15, –1 PM no custo de Toque Vampírico)."
+        },
+        {
+            "name": "Curar Ferimentos",
+            "timing": "padrão",
+            "text": "Uma criatura adjacente cura 11d8+11 PV.",
+            "cost": "10 PM"
+        },
+        {
+            "name": "Ligação Sombria",
+            "timing": "padrão",
+            "text": "O alto sacerdote escolhe um alvo em alcance longo e cria uma conexão entre seu corpo e o desse alvo, deixando uma marca idêntica na pele de ambos. Enquanto a magia durar, sempre que ele sofrer qualquer dano ou condição, o alvo desta magia deve fazer um teste de Fortitude; se falhar, sofre o mesmo dano que o sacerdote ou recebe a mesma condição. A magia termina se o alvo chegar a 0 PV.",
+            "cost": "10 PM"
+        },
+        {
+            "name": "Pele de Pedra",
+            "timing": "padrão",
+            "text": "Uma criatura adjacente é transformada em uma estátua de pedra sem consciência por 1d4 rodadas (Fort evita).",
+            "cost": "10 PM"
+        },
+        {
+            "name": "Perdição",
+            "timing": "padrão",
+            "text": "Criaturas escolhidas em alcance curto sofrem –4 em testes de ataque e rolagens de dano.",
+            "cost": "7 PM"
+        },
+        {
+            "name": "Profanar",
+            "timing": "padrão",
+            "text": "Uma esfera de 9m em alcance longo se enche com energia negativa por 1 dia. Dentro dela, todo dano de trevas é maximizado.",
+            "cost": "1 PM"
+        },
+        {
+            "name": "Resistência a Energia",
+            "timing": "padrão",
+            "text": "Criaturas escolhidas em alcance curto recebem redução de ácido ou fogo 10 até o fim da cena.",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Toque Vampírico",
+            "timing": "padrão",
+            "text": "O alto sacerdote faz um ataque corpo a corpo. Se acertar, além do dano normal, causa 8d6+5 pontos de dano de trevas (Fort reduz à metade) e recupera pontos de vida iguais à metade do dano de trevas causado.",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Corpo Vegetal",
+            "timing": null,
+            "text": "O finntroll possui visão no escuro, cura acelerada 5/ácido ou fogo e natureza vegetal."
+        },
+        {
+            "name": "Presença Arcana",
+            "timing": null,
+            "text": "O finntroll recebe +2 em Misticismo (já contabilizado) e resistência a magia +2."
+        },
+        {
+            "name": "Intolerância a Luz",
+            "timing": null,
+            "text": "O finntroll possui sensibilidade a luz e perde acesso à cura acelerada quando exposto à luz do sol ou similar."
+        }
+    ],
+    "equipment": "Adaga precisa, anel do escudo mental, manto pesado, meia armadura, símbolo sagrado de Tenebra.",
+    "treasure": "Padrão.",
+    "skillsText": "Conhecimento +17, Intimidação +16, Misticismo +17, Religião +20.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const vermeDoGeloLarva = {
+    "id": "verme-do-gelo-larva",
+    "name": "Verme do Gelo Larva",
+    "type": "monster",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 10,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 357,
+        "pdfPage": 359
+    },
+    "stats": {
+        "initiative": 10,
+        "perception": 13,
+        "defense": 36,
+        "fortitude": 22,
+        "reflex": 16,
+        "will": 10,
+        "hitPoints": 400,
+        "speedText": "12m (8q), escavação 15m (10q)",
+        "senses": "faro, percepção às cegas, visão no escuro",
+        "defensesText": "imunidade a frio, redução de dano 5, vulnerabilidade a fogo",
+        "attributes": {
+            "str": 6,
+            "dex": 1,
+            "con": 4,
+            "int": -5,
+            "wis": 2,
+            "cha": -3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +29 (4d8+52 mais 4d6 frio)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +34)."
+        },
+        {
+            "name": "Engolir",
+            "timing": "padrão",
+            "text": "No início de cada um dos turnos do verme do gelo larva, a criatura engolida sofre 2d6+20 pontos de dano de impacto mais 4d6+10 pontos de dano de frio. Ela pode escapar causando um total de 25 pontos de dano a ele (Defesa 15, redução de dano 0)."
+        },
+        {
+            "name": "Espasmo Mortal",
+            "timing": null,
+            "text": "Quando o verme é morto, seu corpo explode, fazendo com que estacas de gelo se projetem do chão em um raio de 6m. Criaturas nessa área sofrem 4d6 pontos de dano de corte mais 4d6 pontos de dano de frio e ficam caídas (Ref CD 30 evita). A área afetada se torna terreno difícil e concede cobertura leve para criaturas dentro dela. Causar dano de fogo mágico a qualquer parte dessa área destrói as estacas nos espaços correspondentes."
+        },
+        {
+            "name": "Sopro Glacial",
+            "timing": "padrão",
+            "text": "Todas as criaturas em um cone de 12m sofrem 8d10 pontos de dano de frio e ficam lentas (Ref CD 30 reduz o dano à metade e evita a condição). Recarga (movimento)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "2d4 doses de gelo extremo (CD 25 para extrair).",
+    "skillsText": "Furtividade +5 (+20 no gelo).",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const vermeDoGeloAdulto = {
+    "id": "verme-do-gelo-adulto",
+    "name": "Verme do Gelo Adulto",
+    "type": "monster",
+    "subtype": null,
+    "size": "Colossal",
+    "challengeRating": 18,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 357,
+        "pdfPage": 359
+    },
+    "stats": {
+        "initiative": 22,
+        "perception": 19,
+        "defense": 56,
+        "fortitude": 32,
+        "reflex": 26,
+        "will": 18,
+        "hitPoints": 1100,
+        "speedText": "15m (10q), escavação 18m (12q)",
+        "senses": "faro, percepção às cegas, visão no escuro",
+        "defensesText": "imunidade a caído, encantamento e frio, redução de dano 10, vulnerabilidade a fogo",
+        "attributes": {
+            "str": 7,
+            "dex": 3,
+            "con": 5,
+            "int": -5,
+            "wis": 3,
+            "cha": -4
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +49 (10d12+100 mais 10d8 frio)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +59)."
+        },
+        {
+            "name": "Engolir",
+            "timing": "padrão",
+            "text": "No início de cada um dos turnos do verme de gelo adulto, a criatura engolida sofre 6d6+30 pontos de dano de impacto mais 4d6+40 pontos de dano de frio. Ela pode escapar causando um total de 200 pontos de dano a ele (Defesa 25, redução de dano 0)."
+        },
+        {
+            "name": "Espasmo Mortal",
+            "timing": null,
+            "text": "Quando o verme é morto, seu corpo explode, fazendo com que estacas de gelo se projetem do chão em um raio de 6m. Criaturas nessa área sofrem 10d8 pontos de dano de corte mais 10d8 pontos de dano de frio e ficam caídas (Ref CD 47 evita). A área afetada se torna terreno difícil e concede cobertura leve para criaturas dentro dela. Causar dano de fogo mágico a qualquer parte dessa área destrói as estacas nos espaços correspondentes."
+        },
+        {
+            "name": "Frio Extremo",
+            "timing": null,
+            "text": "O verme projeta uma aura de frio extremo que enfraquece todas as chamas em um raio de 9m. Nessa área, habilidades de fogo custam +1 PM para ser usadas e causam –1 ponto de dano por dado."
+        },
+        {
+            "name": "Sopro Glacial",
+            "timing": "padrão",
+            "text": "Todas as criaturas em um cone de 12m sofrem 10d12 pontos de dano de frio e ficam lentas (Ref CD 47 reduz o dano à metade e evita a condição). Recarga (movimento)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Padrão mais 2d6 doses de gelo extremo (CD 33 para extrair).",
+    "skillsText": "Furtividade +22 (+32 no gelo).",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const avatarDeMegalokkDeusesDeArton = {
+    "id": "avatar-de-megalokk-deuses-de-arton",
+    "name": "Avatar de Megalokk",
+    "type": "monster",
+    "subtype": "kaiju",
+    "size": "Colossal",
+    "challengeRating": 20,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 191,
+        "pdfPage": 193
+    },
+    "stats": {
+        "initiative": 26,
+        "perception": 27,
+        "defense": 57,
+        "fortitude": 40,
+        "reflex": 29,
+        "will": 18,
+        "hitPoints": 1800,
+        "speedText": "18m (12q), voo 12m (8q)",
+        "senses": "visão no escuro, faro",
+        "defensesText": "cura acelerada 100/kaiju, imunidade a efeitos de metabolismo e mentais, medo, metamorfose, paralisia e veneno, maior que a morte, redução de dano 50",
+        "attributes": {
+            "str": 18,
+            "dex": 8,
+            "con": 20,
+            "int": 3,
+            "wis": 6,
+            "cha": 6
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida x4 +54 (4d20+20, 17/x3) e duas garras +54 (2d20+20, 19/x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +64)."
+        },
+        {
+            "name": "Engolir",
+            "timing": null,
+            "text": "Se o Avatar de Megalokk começar seu turno agarrando uma criatura menor que ele, pode fazer um teste de agarrar contra ela. Se vencer, engole a criatura. Uma criatura engolida continua agarrada, fica cega, tem cobertura total contra efeitos vindos do lado de fora do Avatar (e vice-versa) e sofre 6d12+20 pontos de dano de impacto no início de cada turno do Avatar. O Avatar pode manter quantas criaturas engolidas quiser. Uma criatura engolida pode escapar causando 100 pontos de dano ao estômago do Avatar (Defesa 30). Isso faz com que ela seja regurgitada e fique caída na frente do monstro."
+        },
+        {
+            "name": "Incontível",
+            "timing": null,
+            "text": "Sempre que falha em um teste de resistência contra um efeito com duração maior que instantânea, o Avatar pode fazer um novo teste contra esse efeito no início do seu próximo turno. A cada novo teste de resistência contra o mesmo efeito, o Avatar recebe um bônus cumulativo de +5 no teste."
+        },
+        {
+            "name": "Presas Monstruosas",
+            "timing": null,
+            "text": "Cada vez que o Avatar acerta um ataque com suas Presas Monstruosas, ele gera um dos efeitos abaixo, definido aleatoriamente. 1) Basilisco A criatura atingida fica lenta (Fort CD 48 reduz a duração para 1 rodada). Caso uma criatura lenta dessa forma seja atingida novamente e falhe no teste de Fortitude, fica petrificada. 2) Dragão A criatura atingida sofre 4d12 pontos de dano fogo e sua armadura ou escudo (à escolha dela) fica avariado (Ref CD 48 reduz à metade e evita a condição). 3) Lobo Atroz A criatura atingida fica sangrando (Ref CD 48 evita). Esse sangramento causa a perda de 2d6 PV, em vez do normal. 4) Serpe O ataque inocula veneno de serpe divina."
+        },
+        {
+            "name": "Presença Selvagem",
+            "timing": null,
+            "text": "O Avatar emana uma aura de violência de 30m de raio. No início de seus turnos, cada criatura nessa área deve fazer um teste de Vontade (CD 48). Se falhar, fica esmorecida. Se já estiver esmorecida, em vez disso entra em um frenesi selvagem por 1 rodada; em seu próximo turno, ela deve atacar a criatura mais próxima, mesmo que seja um aliado.",
+            "magical": true
+        },
+        {
+            "name": "Rasgar Montanhas",
+            "timing": "completa",
+            "text": "O Avatar desfere um golpe concentrado que atinge todas as criaturas em um cubo de 15m de lado adjacente a ele. Criaturas nessa área sofrem 10d20+70 pontos de dano de corte e ficam caídas (Ref CD 48 reduz à metade e evita a condição). Recarga (movimento)."
+        },
+        {
+            "name": "Titânico",
+            "timing": null,
+            "text": "O Avatar é imune a manobras de combate, não pode ser flanqueado e sofre metade do dano de de efeitos que não sejam de outra criatura Titânica. Quando se move, pisoteia qualquer criatura ou objeto Enorme ou menor em seu caminho (atravessando seu espaço), causando 20d6 pontos de dano de impacto (uma vez por rodada por criatura, Ref CD 48 reduz à metade). Além disso, ele ignora redução de dano e seus ataques atingem todas as criaturas em um quadrado de 6m (para cada ataque, ele faz um único teste de ataque e compara o resultado com a Defesa de cada inimigo na área)."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Peçonha de Serpe Divina (fica fraco e perde 4d12 pontos de vida por rodada durante 10 rodadas, Fort CD 48 reduz para 1 rodada). Este veneno ignora qualquer imunidade a venenos."
+        },
+        {
+            "name": "Maior que a Morte",
+            "timing": null,
+            "text": "Enquanto tiver pelo menos metade dos PV, o avatar é imune a efeitos de morte instantânea, inclusive os que aprisionam ou destroem seu corpo ou alma. Dano ou perda de PV ainda pode reduzi-lo a 0 PV ou menos."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Atletismo +39, Intimidação +32, Sobrevivência +32.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
 export const monsterCreatures = [
+    avatarDeMegalokkDeusesDeArton,
+    ...divineAspects.filter(aspect => aspect.type === "monster"),
+    vermeDoGeloLarva, vermeDoGeloAdulto,
+    arcanistaFinntroll, defeituoso, mycotannLabutador, mycotannDruida, hordaMycotann, finntrollCacadorAmeacasDeArton, finntrollFeitorAmeacasDeArton, finntrollSenhorDeEstabulo, cavaleiroFinntroll, sacerdoteFinntroll, altoSacerdoteFinntroll,
+    iniciadaDeSszzaas, cultistaDeSszzaasAmeacasDeArton, gorgona, gorgonaMatriarca,
+    canceronteDeGuerra, enguiaRainha, kraken,
+    cerianthar, grandeTachygloss, oxxdon, oxxdonImenso, razzaKham, serpeAmeacasDeArton, serpeAncia, uraghianJovem, uraghianAdulto, kaiju,
+    manticoraAmeacasDeArton, manticoraPrimal, otyughAmeacasDeArton, hordaDeOtyughs,
     // Manuais, Livro Básico e Ameaças de Arton
     glop, glooop, mamaeGlop, cockatrice,
     basilisk, bulette, tendriculo, aranhaGigante,

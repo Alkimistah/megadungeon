@@ -28,12 +28,13 @@ export const GENERAL_CREATURE_ABILITIES = {
     label: "Bando",
     category: "group",
     icon: "bando",
-    summary: "Representa vários indivíduos agindo como uma única ameaça, com dano parcial mesmo quando erra e dano dobrado em acertos muito altos.",
+    summary: "Quando o ataque excede a Defesa por 10 ou mais, causa o dobro do dano. Mesmo se errar, causa metade do dano.",
     notes: [
       "Imune a manobras e a efeitos sem dano que afetem apenas uma criatura.",
-      "Tem vulnerabilidade a dano de área."
+      "Tem vulnerabilidade a dano de área.",
+      "Um personagem com Trespassar que acerte o bando pode usar o poder para fazer um ataque adicional contra ele, uma vez por turno."
     ],
-    source: { ...GENERAL_CREATURE_ABILITY_SOURCE, pdfPage: 1, bookPage: 14 }
+    source: { book: "Ameaças de Arton", pdfFile: "T20 Ameacas de Arton.pdf", pdfPage: 16, bookPage: 14 }
   },
   fastHealing: {
     id: "fastHealing",
@@ -88,13 +89,13 @@ export const GENERAL_CREATURE_ABILITIES = {
     label: "Enxame",
     category: "group",
     icon: "enxame",
-    summary: "Aglomerado de seres menores que pode ocupar o espaço de personagens e aplicar efeito automático no fim do turno.",
+    summary: "O enxame pode entrar no espaço de personagens. No fim de seu turno, aplica automaticamente o efeito indicado em sua ficha aos personagens em seu espaço.",
     notes: [
       "Imune a manobras e a efeitos sem dano que afetem apenas uma criatura.",
       "Tem vulnerabilidade a dano de área e sofre metade do dano de ataques com armas.",
       "Estar dentro de um enxame conta como condição ruim para lançar magias."
     ],
-    source: { ...GENERAL_CREATURE_ABILITY_SOURCE, pdfPage: 2, bookPage: 15 }
+    source: { book: "Ameaças de Arton", pdfFile: "T20 Ameacas de Arton.pdf", pdfPage: 17, bookPage: 15 }
   },
   evasion: {
     id: "evasion",

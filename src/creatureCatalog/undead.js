@@ -2796,6 +2796,7 @@ export const arquilichFerrenAsloth = {
         },
         {
             "name": "Aura de Medo",
+            "magical": true,
             "timing": null,
             "text": "Criaturas em um raio de 30m de Ferren ficam abaladas (Von CD 55 evita e a criatura não pode mais ser abalada por esta habilidade até o fim da cena)."
         },
@@ -3537,7 +3538,329 @@ export const wisphago = {
     "skillsText": "Atletismo +14, Sobrevivência +16"
 };
 
+const zumbiPeconha = {
+    "id": "zumbi-peconha",
+    "name": "Zumbi Peçonha",
+    "type": "undead",
+    "subtype": null,
+    "size": "Médio",
+    "challengeRating": 1,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 335,
+        "pdfPage": 337
+    },
+    "stats": {
+        "initiative": -1,
+        "perception": -1,
+        "defense": 15,
+        "fortitude": 9,
+        "reflex": 1,
+        "will": 6,
+        "hitPoints": 21,
+        "speedText": "6m (4q)",
+        "senses": "visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 3,
+            "dex": -1,
+            "con": 2,
+            "int": null,
+            "wis": -1,
+            "cha": -5
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +10 (1d6+9 mais veneno, alcance 3m)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Bote Oculto",
+            "timing": null,
+            "text": "O alvo do primeiro ataque do zumbi em uma cena é considerado desprevenido."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Atordoado por 1 rodada e fraco (Fort CD 14 reduz para fraco por 1 rodada)."
+        },
+        {
+            "name": "Fraqueza Zumbi",
+            "timing": null,
+            "text": "O zumbi sofre o dobro de dano de acertos críticos ou de ataques feitos contra seu cérebro (Defesa 25)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": null,
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const nastarrath = {
+    "id": "nastarrath",
+    "name": "Nastarrath",
+    "type": "undead",
+    "subtype": null,
+    "size": "Colossal",
+    "challengeRating": 18,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 336,
+        "pdfPage": 338
+    },
+    "stats": {
+        "initiative": 15,
+        "perception": 17,
+        "defense": 56,
+        "fortitude": 32,
+        "reflex": 18,
+        "will": 26,
+        "hitPoints": 1150,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a corte e perfuração, redução de dano 20",
+        "attributes": {
+            "str": 12,
+            "dex": 0,
+            "con": 8,
+            "int": -1,
+            "wis": 2,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +50 (4d10+42, 19/x3, mais veneno) e cauda x2 +50 (3d8+42, x3, mais veneno)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +60)."
+        },
+        {
+            "name": "Engolir",
+            "timing": "padrão",
+            "text": "No início de cada um dos turnos do Nastarrath, a criatura engolida sofre 4d8+21 pontos de dano de perfuração e perde 4d12 pontos de vida por veneno. Ela pode escapar causando um total de 200 pontos de dano a ele (Defesa 25) ou, se for Minúscula, gastando uma ação de movimento. A criatura engolida não fica cega nem tem cobertura contra efeitos do lado de fora (e vice-versa)."
+        },
+        {
+            "name": "Mastigar",
+            "timing": "livre",
+            "text": "No início de cada um de seus turnos, o Nastarrath causa 6d12+34 pontos de dano de corte, mais veneno, na criatura que estiver agarrando com sua mordida."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Perde 6d12 pontos de vida por rodada durante 3 rodadas (Fort CD 52 reduz para 2d12 por 3 rodadas)."
+        }
+    ],
+    "equipment": "1d4 doses de pó de lich (CD 38 para extrair).",
+    "treasure": "Padrão.",
+    "skillsText": "Enganação +16, Furtividade +12, Intuição +17.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const lyuba = {
+    "id": "lyuba",
+    "name": "Lyuba",
+    "type": "undead",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 14,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 351,
+        "pdfPage": 353
+    },
+    "stats": {
+        "initiative": 11,
+        "perception": 13,
+        "defense": 45,
+        "fortitude": 31,
+        "reflex": 15,
+        "will": 19,
+        "hitPoints": 715,
+        "speedText": "12m (8q)",
+        "senses": "faro, visão na penumbra",
+        "defensesText": "redução de dano 10, vulnerabilidade a fogo",
+        "attributes": {
+            "str": 12,
+            "dex": 0,
+            "con": 8,
+            "int": -3,
+            "wis": 2,
+            "cha": 0
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Presas espectrais +39 (2d12+35 perfuração, 18) e tromba +39 (2d12+30 mais doença)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Atropelamento",
+            "timing": "completa",
+            "text": "O lyuba percorre até o dobro de seu deslocamento. Ele pode passar pelo espaço ocupado de quaisquer inimigos menores que ele, mas não pode passar duas vezes pelo mesmo espaço. Criaturas atropeladas desta forma sofrem 4d8+35 pontos de dano de impacto e ficam caídas (Ref CD 38 reduz à metade e evita a condição). Recarga (movimento)."
+        },
+        {
+            "name": "Caçador de Caçadores",
+            "timing": null,
+            "text": "O lyuba causa +1d12 pontos de dano contra criaturas não nativas das Uivantes."
+        },
+        {
+            "name": "Constrição",
+            "timing": "livre",
+            "text": "No início de cada um de seus turnos, o lyuba causa 4d12+30 pontos de dano de impacto na criatura que estiver agarrando com a tromba."
+        },
+        {
+            "name": "Definhamento",
+            "timing": null,
+            "text": "Uma criatura atingida pela tromba do lyuba é exposta à doença podridão da múmia."
+        },
+        {
+            "name": "Desespero",
+            "timing": null,
+            "text": "Uma criatura que comece seu turno vendo o lyuba fica apavorada (Von CD 38 evita e a criatura não pode ser apavorada por esta habilidade até o fim da cena)."
+        },
+        {
+            "name": "Presas Espectrais",
+            "timing": null,
+            "text": "As presas do lyuba contam como armas mágicas e afetam criaturas incorpóreas. Uma criatura atingida pelas presas fica fraca (Fort CD 38 evita). Cada vez que deixa uma criatura fraca com esta habilidade, o lyuba recebe 30 PV temporários cumulativos."
+        },
+        {
+            "name": "Tromba",
+            "timing": "livre",
+            "text": "Se o lyuba acerta um ataque de tromba, pode fazer a manobra agarrar ou derrubar (teste +44)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Padrão, mais couro do lyuba (CD 29 para extrair, reduz em 1 PM o custo para fabricar um item com o encanto fantasmagórico).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const avatarDeTenebraDeusesDeArton = {
+    "id": "avatar-de-tenebra-deuses-de-arton",
+    "name": "Avatar de Tenebra",
+    "type": "undead",
+    "subtype": null,
+    "size": "Médio",
+    "challengeRating": "S",
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 211,
+        "pdfPage": 213
+    },
+    "stats": {
+        "initiative": 30,
+        "perception": 28,
+        "defense": 63,
+        "fortitude": 22,
+        "reflex": 30,
+        "will": 36,
+        "hitPoints": 1750,
+        "speedText": "18m (8q), voo 24m (16q)",
+        "senses": "visão no escuro",
+        "defensesText": "cura acelerada 50, imunidade a efeitos de sentidos, encantamento, escuridão e dano de luz e trevas, maior que a morte, redução de dano 20, resistência a magia +5",
+        "attributes": {
+            "str": 8,
+            "dex": 12,
+            "con": 8,
+            "int": 15,
+            "wis": 10,
+            "cha": 16
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +55 (3d8+35, x4, mais 2d12 trevas) e garra x4 +52 (3d10+30, 18, mais 2d12 trevas)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Centelha Divina",
+            "timing": null,
+            "text": "O Avatar de Tenebra pode lançar qualquer magia como um clérigo de 20º nível sem gastar PM (CD 51, limite de PM 20). Para magias de necromancia, o Avatar recebe +4 na CD e no limite de PM."
+        },
+        {
+            "name": "Deusa das Trevas",
+            "timing": null,
+            "text": "Todo dano de trevas causado pelo Avatar ignora redução de dano e, contra criaturas imunes a trevas, ainda causa metade do dano."
+        },
+        {
+            "name": "Dominação Sombria",
+            "timing": "padrão",
+            "text": "O Avatar sussurra palavras de controle para criaturas a sua escolha em alcance curto. Cada criatura fica confusa, enfeitiçada ou fascinada até o fim da cena, ou perde suas memórias da última hora, à escolha do Avatar (Von CD 51 evita). Uma criatura só pode ser alvo desta habilidade uma vez por cena.",
+            "magical": true
+        },
+        {
+            "name": "Drenar Sangue",
+            "timing": "padrão",
+            "text": "O Avatar causa 13d8 pontos de dano de trevas em uma criatura viva em alcance curto (Fort CD 51 reduz à metade) e recupera PV em valor igual ao dano causado. Uma criatura morta dessa forma se erguerá como um vampiro na próxima noite e deverá vencer um teste de Vontade oposto contra o Avatar ou ficará sob o controle dele até ser libertada ou destruída."
+        },
+        {
+            "name": "Filhos das Trevas",
+            "timing": "reação",
+            "text": "Uma vez por rodada, quando sofre dano, o Avatar transfere esse dano para outro morto-vivo em alcance longo."
+        },
+        {
+            "name": "Hordas dos Mortos",
+            "timing": "completa",
+            "text": "O Avatar invoca um ou mais mortos-vivos a sua escolha, cujo ND total somado seja igual a 20. Eles surgem em um espaço desocupado em alcance curto, obedecem aos comandos do Avatar e agem a partir da próxima rodada, em suas iniciativas. O Avatar só pode usar esta habilidade novamente quando todos os mortos-vivos forem eliminados.",
+            "magical": true
+        },
+        {
+            "name": "Manto da Noite",
+            "timing": null,
+            "text": "O Avatar emana uma aura de 30m de raio de escuridão total, que fornece camuflagem total e bloqueia a visão na área e através dela. Qualquer criatura que tente usar uma habilidade mágica de luz dentro da aura deve passar em um teste de Vontade (CD 51). Se falhar, a habilidade não tem efeito, mas quaisquer custos são pagos."
+        },
+        {
+            "name": "Olhos Sombrios",
+            "timing": null,
+            "text": "O Avatar está permanentemente sob o efeito básico da magia Visão da Verdade.",
+            "magical": true
+        },
+        {
+            "name": "Presença Majestosa",
+            "timing": null,
+            "text": "Qualquer criatura que tente executar uma ação hostil contra o Avatar deve fazer um teste de Vontade (CD 51). Se falhar, perde a ação (apenas uma vez por cena)."
+        },
+        {
+            "name": "Maior que a Morte",
+            "timing": null,
+            "text": "Enquanto tiver pelo menos metade dos PV, o avatar é imune a efeitos de morte instantânea, inclusive os que aprisionam ou destroem seu corpo ou alma. Dano ou perda de PV ainda pode reduzi-lo a 0 PV ou menos."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Acrobacia +30, Atuação +34, Diplomacia +34, Enganação +34, Furtividade +33, Intimidação +34, Misticismo +36, Religião +31.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
 export const undeadCreatures = [
+    avatarDeTenebraDeusesDeArton,
+    lyuba,
+    zumbiPeconha, nastarrath,
     // Manuais, Livro Básico e Ameaças de Arton
     zombie, skeleton, turbaZumbi, esqueletodeElite,
     falange, aparicao, vampiro, estouroDeFuriasDeTauron,

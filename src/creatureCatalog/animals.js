@@ -1,3 +1,5 @@
+import { divineAspects } from "./divineAspects.js";
+
 export const giantRat = {
     id: "rato-gigante",
     name: "Rato Gigante",
@@ -2738,7 +2740,1101 @@ export const tuntram = {
     "skillsText": null
 };
 
+const bufaloDeGuerra = {
+    "id": "bufalo-de-guerra",
+    "name": "Búfalo-de-Guerra",
+    "type": "animal",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 2,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 297,
+        "pdfPage": 299
+    },
+    "stats": {
+        "initiative": 3,
+        "perception": 4,
+        "defense": 18,
+        "fortitude": 13,
+        "reflex": 7,
+        "will": 2,
+        "hitPoints": 80,
+        "speedText": "12m (8q)",
+        "senses": "faro",
+        "defensesText": null,
+        "attributes": {
+            "str": 7,
+            "dex": 0,
+            "con": 4,
+            "int": -5,
+            "wis": 1,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Marrada +10 (2d8+10)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Atropelamento",
+            "timing": "completa",
+            "text": "O búfalo percorre até o dobro do deslocamento e pode atravessar espaços de inimigos menores, uma vez por espaço. Criaturas atropeladas sofrem 4d8+10 de impacto e ficam caídas (Ref CD 16 reduz à metade e evita a condição). Recarga (movimento)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Atletismo +10 (+15 para natação).",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const hippossauro = {
+    "id": "hippossauro",
+    "name": "Hippossauro",
+    "type": "animal",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 3,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 297,
+        "pdfPage": 299
+    },
+    "stats": {
+        "initiative": 4,
+        "perception": 7,
+        "defense": 20,
+        "fortitude": 14,
+        "reflex": 10,
+        "will": 4,
+        "hitPoints": 100,
+        "speedText": "15m (10q)",
+        "senses": "faro, visão na penumbra",
+        "defensesText": "redução de perfuração 10",
+        "attributes": {
+            "str": 4,
+            "dex": 3,
+            "con": 3,
+            "int": -4,
+            "wis": 1,
+            "cha": 1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +13 (1d8+4) e duas garras +13 (1d6+4)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Salto Mortal",
+            "timing": "completa",
+            "text": "Salta sobre um inimigo em alcance curto, causando 4d6+8 de corte e sangramento (Ref CD 17 reduz à metade e evita a condição)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Atletismo +7, Sobrevivência +4.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const canceronte = {
+    "id": "canceronte",
+    "name": "Canceronte",
+    "type": "animal",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 3,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 315,
+        "pdfPage": 317
+    },
+    "stats": {
+        "initiative": 8,
+        "perception": 4,
+        "defense": 21,
+        "fortitude": 15,
+        "reflex": 9,
+        "will": 3,
+        "hitPoints": 110,
+        "speedText": "6m (4q), natação 12m (8q)",
+        "senses": "visão na penumbra",
+        "defensesText": "fortificação 25%",
+        "attributes": {
+            "str": 4,
+            "dex": 2,
+            "con": 5,
+            "int": -4,
+            "wis": 0,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Duas garras +14 (1d8+6)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Autotomia",
+            "timing": "livre",
+            "text": "O canceronte pode sacrificar uma de suas garras para se livrar de um perigo maior. Quando faz isso, ele automaticamente passa em um teste para evitar uma condição de movimento (como um teste de ataque para se libertar de um agarramento), mas perde um de seus ataques de garra. Uma garra sacrificada desta forma se regenera em um mês."
+        },
+        {
+            "name": "Quebrar Tudo!",
+            "timing": null,
+            "text": "O canceronte recebe +2 em testes de ataque para quebrar (teste total +18) e causa +1d8 pontos de dano contra objetos."
+        }
+    ],
+    "equipment": null,
+    "treasure": "1d6 postas de canceronte (CD 18 para extrair; cada posta vale T$ 12 para preparar um banquete de canceronte).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const aguaViva = {
+    "id": "agua-viva",
+    "name": "Água-viva",
+    "type": "animal",
+    "subtype": null,
+    "size": "Pequeno",
+    "challengeRating": 1,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 319,
+        "pdfPage": 321
+    },
+    "stats": {
+        "initiative": 5,
+        "perception": 3,
+        "defense": 15,
+        "fortitude": 5,
+        "reflex": 10,
+        "will": 1,
+        "hitPoints": 9,
+        "speedText": "Natação 12m (8q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a ácido, redução de impacto 5",
+        "attributes": {
+            "str": 0,
+            "dex": 3,
+            "con": 1,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Tentáculo x2 +11 (1d6+2 mais 1d6 ácido)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Corpo Aquático",
+            "timing": null,
+            "text": "Fora d’água, a água-viva evapora e morre em 1d8 horas. Nesse tempo, qualquer criatura que tocar nela sofre 1d6 pontos de dano de ácido."
+        },
+        {
+            "name": "Mesclar-se",
+            "timing": null,
+            "text": "Enquanto está submersa em água, a água-viva tem camuflagem leve."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Filamentos corrosivos (CD 16 para extrair, valem T$ 10 para fabricar ácidos).",
+    "skillsText": "Furtividade +7.",
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const enxameDeAguasVivas = {
+    "id": "enxame-de-aguas-vivas",
+    "name": "Enxame de Águas-vivas",
+    "type": "animal",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 319,
+        "pdfPage": 321
+    },
+    "stats": {
+        "initiative": 9,
+        "perception": 6,
+        "defense": 27,
+        "fortitude": 12,
+        "reflex": 18,
+        "will": 6,
+        "hitPoints": 255,
+        "speedText": "Natação 12m (8q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a ácido, redução de impacto 5",
+        "attributes": {
+            "str": 0,
+            "dex": 4,
+            "con": 3,
+            "int": -4,
+            "wis": 1,
+            "cha": -4
+        }
+    },
+    "actions": [
+        {
+            "name": "Enxame",
+            "text": "4d6+10 perfuração mais 4d6+12 ácido."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Corpo Aquático",
+            "timing": null,
+            "text": "Fora d’água, o enxame de águas-vivas evapora e morre em 1d8 horas. Nesse tempo, qualquer criatura que tocar nele sofre 2d6 pontos de dano de ácido."
+        },
+        {
+            "name": "Grudar nas Costas",
+            "timing": null,
+            "text": "Quando uma criatura sai do espaço do enxame, algumas águas-vivas ficam presas em suas costas. A criatura continua sofrendo metade do dano da habilidade Enxame até gastar uma ação de movimento para se livrar das águas-vivas."
+        },
+        {
+            "name": "Mesclar-se",
+            "timing": null,
+            "text": "Enquanto está submerso em água, o enxame tem camuflagem leve."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Filamentos corrosivos (CD 21 para extrair, valem T$ 60 para fabricar ácidos).",
+    "skillsText": "Furtividade +9.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const aguaVivaGigante = {
+    "id": "agua-viva-gigante",
+    "name": "Água-viva Gigante",
+    "type": "animal",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 8,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 319,
+        "pdfPage": 321
+    },
+    "stats": {
+        "initiative": 11,
+        "perception": 7,
+        "defense": 33,
+        "fortitude": 15,
+        "reflex": 21,
+        "will": 8,
+        "hitPoints": 320,
+        "speedText": "Natação 12m (8q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a ácido, redução de impacto 5",
+        "attributes": {
+            "str": 0,
+            "dex": 4,
+            "con": 3,
+            "int": -4,
+            "wis": 1,
+            "cha": -3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Tentáculo x2 +26 (3d6+22 mais 3d6 ácido)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Corpo Aquático",
+            "timing": null,
+            "text": "Fora d’água, a água-viva gigante evapora e morre em 1d8 horas. Nesse tempo, qualquer criatura que tocar nela sofre 3d6 pontos de dano de ácido."
+        },
+        {
+            "name": "Mesclar-se",
+            "timing": null,
+            "text": "Enquanto está submersa em água, a água-viva tem camuflagem leve."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Filamentos corrosivos (CD 23 para extrair, valem T$ 120 para fabricar ácidos).",
+    "skillsText": "Furtividade +12.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const peixeRecife = {
+    "id": "peixe-recife",
+    "name": "Peixe-Recife",
+    "type": "animal",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 321,
+        "pdfPage": 323
+    },
+    "stats": {
+        "initiative": 6,
+        "perception": 5,
+        "defense": 29,
+        "fortitude": 18,
+        "reflex": 6,
+        "will": 12,
+        "hitPoints": 250,
+        "speedText": "Natação 12m (8q)",
+        "senses": "percepção às cegas",
+        "defensesText": "redução de dano 10",
+        "attributes": {
+            "str": 5,
+            "dex": 0,
+            "con": 5,
+            "int": -4,
+            "wis": 0,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Cabeçada +20 (4d8+20 impacto)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Emergir",
+            "timing": "completa",
+            "text": "O peixe-recife emerge à superfície, atingindo todas as criaturas em um quadrado de 6m imediatamente acima dele. Criaturas nessa área sofrem 4d10 pontos de dano de impacto e são arremessadas 1d4 x1,5m em direção oposta ao peixe (Fort CD 22 reduz à metade e evita o arremesso). Cada vítima fica caída e, se atingir algum obstáculo, sofre 1d6 pontos de dano de impacto para cada 1,5m que foi arremessada."
+        },
+        {
+            "name": "Soçobrar",
+            "timing": "padrão",
+            "text": "O peixe atira seu corpanzil contra uma embarcação (ou outro objeto semelhante), fazendo com que ele balance violentamente. Todas as criaturas na embarcação sofrem 2d8+10 pontos de dano de impacto e ficam atordoadas por 1 rodada e caídas (Ref CD 22 reduz o dano à metade e evita as condições)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const platan = {
+    "id": "platan",
+    "name": "Platan",
+    "type": "animal",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 2,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 322,
+        "pdfPage": 324
+    },
+    "stats": {
+        "initiative": 6,
+        "perception": 5,
+        "defense": 18,
+        "fortitude": 7,
+        "reflex": 12,
+        "will": 3,
+        "hitPoints": 30,
+        "speedText": "Natação 12m (8q)",
+        "senses": "percepção às cegas, visão na penumbra",
+        "defensesText": null,
+        "attributes": {
+            "str": 1,
+            "dex": 3,
+            "con": 2,
+            "int": -4,
+            "wis": 2,
+            "cha": 3
+        }
+    },
+    "actions": [],
+    "abilities": [
+        {
+            "name": "Ataque Sônico",
+            "timing": "padrão",
+            "text": "O platan causa 6d6 pontos de dano de impacto em uma criatura em alcance curto (Fort CD 16 reduz à metade)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Acrobacia +11.",
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const selako = {
+    "id": "selako",
+    "name": "Selako",
+    "type": "animal",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 2,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 322,
+        "pdfPage": 324
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 4,
+        "defense": 18,
+        "fortitude": 12,
+        "reflex": 7,
+        "will": 2,
+        "hitPoints": 90,
+        "speedText": "natação 18m (12q)",
+        "senses": "faro, percepção às cegas",
+        "defensesText": null,
+        "attributes": {
+            "str": 4,
+            "dex": 3,
+            "con": 3,
+            "int": -4,
+            "wis": 2,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +12 (2d8+7, 19/x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Bote de Mandíbula",
+            "timing": "completa",
+            "text": "O selako faz uma investida contra uma criatura. Se acertar esse ataque, ele causa +2d6 pontos de dano e a vítima fica sangrando."
+        },
+        {
+            "name": "Faro do Caçador",
+            "timing": null,
+            "text": "O selako não fica desprevenido contra inimigos que estejam sangrando."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Couro de selako (CD 17 para extrair, vale T$ 30 para fabricar um traje selako) e dentes de selako (CD 17 para extrair, valem T$ 300 para fabricar uma arma superior).",
+    "skillsText": "Furtividade +6.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const selakoTigre = {
+    "id": "selako-tigre",
+    "name": "Selako-Tigre",
+    "type": "animal",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 323,
+        "pdfPage": 325
+    },
+    "stats": {
+        "initiative": 14,
+        "perception": 6,
+        "defense": 25,
+        "fortitude": 17,
+        "reflex": 11,
+        "will": 5,
+        "hitPoints": 260,
+        "speedText": "natação 18m (12q)",
+        "senses": "faro, percepção às cegas",
+        "defensesText": "redução de dano 5",
+        "attributes": {
+            "str": 6,
+            "dex": 4,
+            "con": 3,
+            "int": -4,
+            "wis": 2,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida x2 +18 (3d10+12, 17/x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Bote de Mandíbula",
+            "timing": "completa",
+            "text": "O selako-tigre faz uma investida contra uma criatura. Se acertar esse ataque, ele causa +4d10 pontos de dano e a vítima fica sangrando."
+        },
+        {
+            "name": "Dentes Afiados",
+            "timing": null,
+            "text": "Os ataques do selako-tigre ignoram 5 pontos de redução de dano de seus alvos."
+        },
+        {
+            "name": "Faro do Caçador",
+            "timing": null,
+            "text": "O selako-tigre não fica desprevenido contra inimigos que estejam sangrando."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Couro de selako x2 (CD 21 para extrair, vale T$ 30 para fabricar um traje selako) e dentes de selako x2 (CD 21 para extrair, valem T$ 300 para fabricar uma arma superior).",
+    "skillsText": "Furtividade +10.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const cardumeDeSelakos = {
+    "id": "cardume-de-selakos",
+    "name": "Cardume de Selakos",
+    "type": "animal",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 9,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 323,
+        "pdfPage": 325
+    },
+    "stats": {
+        "initiative": 12,
+        "perception": 9,
+        "defense": 18,
+        "fortitude": 20,
+        "reflex": 15,
+        "will": 9,
+        "hitPoints": 390,
+        "speedText": "natação 18m (12q)",
+        "senses": "faro, percepção às cegas",
+        "defensesText": null,
+        "attributes": {
+            "str": 5,
+            "dex": 3,
+            "con": 3,
+            "int": -4,
+            "wis": 2,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "[Bando] Mordida x2 +27 (4d8+14, 19/x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Frenesi Mortal",
+            "timing": "padrão",
+            "text": "O cardume de selakos faz um ataque de mordida contra cada criatura adjacente ou em quadrados ocupados por ele. Ele faz um único teste de ataque e compara o resultado com a Defesa de cada alvo. Criaturas que sofram dano dessa forma ficam sangrando."
+        },
+        {
+            "name": "Faro do Caçador",
+            "timing": null,
+            "text": "O cardume não fica desprevenido contra inimigos que estejam sangrando."
+        },
+        {
+            "name": "Turbilhão Aquático",
+            "timing": null,
+            "text": "O cardume pode ocupar o espaço de outras criaturas."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Equivalente a 1d4+1 selakos.",
+    "skillsText": "Furtividade +9.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const megaSelako = {
+    "id": "mega-selako",
+    "name": "Mega-Selako",
+    "type": "animal",
+    "subtype": null,
+    "size": "Colossal",
+    "challengeRating": 12,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 323,
+        "pdfPage": 325
+    },
+    "stats": {
+        "initiative": 20,
+        "perception": 10,
+        "defense": 38,
+        "fortitude": 26,
+        "reflex": 18,
+        "will": 8,
+        "hitPoints": 630,
+        "speedText": "natação 18m (12q)",
+        "senses": "faro, percepção às cegas",
+        "defensesText": "redução de dano 10",
+        "attributes": {
+            "str": 7,
+            "dex": 6,
+            "con": 7,
+            "int": -4,
+            "wis": 2,
+            "cha": -3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida x2 +34 (4d12+40, 17/x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Bote de Mandíbula",
+            "timing": "completa",
+            "text": "O mega-selako faz uma investida contra uma criatura. Se acertar esse ataque, ele causa +6d12 pontos de dano e a vítima fica sangrando."
+        },
+        {
+            "name": "Dentes Afiados",
+            "timing": null,
+            "text": "Os ataques do mega-selako ignoram 5 pontos de redução de dano de seus alvos."
+        },
+        {
+            "name": "Devorar",
+            "timing": "livre",
+            "text": "Quando acerta um ataque em uma criatura Enorme ou menor com seu Bote de Mandíbula, o mega-selako a engole. Uma criatura engolida fica agarrada e sofre 8d12+40 pontos de dano de impacto no início de cada turno do mega-selako. O mega-selako só pode manter uma criatura engolida por vez. Uma criatura engolida pode escapar causando 50 pontos de dano ao estômago do mega-selako (Defesa 10). Isso faz com que a criatura seja regurgitada na frente do monstro."
+        },
+        {
+            "name": "Faro do Caçador",
+            "timing": null,
+            "text": "O mega-selako não fica desprevenido contra inimigos que estejam sangrando."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Couro de selako x1d4 (CD 27 para extrair, cada couro vale T$ 30 para fabricar um traje selako) e dentes de selako x1d4+1 (CD 27 para extrair, cada dente vale T$ 300 para fabricar uma arma superior).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const pliorex = {
+    "id": "pliorex",
+    "name": "Pliorex",
+    "type": "animal",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 5,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 325,
+        "pdfPage": 327
+    },
+    "stats": {
+        "initiative": 6,
+        "perception": 5,
+        "defense": 24,
+        "fortitude": 17,
+        "reflex": 11,
+        "will": 5,
+        "hitPoints": 200,
+        "speedText": "6m (4q), natação 15m (10q)",
+        "senses": "faro, visão na penumbra",
+        "defensesText": null,
+        "attributes": {
+            "str": 7,
+            "dex": 1,
+            "con": 6,
+            "int": -5,
+            "wis": 0,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +17 (2d8+15 mais 1d12 ácido)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +22)."
+        },
+        {
+            "name": "Giro da Morte",
+            "timing": null,
+            "text": "Se o pliorex estiver agarrando uma criatura dentro d’água e usar a manobra agarrar novamente para causar dano, causa +2d8 pontos de dano."
+        },
+        {
+            "name": "Predador das Profundezas",
+            "timing": null,
+            "text": "Se estiver agarrando uma criatura Grande ou menor dentro d’água, o pliorex pode se mover a seu deslocamento normal arrastando o alvo (em vez de metade)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const pliorexAbissal = {
+    "id": "pliorex-abissal",
+    "name": "Pliorex Abissal",
+    "type": "animal",
+    "subtype": null,
+    "size": "Colossal",
+    "challengeRating": 10,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 325,
+        "pdfPage": 327
+    },
+    "stats": {
+        "initiative": 11,
+        "perception": 10,
+        "defense": 36,
+        "fortitude": 22,
+        "reflex": 16,
+        "will": 10,
+        "hitPoints": 400,
+        "speedText": "6m (4q), natação 15m (10q)",
+        "senses": "faro, visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 9,
+            "dex": 1,
+            "con": 7,
+            "int": -5,
+            "wis": 0,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +29 (4d8+35, 19/x3, mais 2d12 ácido)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Abalroar",
+            "timing": "completa",
+            "text": "O pliorex abissal percorre até o dobro do seu deslocamento nadando em linha reta e abalroando qualquer criatura ou embarcação em seu caminho. Uma criatura ou embarcação abalroada desta forma sofre 4d10+20 pontos de dano de impacto e, se for uma criatura, começa a se afogar (Ref CD 30 reduz à metade e evita o afogamento; veja “Sufocamento” em Tormenta20, p. 319)."
+        },
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +39)."
+        },
+        {
+            "name": "Giro da Morte",
+            "timing": null,
+            "text": "Se o pliorex estiver agarrando uma criatura dentro d’água e usar a manobra agarrar novamente para causar dano, causa +6d8 pontos de dano."
+        },
+        {
+            "name": "Predador das Profundezas",
+            "timing": null,
+            "text": "Se estiver agarrando uma criatura Grande ou menor dentro d’água, o pliorex pode se mover a seu deslocamento normal arrastando o alvo (em vez de metade)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const perdigueiroTroll = {
+    "id": "perdigueiro-troll",
+    "name": "Perdigueiro Troll",
+    "type": "animal",
+    "subtype": null,
+    "size": "Médio",
+    "challengeRating": 1,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 343,
+        "pdfPage": 345
+    },
+    "stats": {
+        "initiative": 5,
+        "perception": 8,
+        "defense": 17,
+        "fortitude": 5,
+        "reflex": 9,
+        "will": 1,
+        "hitPoints": 10,
+        "speedText": "15m (10q)",
+        "senses": "faro, visão na penumbra",
+        "defensesText": "natureza vegetal",
+        "attributes": {
+            "str": 5,
+            "dex": 3,
+            "con": 2,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +10 (1d6+5) e tentáculos +10 (1d4+5)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Tentáculos (teste +10)."
+        },
+        {
+            "name": "Derrubar",
+            "timing": "livre",
+            "text": "Mordida (teste +10)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Sobrevivência +8, Furtividade +6.",
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const carcaju = {
+    "id": "carcaju",
+    "name": "Carcaju",
+    "type": "animal",
+    "subtype": null,
+    "size": "Pequeno",
+    "challengeRating": 1,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 348,
+        "pdfPage": 350
+    },
+    "stats": {
+        "initiative": 6,
+        "perception": 5,
+        "defense": 15,
+        "fortitude": 10,
+        "reflex": 5,
+        "will": 0,
+        "hitPoints": 26,
+        "speedText": "12m (8q), escalada 9m (6q)",
+        "senses": "faro, visão na penumbra",
+        "defensesText": "evasão",
+        "attributes": {
+            "str": 2,
+            "dex": 2,
+            "con": 3,
+            "int": -4,
+            "wis": 1,
+            "cha": 0
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Duas garras +9 (1d4+2, 18) e mordida +9 (1d6+2)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "O Melhor no que Faz",
+            "timing": null,
+            "text": "Quando sofre dano, o carcaju recebe +2 em testes de ataque e rolagens de dano até o fim de seu próximo turno."
+        },
+        {
+            "name": "Resiliência",
+            "timing": null,
+            "text": "O carcaju não fica inconsciente quando é reduzido a 0 PV ou menos. Quando é reduzido a -13 PV morre, ou fica inconsciente no caso de dano não letal."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Atletismo +6, Intimidação +4, Sobrevivência +8.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const mamute = {
+    "id": "mamute",
+    "name": "Mamute",
+    "type": "animal",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 8,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 350,
+        "pdfPage": 352,
+        "bookPageEnd": 351,
+        "pdfPageEnd": 353
+    },
+    "stats": {
+        "initiative": 8,
+        "perception": 11,
+        "defense": 33,
+        "fortitude": 24,
+        "reflex": 8,
+        "will": 12,
+        "hitPoints": 310,
+        "speedText": "12m (8q)",
+        "senses": "faro, visão na penumbra",
+        "defensesText": "redução de dano 5",
+        "attributes": {
+            "str": 6,
+            "dex": 0,
+            "con": 4,
+            "int": -4,
+            "wis": 1,
+            "cha": 0
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Presas +27 (2d6+29, 19) e tromba +27 (2d6+25)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Arremessar",
+            "timing": "movimento",
+            "text": "Se começar seu turno agarrando uma criatura Média ou menor, o mamute arremessa a vítima 1d6 x 1,5m em uma direção à escolha dele. A vítima sofre 2d6 pontos de dano de impacto, fica caída e, se atingir algum obstáculo, sofre +2d6 pontos de dano (Ref CD 26 reduz à metade e evita a condição). Recarga (movimento)."
+        },
+        {
+            "name": "Atropelamento",
+            "timing": "completa",
+            "text": "O mamute percorre até o dobro de seu deslocamento. Ele pode passar pelo espaço ocupado de quaisquer inimigos menores que ele, mas não pode passar duas vezes pelo mesmo espaço. Criaturas atropeladas desta forma sofrem 2d8+9 pontos de dano de impacto e ficam caídas (Ref CD 26 reduz à metade e evita a condição). Recarga (movimento)."
+        },
+        {
+            "name": "Pisotear",
+            "timing": "padrão",
+            "text": "Uma criatura que o mamute esteja agarrando, ou que esteja caída adjacente a ele, sofre 4d8+58 pontos de dano de impacto e fica fraca por 1 rodada (Fort CD 26 reduz o dano à metade e evita a condição)."
+        },
+        {
+            "name": "Tromba",
+            "timing": "livre",
+            "text": "Se o mamute acerta um ataque de tromba, pode fazer a manobra agarrar ou derrubar (teste +32)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Marfim (CD 23 para extrair, vale T$ 1.000 para fabricar armas superiores) e pele de mamute (CD 23 para extrair, vale T$ 1.000 para fabricar armaduras leves superiores).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const ursoDasNeves = {
+    "id": "urso-das-neves",
+    "name": "Urso das Neves",
+    "type": "animal",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 5,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 355,
+        "pdfPage": 357
+    },
+    "stats": {
+        "initiative": 6,
+        "perception": 9,
+        "defense": 22,
+        "fortitude": 17,
+        "reflex": 11,
+        "will": 5,
+        "hitPoints": 220,
+        "speedText": "12m (8q) natação 12m (8q)",
+        "senses": "faro, visão na penumbra",
+        "defensesText": "redução de dano 5, redução de frio 5",
+        "attributes": {
+            "str": 7,
+            "dex": 1,
+            "con": 6,
+            "int": -4,
+            "wis": 2,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Mordida +17 (1d8+7) e duas garras +17 (1d6+7)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Mordida (teste +19)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "1d3 peças de cristais de sol (CD 20 para extrair).",
+    "skillsText": "Atletismo +12 (+17 para nadar).",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
 export const animalCreatures = [
+    ...divineAspects.filter(aspect => aspect.type === "animal"),
+    carcaju, mamute, ursoDasNeves,
+    perdigueiroTroll,
+    canceronte, aguaViva, enxameDeAguasVivas, aguaVivaGigante, peixeRecife, platan, selako, selakoTigre, cardumeDeSelakos, megaSelako, pliorex, pliorexAbissal,
+    bufaloDeGuerra, hippossauro,
     // Manuais, Livro Básico e Ameaças de Arton
     giantRat, wolf, caveWolf, aranhasFilhotes,
     gorlogg, gorloggBasic, cascavel, jiboia, naja,

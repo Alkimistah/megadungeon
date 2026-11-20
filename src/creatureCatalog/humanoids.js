@@ -1,3 +1,5 @@
+import { divineAspects } from "./divineAspects.js";
+
 export const orcCombatant = {
     "id": "orc-combatente",
     "name": "Orc Combatente",
@@ -2476,17 +2478,20 @@ export const xamaDeMegalokk = {
     "abilities": [
         {
             "name": "Ira Coletiva",
+            "magical": true,
             "timing": "padrão",
             "cost": "10 PM, sustentada",
             "text": "O centauro xamã de Megalokk causa um frenesi em aliados em alcance curto. Essas criaturas recebem +5 em testes de ataque e rolagens de dano corpo a corpo e redução de dano 10, mas ficam esmorecidas e não podem fazer nenhuma ação que exija calma e concentração (como usar a perícia Furtividade ou lançar magias)."
         },
         {
             "name": "Voz dos Monstros",
+            "magical": true,
             "timing": null,
             "text": "O centauro está sempre sob efeito da magia Voz Divina, apenas para falar com monstros."
         },
         {
             "name": "Magias",
+            "magical": true,
             "timing": null,
             "text": "Como um clérigo de Megalokk de 10º nível (CD 32)."
         },
@@ -2693,17 +2698,20 @@ export const bruxoDaTormenta = {
     abilities: [
         {
             "name": "Cuspir Enxame",
+            "magical": true,
             "timing": "completa",
             "cost": "2 PM",
             "text": "Sustentada. Um enxame de insetos rubros Médio surge em um ponto em alcance curto. No fim de cada um dos seus turnos, ele causa 4d6 pontos de dano de ácido a qualquer criatura em seu espaço. O bruxo pode gastar uma ação de movimento para mover o enxame com deslocamento de 9m."
         },
         {
             "name": "Mente Aberrante",
+            "magical": true,
             "timing": "reação",
             "text": "Quando faz um teste de Vontade para resistir a um efeito, o bruxo causa 5d6 pontos de dano psíquico na criatura que gerou o efeito."
         },
         {
             "name": "Raio Arcano",
+            "magical": true,
             "timing": "padrão",
             "cost": "1 PM",
             "text": "Uma criatura em alcance médio sofre 2d12 pontos de dano de trevas e não pode curar PV por 1 rodada (Ref CD 24 reduz à metade e evita a restrição de cura)."
@@ -4611,6 +4619,7 @@ export const bruxaGoblin = {
         },
         {
             "name": "Raio Conspurcado",
+            "magical": true,
             "timing": "padrão",
             "cost": "1 PM",
             "text": "A bruxa dispara um raio em uma criatura em alcance médio. A vítima sofre 4d12 pontos de dano de trevas e fica abalada (Von CD 33 reduz à metade e evita a condição)."
@@ -4622,42 +4631,49 @@ export const bruxaGoblin = {
         },
         {
             "name": "Amedrontar",
+            "itemEnhanced": true,
             "timing": "padrão",
             "cost": "9 PM",
             "text": "Criaturas à escolha da bruxa em alcance curto ficam apavoradas por 1d4+1 rodadas e depois abaladas (Von reduz para abalada por 1d4 rodadas)."
         },
         {
             "name": "Crânio Voador de Vladislav",
+            "itemEnhanced": true,
             "timing": "padrão",
             "cost": "10 PM",
             "text": "Um crânio de energia negativa causa 8d8+8 pontos de dano de trevas em uma criatura em alcance médio e deixa o alvo e todas as criaturas a 3m dele abaladas (Fort reduz à metade e evita a condição)."
         },
         {
             "name": "Ferver Sangue",
+            "itemEnhanced": true,
             "timing": "padrão",
             "cost": "11 PM",
             "text": "Sustentada. A bruxa faz o sangue de uma criatura em alcance curto aquecer até entrar em ebulição. Quando a magia é lançada, e no início de cada um de seus turnos, o alvo sofre 7d8 pontos de dano de fogo e fica enjoado por 1 rodada (Fort reduz à metade e evita a condição). Se o alvo passar em dois testes de Fortitude seguidos, dissipa a magia. Se o alvo for reduzido a 0 PV pelo dano desta magia, seu corpo explode, matando-o e causando 6d6 pontos de dano de fogo em todas as criaturas a até 3m (Ref reduz à metade). Não afeta criaturas sem sangue, como construtos ou mortos-vivos."
         },
         {
             "name": "Marionete",
+            "itemEnhanced": true,
             "timing": "padrão",
             "cost": "9 PM",
             "text": "Sustentada. A bruxa controla as ações físicas de uma criatura em alcance médio. Ao sofrer a magia, e no início de cada um de seus turnos, a vítima faz um teste de Fortitude. Se passar, a magia é anulada."
         },
         {
             "name": "Raio do Enfraquecimento",
+            "itemEnhanced": true,
             "timing": "padrão",
             "cost": "7 PM",
             "text": "Criaturas à escolha da bruxa em alcance curto ficam exaustas (Fort reduz para fatigada)."
         },
         {
             "name": "Sussurros Insanos",
+            "itemEnhanced": true,
             "timing": "padrão",
             "cost": "3 PM",
             "text": "Palavras desconexas proferidas pela bruxa deixam um humanoide em alcance curto confuso (Von anula)."
         },
         {
             "name": "Tentáculos de Trevas",
+            "itemEnhanced": true,
             "timing": "padrão",
             "cost": "6 PM",
             "text": "Até o fim da cena, tentáculos surgem em uma esfera de 6m em alcance médio e tentam agarrar todas as criaturas na área. Ao lançar a magia e no início de cada um de seus turnos, a bruxa faz um teste da manobra agarrar (usando Misticismo) contra cada criatura na área. Se ela passar, a criatura é agarrada; se a vítima já está agarrada, é esmagada, sofrendo 4d6 pontos de dano de trevas. A área conta como terreno difícil e os tentáculos são imunes a dano."
@@ -5346,6 +5362,7 @@ export const sangueDoAyrrak = {
         },
         {
             "name": "Vida",
+            "magical": true,
             "timing": null,
             "text": "Recebe cura acelerada 15, imunidade a efeitos de metabolismo e veneno e pode lançar as magias Curar Ferimentos e Sopro da Salvação (CD 47)."
         },
@@ -5356,17 +5373,20 @@ export const sangueDoAyrrak = {
         },
         {
             "name": "Mudança",
+            "magical": true,
             "timing": null,
             "text": "Pode lançar a magia Metamorfose (CD 47)."
         },
         {
             "name": "Fim",
+            "magical": true,
             "timing": "livre",
             "cost": "5 PM",
             "text": "O Sangue encerra um efeito sobre uma criatura adjacente (incluindo ele mesmo)."
         },
         {
             "name": "Morte",
+            "magical": true,
             "timing": null,
             "text": "Pode lançar as magias Assassino Fantasmagórico, Poeira da Podridão e Toque da Morte (CD 47)."
         },
@@ -5382,6 +5402,7 @@ export const sangueDoAyrrak = {
         },
         {
             "name": "Início",
+            "magical": true,
             "timing": "padrão",
             "cost": "10 PM",
             "text": "O Sangue, e todas as criaturas em alcance longo, voltam ao início do turno anterior do Sangue. Todas as ações a partir daquele ponto são desfeitas (isso inclui as consequências destas ações, como perda de PV e PM, exceto o gasto de PM para ativar esta habilidade). Com exceção do Sangue, nenhuma outra criatura sabe o que vai acontecer, e todas devem executar as mesmas ações que realizaram originalmente (mas quaisquer dados devem ser rolados novamente)."
@@ -5768,12 +5789,14 @@ export const gnollXamaDeMarah = {
     "abilities": [
         {
             "name": "Aura de Paz",
+            "magical": true,
             "timing": "livre",
             "cost": "2 PM",
             "text": "O xamã gera uma aura de paz com 9m de raio e duração cena. Qualquer inimigo dentro da aura que tente fazer uma ação hostil contra ele deve passar em um teste de Vontade (CD 24) ou perde a ação. Se passar, fica imune a esta habilidade por um dia."
         },
         {
             "name": "Símbolo Sagrado Energizado",
+            "magical": true,
             "timing": "movimento",
             "cost": "1 PM",
             "text": "O xamã energiza seu símbolo sagrado. Até o fim da cena, ele emite uma luz prateada que ilumina como uma tocha e, enquanto estiver sendo empunhado pelo xamã, reduz o custo de magias divinas em –1 PM."
@@ -5864,6 +5887,7 @@ export const gnollXamaDeMegalokk = {
         },
         {
             "name": "Voz dos Monstros",
+            "magical": true,
             "timing": null,
             "text": "O xamã pode se comunicar livremente com monstros não inteligentes (Int –4 ou menor), como se estivesse sob efeito da magia Voz Divina."
         },
@@ -6026,6 +6050,7 @@ export const bispoDeGuerra = {
         },
         {
             "name": "Símbolo Sagrado Energizado",
+            "magical": true,
             "timing": "movimento",
             "cost": "1 PM",
             "text": "O bispo energiza seu símbolo sagrado. Até o fim da cena, ele emite uma luz avermelhada que ilumina como uma tocha e, enquanto estiver sendo empunhado pelo bispo, reduz o custo de magias divinas em –1 PM."
@@ -6337,12 +6362,14 @@ export const acolitoDeKally = {
     "abilities": [
         {
             "name": "Aura de Medo",
+            "magical": true,
             "timing": "livre",
             "cost": "2 PM",
             "text": "O acólito de Kally gera uma aura de medo de 9m de raio que dura até o fim da cena. Todos os inimigos que entrem na aura ficam abalados até o fim da cena (Von CD 19 evita e a criatura fica imune a esta habilidade por um dia)."
         },
         {
             "name": "Servos do Dragão",
+            "magical": true,
             "timing": "completa",
             "cost": "2 PM",
             "text": "O acólito invoca 2d4+1 kobolds em espaços desocupados em alcance curto. Eles agem a partir da próxima rodada do acólito, têm deslocamento 9m e podem gastar uma ação padrão para causar 1d6-1 pontos de dano de corte em uma criatura adjacente. Os kobolds têm For –1, Des 4, Defesa 12 e 1 PV, falham automaticamente em qualquer teste oposto ou de resistência e desaparecem quando mortos ou ao fim da cena."
@@ -6506,6 +6533,7 @@ export const clerigoDeKally = {
     "abilities": [
         {
             "name": "Aura de Medo",
+            "magical": true,
             "timing": "livre",
             "cost": "2 PM",
             "text": "O clérigo de Kally gera uma aura de medo de 9m de raio que dura até o fim da cena. Todos os inimigos que entrem na aura ficam abalados até o fim da cena (Von CD 28 evita e a criatura fica imune a esta habilidade por um dia)."
@@ -6518,6 +6546,7 @@ export const clerigoDeKally = {
         },
         {
             "name": "Servos do Dragão",
+            "magical": true,
             "timing": "completa",
             "cost": "2 PM",
             "text": "O clérigo invoca 2d4+1 kobolds (veja Acólito de Kally)."
@@ -6625,6 +6654,7 @@ export const dracomante = {
         },
         {
             "name": "Raio Arcano",
+            "magical": true,
             "timing": "padrão",
             "cost": "1 PM",
             "text": "Uma criatura em alcance médio sofre 2d12+6 pontos de dano de fogo e fica em chamas (Ref CD 22 reduz à metade e evita a condição)."
@@ -6742,6 +6772,7 @@ export const dracomanteSuperior = {
         },
         {
             "name": "Raio Arcano",
+            "magical": true,
             "timing": "padrão",
             "cost": "1 PM",
             "text": "Uma criatura em alcance médio sofre 4d12+8 pontos de dano de fogo e fica em chamas (Ref CD 38 reduz à metade e evita a condição)."
@@ -7847,6 +7878,7 @@ export const armeiroDeTenebraDevoto = {
         },
         {
             "name": "Manto da Penumbra",
+            "magical": true,
             "timing": "padrão",
             "text": "Uma vez por cena, o armeiro pode gerar uma área de sombras como o efeito básico da magia Escuridão (CD 22)."
         },
@@ -9388,6 +9420,7 @@ export const xamaDeSarana = {
     "abilities": [
         {
             "name": "Aura de Paz",
+            "magical": true,
             "timing": "livre",
             "cost": "2 PM",
             "text": "A xamã de Sarana gera uma aura de paz com um raio de 9m e duração cena. Qualquer inimigo dentro da aura que tente fazer uma ação hostil contra ela deve passar em um teste de Vontade (CD 24) ou perde a ação. Se passar, fica imune a esta habilidade por um dia."
@@ -10185,7 +10218,2356 @@ export const liderMercenarioDeAslothia = {
     "skillsText": "Atletismo +8, Intimidação +7"
 };
 
+const raposaBucaneira = {
+    "id": "raposa-bucaneira",
+    "name": "Raposa Bucaneira",
+    "type": "humanoid",
+    "subtype": "moreau",
+    "size": "Médio",
+    "challengeRating": 2,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 301,
+        "pdfPage": 303,
+        "bookPageEnd": 302,
+        "pdfPageEnd": 304
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 3,
+        "defense": 18,
+        "fortitude": 7,
+        "reflex": 14,
+        "will": 1,
+        "hitPoints": 46,
+        "speedText": "12m (8q)",
+        "senses": "faro, visão na penumbra",
+        "defensesText": "evasão",
+        "attributes": {
+            "str": 0,
+            "dex": 4,
+            "con": 2,
+            "int": 2,
+            "wis": -1,
+            "cha": 3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Pistola-punhal +12 (1d6+4, 19)."
+        },
+        {
+            "name": "À Distância",
+            "text": "Pistola-punhal +10 (2d6+6, 19/x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Audácia",
+            "timing": null,
+            "text": "Uma vez por rodada, soma seu Carisma a um teste de perícia, exceto ataque."
+        },
+        {
+            "name": "Cobrir de Pólvora",
+            "timing": "movimento",
+            "text": "Cobre um alvo em alcance curto de pólvora. Até o fim da cena, o próximo ataque contra o alvo causa +1d6 de fogo e o deixa em chamas."
+        },
+        {
+            "name": "Estampido Ensurdecedor",
+            "timing": null,
+            "text": "Ao disparar a pistola-punhal, mesmo em corpo a corpo, criaturas adjacentes ficam abaladas e surdas (Fort CD 18 reduz para 1 rodada)."
+        },
+        {
+            "name": "Pistola-Punhal",
+            "timing": null,
+            "text": "Pode disparar a bala da arma em um ataque corpo a corpo para causar +2d6 de perfuração."
+        },
+        {
+            "name": "Pistoleira Veloz",
+            "timing": null,
+            "text": "Ignora a penalidade de –5 ao atirar em oponente envolvido em combate corpo a corpo e recarrega como ação de movimento."
+        }
+    ],
+    "equipment": "Balas x20, capa esvoaçante, pistola-punhal.",
+    "treasure": "Padrão.",
+    "skillsText": "Acrobacia +7, Atletismo +3, Enganação +9, Intimidação +6, Nobreza +7.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const bufaloPaladinoDeBullton = {
+    "id": "bufalo-paladino-de-bullton",
+    "name": "Búfalo Paladino de Bullton",
+    "type": "humanoid",
+    "subtype": "moreau",
+    "size": "Médio",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 302,
+        "pdfPage": 304
+    },
+    "stats": {
+        "initiative": 3,
+        "perception": 4,
+        "defense": 28,
+        "fortitude": 16,
+        "reflex": 6,
+        "will": 14,
+        "hitPoints": 250,
+        "speedText": "6m (4q)",
+        "senses": "faro",
+        "defensesText": null,
+        "attributes": {
+            "str": 5,
+            "dex": 0,
+            "con": 3,
+            "int": 0,
+            "wis": 1,
+            "cha": 3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Montante +18 (3d6+15, 19) e chifres +18 (1d6+10)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Búfalo de Batalha",
+            "timing": null,
+            "text": "Montado no búfalo-de-guerra, tem deslocamento 12m, ignora terreno difícil e recebe +1d8 em uma rolagem de dano em investida."
+        },
+        {
+            "name": "Fúria Sagrada",
+            "timing": "livre",
+            "text": "Recebe +4 em testes de ataque e rolagens de dano e RD 5. O efeito acaba se passar uma rodada sem atacar nem ser alvo de efeito hostil. Recarga (movimento)."
+        },
+        {
+            "name": "Grandes Chifres",
+            "timing": null,
+            "text": "Em investida montada, pode usar todos os ataques corpo a corpo contra um único alvo."
+        },
+        {
+            "name": "Marrada Impressionante",
+            "timing": null,
+            "text": "Recebe +2 em ataques em investida e testes para empurrar."
+        }
+    ],
+    "equipment": "Alforje, armadura completa, montante aumentada.",
+    "treasure": "Padrão.",
+    "skillsText": "Atletismo +10, Cavalgar +7, Intimidação +10, Nobreza +5, Religião +6.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const corujaDruida = {
+    "id": "coruja-druida",
+    "name": "Coruja Druida",
+    "type": "humanoid",
+    "subtype": "moreau",
+    "size": "Médio",
+    "challengeRating": 10,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 302,
+        "pdfPage": 304
+    },
+    "stats": {
+        "initiative": 12,
+        "perception": 16,
+        "defense": 33,
+        "fortitude": 12,
+        "reflex": 14,
+        "will": 24,
+        "hitPoints": 284,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 1,
+            "dex": 3,
+            "con": 3,
+            "int": 2,
+            "wis": 5,
+            "cha": 1
+        },
+        "manaPoints": 55
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Dois ataques de bordão +25 (1d8+16)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Chamado da Dama Altiva",
+            "timing": "padrão",
+            "magical": true,
+            "text": "Uma vez por cena, invoca 2d4 animais em espaços livres em alcance curto. Agem a partir da próxima rodada do druida. Têm deslocamento terrestre e de escalada 9m, For –1, Des 2, Defesa 13 e 1 PV. Podem gastar ação padrão para causar 2d4 de perfuração em uma criatura adjacente, falham em testes opostos e de resistência e somem ao morrer ou ao fim da cena."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Lança magias como um druida de Allihanna de 10º nível (CD 32)."
+        },
+        {
+            "name": "Comunhão com a Natureza",
+            "timing": "completa",
+            "text": "Recebe 6d4 dados de auxílio até gastar ou até o fim do dia. Pode gastar dois dados para somar +2d4 a um teste de perícia na natureza.",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Concentração de Combate",
+            "timing": "padrão",
+            "text": "Até o fim da cena, usa o melhor de dois dados em seus ataques e oponentes usam o pior de dois dados ao atacá-lo.",
+            "cost": "8 PM"
+        },
+        {
+            "name": "Ilusão Lacerante",
+            "timing": "padrão",
+            "text": "Uma ilusão em cubo de 9m em alcance médio causa 5d6 de dano psíquico não letal a criaturas na área e a quem iniciar seu turno nela (Von anula).",
+            "cost": "9 PM, sustentada"
+        },
+        {
+            "name": "Silêncio",
+            "timing": "padrão",
+            "text": "Cria uma esfera de 6m de raio em alcance médio. Criaturas na área ficam surdas e não podem lançar magias.",
+            "cost": "3 PM, sustentada"
+        },
+        {
+            "name": "Vidência",
+            "timing": "completa",
+            "text": "Pode ver e ouvir uma criatura e seus arredores a alcance ilimitado (Von evita). A familiaridade altera o teste de resistência (Livro Básico, p. 211).",
+            "cost": "6 PM, sustentada"
+        }
+    ],
+    "equipment": "Bandoleira de poções, bordão, essência de mana x3, farrapos de ermitão, símbolo sagrado de Allihanna.",
+    "treasure": "Metade.",
+    "skillsText": "Adestramento +12, Misticismo +11, Religião +14, Sobrevivência +16.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const elfoDoMarPescador = {
+    "id": "elfo-do-mar-pescador",
+    "name": "Elfo-do-Mar Pescador",
+    "type": "humanoid",
+    "subtype": "elfo-do-mar",
+    "size": "Médio",
+    "challengeRating": 2,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 316,
+        "pdfPage": 318
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 7,
+        "defense": 18,
+        "fortitude": 8,
+        "reflex": 11,
+        "will": 3,
+        "hitPoints": 14,
+        "speedText": "9m (6q), natação 9m (6q)",
+        "senses": "percepção às cegas (apenas embaixo d’água), visão na penumbra",
+        "defensesText": null,
+        "attributes": {
+            "str": 2,
+            "dex": 4,
+            "con": 3,
+            "int": -1,
+            "wis": 2,
+            "cha": 0
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Arpão +12 (1d10+6, x3)."
+        },
+        {
+            "name": "À Distância",
+            "text": "Arpão +14 (1d10+10, x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Caçador Submarino",
+            "timing": null,
+            "text": "Quando faz um teste de perícia (exceto testes de ataque) em um terreno aquático, o elfo-do-mar pescador rola dois dados e usa o melhor resultado."
+        }
+    ],
+    "equipment": "Arpão, gibão de peles.",
+    "treasure": "Metade.",
+    "skillsText": "Furtividade +7, Sobrevivência +7 (+9 embaixo d’água).",
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const elfoDoMarChefe = {
+    "id": "elfo-do-mar-chefe",
+    "name": "Elfo-do-Mar Chefe",
+    "type": "humanoid",
+    "subtype": "elfo-do-mar",
+    "size": "Médio",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 316,
+        "pdfPage": 318,
+        "bookPageEnd": 317,
+        "pdfPageEnd": 319
+    },
+    "stats": {
+        "initiative": 12,
+        "perception": 10,
+        "defense": 29,
+        "fortitude": 12,
+        "reflex": 18,
+        "will": 6,
+        "hitPoints": 230,
+        "speedText": "9m (6q), natação 9m (6q)",
+        "senses": "percepção às cegas (apenas embaixo d’água), visão na penumbra",
+        "defensesText": null,
+        "attributes": {
+            "str": 4,
+            "dex": 5,
+            "con": 3,
+            "int": -1,
+            "wis": 3,
+            "cha": 2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Tridente x2 +22 (1d8+15)."
+        },
+        {
+            "name": "À Distância",
+            "text": "Rede +20 (agarrar)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Caçador Submarino",
+            "timing": null,
+            "text": "Quando faz um teste de perícia (exceto testes de ataque) em um terreno aquático, o elfo-do-mar chefe rola dois dados e usa o melhor resultado."
+        },
+        {
+            "name": "Ginete de Selako",
+            "timing": null,
+            "text": "O elfo-do-mar possui um selako como parceiro montaria Grande. Se estiver montado, seu deslocamento muda para 15m, ele recebe +2d6 em uma rolagem de dano corpo a corpo uma vez por rodada e, quando acerta um ataque corpo a corpo, o alvo fica sangrando."
+        },
+        {
+            "name": "Investida Aquática",
+            "timing": "completa",
+            "text": "O elfo-do-mar realiza uma investida e faz seus dois ataques com tridente. Os dois ataques recebem o bônus de +2 da investida e causam +1d8 pontos de dano, mas devem ser feitos contra o mesmo alvo."
+        }
+    ],
+    "equipment": "Couraça, escudo leve, rede, tridente equilibrado.",
+    "treasure": "Padrão.",
+    "skillsText": "Atletismo +9, Cavalgar +10, Diplomacia +7, Furtividade +10, Guerra +6, Sobrevivência +10 (+12 embaixo d’água).",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const elfoDoMarDruida = {
+    "id": "elfo-do-mar-druida",
+    "name": "Elfo-do-Mar Druida",
+    "type": "humanoid",
+    "subtype": "elfo-do-mar",
+    "size": "Médio",
+    "challengeRating": 10,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 317,
+        "pdfPage": 319
+    },
+    "stats": {
+        "initiative": 14,
+        "perception": 15,
+        "defense": 31,
+        "fortitude": 14,
+        "reflex": 20,
+        "will": 24,
+        "hitPoints": 250,
+        "speedText": "9m (6q), natação 9m (6q)",
+        "senses": "percepção às cegas (apenas embaixo d’água), visão na penumbra",
+        "defensesText": null,
+        "attributes": {
+            "str": 1,
+            "dex": 5,
+            "con": 2,
+            "int": -2,
+            "wis": 6,
+            "cha": 2
+        },
+        "manaPoints": 54
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Arpão +22 (1d10+1d12+18, x3)."
+        },
+        {
+            "name": "À Distância",
+            "text": "Arpão +24 (1d10+25, x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Companheiro Animal",
+            "timing": null,
+            "text": "O druida sempre está acompanhado de um canceronte que serve como um parceiro adepto guardião veterano (já contabilizado)."
+        },
+        {
+            "name": "Forma Animal",
+            "timing": "completa",
+            "text": "O druida adquire a forma de uma orca. Ele recebe +5 em Força, +4 na Defesa, um ataque corpo a corpo de mordida +26 (2d6+28) e um de pancada +26 (2d6+28) e seu tamanho muda para Grande. Nessa forma, ele não pode falar, mas pode lançar magias e empunhar catalisadores e esotéricos.",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como um druida do Oceano de 10º nível (CD 32)."
+        },
+        {
+            "name": "Controlar Água",
+            "timing": "padrão",
+            "text": "Até o fim da cena, o druida controla a água em uma esfera de 30m em alcance longo. (veja Tormenta20, p. 186).",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Curar Ferimentos",
+            "timing": "padrão",
+            "text": "Uma criatura em alcance curto cura 10d8+10 pontos de vida.",
+            "cost": "9 PM"
+        },
+        {
+            "name": "Despedaçar",
+            "timing": "padrão",
+            "text": "Um alvo em alcance curto sofre 5d8+10 pontos de dano de impacto, ou o dobro sem aplicar RD se for um construto ou um objeto mundano Pequeno, e fica atordoado (Fort reduz o dano à metade e evita a condição). Uma criatura só pode ser atordoada por esta magia uma vez por cena.",
+            "cost": "9 PM"
+        },
+        {
+            "name": "Escudo da Fé",
+            "timing": "reação",
+            "text": "Quando o druida ou um aliado em alcance curto sofre um ataque, o druida ou o aliado recebe camuflagem contra ataques à distância e +5 na Defesa até seu próximo turno.",
+            "cost": "7 PM"
+        },
+        {
+            "name": "Suporte Ambiental",
+            "timing": "padrão",
+            "text": "Por 1 dia, criaturas escolhidas em alcance curto ficam imunes aos efeitos de calor e frio extremos, podem respirar na água e não sufocam em fumaça densa.",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Dependência de Água",
+            "timing": null,
+            "text": "Se ficar um dia sem contato com água, o elfo-do-mar não recupera PM até voltar para a água."
+        }
+    ],
+    "equipment": "Arpão, escudo leve, essência de mana x2, gibão de peles, ramo verdejante x5, símbolo sagrado do Oceano.",
+    "treasure": "Padrão.",
+    "skillsText": "Adestramento +15, Cura +15, Religião +15, Sobrevivência +15 (+17 embaixo d’água).",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const irukanjin = {
+    "id": "irukanjin",
+    "name": "Irukanjin",
+    "type": "humanoid",
+    "subtype": "irukanjin",
+    "size": "Médio",
+    "challengeRating": 4,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 319,
+        "pdfPage": 321
+    },
+    "stats": {
+        "initiative": 6,
+        "perception": 3,
+        "defense": 20,
+        "fortitude": 10,
+        "reflex": 5,
+        "will": 0,
+        "hitPoints": 126,
+        "speedText": "Natação 12m (8q)",
+        "senses": "visão no escuro",
+        "defensesText": "redução de ácido e impacto 5",
+        "attributes": {
+            "str": 0,
+            "dex": 3,
+            "con": 2,
+            "int": 4,
+            "wis": 1,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Dois tentáculos +16 (3d4+6 mais Inocular Ácido)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Impacto Mental",
+            "timing": "padrão",
+            "text": "Uma criatura em alcance médio sofre 4d6 pontos de dano psíquico e fica atordoada por 1d4 rodadas (Von CD 18 reduz à metade e evita a condição). Uma criatura só pode ser atordoada por esta habilidade uma vez por cena. Recarga (movimento)."
+        },
+        {
+            "name": "Inocular Ácido",
+            "timing": null,
+            "text": "Uma criatura atingida por um tentáculo do irukanjin sofre 2d4 pontos de dano de ácido e fica lenta. Se já estiver lenta, fica paralisada por 1 rodada (Fort CD 18 reduz à metade e evita a condição)."
+        },
+        {
+            "name": "Mesclar-se",
+            "timing": null,
+            "text": "Enquanto está submerso em água, o irukanjin tem camuflagem leve."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Furtividade +12.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const nagahMisticaAmeacasDeArton = {
+    "variantOf": "nagah-mistica",
+    "id": "nagah-mistica-ameacas-de-arton",
+    "name": "Nagah Mística",
+    "type": "humanoid",
+    "subtype": "nagah",
+    "size": "Médio",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 331,
+        "pdfPage": 333
+    },
+    "stats": {
+        "initiative": 8,
+        "perception": 6,
+        "defense": 20,
+        "fortitude": 6,
+        "reflex": 12,
+        "will": 18,
+        "hitPoints": 160,
+        "speedText": "9m (6q)",
+        "senses": "visão na penumbra",
+        "defensesText": "resistência a veneno +5",
+        "attributes": {
+            "str": 1,
+            "dex": 3,
+            "con": 2,
+            "int": 4,
+            "wis": 2,
+            "cha": 2
+        },
+        "manaPoints": 35
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Adaga +18 (1d6+6, 19) e cauda +18 (1d6+6)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Falso Amigo",
+            "timing": null,
+            "text": "Adepta veterana. Sob essa identidade, pode atuar como o parceiro indicado e recebe +10 em Enganação para manter o disfarce e em Vontade contra efeitos que possam revelar sua identidade. Veja Ameaças de Arton, p. 327."
+        },
+        {
+            "name": "Magia Acelerada",
+            "timing": "livre",
+            "text": "Uma vez por rodada, quando lança uma magia com execução de ação completa ou menor, a nagah mística muda a execução dela para livre.",
+            "cost": "+4 PM"
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como uma maga de 8º nível (CD 24)."
+        },
+        {
+            "name": "Imagem Espelhada",
+            "timing": "padrão",
+            "text": "Cinco cópias ilusórias da nagah surgem ao seu redor, concedendo +10 na Defesa. Cada vez que um ataque erra a nagah, uma das cópias desaparece e o bônus na Defesa diminui em 2.",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Relâmpago",
+            "timing": "padrão",
+            "text": "A nagah causa 8d6 pontos de dano de eletricidade em todas as criaturas em uma linha de 30m (Ref reduz à metade).",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Velocidade",
+            "timing": "padrão",
+            "text": "A nagah pode executar uma ação padrão adicional por turno, que não pode ser usada para lançar magias.",
+            "cost": "3 PM, sustentada"
+        },
+        {
+            "name": "Inocência Dissimulada",
+            "timing": null,
+            "text": "Uma vez por cena, a nagah pode substituir um teste de perícia por um teste de Enganação."
+        },
+        {
+            "name": "Fraquezas Ofídicas",
+            "timing": null,
+            "text": "A nagah sofre 1 ponto adicional de dano para cada dado de dano de frio e recebe –5 em testes de resistência contra Músicas de bardo."
+        }
+    ],
+    "equipment": "Adaga, essência de mana.",
+    "treasure": "Padrão.",
+    "skillsText": "Conhecimento +10, Enganação +9, Furtividade +10, Intuição +9, Misticismo +10.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const nagahEncantadora = {
+    "id": "nagah-encantadora",
+    "name": "Nagah Encantadora",
+    "type": "humanoid",
+    "subtype": "nagah",
+    "size": "Médio",
+    "challengeRating": 7,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 331,
+        "pdfPage": 333
+    },
+    "stats": {
+        "initiative": 10,
+        "perception": 10,
+        "defense": 29,
+        "fortitude": 9,
+        "reflex": 15,
+        "will": 20,
+        "hitPoints": 197,
+        "speedText": "9m (6q)",
+        "senses": "visão na penumbra",
+        "defensesText": "resistência a veneno +5",
+        "attributes": {
+            "str": 0,
+            "dex": 3,
+            "con": 2,
+            "int": 3,
+            "wis": 1,
+            "cha": 5
+        },
+        "manaPoints": 59
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Adaga +22 (1d6+4, 19) e cauda +22 (1d6+4)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Falso Amigo",
+            "timing": null,
+            "text": "Adepta veterana. Sob essa identidade, pode atuar como o parceiro indicado e recebe +10 em Enganação para manter o disfarce e em Vontade contra efeitos que possam revelar sua identidade. Veja Ameaças de Arton, p. 327."
+        },
+        {
+            "name": "Linhagem Feérica",
+            "timing": null,
+            "text": "A CD para resistir às magias de encantamento* e ilusão* da nagah encantadora aumenta em +2 e essas magias custam –1 PM (já contabilizado)."
+        },
+        {
+            "name": "Magia Acelerada",
+            "timing": "livre",
+            "text": "Uma vez por rodada, quando lança uma magia com execução de ação completa ou menor, a nagah muda a execução dela para livre.",
+            "cost": "+4 PM"
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como uma feiticeira de 9º nível (CD 26, 28 para encantamento* e ilusão*, limite de PM 9)."
+        },
+        {
+            "name": "Adaga Mental*",
+            "timing": "padrão",
+            "text": "Uma criatura em alcance curto sofre 6d6 pontos de dano psíquico e fica atordoada por 1 rodada (Von reduz o dano à metade e evita a condição). Uma criatura só pode ser atordoada por esta magia uma vez por cena.",
+            "cost": "8 PM"
+        },
+        {
+            "name": "Desespero Esmagador*",
+            "timing": "padrão",
+            "text": "A nagah projeta uma onda de desespero em um cone de 6m. Criaturas na área ficam fracas e frustradas até o fim da cena e pasmas por 1 rodada (Von evita a condição pasmo e reduz a duração das outras condições para 1 rodada). Uma criatura só pode ser pasmada por esta magia uma vez por cena.",
+            "cost": "8 PM"
+        },
+        {
+            "name": "Enfeitiçar*",
+            "timing": "padrão",
+            "text": "Cada humanoide em alcance curto fica enfeitiçado pela nagah até o fim da cena, ou até a nagah ou um de seus aliados tomar uma ação hostil contra a criatura.",
+            "cost": "5 PM"
+        },
+        {
+            "name": "Ilusão Lacerante*",
+            "timing": "padrão",
+            "text": "A nagah cria uma ilusão que ocupa um cubo de 9m. Quando a magia é lançada, cada criatura na área deve fazer um teste de Vontade; se falhar, acredita que a ilusão é real e sofre 5d6 pontos de dano psíquico não letal. Cada criatura que começar seu turno dentro da área e acreditar na ilusão deve repetir o teste de Vontade.",
+            "cost": "8 PM, sustentada"
+        },
+        {
+            "name": "Imagem Espelhada*",
+            "timing": "padrão",
+            "text": "Seis cópias ilusórias da nagah surgem ao seu redor, concedendo +12 na Defesa. Cada vez que um ataque erra a nagah, uma das cópias desaparece e o bônus na Defesa diminui em 2, mas a criatura atacante fica ofuscada por 1 rodada.",
+            "cost": "8 PM"
+        },
+        {
+            "name": "Invisibilidade*",
+            "timing": "padrão",
+            "text": "A nagah fica invisível até o fim da cena ou até realizar uma ação hostil. Ela recebe camuflagem total e +10 em testes de Furtividade contra ouvir, e criaturas que não possam vê-la ficam desprevenidas contra seus ataques.",
+            "cost": "4 PM"
+        },
+        {
+            "name": "Inocência Dissimulada",
+            "timing": null,
+            "text": "Uma vez por cena, a nagah pode substituir um teste de perícia por um teste de Enganação."
+        },
+        {
+            "name": "Fraquezas Ofídicas",
+            "timing": null,
+            "text": "A nagah sofre 1 ponto adicional de dano para cada dado de dano de frio e recebe –5 em testes de resistência contra Músicas de bardo."
+        }
+    ],
+    "equipment": "Adaga, essência de mana.",
+    "treasure": "Padrão.",
+    "skillsText": "Conhecimento +11, Enganação +16, Furtividade +10, Intuição +10, Misticismo +12.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const nagahDormente = {
+    "id": "nagah-dormente",
+    "name": "Nagah Dormente",
+    "type": "humanoid",
+    "subtype": "nagah",
+    "size": "Médio",
+    "challengeRating": 3,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 332,
+        "pdfPage": 334
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 6,
+        "defense": 22,
+        "fortitude": 6,
+        "reflex": 12,
+        "will": 9,
+        "hitPoints": 27,
+        "speedText": "9m (6q)",
+        "senses": "visão na penumbra",
+        "defensesText": "resistência a veneno +5",
+        "attributes": {
+            "str": 0,
+            "dex": 4,
+            "con": 1,
+            "int": 0,
+            "wis": 3,
+            "cha": 1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Espada curta +14 (1d6+4, 19) e cauda +14 (1d6+4)."
+        },
+        {
+            "name": "À Distância",
+            "text": "Arco curto +14 (1d6+8, x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Falso Amigo",
+            "timing": null,
+            "text": "Parceiro perseguidor. Sob essa identidade, pode atuar como o parceiro indicado e recebe +10 em Enganação para manter o disfarce e em Vontade contra efeitos que possam revelar sua identidade. Veja Ameaças de Arton, p. 327."
+        },
+        {
+            "name": "Marca da Traição",
+            "timing": "movimento",
+            "text": "A nagah analisa um alvo em alcance curto. Até o fim da cena ela recebe +1d8 em rolagens de dano contra essa criatura. Se o alvo for alguém com quem ela passou pelo menos uma cena como aliada, esse bônus é dobrado. Ela só pode ter um oponente marcado por vez."
+        },
+        {
+            "name": "Inocência Dissimulada",
+            "timing": null,
+            "text": "Uma vez por cena, a nagah pode substituir um teste de perícia por um teste de Enganação."
+        },
+        {
+            "name": "Fraquezas Ofídicas",
+            "timing": null,
+            "text": "A nagah sofre 1 ponto adicional de dano para cada dado de dano de frio e recebe –5 em testes de resistência contra Músicas de bardo."
+        }
+    ],
+    "equipment": "Arco curto, armadura de couro, espada curta, flechas x20.",
+    "treasure": "Metade.",
+    "skillsText": "Enganação +8, Furtividade +9, Sobrevivência +9.",
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const hynneDormente = {
+    "id": "hynne-dormente",
+    "name": "Hynne Dormente",
+    "type": "humanoid",
+    "subtype": "hynne",
+    "size": "Pequeno",
+    "challengeRating": 5,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 332,
+        "pdfPage": 334
+    },
+    "stats": {
+        "initiative": 14,
+        "perception": 6,
+        "defense": 22,
+        "fortitude": 6,
+        "reflex": 16,
+        "will": 11,
+        "hitPoints": 99,
+        "speedText": "6m (4q)",
+        "senses": null,
+        "defensesText": null,
+        "attributes": {
+            "str": -1,
+            "dex": 3,
+            "con": 1,
+            "int": 3,
+            "wis": 0,
+            "cha": 2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Adaga +15 (1d4+11, 19, mais veneno)."
+        },
+        {
+            "name": "À Distância",
+            "text": "Adaga +15 (1d6+11, 19, mais veneno)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Ataque Furtivo",
+            "timing": null,
+            "text": "+4d6."
+        },
+        {
+            "name": "Falso Amigo",
+            "timing": null,
+            "text": "Assassino veterano. Sob essa identidade, pode atuar como o parceiro indicado e recebe +10 em Enganação para manter o disfarce e em Vontade contra efeitos que possam revelar sua identidade. Veja Ameaças de Arton, p. 327."
+        },
+        {
+            "name": "Pirueta Escapatória",
+            "timing": "reação",
+            "text": "Uma vez por rodada, quando é atingido por um ataque, o hynne pode fazer um teste de Acrobacia e reduzir o resultado deste teste do dano sofrido."
+        },
+        {
+            "name": "Reviravolta",
+            "timing": null,
+            "text": "O alvo do primeiro ataque do hynne na cena é considerado desprevenido."
+        },
+        {
+            "name": "Sorte Salvadora",
+            "timing": "reação",
+            "text": "Uma vez por rodada, o hynne pode rolar novamente um teste de resistência."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Peçonha concentrada (perde 1d12 pontos de vida por rodada durante 3 rodadas, Fort CD 20 reduz a duração para 1 rodada)."
+        }
+    ],
+    "equipment": "Adaga certeira, gazua.",
+    "treasure": "Metade.",
+    "skillsText": "Acrobacia +9, Atletismo +7, Enganação +10, Furtividade +11, Ladinagem +7.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const nagahDefensor = {
+    "id": "nagah-defensor",
+    "name": "Nagah Defensor",
+    "type": "humanoid",
+    "subtype": "nagah",
+    "size": "Médio",
+    "challengeRating": 7,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 332,
+        "pdfPage": 334
+    },
+    "stats": {
+        "initiative": 12,
+        "perception": 10,
+        "defense": 31,
+        "fortitude": 10,
+        "reflex": 17,
+        "will": 14,
+        "hitPoints": 82,
+        "speedText": "9m (6q)",
+        "senses": "visão na penumbra",
+        "defensesText": "redução de dano 5, resistência a veneno +5",
+        "attributes": {
+            "str": 5,
+            "dex": 3,
+            "con": 3,
+            "int": 0,
+            "wis": 1,
+            "cha": 0
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Alfange x2 +26 (4d4+15, 18) e cauda +26 (1d6+10)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Escudo Vivo",
+            "timing": "reação",
+            "text": "Uma vez por rodada, quando um aliado adjacente ao nagah defensor sofre dano, ele pode proteger esse aliado. Se fizer isso, o dano é reduzido à metade e é causado ao nagah, em vez de ao aliado."
+        },
+        {
+            "name": "Falso Amigo",
+            "timing": null,
+            "text": "Fortão veterano. Sob essa identidade, pode atuar como o parceiro indicado e recebe +10 em Enganação para manter o disfarce e em Vontade contra efeitos que possam revelar sua identidade. Veja Ameaças de Arton, p. 327."
+        },
+        {
+            "name": "Inocência Dissimulada",
+            "timing": null,
+            "text": "Uma vez por cena, a nagah pode substituir um teste de perícia por um teste de Enganação."
+        },
+        {
+            "name": "Fraquezas Ofídicas",
+            "timing": null,
+            "text": "A nagah sofre 1 ponto adicional de dano para cada dado de dano de frio e recebe –5 em testes de resistência contra Músicas de bardo."
+        }
+    ],
+    "equipment": "Alfange, couraça.",
+    "treasure": "Padrão.",
+    "skillsText": "Atletismo +12, Enganação +5.",
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const nagahRetalhador = {
+    "id": "nagah-retalhador",
+    "name": "Nagah Retalhador",
+    "type": "humanoid",
+    "subtype": "nagah",
+    "size": "Médio",
+    "challengeRating": 12,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 333,
+        "pdfPage": 335
+    },
+    "stats": {
+        "initiative": 20,
+        "perception": 14,
+        "defense": 43,
+        "fortitude": 20,
+        "reflex": 26,
+        "will": 12,
+        "hitPoints": 600,
+        "speedText": "12m (8q)",
+        "senses": "visão na penumbra",
+        "defensesText": "resistência a veneno +5",
+        "attributes": {
+            "str": 6,
+            "dex": 5,
+            "con": 4,
+            "int": 0,
+            "wis": 2,
+            "cha": 1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Quatro cimitarras +36 (1d8+12, 15/x3, mais veneno) e cauda +36 (1d6+12)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Agarrar Aprimorado",
+            "timing": "livre",
+            "text": "Cauda (teste +38)."
+        },
+        {
+            "name": "Barreira de Lâminas",
+            "timing": "reação",
+            "text": "Duas vezes por rodada, quando é alvo de um ataque corpo a corpo, o nagah retalhador pode fazer um teste de ataque oposto ao resultado desse ataque. Se vencer, evita o dano e pode fazer um ataque corpo a corpo contra o atacante."
+        },
+        {
+            "name": "Constrição",
+            "timing": "livre",
+            "text": "No início de cada um de seus turnos, o retalhador causa 2d6+12 pontos de dano de impacto na criatura que estiver agarrando com sua cauda."
+        },
+        {
+            "name": "Retalhar",
+            "timing": null,
+            "text": "Para cada dois ataques de cimitarra que o retalhador acertar em uma mesma criatura na mesma rodada, ele causa mais 2d8+12 pontos de dano."
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Peçonha potente (perde 2d12 pontos de vida por rodada durante 3 rodadas, Fort CD 33 reduz a duração para 1 rodada)."
+        },
+        {
+            "name": "Inocência Dissimulada",
+            "timing": null,
+            "text": "Uma vez por cena, a nagah pode substituir um teste de perícia por um teste de Enganação."
+        },
+        {
+            "name": "Fraquezas Ofídicas",
+            "timing": null,
+            "text": "A nagah sofre 1 ponto adicional de dano para cada dado de dano de frio e recebe –5 em testes de resistência contra Músicas de bardo."
+        }
+    ],
+    "equipment": "Cimitarra de mitral x4.",
+    "treasure": "Metade.",
+    "skillsText": "Enganação +15, Furtividade +17, Intimidação +13.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const nagahSacerdotisa = {
+    "id": "nagah-sacerdotisa",
+    "name": "Nagah Sacerdotisa",
+    "type": "humanoid",
+    "subtype": "nagah",
+    "size": "Médio",
+    "challengeRating": 5,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 334,
+        "pdfPage": 336
+    },
+    "stats": {
+        "initiative": 6,
+        "perception": 7,
+        "defense": 23,
+        "fortitude": 5,
+        "reflex": 11,
+        "will": 17,
+        "hitPoints": 140,
+        "speedText": "9m (6q)",
+        "senses": "visão na penumbra",
+        "defensesText": "resistência a veneno +5",
+        "attributes": {
+            "str": -1,
+            "dex": 2,
+            "con": 0,
+            "int": 3,
+            "wis": 3,
+            "cha": 5
+        },
+        "manaPoints": 38
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Adaga +15 (1d4+5,19, mais veneno) e cauda +15 (1d6+5)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Devoção Dissimulada",
+            "timing": null,
+            "text": "A nagah sacerdotisa se apresenta como devota de outra divindade. Quando faz um teste de Enganação ou Religião para ocultar sua devoção verdadeira, ela rola dois dados e usa o melhor resultado."
+        },
+        {
+            "name": "Falso Amigo",
+            "timing": null,
+            "text": "Médica veterana. Sob essa identidade, pode atuar como o parceiro indicado e recebe +10 em Enganação para manter o disfarce e em Vontade contra efeitos que possam revelar sua identidade. Veja Ameaças de Arton, p. 327."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como uma clériga de Sszzaas de 7º nível (CD 22, limite de PM 7)."
+        },
+        {
+            "name": "Curar Ferimentos",
+            "timing": "padrão",
+            "text": "Uma criatura em alcance curto cura 8d8+8 PV.",
+            "cost": "7 PM"
+        },
+        {
+            "name": "Comando",
+            "timing": "padrão",
+            "text": "No início do seu próximo turno, três criaturas em alcance curto ficam pasmas por 1 rodada (Von evita).",
+            "cost": "6 PM"
+        },
+        {
+            "name": "Marca da Obediência",
+            "timing": "padrão",
+            "text": "A sacerdotisa ordena que uma criatura adjacente não ataque a ela ou a seus aliados até o fim da cena (Von evita). A criatura pode repetir o teste de Vontade em cada um de seus turnos subsequentes.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Miasma Mefítico",
+            "timing": "padrão",
+            "text": "Criaturas em um raio de 6m em alcance médio sofrem 7d6 pontos de dano de ácido e ficam enjoadas por 1 rodada (Fort reduz à metade e evita a condição).",
+            "cost": "7 PM"
+        },
+        {
+            "name": "Santuário",
+            "timing": "padrão",
+            "text": "A sacerdotisa toca uma criatura. Até o fim da cena, ou até que essa criatura faça uma ação hostil, qualquer criatura que tente fazer uma ação hostil contra ela perde a ação (Von evita).",
+            "cost": "1 PM"
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Peçonha concentrada (perde 1d12 pontos de vida por rodada durante 3 rodadas, Fort CD 22 reduz para 1 rodada)."
+        },
+        {
+            "name": "Inocência Dissimulada",
+            "timing": null,
+            "text": "Uma vez por cena, a nagah pode substituir um teste de perícia por um teste de Enganação."
+        },
+        {
+            "name": "Fraquezas Ofídicas",
+            "timing": null,
+            "text": "A nagah sofre 1 ponto adicional de dano para cada dado de dano de frio e recebe –5 em testes de resistência contra Músicas de bardo."
+        }
+    ],
+    "equipment": "Adaga, couraça, escudo leve, símbolo sagrado (qualquer, exceto Sszzaas).",
+    "treasure": "Padrão.",
+    "skillsText": "Enganação +15, Furtividade +1, Intuição +9, Religião +9.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const sszzaazitaCelebrante = {
+    "id": "sszzaazita-celebrante",
+    "name": "Sszzaazita Celebrante",
+    "type": "humanoid",
+    "subtype": "humano",
+    "size": "Médio",
+    "challengeRating": 16,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 337,
+        "pdfPage": 339
+    },
+    "stats": {
+        "initiative": 23,
+        "perception": 17,
+        "defense": 51,
+        "fortitude": 24,
+        "reflex": 28,
+        "will": 18,
+        "hitPoints": 571,
+        "speedText": "9m (6q)",
+        "senses": null,
+        "defensesText": "evasão",
+        "attributes": {
+            "str": 0,
+            "dex": 7,
+            "con": 4,
+            "int": 2,
+            "wis": 3,
+            "cha": 5
+        },
+        "manaPoints": 83
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Punhal sszzaazita +44 (1d4+20, 19, mais veneno)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Assassinar",
+            "timing": "movimento",
+            "text": "O sszzaazita celebrante analisa uma criatura em alcance curto. Até o fim de seu próximo turno, ele dobra os dados de dano extras por Ataque Furtivo em seu primeiro Ataque Furtivo que causar dano contra essa criatura."
+        },
+        {
+            "name": "Ataque Furtivo",
+            "timing": null,
+            "text": "+8d8."
+        },
+        {
+            "name": "Cobra em Pele de Cordeiro",
+            "timing": null,
+            "text": "O celebrante é considerado um respeitado membro do clero de outro deus e recebe +5 em testes de Enganação e Intimidação com seus devotos."
+        },
+        {
+            "name": "Falso Amigo",
+            "timing": null,
+            "text": "Médico veterano. Sob essa identidade, pode atuar como o parceiro indicado e recebe +10 em Enganação para manter o disfarce e em Vontade contra efeitos que possam revelar sua identidade. Veja Ameaças de Arton, p. 327."
+        },
+        {
+            "name": "Ritual Disfarçado",
+            "timing": "livre",
+            "text": "O celebrante disfarça suas magias como se fossem de outra divindade. Uma criatura que veja o celebrante lançar uma magia deve fazer um teste de Intuição ou Misticismo (CD 38) para perceber sua verdadeira natureza. Se falhar, sofre –5 em seu teste de resistência contra ela."
+        },
+        {
+            "name": "Manto do Traidor",
+            "timing": null,
+            "text": "O celebrante pode se esconder mesmo sem camuflagem ou cobertura disponíveis, não sofre penalidade em testes de Furtividade por se mover ao seu deslocamento normal e reduz a penalidade em Furtividade por atacar e fazer outras ações chamativas para –5."
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como um clérigo de Sszzaas de 16º nível (CD 38)."
+        },
+        {
+            "name": "Curar Ferimentos",
+            "timing": "padrão",
+            "text": "Uma criatura adjacente cura 13d8+13 PV.",
+            "cost": "12 PM"
+        },
+        {
+            "name": "Libertação",
+            "timing": "padrão",
+            "text": "O celebrante fica imune a efeitos de movimento, ignora qualquer efeito que impeça ou restrinja seu deslocamento, pode escolher 20 em testes de Atletismo e Acrobacia, e pode fazer todas as manobras desta perícia mesmo sem treinamento.",
+            "cost": "14 PM"
+        },
+        {
+            "name": "Manto de Sombras",
+            "timing": "padrão",
+            "text": "O celebrante se torna incorpóreo. Ele pode gastar uma ação de movimento e 1 PM para “entrar” em uma sombra do seu tamanho ou maior e se teletransportar para outra sombra, também do seu tamanho ou maior, em alcance médio. Além disso, torna-se vulnerável a luz direta: se for exposto a uma fonte de luz, sofre 1 ponto de dano por rodada.",
+            "cost": "6 PM, sustentada"
+        },
+        {
+            "name": "Silêncio",
+            "timing": "padrão",
+            "text": "O celebrante cria uma esfera de 6m em alcance médio. Criaturas nessa área ficam surdas e por isso não podem lançar magias.",
+            "cost": "3 PM, sustentada"
+        },
+        {
+            "name": "Veneno",
+            "timing": null,
+            "text": "Perde 2d12 pontos de vida durante 3 rodadas (Fort CD 38 reduz para 1 rodada)."
+        }
+    ],
+    "equipment": "Estojo de disfarces aprimorado, punhal sszzaazita, símbolo sagrado (qualquer, exceto Sszzaas).",
+    "treasure": "Nenhum.",
+    "skillsText": "Enganação +26 (+27 para disfarces), Furtividade +28, Intimidação +26, Intuição +24, Religião +24.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const protetorRefem = {
+    "id": "protetor-refem",
+    "name": "Protetor-Refém",
+    "type": "humanoid",
+    "subtype": "anão",
+    "size": "Médio",
+    "challengeRating": 5,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 344,
+        "pdfPage": 346
+    },
+    "stats": {
+        "initiative": 2,
+        "perception": 5,
+        "defense": 23,
+        "fortitude": 16,
+        "reflex": 11,
+        "will": 6,
+        "hitPoints": 40,
+        "speedText": "6m (4q)",
+        "senses": "(+7 em subterrâneo), visão no escuro",
+        "defensesText": "redução de dano 5, resistência a efeitos mentais +2",
+        "attributes": {
+            "str": 2,
+            "dex": 0,
+            "con": 4,
+            "int": -1,
+            "wis": 1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Martelo de guerra x2 +20 (2d8+18, x3)."
+        },
+        {
+            "name": "À Distância",
+            "text": "Machadinha +17 (1d6+16, x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Libertação Mental",
+            "timing": null,
+            "text": "Embora difícil, é possível libertar a mente de um protetor-refém. Primeiro, é necessário deixá-lo esmorecido, exausto ou enfeitiçado. Após isso, um personagem deve fazer um teste estendido de Diplomacia (CD 20, 3 sucessos exigidos), em que cada teste é uma ação completa. Se passar, o controle mental sobre o protetor-refém termina, mas ele fica inconsciente por 1 hora."
+        }
+    ],
+    "equipment": "Escudo pesado, loriga segmentada, machadinha x3, martelo de guerra.",
+    "treasure": "Nenhum.",
+    "skillsText": "Sobrevivência +5 (+7 em subterrâneo).",
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const minotauroDaManada = {
+    "id": "minotauro-da-manada",
+    "name": "Minotauro da Manada",
+    "type": "humanoid",
+    "subtype": "minotauro",
+    "size": "Médio",
+    "challengeRating": 2,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 352,
+        "pdfPage": 354
+    },
+    "stats": {
+        "initiative": 3,
+        "perception": 4,
+        "defense": 18,
+        "fortitude": 11,
+        "reflex": 6,
+        "will": 3,
+        "hitPoints": 16,
+        "speedText": "9m (6q)",
+        "senses": "faro",
+        "defensesText": "redução de frio 5",
+        "attributes": {
+            "str": 4,
+            "dex": 0,
+            "con": 3,
+            "int": 0,
+            "wis": 1,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Machado de batalha +13 (2d8+5, x3) e chifres +13 (1d6+5)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Capturar",
+            "timing": null,
+            "text": "O minotauro da Manada recebe +2 em testes de agarrar e pode se deslocar normalmente enquanto arrasta uma criatura. Uma criatura arrastada desta forma sofre 1d4 pontos de dano de impacto para cada 3m que for arrastada."
+        },
+        {
+            "name": "Ver Vermelho",
+            "timing": null,
+            "text": "Se tiver sido alvo de um efeito hostil (ataque, habilidade, magia…) desde o fim de seu último turno, o minotauro recebe +2 em testes de perícia."
+        }
+    ],
+    "equipment": "Gibão de peles, machado de batalha.",
+    "treasure": "Padrão.",
+    "skillsText": "Atletismo +9, Intimidação +7.",
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const minotauroChefeDaManada = {
+    "id": "minotauro-chefe-da-manada",
+    "name": "Minotauro Chefe da Manada",
+    "type": "humanoid",
+    "subtype": "minotauro",
+    "size": "Médio",
+    "challengeRating": 6,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 352,
+        "pdfPage": 354
+    },
+    "stats": {
+        "initiative": 11,
+        "perception": 10,
+        "defense": 26,
+        "fortitude": 17,
+        "reflex": 11,
+        "will": 5,
+        "hitPoints": 232,
+        "speedText": "9m (6q)",
+        "senses": "faro",
+        "defensesText": "redução de frio 5",
+        "attributes": {
+            "str": 2,
+            "dex": 4,
+            "con": 3,
+            "int": -1,
+            "wis": 3,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Machado de batalha x2 +19 (2d8+12, x3) e chifres +19 (1d6+12)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Liderança Brutal",
+            "timing": null,
+            "text": "Aliados do minotauro chefe da Manada em alcance curto recebem os bônus em ataque e dano de sua habilidade Marca da Presa."
+        },
+        {
+            "name": "Marca da Presa",
+            "timing": "movimento",
+            "text": "O chefe analisa uma criatura em alcance curto. Até o fim da cena, ele recebe +2 em testes de perícia e +1d8 em rolagens de dano contra essa criatura (esses bônus são dobrados contra anões, elfos e humanos)."
+        },
+        {
+            "name": "Ver Vermelho",
+            "timing": null,
+            "text": "Se tiver sido alvo de um efeito hostil (ataque, habilidade, magia…) desde o fim de seu último turno, o minotauro recebe +2 em testes de perícia."
+        }
+    ],
+    "equipment": "Gibão de peles, machado de batalha preciso x2.",
+    "treasure": "Padrão.",
+    "skillsText": "Atletismo + 9, Furtividade +11, Sobrevivência +10 (+12 em ambientes nevados).",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const ogroFurioso = {
+    "id": "ogro-furioso",
+    "name": "Ogro Furioso",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Grande",
+    "challengeRating": 5,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 353,
+        "pdfPage": 355
+    },
+    "stats": {
+        "initiative": 5,
+        "perception": 2,
+        "defense": 24,
+        "fortitude": 17,
+        "reflex": 11,
+        "will": 0,
+        "hitPoints": 222,
+        "speedText": "9m (6q)",
+        "senses": "visão na penumbra",
+        "defensesText": "redução de frio 5",
+        "attributes": {
+            "str": 5,
+            "dex": 1,
+            "con": 3,
+            "int": -1,
+            "wis": 0,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Tacape +17 (4d12+14)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Burro Demais…",
+            "timing": null,
+            "text": "O ogro furioso sofre –5 em testes de Intuição e Vontade (já contabilizado)."
+        },
+        {
+            "name": "…Para Morrer!",
+            "timing": null,
+            "text": "Todo o dano de corte, impacto e perfuração que o ogro sofre é reduzido à metade."
+        },
+        {
+            "name": "Fúria Imparável",
+            "timing": null,
+            "text": "O ogro não fica inconsciente quando é reduzido a 0 PV ou menos e só morre quando é reduzido a -111 PV."
+        },
+        {
+            "name": "Raiva Inflamável",
+            "timing": null,
+            "text": "Cada vez que acerta um ataque ou é atingido por um ataque, o ogro recebe um bônus cumulativo de +1 em testes de ataque e rolagens de dano até o fim da cena."
+        }
+    ],
+    "equipment": "Gibão de peles, tacape aumentado.",
+    "treasure": "Metade.",
+    "skillsText": "Atletismo +11, Intimidação +11, Intuição –3.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const keylor = {
+    "id": "keylor",
+    "name": "Keylor",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Grande",
+    "challengeRating": 9,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 353,
+        "pdfPage": 355
+    },
+    "stats": {
+        "initiative": 8,
+        "perception": 9,
+        "defense": 34,
+        "fortitude": 21,
+        "reflex": 8,
+        "will": 16,
+        "hitPoints": 360,
+        "speedText": "9m (6q)",
+        "senses": "visão na penumbra",
+        "defensesText": "redução de frio 10",
+        "attributes": {
+            "str": 6,
+            "dex": 0,
+            "con": 4,
+            "int": 1,
+            "wis": 1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Machado de guerra x2 +27 (3d6+28, x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Arremessar Rochas",
+            "timing": "completa",
+            "text": "Criaturas em um quadrado de 3m em alcance curto sofrem 4d6+20 pontos de dano (Ref CD 28 reduz à metade)."
+        },
+        {
+            "name": "Aura de Frio",
+            "timing": null,
+            "text": "No início de cada turno do Keylor, todas as criaturas em um raio de 3m sofrem 2d6+8 pontos de dano de frio."
+        },
+        {
+            "name": "Varrer",
+            "timing": null,
+            "text": "Uma vez por rodada, quando o Keylor faz um ataque corpo a corpo e reduz os pontos de vida do alvo a 0 ou menos, pode fazer um ataque adicional contra outra criatura dentro do seu alcance."
+        }
+    ],
+    "equipment": "Gibão de peles, machado de guerra aumentado.",
+    "treasure": "Padrão.",
+    "skillsText": "Sobrevivência +11.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+// Deuses de Arton, p. 312. As CDs de resistência vêm de cada ficha.
+const giantBarrelOptions = [
+    "Aguardente: criaturas num cone de 6m ficam enjoadas (Fort reduz para 1 rodada).",
+    "Dilínio: o gigante recebe RD 5/mágico até o fim da cena.",
+    "Hidromel: criaturas em uma esfera de 3m de raio em alcance curto ganham +2 em ataques e dano até o fim da cena e ficam confusas por 1d2 rodadas (Fort evita a condição).",
+    "Rum: o gigante fica imune a fadiga e metabolismo por 1d4+1 rodadas e depois fica fraco.",
+    "Sidra: uma criatura em alcance curto sofre 1d8+15 de impacto e fica atordoada por 1 rodada (Fort reduz à metade e evita a condição). Cada criatura só pode ser atordoada por este efeito uma vez por cena.",
+    "Vinho: até o fim da cena, o gigante recebe Cura Acelerada 5 e sofre –5 em Vontade."
+].join(" ");
+
+const galokkCapanga = {
+    "id": "galokk-capanga",
+    "name": "Galokk Capanga",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Grande",
+    "challengeRating": 6,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 307,
+        "pdfPage": 309
+    },
+    "stats": {
+        "initiative": 3,
+        "perception": 3,
+        "defense": 26,
+        "fortitude": 17,
+        "reflex": 7,
+        "will": 12,
+        "hitPoints": 50,
+        "speedText": "9m (6q)",
+        "senses": null,
+        "defensesText": null,
+        "attributes": {
+            "str": 4,
+            "dex": 0,
+            "con": 2,
+            "int": -1,
+            "wis": 0,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Machado de guerra x2 +24 (3d6+19, x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Força dos Titãs",
+            "timing": null,
+            "text": "Quando acerta um ataque corpo a corpo, o galokk capanga pode rolar mais uma vez qualquer resultado máximo da rolagem de dano e adicionar o novo resultado ao dano causado."
+        },
+        {
+            "name": "Forçar a Barra",
+            "timing": "reação",
+            "text": "Uma vez por rodada, quando faz um teste de resistência, o galokk soma sua Força (+4) nesse teste."
+        }
+    ],
+    "equipment": "Couro batido, machado de guerra aumentado.",
+    "treasure": "Nenhum.",
+    "skillsText": "Atletismo +9, Intimidação +5.",
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const galokkGuardaCostas = {
+    "id": "galokk-guarda-costas",
+    "name": "Galokk Guarda-Costas",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Grande",
+    "challengeRating": 10,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 307,
+        "pdfPage": 309
+    },
+    "stats": {
+        "initiative": 5,
+        "perception": 7,
+        "defense": 35,
+        "fortitude": 21,
+        "reflex": 11,
+        "will": 16,
+        "hitPoints": 80,
+        "speedText": "6m (4q)",
+        "senses": null,
+        "defensesText": null,
+        "attributes": {
+            "str": 5,
+            "dex": 0,
+            "con": 2,
+            "int": 0,
+            "wis": 0,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Machado de batalha x2 +34 (1d10+31, x3) e escudo pesado +34 (1d8+26)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Força dos Titãs",
+            "timing": null,
+            "text": "Quando acerta um ataque corpo a corpo, o galokk guarda-costas pode rolar mais uma vez qualquer resultado máximo da rolagem de dano e adicionar o novo resultado ao dano causado."
+        },
+        {
+            "name": "Forçar a Barra",
+            "timing": null,
+            "text": "Uma vez por rodada, quando faz um teste de resistência, o galokk soma sua Força (+5) nesse teste."
+        },
+        {
+            "name": "Grande Escudo",
+            "timing": null,
+            "text": "O galokk guarda-costas fornece cobertura leve a aliados adjacentes menores que ele."
+        }
+    ],
+    "equipment": "Escudo pesado espinhoso, machado de batalha aumentado, meia armadura.",
+    "treasure": "Metade.",
+    "skillsText": "Atletismo +14, Intimidação +9.",
+    "role": "minion",
+    "roleSource": "pdf-review"
+};
+
+const giganteBicefalo = {
+    "id": "gigante-bicefalo",
+    "name": "Gigante Bicéfalo",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Enorme",
+    "challengeRating": 13,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 308,
+        "pdfPage": 310
+    },
+    "stats": {
+        "initiative": 10,
+        "perception": 17,
+        "defense": 44,
+        "fortitude": 26,
+        "reflex": 11,
+        "will": 20,
+        "hitPoints": 680,
+        "speedText": "12m (9q)",
+        "senses": null,
+        "defensesText": null,
+        "attributes": {
+            "str": 14,
+            "dex": -1,
+            "con": 10,
+            "int": -2,
+            "wis": 1,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Duas clavas +38 (4d10+40)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Arremessar Duas Rochas",
+            "timing": "completa",
+            "text": "O gigante bicéfalo arremessa duas rochas, cada uma em um quadrado de 3m em alcance curto. Criaturas nessas áreas sofrem 6d12 pontos de dano de impacto (Ref CD 35 reduz à metade)."
+        },
+        {
+            "name": "Atropelamento",
+            "timing": "completa",
+            "text": "O gigante percorre até o dobro de seu deslocamento. Ele pode passar pelos espaços de quaisquer inimigos menores que ele, mas não pode passar duas vezes pelo mesmo espaço. Criaturas atropeladas dessa forma sofrem 6d10+40 pontos de dano de impacto e ficam caídas (Ref CD 35 reduz à metade e evita a condição). Recarga (movimento)."
+        },
+        {
+            "name": "Duas Cabeças…",
+            "timing": null,
+            "text": "quando faz um teste de Intuição ou Vontade, o gigante faz dois testes e usa o melhor resultado."
+        },
+        {
+            "name": "…Brigam Mais do que Uma",
+            "timing": null,
+            "text": "Quando usa Duas Cabeças... em um teste contra uma perícia baseada em Carisma ou contra um efeito de encantamento, se passar em apenas um dos testes, o gigante fica pasmo por uma rodada. Ele só pode ficar pasmo dessa forma uma vez por cena para a mesma perícia ou o mesmo efeito."
+        }
+    ],
+    "equipment": "Clava aumentada x2.",
+    "treasure": "Dobro.",
+    "skillsText": "Atletismo +26, Intimidação +13.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const giganteDasColinas = {
+    "id": "gigante-das-colinas",
+    "name": "Gigante das Colinas",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Enorme",
+    "challengeRating": 7,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 309,
+        "pdfPage": 311
+    },
+    "stats": {
+        "initiative": 2,
+        "perception": 2,
+        "defense": 31,
+        "fortitude": 20,
+        "reflex": 14,
+        "will": 7,
+        "hitPoints": 280,
+        "speedText": "9m (6q)",
+        "senses": null,
+        "defensesText": null,
+        "attributes": {
+            "str": 9,
+            "dex": -1,
+            "con": 3,
+            "int": -2,
+            "wis": -1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Clava x2 +24 (1d10+24)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Arremessar Rochas",
+            "timing": "completa",
+            "text": "O gigante das colinas arremessa uma rocha em um quadrado de 3m em alcance curto. Criaturas nessa área sofrem 6d12 pontos de dano de impacto (Ref CD 24 reduz à metade)."
+        }
+    ],
+    "equipment": "Clava aumentada, gibão de peles.",
+    "treasure": "Bolsa de gigante.",
+    "skillsText": "Atletismo +16, Intimidação +8, Sobrevivência +6.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const giganteDoFogo = {
+    "id": "gigante-do-fogo",
+    "name": "Gigante do Fogo",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Enorme",
+    "challengeRating": 11,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 310,
+        "pdfPage": 312
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 9,
+        "defense": 36,
+        "fortitude": 24,
+        "reflex": 9,
+        "will": 15,
+        "hitPoints": 390,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a fogo, redução de dano 10",
+        "attributes": {
+            "str": 12,
+            "dex": -2,
+            "con": 4,
+            "int": 3,
+            "wis": -1,
+            "cha": 1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Machado de batalha x3 +27 (3d6+16, x3, mais 2d6 fogo)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Arremessar Bigorna",
+            "timing": "padrão",
+            "text": "O gigante do fogo arremessa sua bigorna em um quadrado de 4,5m em alcance curto. Criaturas nessa área sofrem 10d12 pontos de dano, metade impacto e metade fogo, e ficam em chamas (Ref CD 33 reduz à metade e evita a condição). Recarga (recuperar a bigorna)."
+        },
+        {
+            "name": "Bigorna Flamejante",
+            "timing": "padrão",
+            "text": "O gigante faz com que uma arma adjacente cause +2d6 pontos de dano de fogo até o fim da cena. Ele não pode utilizar esta habilidade se usar Arremessar Bigorna (por motivos óbvios)."
+        },
+        {
+            "name": "Falange de Fogo",
+            "timing": null,
+            "text": "Aliados adjacentes ao gigante recebem redução de dano 5."
+        },
+        {
+            "name": "Ponto de Forja",
+            "timing": null,
+            "text": "Criaturas que causem dano corpo a corpo contra o gigante ou contra um dos aliados adjacentes a ele sofrem 4d6 pontos de dano e ficam com suas armas avariadas (Fort CD 33 evita a avaria)."
+        }
+    ],
+    "equipment": "Machado de batalha de adamante aumentado, meia armadura banhada a ouro.",
+    "treasure": "Padrão.",
+    "skillsText": "Atletismo +23, Guerra +12, Ofício (armeiro) +14.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const giganteDasRochas = {
+    "id": "gigante-das-rochas",
+    "name": "Gigante das Rochas",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Enorme",
+    "challengeRating": 9,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 311,
+        "pdfPage": 313
+    },
+    "stats": {
+        "initiative": 6,
+        "perception": 5,
+        "defense": 33,
+        "fortitude": 21,
+        "reflex": 9,
+        "will": 14,
+        "hitPoints": 380,
+        "speedText": "12m (8q)",
+        "senses": null,
+        "defensesText": "redução de dano 5",
+        "attributes": {
+            "str": 11,
+            "dex": -1,
+            "con": 4,
+            "int": 1,
+            "wis": -1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Machado de batalha x2 +26 (4d12+10, x4)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Barril Gigante de…",
+            "timing": "completa",
+            "text": "O gigante das rochas usa uma dose da bebida de seu barril gigante (CD 28). " + giantBarrelOptions
+        },
+        {
+            "name": "Arremessar Barris",
+            "timing": "padrão",
+            "text": "O gigante arremessa seu barril em um quadrado de 3m em alcance curto. Criaturas nessa área sofrem 7d12 pontos de dano de impacto (Ref CD 28 reduz à metade). Recarga (recuperar o barril)."
+        },
+        {
+            "name": "Fúria Blindada",
+            "timing": null,
+            "text": "Enquanto está sob efeito de Pavio Curto, o gigante sofre apenas metade do dano de corte, impacto e perfuração não mágico."
+        },
+        {
+            "name": "Pavio Curto",
+            "timing": "reação",
+            "text": "Quando é ofendido ou sofre dano de um inimigo, o gigante entra em fúria. Ele recebe +3 em testes de ataque e rolagens de dano, e seus ataques deixam as vítimas sangrando, mas ele deve sempre atacar a criatura mais próxima. A fúria termina se, ao fim da rodada, ele não tiver atacado nem sido alvo de um efeito hostil."
+        }
+    ],
+    "equipment": "Barril gigante, couraça, machado de batalha aumentado maciço.",
+    "treasure": "Metade.",
+    "skillsText": "Atletismo +19, Intuição +7, Ofício (cervejeiro) +9, Sobrevivência +7.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const giganteDoGelo = {
+    "id": "gigante-do-gelo",
+    "name": "Gigante do Gelo",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Enorme",
+    "challengeRating": 9,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 311,
+        "pdfPage": 313,
+        "bookPageEnd": 312,
+        "pdfPageEnd": 314
+    },
+    "stats": {
+        "initiative": 6,
+        "perception": 5,
+        "defense": 33,
+        "fortitude": 21,
+        "reflex": 9,
+        "will": 14,
+        "hitPoints": 380,
+        "speedText": "12m (8q)",
+        "senses": null,
+        "defensesText": "redução de frio 15",
+        "attributes": {
+            "str": 11,
+            "dex": -1,
+            "con": 4,
+            "int": 1,
+            "wis": -1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Machado de batalha x2 +26 (4d12+8, x3, mais 1d6 gelo)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Arremessar Geleira",
+            "timing": "completa",
+            "text": "O gigante arremessa um pedaço de geleira em um quadrado de 4,5m em alcance curto. Criaturas nessa área sofrem 8d12 pontos de dano de frio e ficam lentas (Ref CD 28 reduz à metade e evita a condição)."
+        },
+        {
+            "name": "Barril Gigante de…",
+            "timing": "completa",
+            "text": "O gigante usa uma dose da bebida de seu barril gigante (CD 28). " + giantBarrelOptions
+        },
+        {
+            "name": "Fúria Gélida",
+            "timing": null,
+            "text": "Enquanto está sob efeito de Pavio Curto, o gigante emana uma aura de 9m de frio e ventos fortes. Ele recebe camuflagem leve contra ataques à distância feitos fora da aura e, no início dos seus turnos, criaturas dentro da aura sofrem 4d6 pontos de dano de frio (Fort CD 28 reduz à metade).",
+            "magical": true
+        },
+        {
+            "name": "Pavio Curto",
+            "timing": "reação",
+            "text": "Quando é ofendido ou sofre dano de um inimigo, o gigante entra em fúria. Ele recebe +3 em testes de ataque e rolagens de dano, e seus ataques deixam as vítimas sangrando, mas ele deve sempre atacar a criatura mais próxima. A fúria termina se, ao fim da rodada, ele não tiver atacado nem sido alvo de um efeito hostil."
+        }
+    ],
+    "equipment": "Barril gigante, gibão de peles, machado de batalha aumentado de gelo eterno.",
+    "treasure": "Metade.",
+    "skillsText": "Atletismo +21, Intuição +7, Ofício (cozinheiro) +11, Sobrevivência +7.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const giganteDosMares = {
+    "id": "gigante-dos-mares",
+    "name": "Gigante dos Mares",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Enorme",
+    "challengeRating": 9,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 312,
+        "pdfPage": 314
+    },
+    "stats": {
+        "initiative": 6,
+        "perception": 5,
+        "defense": 33,
+        "fortitude": 21,
+        "reflex": 9,
+        "will": 14,
+        "hitPoints": 380,
+        "speedText": "12m (8q), natação 12m (8q)",
+        "senses": "visão na penumbra",
+        "defensesText": null,
+        "attributes": {
+            "str": 11,
+            "dex": -1,
+            "con": 4,
+            "int": 1,
+            "wis": -1,
+            "cha": -1
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Machado de batalha x2 +26 (4d12+10, x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Barril Gigante de…",
+            "timing": "completa",
+            "text": "O gigante dos mares usa uma dose da bebida de seu barril gigante (CD 28). " + giantBarrelOptions
+        },
+        {
+            "name": "Coquetel Praiano",
+            "timing": "completa",
+            "text": "Uma vez por cena, o gigante usa uma bebida que combina os efeitos de duas bebidas diferentes de Barril Gigante..."
+        },
+        {
+            "name": "Dar um Tchibum",
+            "timing": "padrão",
+            "text": "O gigante salta em um quadrado de 4,5m em alcance curto e fica caído. Criaturas nessa área sofrem 9d12 pontos de dano de impacto e são empurradas 6m para fora da área (Ref CD 28 reduz à metade). Recarga (movimento)."
+        },
+        {
+            "name": "Pavio Curto",
+            "timing": "reação",
+            "text": "Quando é ofendido ou sofre dano de um inimigo, o gigante entra em fúria. Ele recebe +3 em testes de ataque e rolagens de dano e seus ataques deixam as vítimas sangrando, mas ele deve sempre atacar a criatura mais próxima. A fúria termina se, ao fim da rodada, ele não tiver atacado nem sido alvo de um efeito hostil."
+        }
+    ],
+    "equipment": "Barril gigante, gibão de peles, machado de batalha aumentado de lanajuste.",
+    "treasure": "Metade.",
+    "skillsText": "Atletismo +19, Intuição +7, Ofício (pescador) +9, Sobrevivência +7.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const giganteReal = {
+    "id": "gigante-real",
+    "name": "Gigante Real",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Colossal",
+    "challengeRating": 19,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 313,
+        "pdfPage": 315
+    },
+    "stats": {
+        "initiative": 14,
+        "perception": 9,
+        "defense": 59,
+        "fortitude": 32,
+        "reflex": 26,
+        "will": 19,
+        "hitPoints": 1140,
+        "speedText": "15m (10q), sem redução por terreno difícil",
+        "senses": null,
+        "defensesText": "fortificação 50%, redução de dano 20",
+        "attributes": {
+            "str": 17,
+            "dex": -1,
+            "con": 15,
+            "int": -1,
+            "wis": 0,
+            "cha": 0
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Clava x3 +52 (5d20+40, x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Arremessar Descomunal",
+            "timing": "completa",
+            "text": "O gigante arremessa uma criatura que esteja agarrando ou um objeto Enorme ou menor em um ponto em alcance longo, atingindo uma área equivalente ao espaço da criatura ou objeto arremessado. Criaturas nessa área (e a criatura arremessada, se for o caso) sofrem 20d10+40 pontos de dano de impacto e ficam atordoadas por 1 rodada e caídas (Ref CD 47 reduz à metade e evita as condições; uma criatura só pode ser atordoada por esta habilidade uma vez por cena)."
+        },
+        {
+            "name": "Golpe Racha-Montanha",
+            "timing": "completa",
+            "text": "O gigante faz um único ataque corpo a corpo com +5 na margem de ameaça e no multiplicador de crítico. Recarga (movimento)."
+        },
+        {
+            "name": "Pisotear o Solo",
+            "timing": "completa",
+            "text": "O gigante gera uma onda de choque que afeta um raio de 30m. Criaturas na área em contato com o solo sofrem 25d12 pontos de dano de impacto e ficam caídas (Ref CD 47 reduz à metade e evita a condição). Recarga (movimento)."
+        },
+        {
+            "name": "Titânico",
+            "timing": null,
+            "text": "O gigante é imune a manobras de combate, não pode ser flanqueado e sofre metade do dano de ataques que não sejam de outra criatura Titânica. Quando se move, pisoteia qualquer criatura ou objeto Enorme ou menor em seu caminho (atravessando seu espaço), causando 18d6 pontos de dano de impacto (uma vez por rodada por criatura, Ref CD 47 reduz à metade). Além disso, seus ataques ignoram redução de dano e atingem todas as criaturas em um quadrado de 6m (para cada ataque, ele faz um único teste de ataque e compara o resultado com a Defesa de cada inimigo na área)."
+        }
+    ],
+    "equipment": "Clava gigante, meia armadura.",
+    "treasure": "Padrão.",
+    "skillsText": "Atletismo +34, Intimidação +34.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const giganteMaximo = {
+    "id": "gigante-maximo",
+    "name": "Gigante Máximo",
+    "type": "humanoid",
+    "subtype": "gigante",
+    "size": "Colossal",
+    "challengeRating": "S+",
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 314,
+        "pdfPage": 316,
+        "bookPageEnd": 315,
+        "pdfPageEnd": 317
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 16,
+        "defense": 70,
+        "fortitude": 38,
+        "reflex": 25,
+        "will": 33,
+        "hitPoints": null,
+        "speedText": "45m (30q), sem redução por terreno difícil",
+        "senses": "visão na penumbra",
+        "defensesText": "imunidade a atordoamento, encantamento, dano mental (exceto cabeça), metamorfose e efeitos de movimento",
+        "attributes": {
+            "str": 20,
+            "dex": -3,
+            "con": 20,
+            "int": -2,
+            "wis": 0,
+            "cha": -2
+        },
+        "hitPointsText": "Especial (veja Grande Demais)"
+    },
+    "actions": [],
+    "abilities": [
+        {
+            "name": "Ataques Colossais",
+            "timing": "padrão",
+            "text": "O gigante máximo usa duas habilidades diferentes entre as seguintes. • Agarrar (braço) O gigante agarra uma criatura em seu alcance (teste +75). Uma criatura agarrada pode se soltar com uma ação padrão e um teste de manobra ou Acrobacia oposto ao gigante, ou causando 100 pontos de dano contra o braço. • Apertar (braço) O gigante causa 1d100+50 pontos de dano de impacto a uma criatura que esteja agarrando. • Arremessar (braço) O gigante arremessa uma criatura que esteja agarrando em um ponto em alcance longo. O alvo sofre 30d6 pontos de dano de impacto e fica caído (Acrobacia ou Ref CD 55 reduz à metade). • Chute (perna) O gigante desfere um poderoso chute. Criaturas em um quadrado de 9m em alcance curto sofrem 3d20+25 pontos de dano de impacto, são arremessadas 30m na direção oposta e ficam caídas (Fort CD 55 reduz à metade e evita o empurrão e a condição). • Pisotear (perna) O gigante gera o efeito básico da magia Terremoto (Tormenta20, p. 209) em um raio de 90m ao seu redor. Este não é um efeito mágico e não afeta o gigante. • Safanão (braço) O gigante derruba uma criatura que o esteja escalando (Ref CD 55 evita). Se falhar no teste, a criatura é arremessada ao chão, fica caída e sofre dano de queda de acordo com a etapa em que estava (veja Grande Demais). • Tapa (braço) O gigante faz um ataque corpo a corpo (teste +65, dano 1d100+100 impacto). O gigante pode fazer esta ação mesmo com braços derrotados, mas sofre –10 no teste de ataque e causa metade do dano."
+        },
+        {
+            "name": "Grande Demais",
+            "timing": null,
+            "text": "O gigante é muito grande para ser derrotado de uma só vez. Em vez disso, é necessário escalá-lo e derrotar cada parte de seu corpo individualmente. Cada uma dessas partes conta como uma criatura individual, com seus próprios PV. Escalar uma parte exige uma ação completa e um teste de Atletismo (CD conforme a etapa). Se falhar, o personagem não avança e sofre 8d6 pontos de dano de impacto. Se falhar por 5 ou mais, sofre 16d6 pontos de dano de impacto e cai para a parte anterior. Por fim, se falhar por 10 ou mais, cai no chão e sofre dano de queda de acordo com a parte em que estava. Personagens com deslocamento de escalada ou de voo recebem +10 nos testes de Atletismo e personagens usando um veículo ou montaria capaz de voar ou escalar podem substituir Atletismo por Cavalgar ou Pilotagem. 1) Duas Pernas CD 20, dano de queda 10d6, 750 PV cada. Cada perna derrotada reduz o deslocamento do gigante em 15m e o número de Ataques Colossais de perna que ele pode usar em 1. 2) Tronco CD 25, dano de queda 20d6, 3.000 PV. 3) Dois Braços CD 30, dano de queda 30d6, 750 PV cada. Cada braço derrotado reduz em 1 o número de Ataques Colossais de braço (exceto Tapa) que ele pode usar. 4) Cabeça CD 40, dano de queda 40d6, 1.000 PV. A cabeça possui Cura Acelerada 500; para cada outra parte do corpo derrotada, esse valor é reduzido em 100. Quando a cabeça é derrotada, o gigante cai inconsciente."
+        },
+        {
+            "name": "Titânico",
+            "timing": null,
+            "text": "O gigante é imune a manobras de combate, não pode ser flanqueado e sofre metade do dano de ataques que não sejam de outra criatura Titânica. Quando se move, pisoteia qualquer criatura ou objeto Enorme ou menor em seu caminho (atravessando seu espaço), causando 20d8 pontos de dano de impacto (uma vez por rodada por criatura, Ref CD 55 reduz à metade). Além disso, ele ignora redução de dano e seus ataques atingem todas as criaturas em um quadrado de 6m (para cada ataque, ele faz um único teste de ataque e compara o resultado com a Defesa de cada inimigo na área)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Dobro.",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const avatarDeThworDeusesDeArton = {
+    "id": "avatar-de-thwor-deuses-de-arton",
+    "name": "Avatar de Thwor",
+    "type": "humanoid",
+    "subtype": "bugbear",
+    "size": "Enorme",
+    "challengeRating": 18,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 215,
+        "pdfPage": 217
+    },
+    "stats": {
+        "initiative": 25,
+        "perception": 27,
+        "defense": 56,
+        "fortitude": 32,
+        "reflex": 22,
+        "will": 22,
+        "hitPoints": 1100,
+        "speedText": "15m (10q)",
+        "senses": "faro, visão no escuro",
+        "defensesText": "imunidade a cansaço, efeitos mentais e de metabolismo, paralisia e veneno, redução de dano 20/adamante, resistência a magia +10",
+        "attributes": {
+            "str": 14,
+            "dex": 8,
+            "con": 12,
+            "int": 10,
+            "wis": 10,
+            "cha": 10
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Machado de guerra x3 +49 (4d10+20, 15/x3, mais 2d8 em não duyshidakk)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Centelha Divina",
+            "timing": null,
+            "text": "O Avatar de Thwor lança qualquer magia divina como um clérigo de 18º nível, sem gastar PM (CD 47, limite de PM 18)."
+        },
+        {
+            "name": "Discurso Impactante",
+            "timing": "completa",
+            "text": "Uma vez por cena, o Avatar faz um discurso que leva todas as criaturas em um raio de 30m a questionarem suas próprias crenças. Devotos de outros deuses perdem seus PM e ficam abalados, enquanto criaturas inteligentes (Int –3 ou mais) sem devoção passam a obedecer às Obrigações & Restrições de Thwor até o fim da cena (Von CD 47 evita). Devotos de Thwor na área afetada recuperam todos os seus PM e recebem +2 em testes de perícia até o fim da cena. Mental."
+        },
+        {
+            "name": "Encarnação do Mundo Como Deve Ser",
+            "timing": null,
+            "text": "O Avatar começa com todos os poderes abaixo. Para cada 100 pontos de vida que ele tiver abaixo de seu máximo de PV, perde um desses poderes em ordem a partir de Vida (ele recupera os poderes se recuperar seus PV). • Luz. Quando fosse sofrer dano de luz, em vez disso o Avatar causa essa mesma quantidade de dano em uma criatura em alcance curto e a deixa ofuscada (Ref CD 47 reduz à metade e evita a condição). • Início (Padrão). Todas as criaturas em um raio de 30m voltam ao início do turno anterior do Avatar. Todas as ações a partir desse ponto são desfeitas (isso inclui as consequências dessas ações, como perda de PV e PM). Com exceção do Avatar, nenhuma outra criatura sabe o que vai acontecer e todas devem executar as mesmas ações que realizaram originalmente (mas quaisquer dados devem ser rolados novamente). Habilidade mágica. • Movimento. O Avatar executa uma ação padrão adicional por turno. • Continuidade. Quando um inimigo em alcance médio faz um teste de resistência contra uma magia do Avatar, se um sucesso nesse teste reduziria a duração do efeito, o inimigo faz o teste duas vezes e usa o pior resultado. • Eles. Inimigos do Avatar em um raio de 30m não são considerados aliados uns dos outros para efeitos de suas próprias habilidades. • Conhecimento. O Avatar recebe +10 em sua resistência a magia. • Fora. Quando um inimigo em alcance médio usa uma habilidade em área ou que afeta vários aliados, esse inimigo não é incluído na própria habilidade. • Vida. O Avatar recebe cura acelerada 20. Habilidade mágica."
+        },
+        {
+            "name": "O Ayrrak",
+            "timing": "reação",
+            "text": "Uma vez por rodada, quando o Avatar sofre uma condição ou dano, ele os transfere para um outro duyshidakk em alcance longo."
+        },
+        {
+            "name": "Ordens de Ataque",
+            "timing": "livre",
+            "text": "Uma vez por rodada, o Avatar ordena um aliado duyshidakk em alcance médio a fazer uma ação agredir como uma reação, imediatamente."
+        },
+        {
+            "name": "Presença Motivadora",
+            "timing": null,
+            "text": "O Avatar emana uma aura de euforia em um raio de 30m. Aliados duyshidakk nessa área recebem +5 na Defesa e em testes de perícia."
+        }
+    ],
+    "equipment": "Machado de guerra magnífico gigante atroz de adamante.",
+    "treasure": "Dobro.",
+    "skillsText": "Atletismo +34, Diplomacia +30, Guerra +35, Intimidação +30, Religião +30.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
 export const humanoidCreatures = [
+    avatarDeThworDeusesDeArton,
+    galokkCapanga, galokkGuardaCostas, giganteBicefalo, giganteDasColinas, giganteDoFogo, giganteDasRochas, giganteDoGelo, giganteDosMares, giganteReal, giganteMaximo,
+    ...divineAspects.filter(aspect => aspect.type === "humanoid"),
+    minotauroDaManada, minotauroChefeDaManada, ogroFurioso, keylor,
+    protetorRefem,
+    nagahMisticaAmeacasDeArton, nagahEncantadora, nagahDormente, hynneDormente, nagahDefensor, nagahRetalhador, nagahSacerdotisa, sszzaazitaCelebrante,
+    elfoDoMarPescador, elfoDoMarChefe, elfoDoMarDruida, irukanjin,
+    raposaBucaneira, bufaloPaladinoDeBullton, corujaDruida,
     // Manuais, Livro Básico e Ameaças de Arton
     orcCombatant, orcEnfraquecido, orcChief, ogre, ogreBasic,
     gnollMarauder, gnollMarauderBasic, gnollFilibuster, gnollFilibusterBasic,

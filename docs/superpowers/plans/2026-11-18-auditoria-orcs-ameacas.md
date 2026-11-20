@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. As **335 fichas auditadas** estão publicadas. Todas as fichas de Ameaças do catálogo foram conferidas. Familiares ficou registrado como fora do catálogo. De Reinos de Moreania a Trolls Nobres não há fichas no catálogo, e o próximo passo depende de decisão. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. As **335 fichas auditadas** estão publicadas. O cadastro local tem mais 82 fichas conferidas. Familiares ficou registrado como fora do catálogo. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -893,7 +893,7 @@ O bloco Uivantes, pp. 348–357 impressas, traz 15 fichas. Só estas três estã
 
 **Correção de formato.** Os cadastros vindos de prints não seguiam o padrão das demais fichas. Aura Congelante do Golem e Agarrar Aprimorado e Constrição Congelante do Soterrado estavam como ataques, com nome e execução repetidos no texto. Agora são habilidades com execução padrão, livre e padrão. Aura de Frio do Stagh e Esquife de Gelo do Soterrado usavam a execução “passiva”, que não existe no livro, e passam a não ter execução, como as demais habilidades contínuas. O Golem perde o subtipo “nor”, ausente da ficha impressa, e o ponto final do equipamento. Os papéis explícitos não mudaram, e um teste dos andares 11–20 fixa referências, papéis e formato. O QA dos andares 11–20 no Chrome passou contra o build local.
 
-**Fichas do bloco fora do catálogo.** Golem de Nor Grande e Enorme, Carcaju, Mamute, Lyuba, Minotauro da Manada e sua versão de ND 6, Ogro Furioso, Keylor, Urso das Neves e os dois Vermes do Gelo não estão no catálogo. Ficam junto da decisão pendente sobre os blocos de Reinos de Moreania a Trolls Nobres.
+**Cadastro posterior.** As 12 fichas restantes foram cadastradas com papéis impressos e referências ao PDF integral.
 
 **Anotações de apresentação.** O éter elemental do Stagh traz o ícone de novo item. Os quadros Raça Variante: Soterrado e o Familiar do Stagh ficam fora das fichas.
 
@@ -956,7 +956,7 @@ Situação em 19 de novembro de 2026.
 | Povos-Trovão | 264–273 | 12 | Publicado |
 | Puristas | 274–283 | 11 | Publicado |
 | Reino dos Mortos | 284–295 | 10 | Publicado |
-| Uivantes | 348–357 | 3 | Publicado |
+| Uivantes | 348–357 | 12 fichas cadastradas neste lote. 3 | Publicado |
 | Áreas de Tormenta | 18–29 | 13 | Publicado |
 | **Total** | | **335** | **Publicadas** |
 
@@ -978,18 +978,24 @@ Nenhuma ficha de Ameaças do catálogo cita recortes ou prints. A revisão das f
 
 ### Cadastro futuro
 
-A intenção do projeto é, depois de revisar todo o catálogo atual, cadastrar os inimigos dos livros que ainda faltam. Os grupos abaixo foram identificados durante a auditoria de Ameaças e ficam anotados para esse cadastro. Os nomes vêm do sumário e dos títulos das páginas; o número exato de fichas deve ser inventariado no momento do cadastro, como foi feito nos blocos auditados.
+Os seis blocos foram conferidos contra as fichas do PDF. O catálogo recebeu todas as 82 fichas de ND fixo identificadas nesses blocos.
 
 | Bloco | Páginas impressas | Fichas a cadastrar |
 |---|---:|---|
-| Reinos de Moreania | 296–305 | Búfalo-de-Guerra, Hippossauro, Mantícora, Otyugh, Yidishan, Moreau |
-| Sanguinárias | 306–313 | Cerianthar, Grande Tachygloss, Oxxdon, Razza’Kham, Serpe, Uraghian, Kaiju |
-| Sob as Ondas | 314–325 | Canceronte, Elfo-do-Mar, Enguia Rainha, Irukanjin, Nereida, Peixe-Recife, Platan, Selako, Kraken e Pliorex |
-| Sszzaazitas | 326–337 | Adorador de Sszzaas, Elemental do Veneno, Górgona, Nagah Arcanista, Nagah Dormente, Nagah Defensor, Nagah Retalhador, Nagah Sacerdotisa, Rival Espelho, Zumbi Peçonha, Sszzaazita Celebrante e Nastarrath |
-| Trolls Nobres | 338–347 | Arcanista Finntroll, Defeituoso, Mycotann, Opressor Finntroll, Perdigueiro Troll, Protetor-Refém, Cavaleiro Finntroll, Sacerdote Finntroll |
-| Uivantes | 348–357 | Carcaju, Golem de Nor Grande, Golem de Nor Enorme, Mamute, Lyuba, as duas fichas de Minotauro da Manada, Ogro Furioso, Keylor, Urso das Neves, Verme do Gelo Larva, Verme do Gelo Adulto |
+| Reinos de Moreania | 296–305 | Dez fichas cadastradas em 20 de novembro de 2026. |
+| Sanguinárias | 306–313 | Dez fichas cadastradas em 20 de novembro de 2026. |
+| Sob as Ondas | 314–325 | 20 fichas cadastradas. Canceronte, Canceronte de Guerra, Elfo-do-Mar Pescador, Chefe e Druida, Enguia Rainha, Irukanjin, Água-viva, Enxame de Águas-vivas, Água-viva Gigante, Nereida, Peixe-Recife, Platan, Selako, Selako-Tigre, Cardume de Selakos, Mega-Selako, Kraken, Pliorex e Pliorex Abissal |
+| Sszzaazitas | 326–337 | 17 fichas cadastradas. Iniciada de Sszzaas, Cultista de Sszzaas, Elementais do Veneno Pequeno, Médio e Grande, Górgona, Górgona Matriarca, Nagah Mística, Nagah Encantadora, Nagah Dormente, Hynne Dormente, Nagah Defensor, Nagah Retalhador, Nagah Sacerdotisa, Zumbi Peçonha, Sszzaazita Celebrante e Nastarrath |
+| Trolls Nobres | 338–347 | 13 fichas cadastradas. Arcanista Finntroll, Defeituoso, Mycotann Labutador, Mycotann Druida, Horda Mycotann, Finntroll Caçador, Finntroll Feitor, Finntroll Senhor de Estábulo, Perdigueiro Troll, Protetor-Refém, Cavaleiro Finntroll, Sacerdote Finntroll e Alto Sacerdote Finntroll |
+| Uivantes | 348–357 | 12 fichas cadastradas neste lote. Carcaju, Golem de Nor Grande, Golem de Nor Enorme, Mamute, Lyuba, as duas fichas de Minotauro da Manada, Ogro Furioso, Keylor, Urso das Neves, Verme do Gelo Larva, Verme do Gelo Adulto |
 
-Mantícora, Serpe e Otyugh já existem no catálogo na versão do Livro Básico. Ao cadastrá-las, comparar com Ameaças e separar as versões por fonte, como em Gorlogg e Capelão de Guerra. Finntroll Caçador, Finntroll Feitor, Nagah Guardião, Nagah Mística e Cultista de Sszzaas também são fichas do Básico e devem ser cotejadas com as de Ameaças do mesmo povo.
+**Reinos de Moreania.** Búfalo-de-Guerra e Hippossauro, p. 297; Mantícora e Mantícora Primal, p. 298; Otyugh e Horda de Otyughs, p. 299; Yidishan Bugbear, p. 300; Raposa Bucaneira, pp. 301–302; Búfalo Paladino de Bullton e Coruja Druida, p. 302. As versões de Ameaças de Mantícora e Otyugh têm IDs próprios. O sorteio dos perfis mantém as versões do Básico como padrão e a seleção manual oferece as duas fontes. As entradas de Parceiro e os quadros de raça ficam fora das fichas.
+
+**Sanguinárias.** Cerianthar, p. 307; Grande Tachygloss, p. 308; Oxxdon, pp. 308–309; Oxxdon Imenso e Razza’Kham, p. 309; Serpe, p. 310; Serpe Anciã, pp. 310–311; Uraghian Jovem e Uraghian Adulto, p. 311; e Kaiju, p. 313. Todas têm papel Solo impresso. A versão de Ameaças de Serpe tem ID próprio, com a versão do Básico como padrão do sorteio.
+
+Finntroll Caçador, Finntroll Feitor, Nagah Mística e Cultista de Sszzaas receberam versões próprias de Ameaças. Os identificadores e as preferências anteriores do Livro Básico foram conservados. O Nagah Guardião do Básico e o Nagah Defensor de Ameaças são fichas distintas.
+
+**Rival Espelho, p. 335.** A ficha tem ND `?` e copia as estatísticas do personagem. O fluxo atual calcula encontros a partir de um ND fixo por criatura. O cadastro depende de modelar a cópia de ficha e a resolução do ND no encontro. O quadro Troll Montaria, p. 344, contém regras de parceiro e não tem ficha própria.
 
 Familiares, pp. 190–197, ficou fora do catálogo por decisão anterior, porque são criaturas de apoio a personagens. A Tropa de Tentacutes, de ND 2 e com marca de Bando, é a única com uso direto como encontro e pode ser reavaliada no cadastro futuro.
 
@@ -997,10 +1003,10 @@ Familiares, pp. 190–197, ficou fora do catálogo por decisão anterior, porque
 
 Itens anotados durante os lotes que não alteram números, mas podem melhorar a ficha exibida:
 
-- Bando, p. 14 impressa, e Enxame, p. 15 impressa, estão em `src/generalCreatureAbilities.js`. A integração com a ficha e o combate fica pendente.
+- Bando, p. 14 impressa, e Enxame, p. 15 impressa, são exibidos nas fichas de combate com as marcas de grupo cadastradas.
 - As regras compartilhadas dos lefeu e as habilidades dracônicas do Livro Básico poderiam ser expostas nas fichas que dependem delas.
-- Exibir a marca de habilidade mágica, definida na p. 384 impressa, e os asteriscos das magias beneficiadas por itens nas fichas que os usam.
-- A tabela de parâmetros do código foi corrigida em 19 de novembro de 2026, e 35 papéis inferidos passaram a Lacaio, a maioria igual ao papel impresso, como o Bugbear Sentinela. As divergências registradas nas seções anteriores refletem a tabela antiga. Uma revisão futura pode recontar as que restam e decidir se o papel impresso deve prevalecer. [Correção da tabela](2026-11-19-validacao-praxis-e-parametros.md#correção-aplicada)
+- A ficha exibe a marca de habilidade mágica, definida na p. 384 impressa, para as 39 habilidades já marcadas no cadastro e os sete asteriscos identificados nas magias da Bruxa Goblin. A busca por outros símbolos continua pendente.
+- A recontagem de 20 de novembro usou 291 papéis documentados na auditoria e 43 conferidos nas páginas renderizadas. Encontrou 50 divergências após a correção da tabela de parâmetros. O papel impresso prevalece na ficha e na geração para os 334 registros conferidos. O Vagalhão Kobold é um evento e continua com seu papel de cadastro. [Correção da tabela](2026-11-19-validacao-praxis-e-parametros.md#correção-aplicada)
 
 ### Depois de Ameaças
 

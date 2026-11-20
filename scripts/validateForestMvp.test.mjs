@@ -434,15 +434,15 @@ test("kobold sheets show the optional explosive variant", () => {
   }
   assert.equal(getCreatureById("kobold-explosivo").abilities.filter(ability => /^Detonação Final/.test(ability.name)).length, 1);
   assert.equal(getCreatureById("kobold-bruto").role, "solo");
-  assert.equal(getCreatureById("kobold-mae").role, "solo");
+  assert.equal(getCreatureById("kobold-mae").role, "special");
 });
 
-test("Ameaças dungeon sheets cite the full PDF and keep their current roles", () => {
+test("Ameaças dungeon sheets cite the full PDF and use their printed roles", () => {
   const pages = [
     ["asa-assassina", 200, 201, "minion"], ["cocatriz", 201, null, "solo"], ["cocatriz-real", 202, null, "solo"],
-    ["harpia-saqueadora", 202, 203, "minion"], ["glop", 203, null, "solo"], ["glooop", 204, null, "solo"],
+    ["harpia-saqueadora", 202, 203, "minion"], ["glop", 203, null, "minion"], ["glooop", 204, null, "solo"],
     ["mamae-glop", 204, null, "solo"], ["mantor", 205, null, "solo"], ["mimico", 206, null, "solo"],
-    ["quimera", 206, 207, "solo"], ["slark", 208, null, "special"], ["tigre-de-hyninn", 209, null, "solo"],
+    ["quimera", 206, 207, "solo"], ["slark", 208, null, "minion"], ["tigre-de-hyninn", 209, null, "solo"],
     ["tigre-de-hyninn-primordial", 209, null, "solo"], ["brawar", 210, null, "solo"]
   ];
   const basicBookPages = { glop: 292 };
@@ -462,17 +462,17 @@ test("Ameaças dungeon sheets cite the full PDF and keep their current roles", (
   }
 });
 
-test("creature sheets leave out player-side partner and familiar rules without changing roles", () => {
+test("creature sheets leave out player-side partner and familiar rules", () => {
   for (const creature of creatureCatalog) {
     const names = (creature.abilities ?? []).map(ability => ability.name);
     assert.equal(names.some(name => /^(Parceiro|Familiar)\b/.test(name)), false, creature.id);
   }
   const roles = {
-    hiena: "special", hienodonte: "special", "chibi-kabuto": "minion", "ko-kabuto": "minion", "dai-kabuto": "solo",
-    "asa-assassina": "minion", aquinne: "special", terrier: "solo", "t-peel": "minion", pakk: "minion", stagh: "minion",
+    hiena: "minion", hienodonte: "minion", "chibi-kabuto": "solo", "ko-kabuto": "solo", "dai-kabuto": "solo",
+    "asa-assassina": "minion", aquinne: "minion", terrier: "solo", "t-peel": "minion", pakk: "minion", stagh: "minion",
     cocatriz: "solo", bulette: "solo", "cao-de-kally": "minion", "kobold-bruto": "solo", "corcel-de-kally": "solo",
     "sapo-atroz": "solo", estirge: "minion", "kobold-patrulheiro": "minion", "kobold-veterano": "minion",
-    "kobold-explosivo": "minion", "kobold-xama": "special", "cocatriz-real": "solo", tigre: "special"
+    "kobold-explosivo": "minion", "kobold-xama": "special", "cocatriz-real": "solo", tigre: "solo"
   };
   for (const [id, role] of Object.entries(roles)) assert.equal(getCreatureById(id).role, role, id);
   assert.match(getCreatureById("pteros-ceifador").abilities.find(ability => ability.name === "Companheiros de Voo").text, /flanqueando/);
@@ -713,7 +713,7 @@ test("every ND S and S+ sheet with Maior que a Morte states the death immunity t
     assert.match(ability.text, /perda de PV.*0 PV/, creature.id);
     assert.doesNotMatch(ability.text, /possuem um status especial/, creature.id);
   }
-  assert.equal(checked, 7);
+  assert.equal(checked, 15);
 });
 
 test("threat parameters reproduce Ameaças de Arton Table 2-3", async () => {
@@ -1819,4 +1819,287 @@ test("guidance follows the existing choice, completion and floor advance permiss
   assert.match(presentation.getNodeMapGuidance(levels, state, true), /Andar concluído/);
   assert.equal(presentation.getNodeMapGuidance(levels, state, false), "Etapa concluída.");
   assert.match(presentation.getNodeMapGuidance(levels, state, true, false), /Gere o mapa do andar selecionado/);
+});
+
+test("audited core-book roles and the new Ameaças variants reach the catalog", () => {
+  assert.equal(getCreatureById("turba-zumbi").role, "minion");
+  assert.equal(getCreatureById("enxame-kobold").role, "solo");
+  assert.equal(getCreatureById("reishid-livro-basico").role, "special");
+  const pages = {
+    "bufalo-de-guerra": 297, hippossauro: 297, "manticora-ameacas-de-arton": 298,
+    "manticora-primal": 298, "otyugh-ameacas-de-arton": 299, "horda-de-otyughs": 299,
+    "yidishan-bugbear": 300, "raposa-bucaneira": 301,
+    "bufalo-paladino-de-bullton": 302, "coruja-druida": 302,
+    cerianthar: 307, "grande-tachygloss": 308, oxxdon: 308, "oxxdon-imenso": 309,
+    "razza-kham": 309, "serpe-ameacas-de-arton": 310, "serpe-ancia": 310,
+    "uraghian-jovem": 311, "uraghian-adulto": 311, kaiju: 313,
+    canceronte: 315, "canceronte-de-guerra": 315, "elfo-do-mar-pescador": 316, "elfo-do-mar-chefe": 316,
+    "elfo-do-mar-druida": 317, "enguia-rainha": 317, irukanjin: 319, "agua-viva": 319,
+    "enxame-de-aguas-vivas": 319, "agua-viva-gigante": 319, nereida: 320, "peixe-recife": 321,
+    platan: 322, selako: 322, "selako-tigre": 323, "cardume-de-selakos": 323, "mega-selako": 323,
+    pliorex: 325, "pliorex-abissal": 325, kraken: 325,
+    "iniciada-de-sszzaas": 326, "cultista-de-sszzaas-ameacas-de-arton": 327,
+    "elemental-do-veneno-pequeno": 328, "elemental-do-veneno-medio": 328, "elemental-do-veneno-grande": 329,
+    gorgona: 329, "gorgona-matriarca": 330, "nagah-mistica-ameacas-de-arton": 331, "nagah-encantadora": 331,
+    "nagah-dormente": 332, "hynne-dormente": 332, "nagah-defensor": 332, "nagah-retalhador": 333,
+    "nagah-sacerdotisa": 334, "zumbi-peconha": 335, nastarrath: 336, "sszzaazita-celebrante": 337,
+    "arcanista-finntroll": 338, defeituoso: 340, "mycotann-labutador": 341, "mycotann-druida": 341,
+    "horda-mycotann": 341, "finntroll-cacador-ameacas-de-arton": 342, "finntroll-feitor-ameacas-de-arton": 342,
+    "finntroll-senhor-de-estabulo": 342, "perdigueiro-troll": 343, "protetor-refem": 344,
+    "cavaleiro-finntroll": 345, "sacerdote-finntroll": 347, "alto-sacerdote-finntroll": 347,
+    carcaju: 348, "golem-de-nor-grande": 349, "golem-de-nor-enorme": 349, mamute: 350,
+    lyuba: 351, "minotauro-da-manada": 352, "minotauro-chefe-da-manada": 352, "ogro-furioso": 353,
+    keylor: 353, "urso-das-neves": 355, "verme-do-gelo-larva": 357, "verme-do-gelo-adulto": 357
+  };
+  for (const [id, page] of Object.entries(pages)) {
+    const creature = getCreatureById(id);
+    assert.ok(creature, id);
+    assert.equal(creature.source.pdfPage, page + 2, id);
+    assert.equal(creature.source.bookPage, page, id);
+    assert.equal(creature.roleSource, "pdf-review", id);
+  }
+  for (const id of ["manticora", "otyugh", "serpe", "nagah-mistica", "cultista-de-sszzaas", "finntroll-cacador", "finntroll-feitor"]) {
+    const variant = getCreatureById(`${id}-ameacas-de-arton`);
+    assert.equal(variant.variantOf, id);
+    assert.match(formatCreatureCatalogName(variant), / · Ameaças de Arton$/);
+    assert.ok(getAutomaticCreatureCatalog(profile).some(creature => creature.id === id));
+    assert.ok(!getAutomaticCreatureCatalog(profile).includes(variant));
+  }
+});
+
+test("the creature sheet shows published group rules and confirmed magical abilities", async () => {
+  const { createCreatureDetail } = await import("../src/nodeDialog.js");
+  const previousDocument = globalThis.document;
+  globalThis.document = {
+    createElement() {
+      return {
+        children: [],
+        appendChild(child) { this.children.push(child); }
+      };
+    }
+  };
+  try {
+    function sheetText(id) {
+      const creature = getCreatureById(id);
+      const sheet = createCreatureDetail({
+        creatureId: id,
+        name: creature.name,
+        typeLabel: creature.type,
+        roleLabel: "Papel salvo anteriormente",
+        challengeLabel: creature.challengeRating,
+        quantity: 1
+      });
+      function read(element) {
+        return [element.textContent, ...element.children.map(read)].join(" ");
+      }
+      return read(sheet);
+    }
+    assert.match(sheetText("horda-de-otyughs"), /Bando.*Defesa por 10/);
+    assert.match(sheetText("enxame-kobold"), /Enxame.*condição ruim para lançar magias/);
+    assert.match(sheetText("coruja-druida"), /Chamado da Dama Altiva \(Padrão\) · Mágica/);
+    assert.match(sheetText("coruja-druida"), /Comunhão com a Natureza \(Completa, 6 PM\)/);
+    assert.match(sheetText("turba-zumbi"), /Lacaio/);
+    assert.match(sheetText("bruxa-goblin"), /Raio Conspurcado.*Mágica/);
+    assert.match(sheetText("bruxa-goblin"), /Tentáculos de Trevas\*/);
+    assert.match(sheetText("gigante-maximo"), /PONTOS DE VIDA\s+Especial \(veja Grande Demais\)/);
+  } finally {
+    globalThis.document = previousDocument;
+  }
+});
+
+test("divine abyssal sheets preserve references, printed roles and special ND", () => {
+  const sheets = {
+    aucharai: [253, 253, 6, "solo"], "trio-de-carvarel": [253, 253, 8, "solo"],
+    diabrete: [254, 254, 2, "minion"], "diabrete-negociante": [254, 254, 4, "special"],
+    jhumariel: [255, 256, 10, "solo"], margharon: [256, 256, 14, "special"],
+    rhayrivel: [258, 258, 7, "solo"], sucubo: [259, 259, 5, "special"],
+    abahddon: [260, 261, "S", "solo"], lamashtu: [263, 263, "S", "solo"]
+  };
+  for (const [id, [page, end, nd, role]] of Object.entries(sheets)) {
+    const creature = getCreatureById(id);
+    assert.ok(creature, id);
+    assert.equal(creature.source.pdfFile, "T20 Deuses de Arton.pdf", id);
+    assert.equal(creature.source.pdfPage, page + 2, id);
+    assert.equal(creature.source.pdfPageEnd ?? creature.source.pdfPage, end + 2, id);
+    assert.equal(creature.challengeRating, nd, id);
+    assert.equal(creature.role, role, id);
+    assert.equal(creature.roleSource, "pdf-review", id);
+  }
+  assert.ok(getCreatureById("aucharai").abilities.find(a => a.name === "Escurecer Olhos").magical);
+  assert.equal(getCreatureById("lamashtu").stats.hitPoints, 2500);
+  assert.equal(getCreatureById("abahddon").stats.manaPoints, 156);
+});
+
+test("Deuses aspects show the printed sheets and their shared invocation ritual", () => {
+  const sheets = {
+    "aspecto-de-allihanna": [265, 265, 5, "animal"],
+    "aspecto-de-kallyadranoch": [267, 267, 6, "monster"],
+    "aspecto-de-khalmyr": [269, 269, 5, "humanoid"],
+    "aspecto-de-lin-wu": [269, 270, 4, "spirit"],
+    "aspecto-de-marah": [271, 272, 4, "spirit"],
+    "aspecto-de-valkaria": [273, 273, 5, "humanoid"]
+  };
+  for (const [id, [page, end, nd, type]] of Object.entries(sheets)) {
+    const creature = getCreatureById(id);
+    assert.ok(creature, id);
+    assert.equal(creature.source.book, "Deuses de Arton", id);
+    assert.equal(creature.source.pdfPage, page + 2, id);
+    assert.equal(creature.source.pdfPageEnd ?? creature.source.pdfPage, end + 2, id);
+    assert.equal(creature.challengeRating, nd, id);
+    assert.equal(creature.type, type, id);
+    assert.equal(creature.role, "solo", id);
+    const ritual = creature.abilities.find(ability => ability.name === "Invocando Aspectos");
+    assert.match(ritual?.text ?? "", new RegExp(`Religião CD ${25 + nd}`), id);
+    assert.match(ritual.text, /Celebrar Ritual.*1 hora.*10 PM.*T\$ 3\.000/, id);
+  }
+  assert.equal(getCreatureById("aspecto-de-marah").actions.length, 0);
+  assert.equal(getCreatureById("aspecto-de-lin-wu").stats.manaPoints, 36);
+  assert.ok(getCreatureById("aspecto-de-khalmyr").abilities.find(ability => ability.name === "Cura pelas Mãos").magical);
+});
+
+test("celestial and inevitable sheets retain printed roles, page spans and common rules", () => {
+  const sheets = {
+    pilly: [274, 275, 3, "minion"], protetor: [276, 276, 7, "solo"], shiradi: [277, 277, 7, "solo"],
+    pegaso: [280, 280, 3, "solo"], "pegaso-de-khalmyr": [280, 280, 15, "solo"],
+    muhir: [282, 282, 15, "solo"], orel: [283, 283, 16, "special"], "furia-extrema": [284, 284, 20, "solo"],
+    fado: [279, 279, 8, "solo"], probo: [279, 279, 11, "special"], parcus: [279, 279, 14, "solo"]
+  };
+  for (const [id, [page, end, nd, role]] of Object.entries(sheets)) {
+    const creature = getCreatureById(id);
+    assert.ok(creature, id);
+    assert.equal(creature.source.pdfFile, "T20 Deuses de Arton.pdf", id);
+    assert.equal(creature.source.pdfPage, page + 2, id);
+    assert.equal(creature.source.pdfPageEnd ?? creature.source.pdfPage, end + 2, id);
+    assert.equal(creature.challengeRating, nd, id);
+    assert.equal(creature.role, role, id);
+    assert.equal(creature.roleSource, "pdf-review", id);
+  }
+  for (const id of ["fado", "probo", "parcus"]) {
+    const { abilities } = getCreatureById(id);
+    assert.ok(abilities.find(ability => ability.name === "Encontrar o Culpado")?.magical, id);
+    assert.match(abilities.find(ability => ability.name === "Investir a Culpa")?.text ?? "", /\+2d6.*luz/, id);
+    assert.match(abilities.find(ability => ability.name === "Visão da Justiça")?.text ?? "", /Visão da Verdade/, id);
+  }
+  assert.equal(getCreatureById("probo").abilities.find(ability => ability.name === "Negar Recurso").cost, "3 PM");
+});
+
+test("Deuses fey sheets retain printed roles, references and supernatural abilities", () => {
+  const sheets = {
+    driade: [286, 287, 4], "duende-menor": [288, 288, 1], "duende-maior": [288, 288, 5],
+    dragonete: [289, 289, 4], naiade: [290, 290, 3], ninfa: [291, 291, 6],
+    "satiro-arqueiro": [292, 293, 2], "silfide-travessa": [293, 294, 1],
+    "silfide-encantadora": [294, 294, 8], "velha-bruxa": [294, 295, 9],
+    "eiradaan-guardiao": [296, 296, 7], "eiradaan-nobre": [296, 297, 13]
+  };
+  for (const [id, [page, end, nd]] of Object.entries(sheets)) {
+    const creature = getCreatureById(id);
+    assert.ok(creature, id);
+    assert.equal(creature.type, "spirit", id);
+    assert.equal(creature.source.pdfFile, "T20 Deuses de Arton.pdf", id);
+    assert.equal(creature.source.pdfPage, page + 2, id);
+    assert.equal(creature.source.pdfPageEnd ?? creature.source.pdfPage, end + 2, id);
+    assert.equal(creature.challengeRating, nd, id);
+    assert.equal(creature.role, id === "satiro-arqueiro" ? "minion" : "special", id);
+    assert.equal(creature.roleSource, "pdf-review", id);
+  }
+  const getAbility = (id, name) => getCreatureById(id).abilities.find(ability => ability.name === name);
+  assert.ok(getAbility("dragonete", "Ladrão de Magias").magical);
+  assert.equal(getAbility("silfide-encantadora", "Enganadora Nata").cost, "3 PM");
+  assert.match(getAbility("satiro-arqueiro", "Flautista Mágico").text, /sem gastar PM/);
+  assert.match(getAbility("eiradaan-nobre", "Montaria Celestial").text, /15m/);
+});
+
+test("Deuses genie sheets include their printed stats and shared pact rules", () => {
+  const sheets = {
+    yazzu: [299, 299, 10, 72], jairuan: [300, 300, 6, 41], gizzehi: [301, 302, 12, 85],
+    allaraz: [302, 303, 14, 113], kemooz: [304, 304, 9, 57], dabbus: [304, 305, 15, 98]
+  };
+  for (const [id, [page, end, nd, mana]] of Object.entries(sheets)) {
+    const creature = getCreatureById(id);
+    assert.ok(creature, id);
+    assert.equal(creature.source.pdfFile, "T20 Deuses de Arton.pdf", id);
+    assert.equal(creature.source.pdfPage, page + 2, id);
+    assert.equal(creature.source.pdfPageEnd ?? creature.source.pdfPage, end + 2, id);
+    assert.equal(creature.challengeRating, nd, id);
+    assert.equal(creature.role, "special", id);
+    assert.equal(creature.stats.manaPoints, mana, id);
+    const ability = name => creature.abilities.find(entry => entry.name === name);
+    assert.match(ability("Dentro de uma Lampadazinha")?.text ?? "", /1 PM.*pacto/);
+    assert.equal(ability("Poderes Cósmicos Fenomenais")?.timing, "completa");
+    assert.match(ability("Servo dos Deuses")?.text ?? "", /Viagem Planar.*sem componente material.*apenas em si/);
+  }
+  const protect = getCreatureById("allaraz").abilities.find(ability => ability.name === "Proteger Criação");
+  assert.equal(protect.cost, "10 PM");
+  assert.ok(protect.magical);
+});
+
+test("Deuses giants retain printed roles, references and special hit points", () => {
+  const sheets = {
+    "galokk-capanga": [307, 307, 6, "minion"], "galokk-guarda-costas": [307, 307, 10, "minion"],
+    "gigante-bicefalo": [308, 308, 13, "solo"], "gigante-das-colinas": [309, 309, 7, "solo"],
+    "gigante-do-fogo": [310, 310, 11, "special"], "gigante-das-rochas": [311, 311, 9, "solo"],
+    "gigante-do-gelo": [311, 312, 9, "solo"], "gigante-dos-mares": [312, 312, 9, "solo"],
+    "gigante-real": [313, 313, 19, "solo"], "gigante-maximo": [314, 315, "S+", "solo"]
+  };
+  for (const [id, [page, end, nd, role]] of Object.entries(sheets)) {
+    const creature = getCreatureById(id);
+    assert.ok(creature, id);
+    assert.equal(creature.source.pdfFile, "T20 Deuses de Arton.pdf", id);
+    assert.equal(creature.source.pdfPage, page + 2, id);
+    assert.equal(creature.source.pdfPageEnd ?? creature.source.pdfPage, end + 2, id);
+    assert.equal(creature.challengeRating, nd, id);
+    assert.equal(creature.role, role, id);
+  }
+  const max = getCreatureById("gigante-maximo");
+  assert.equal(max.stats.hitPoints, null);
+  assert.equal(max.stats.hitPointsText, "Especial (veja Grande Demais)");
+  assert.match(max.abilities.find(a => a.name === "Grande Demais").text, /3\.000 PV/);
+  for (const id of ["gigante-das-rochas", "gigante-do-gelo", "gigante-dos-mares"]) {
+    assert.match(getCreatureById(id).abilities.find(a => a.name.startsWith("Barril Gigante")).text, /Aguardente.*Sidra.*Vinho/, id);
+  }
+});
+
+test("Deuses avatars retain their printed roles, ND and full PDF references", () => {
+  const sheets = {
+    "avatar-de-allihanna-deuses-de-arton": [155, 20, "solo", 1200],
+    "avatar-de-arsenal-deuses-de-arton": [159, 18, "solo", 1080],
+    "avatar-de-azgher-deuses-de-arton": [163, "S", "solo", 2752],
+    "avatar-de-hyninn-deuses-de-arton": [167, 19, "special", 798],
+    "avatar-de-khalmyr-deuses-de-arton": [175, "S", "solo", 2500],
+    "avatar-de-lena-deuses-de-arton": [179, 20, "special", 900],
+    "avatar-de-lin-wu-deuses-de-arton": [183, 19, "solo", 1284],
+    "avatar-de-marah-deuses-de-arton": [187, 19, "special", 789],
+    "avatar-de-megalokk-deuses-de-arton": [191, 20, "solo", 1800],
+    "avatar-do-oceano-deuses-de-arton": [199, "S", "solo", 2500],
+    "avatar-de-sszzaas-deuses-de-arton": [203, 19, "solo", 1007],
+    "avatar-de-tanna-toh-deuses-de-arton": [207, 20, "special", 953],
+    "avatar-de-tenebra-deuses-de-arton": [211, "S", "special", 1750],
+    "avatar-de-nimb-deuses-de-arton": [195, "S+", "solo", 4777],
+    "avatar-de-thwor-deuses-de-arton": [215, 18, "solo", 1100],
+    "avatar-de-thyatis-deuses-de-arton": [219, 19, "solo", 1140],
+    "avatar-de-valkaria-deuses-de-arton": [223, "S+", "solo", 3800],
+    "avatar-de-wynna-deuses-de-arton": [227, "S", "special", 1800]
+  };
+  for (const [id, [page, nd, role, pv]] of Object.entries(sheets)) {
+    const creature = getCreatureById(id);
+    assert.ok(creature, id);
+    assert.equal(creature.source.pdfFile, "T20 Deuses de Arton.pdf", id);
+    assert.equal(creature.source.pdfPage, page + 2, id);
+    assert.equal(creature.challengeRating, nd, id);
+    assert.equal(creature.role, role, id);
+    assert.equal(creature.stats.hitPoints, pv, id);
+    if (creature.stats.defensesText.includes("maior que a morte")) {
+      assert.match(creature.abilities.find(a => a.name === "Maior que a Morte")?.text ?? "", /metade dos PV/);
+    }
+  }
+  const avatar = getCreatureById("avatar-de-allihanna-deuses-de-arton");
+  assert.match(avatar.abilities.find(a => a.name === "Arsenal Natural").text, /Cauda.*Tentáculo/);
+  assert.ok(avatar.abilities.find(a => a.name === "Forma Natural").magical);
+  const nimb = getCreatureById("avatar-de-nimb-deuses-de-arton");
+  assert.equal(nimb.stats.perception, "1d20+21");
+  assert.equal(nimb.stats.attributes.wis, "1d20");
+  const thwor = getCreatureById("avatar-de-thwor-deuses-de-arton");
+  assert.match(thwor.abilities.find(a => a.name === "Encarnação do Mundo Como Deve Ser").text, /Início \(Padrão\).*Habilidade mágica.*Vida\. O Avatar recebe cura acelerada 20\. Habilidade mágica\./);
+  const wynna = getCreatureById("avatar-de-wynna-deuses-de-arton");
+  assert.equal(wynna.abilities.filter(a => a.magical).length, 5);
 });

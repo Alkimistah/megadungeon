@@ -652,6 +652,31 @@ async function creatureHealthFlow() {
     assert.match(text, sheetText);
     assert.ok(text.includes(`PDF p. ${pdfPage}`));
   }
+  for (const [id, patterns] of [
+    ["horda-de-otyughs", [/PDF p\. 301/, /Defesa por 10 ou mais/]],
+    ["enxame-kobold", [/Solo/, /condição ruim para lançar magias/]],
+    ["coruja-druida", [/Chamado da Dama Altiva \(Padrão\) · Mágica/i, /PONTOS DE MANA\s+55/]],
+    ["serpe-ameacas-de-arton", [/Serpe · Ameaças de Arton/i, /PDF p\. 312/]],
+    ["cardume-de-selakos", [/Defesa por 10 ou mais/, /PDF p\. 325/]],
+    ["kraken", [/Chamado do Mar \(Padrão\) · Mágica/i, /PDF p\. 327/]],
+    ["finntroll-senhor-de-estabulo", [/Corpo Vegetal/i, /PDF p\. 344–345/]],
+    ["abahddon", [/ND S/, /PONTOS DE MANA\s+156/, /PDF p\. 262–263/]],
+    ["aspecto-de-lin-wu", [/Dragão Divino/i, /Religião CD 29/, /PDF p\. 271–272/]],
+    ["aspecto-de-khalmyr", [/Cura pelas Mãos \(Movimento\) · Mágica/i, /Religião CD 30/]],
+    ["pilly", [/Lacaio/, /Raio Iridescente/i, /PDF p\. 276–277/]],
+    ["probo", [/Especial/, /Negar Recurso \(Movimento, 3 PM\)/i, /Encontrar o Culpado · Mágica/i]],
+    ["dragonete", [/Especial/, /Ladrão de Magias \(Reação\) · Mágica/i, /PDF p\. 291/]],
+    ["eiradaan-nobre", [/Montaria Celestial/i, /PONTOS DE MANA\s+65/, /PDF p\. 298–299/]],
+    ["allaraz", [/Especial/, /Proteger Criação \(Reação, 10 PM\) · Mágica/i, /PDF p\. 304–305/]],
+    ["dabbus", [/Poderes Cósmicos Fenomenais \(Completa\)/i, /Viagem Planar sem componente material/, /PONTOS DE MANA\s+98/]],
+    ["gigante-dos-mares", [/Coquetel Praiano/i, /Aguardente:.*Sidra:.*Vinho:/s, /PDF p\. 314/]],
+    ["gigante-maximo", [/ND S\+/, /PONTOS DE VIDA\s+Especial \(veja Grande Demais\)/i, /3\.000 PV/, /PDF p\. 316–317/]]
+  ]) {
+    await creature.selectOption(id);
+    await manual.getByRole("button", { name: "Gerar encontro", exact: true }).click();
+    const text = await detail.innerText();
+    for (const pattern of patterns) assert.match(text, pattern, id);
+  }
   await creature.selectOption("");
   assert.equal(await budget.isEnabled(), true);
   await page.close();

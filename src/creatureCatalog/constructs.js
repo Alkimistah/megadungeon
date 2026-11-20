@@ -1784,7 +1784,446 @@ export const corcelDeComando = {
     "skillsText": "Atletismo +13"
 };
 
+const yidishanBugbear = {
+    "id": "yidishan-bugbear",
+    "name": "Yidishan Bugbear",
+    "type": "construct",
+    "subtype": "yidishan",
+    "size": "Médio",
+    "challengeRating": 2,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 300,
+        "pdfPage": 302
+    },
+    "stats": {
+        "initiative": 3,
+        "perception": 0,
+        "defense": 21,
+        "fortitude": 13,
+        "reflex": 9,
+        "will": 2,
+        "hitPoints": 70,
+        "speedText": "9m (6q)",
+        "senses": "faro, visão no escuro",
+        "defensesText": null,
+        "attributes": {
+            "str": 6,
+            "dex": 2,
+            "con": 3,
+            "int": -2,
+            "wis": -1,
+            "cha": -4
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Pancada +10 (2d6+6, x3)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Espasmo Final",
+            "timing": "reação",
+            "text": "Ao chegar a 0 PV ou menos, faz um ataque de pancada contra uma criatura adjacente, normalmente a que lhe causou o último dano."
+        },
+        {
+            "name": "Saborear Pavor",
+            "timing": null,
+            "text": "Perto de uma criatura abalada ou apavorada (alcance curto), recebe bônus em ataque e dano igual à penalidade da condição."
+        },
+        {
+            "name": "Soco Pneumático",
+            "timing": "padrão",
+            "text": "Faz uma pancada que, se acertar, causa +2d6 de dano e deixa a vítima enjoada por um turno e caída (Fort CD 16 evita a condição enjoada). Recarga (movimento)."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Metade.",
+    "skillsText": "Furtividade +3, Intimidação +9.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const golemDeNorGrande = {
+    "id": "golem-de-nor-grande",
+    "name": "Golem de Nor Grande",
+    "type": "construct",
+    "subtype": null,
+    "size": "Grande",
+    "challengeRating": 8,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 349,
+        "pdfPage": 351
+    },
+    "stats": {
+        "initiative": 10,
+        "perception": 13,
+        "defense": 32,
+        "fortitude": 21,
+        "reflex": 7,
+        "will": 15,
+        "hitPoints": 290,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a frio, redução de fogo 15",
+        "attributes": {
+            "str": 5,
+            "dex": 0,
+            "con": 5,
+            "int": null,
+            "wis": 0,
+            "cha": -5
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Espada longa x2 +26 (2d8+25, 19, mais 2 frio)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Aura Congelante",
+            "timing": "padrão",
+            "text": "Uma vez por cena, o golem de Nor grande recebe 50 PV temporários. Se uma criatura acertar um ataque corpo a corpo contra o golem enquanto ele tem estes PV temporários, fica enredada (Fort CD 24 evita)."
+        },
+        {
+            "name": "Imunidade a Magia",
+            "timing": null,
+            "text": "O golem é imune a efeitos mágicos, com a seguinte exceção. Efeitos mágicos de frio curam PV em quantidade igual à metade do dano que causariam."
+        }
+    ],
+    "equipment": "Escudo pesado de gelo eterno, espada longa aumentada de gelo eterno.",
+    "treasure": "Lascas gélidas (CD 23 para extrair, valem T$ 200 para fabricar itens de gelo eterno).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const golemDeNorEnorme = {
+    "id": "golem-de-nor-enorme",
+    "name": "Golem de Nor Enorme",
+    "type": "construct",
+    "subtype": null,
+    "size": "Enorme",
+    "challengeRating": 10,
+    "source": {
+        "book": "Ameaças de Arton",
+        "edition": "1ª edição, novembro de 2023",
+        "pdfFile": "T20 Ameacas de Arton.pdf",
+        "bookPage": 349,
+        "pdfPage": 351,
+        "bookPageEnd": 350,
+        "pdfPageEnd": 352
+    },
+    "stats": {
+        "initiative": 12,
+        "perception": 15,
+        "defense": 35,
+        "fortitude": 11,
+        "reflex": 8,
+        "will": 16,
+        "hitPoints": 370,
+        "speedText": "12m (8q)",
+        "senses": "visão no escuro",
+        "defensesText": "imunidade a frio, redução de fogo 15",
+        "attributes": {
+            "str": 7,
+            "dex": 0,
+            "con": 9,
+            "int": null,
+            "wis": 0,
+            "cha": -5
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Espada longa x2 +29 (2d10+29, 19, mais 2 frio)."
+        }
+    ],
+    "abilities": [
+        {
+            "name": "Aura Congelante",
+            "timing": "padrão",
+            "text": "Uma vez por cena, o golem de Nor enorme recebe 100 PV temporários. Se uma criatura acertar um ataque corpo a corpo contra o golem enquanto ele tem estes PV temporários, fica enredada (Fort CD 28 evita)."
+        },
+        {
+            "name": "Imunidade a Magia",
+            "timing": null,
+            "text": "O golem é imune a efeitos mágicos, com a seguinte exceção. Efeitos mágicos de frio curam PV em quantidade igual à metade do dano que causariam."
+        },
+        {
+            "name": "Sentinela Eterno",
+            "timing": "reação",
+            "text": "O golem ataca uma criatura que entre em seu alcance corpo a corpo voluntariamente. Se acertar esse ataque, o golem deixa a criatura lenta e, se ela estava fazendo uma investida, ele causa +3d8 pontos de dano de frio. O golem pode usar esta habilidade uma vez por rodada contra cada criatura."
+        }
+    ],
+    "equipment": "Escudo pesado de gelo eterno, espada longa aumentada de gelo eterno.",
+    "treasure": "Lascas gélidas (CD 25 para extrair, valem T$ 600 para fabricar itens de gelo eterno).",
+    "skillsText": null,
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+// Deuses de Arton, p. 278. As regras do Chassi Dourado são para personagens.
+const inevitableAbilities = [
+    {
+        name: "Encontrar o Culpado",
+        timing: null,
+        magical: true,
+        text: "O inevitável sempre sabe a localização da criatura que deve caçar, como sob o efeito permanente da magia Localização com alcance de toda Arton."
+    },
+    {
+        name: "Investir a Culpa",
+        timing: null,
+        text: "Contra a criatura que foi criado para caçar, o inevitável recebe +5 em testes de perícia e seus ataques causam +2d6 pontos de dano de luz."
+    },
+    {
+        name: "Visão da Justiça",
+        timing: null,
+        text: "O inevitável está permanentemente sob o efeito básico da magia Visão da Verdade."
+    }
+];
+
+const fado = {
+    "id": "fado",
+    "name": "Fado",
+    "type": "construct",
+    "subtype": "inevitável",
+    "size": "Grande",
+    "challengeRating": 8,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 279,
+        "pdfPage": 281
+    },
+    "stats": {
+        "initiative": 10,
+        "perception": 13,
+        "defense": 31,
+        "fortitude": 21,
+        "reflex": 8,
+        "will": 15,
+        "hitPoints": 330,
+        "speedText": "12m (8q), voo 24m (16q)",
+        "senses": "visão no escuro",
+        "defensesText": "cura acelerada 5, resistência a dano 10, imunidade a fogo, resistência a magia +5",
+        "attributes": {
+            "str": 4,
+            "dex": 2,
+            "con": 4,
+            "int": null,
+            "wis": 3,
+            "cha": -2
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Corrente de espinhos sagrada x2 +23 (1d10+17, 19, mais 2d6 fogo)."
+        }
+    ],
+    "abilities": [
+        ...inevitableAbilities,
+        {
+            "name": "Derrubar e Desarmar",
+            "timing": "livre",
+            "text": "Se o fado acerta um ataque de corrente de espinhos, pode fazer a manobra derrubar ou a manobra desarmar (teste +29)."
+        }
+    ],
+    "equipment": "Corrente de espinhos sagrada.",
+    "treasure": "Nenhum.",
+    "skillsText": "Religião +11, Sobrevivência +11.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
+const probo = {
+    "id": "probo",
+    "name": "Probo",
+    "type": "construct",
+    "subtype": "inevitável",
+    "size": "Médio",
+    "challengeRating": 11,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 279,
+        "pdfPage": 281
+    },
+    "stats": {
+        "initiative": 7,
+        "perception": 13,
+        "defense": 40,
+        "fortitude": 16,
+        "reflex": 9,
+        "will": 22,
+        "hitPoints": 550,
+        "speedText": "9m (6q)",
+        "senses": "visão no escuro",
+        "defensesText": "cura acelerada 5, imunidade a frio, redução de dano 10, resistência a magia +5",
+        "attributes": {
+            "str": 5,
+            "dex": 2,
+            "con": 3,
+            "int": 0,
+            "wis": 3,
+            "cha": 1
+        },
+        "manaPoints": 58
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Espada bastarda sagrada x3 +26 (1d10+23, 19, mais 2d6 frio)."
+        }
+    ],
+    "abilities": [
+        ...inevitableAbilities,
+        {
+            "name": "Analisar Suspeito",
+            "timing": "completa",
+            "text": "O probo analisa uma criatura em alcance médio. Até o fim do dia, ele recebe +3 em testes de perícia contra ela."
+        },
+        {
+            "name": "Ler Seus Direitos",
+            "timing": "movimento",
+            "text": "Uma criatura em alcance curto fica pasma por 1 rodada, ou atordoada por 1 rodada se for a criatura que o probo deve caçar (Fort CD 31 evita).",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Negar Recurso",
+            "timing": "movimento",
+            "text": "Uma criatura em alcance médio do probo faz um teste de Vontade (CD 31). Se falhar, não pode utilizar uma habilidade à escolha do probo até o fim da cena (para esse efeito, cada magia da criatura conta como uma habilidade). Uma mesma criatura só pode ter uma habilidade negada por vez.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Magias",
+            "timing": null,
+            "text": "Como um clérigo de 11º nível (CD 31)."
+        },
+        {
+            "name": "Disfarce Ilusório",
+            "timing": "padrão",
+            "text": "Até o fim da cena, o probo muda a própria aparência, incluindo seu equipamento e os odores e as sensações que transmite. Isso afeta altura, peso, tom de pele, cor de cabelo, timbre de voz etc. Ele recebe +20 em testes de Enganação para disfarce (Von desacredita).",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Dissipar Magia",
+            "timing": "padrão",
+            "text": "O probo escolhe uma criatura, objeto ou esfera de 3m em alcance médio e faz um teste de Misticismo. Todas as magias nesse alvo com CD igual ou menor que o resultado do teste são dissipadas.",
+            "cost": "3 PM"
+        },
+        {
+            "name": "Imobilizar",
+            "timing": "padrão",
+            "text": "Uma criatura em alcance curto fica paralisada (Von muda para lenta). A cada rodada, a vítima pode gastar uma ação completa para fazer um novo teste de Vontade. Se passar, liberta-se do efeito.",
+            "cost": "7 PM"
+        },
+        {
+            "name": "Silêncio",
+            "timing": "padrão",
+            "text": "O probo cria uma esfera de 6m em alcance médio. Criaturas nessa área ficam surdas e não podem lançar magias.",
+            "cost": "3 PM, sustentada"
+        }
+    ],
+    "equipment": "Espada bastarda sagrada, loriga segmentada.",
+    "treasure": "Nenhum.",
+    "skillsText": "Conhecimento +9, Diplomacia +10, Intuição +10, Misticismo +9, Nobreza +9, Religião +10.",
+    "role": "special",
+    "roleSource": "pdf-review"
+};
+
+const parcus = {
+    "id": "parcus",
+    "name": "Parcus",
+    "type": "construct",
+    "subtype": "inevitável",
+    "size": "Médio",
+    "challengeRating": 14,
+    "source": {
+        "book": "Deuses de Arton",
+        "edition": "1ª edição, maio de 2025 (v1.1)",
+        "pdfFile": "T20 Deuses de Arton.pdf",
+        "bookPage": 279,
+        "pdfPage": 281
+    },
+    "stats": {
+        "initiative": 10,
+        "perception": 15,
+        "defense": 44,
+        "fortitude": 22,
+        "reflex": 14,
+        "will": 28,
+        "hitPoints": 700,
+        "speedText": "12m (8q)",
+        "senses": "visão no escuro",
+        "defensesText": "cura acelerada 10, imunidade a eletricidade e trevas, resistência a magia +5, redução de dano 15",
+        "attributes": {
+            "str": 7,
+            "dex": 3,
+            "con": 4,
+            "int": 0,
+            "wis": 4,
+            "cha": 3
+        }
+    },
+    "actions": [
+        {
+            "name": "Corpo a Corpo",
+            "text": "Dois punhos trovejantes x2 +34 (2d8+12 impacto, 19/x3, mais 2d8 eletricidade)."
+        }
+    ],
+    "abilities": [
+        ...inevitableAbilities,
+        {
+            "name": "Aura de Luz",
+            "timing": null,
+            "text": "No início de cada turno do parcus, todas as criaturas em um raio de 9m dele sofrem 8d6 pontos de dano de luz."
+        },
+        {
+            "name": "Aura Antimagia",
+            "timing": null,
+            "text": "O parcus está permanentemente cercado por uma aura de 9m de raio que gera um efeito semelhante ao da magia Campo Antimagia."
+        },
+        {
+            "name": "Corrente de Relâmpagos",
+            "timing": "padrão",
+            "text": "Criaturas à escolha do parcus em alcance médio sofrem 8d8 pontos de dano de eletricidade e 8d8 pontos de dano de luz (Ref CD 37 reduz à metade). Recarga (movimento)."
+        },
+        {
+            "name": "Sentença de Re-Morte",
+            "timing": "padrão",
+            "text": "Uma vez por cena, o parcus marca uma criatura em alcance curto. Até o fim da cena, essa criatura não pode curar pontos de vida nem receber PV temporários e, se for um morto-vivo, fica alquebrada (Fort CD 37 evita o efeito sobre pontos de vida e reduz a condição para esmorecido)."
+        },
+        {
+            "name": "Vingador Celestial",
+            "timing": "reação",
+            "text": "Quando é reduzido a 350 PV ou menos, até o fim da cena o parcus recebe deslocamento de voo 12m, sua cura acelerada aumenta para 15, seu dano de luz se torna maximizado e a área de suas auras aumenta para 30m."
+        }
+    ],
+    "equipment": null,
+    "treasure": "Nenhum.",
+    "skillsText": "Conhecimento +11, Intuição +20, Misticismo +11, Sobrevivência +15.",
+    "role": "solo",
+    "roleSource": "pdf-review"
+};
+
 export const constructCreatures = [
+    fado, probo, parcus,
+    golemDeNorGrande, golemDeNorEnorme,
+    yidishanBugbear,
     // Manuais, Livro Básico e Ameaças de Arton
     gargoyle, gargoyleBasic, golemDeHierro, golemDeFerroBasic, colossoSupremo, engenhoDeGuerraGoblin,
     mashinMonge, mashinSamurai, golemDeBarro, golemDeBronze,
