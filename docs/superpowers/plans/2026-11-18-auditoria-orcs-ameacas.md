@@ -1,6 +1,6 @@
 # Auditoria de Ameaças de Arton
 
-Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. Das **227 fichas auditadas**, **187 estão publicadas** e **40 estão no trabalho local**. Familiares ficou registrado como fora do catálogo. O próximo bloco é Mascotes & Mortos-Vivos. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
+Lotes conferidos contra o PDF integral da 1ª edição, de novembro de 2023. As **227 fichas auditadas** estão publicadas. Familiares ficou registrado como fora do catálogo. O próximo bloco é Mascotes & Mortos-Vivos. [Situação por bloco e pendências](#pendências-e-ponto-de-retomada)
 
 | ID do catálogo | ND | Página impressa | Página no PDF integral | Percepção em subterrâneos no livro |
 |---|---:|---:|---:|---:|
@@ -740,9 +740,9 @@ Situação em 19 de novembro de 2026.
 | Império de Tauron | 168–177 | 12 | Publicado |
 | Kobolds | 178–189 | 10 | Publicado |
 | Familiares | 190–197 | 0 | Fora do catálogo |
-| Masmorras | 198–209 | 14 | Validado localmente |
-| Montarias | 210–227 | 26 | Validado localmente |
-| **Total** | | **227** | **187 publicadas e 40 locais** |
+| Masmorras | 198–209 | 14 | Publicado |
+| Montarias | 210–227 | 26 | Publicado |
+| **Total** | | **227** | **Publicadas** |
 
 As 227 fichas citam o PDF integral, `T20 Ameacas de Arton.pdf`, com página impressa e página do PDF. Os testes dos andares 11–20 fixam essas referências. As omissões de texto, os erros tipográficos do livro e os papéis impressos estão registrados nas seções de cada lote.
 
@@ -750,7 +750,7 @@ Os nove blocos de Elementais a Kobolds foram publicados em `18952eb`, com as ref
 
 Antes do push, passaram o build de produção, os testes de andares 1–10, os 65 testes de andares 11–20 e os testes de missões. O QA dos andares 11–20 no Chrome passou contra o site publicado, sem erros de JavaScript, incluindo a seleção por livro e o uso offline após o cache. O bundle publicado traz as sete Detonações Finais opcionais e já não cita os recortes de Elementais, Império de Jade e Kobolds. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44650121973)
 
-Masmorras e Montarias estão validados localmente: passaram o build de produção, os testes de andares 1–10, os 69 testes de andares 11–20, os testes de missões e o QA dos andares 11–20 no Chrome contra o build local, incluindo a seleção das duas versões do Gorlogg. A publicação está pendente.
+Masmorras, Montarias e a retirada dos quadros de parceiro e familiar foram publicados em `da7c816`. Antes do push, passaram o build de produção, os testes de andares 1–10, os 69 testes de andares 11–20, os testes de missões e o QA dos andares 11–20 contra o build local. Depois do deploy, o QA passou contra o site publicado, sem erros de JavaScript. O bundle publicado traz `gorlogg-livro-basico`, não cita o recorte `ameacas de arton p200 ate 229.pdf` e não tem habilidades chamadas Parceiro ou Familiar. [Implantação validada](https://github.com/Alkimistah/megadungeon/actions/runs/44654215976)
 
 ### O que falta em Ameaças de Arton
 
