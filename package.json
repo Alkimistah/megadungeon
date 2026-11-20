@@ -12,6 +12,8 @@
     "test:treasure": "node scripts/treasure.test.mjs",
     "qa:floors-11-20": "node scripts/qaForestMvp.mjs",
     "qa:floors-1-10": "node scripts/qaFloors1to10.mjs",
+    "qa:treasure": "node scripts/qaTreasure.mjs",
+    "qa:treasure-offline": "node scripts/qaTreasureOffline.mjs",
     "preview": "vite preview --host 0.0.0.0"
   },
   "devDependencies": {

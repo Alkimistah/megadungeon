@@ -509,16 +509,30 @@ O app funciona offline via Service Worker (`public/sw.js`) com cache de todos os
 
 ### Rolagem de tesouros
 
-A interface proposta foi registrada no commit `2860070`. O detalhamento das regras e a implementação ficam para depois da auditoria das fichas de criaturas. Um botão no cabeçalho, junto aos acessos de encontros manuais e missões, abrirá a modal **Rolar tesouros**.
+A modal **Tesouros** rola tesouros do Livro Básico e consulta as tabelas passo a passo. Regras, decisões do PO e critérios de validação estão em [docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md](docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md).
 
-- **Entrada.** Uma linha de controles com **ND**, **Quantidade**, um grupo de opções exclusivas **Padrão**, **Item** e **Riqueza**, e o botão **Rolar**.
-- **Tabela de resultados.** Uma linha numerada por tesouro. **Padrão** mostra as colunas **Item** e **Riqueza**. **Item** e **Riqueza** exibem somente a coluna selecionada.
-- **Detalhe por célula.** Mostrar, em ordem, o valor de cada rolagem e o resultado da tabela consultada. Quando o resultado direcionar a outra tabela, exibir a rolagem seguinte logo abaixo. Quando houver uma expressão de dados, mostrar a expressão e o valor obtido.
-- **Resumo do lote.** O rodapé reúne os itens e suas quantidades, os valores em T$ e as demais riquezas discriminadas, incluindo quantidade, valor e outras informações relevantes quando aplicáveis.
+- **Entrada.** Um botão no cabeçalho, com o ícone de baú aberto e junto aos acessos de encontros manuais e missões, abre a modal. Ela ocupa a tela inteira, como a modal do nodo, e as cores seguem o tema do perfil de andares selecionado.
+- **Aba Rolar.** Uma linha por rolagem, com ND, Quantidade (1 a 99), Tipo (Padrão, Metade ou Dobro) e Colunas (Item e Riqueza, Só Item ou Só Riqueza). Uma linha também pode apontar para uma tabela específica, inclusive as listas de outros livros. **Rolar tudo** gera o lote: cada tesouro aparece numerado, com a cascata de passos (valor rolado, linha obtida e tabela seguinte).
+- **Rodapé do lote.** Moedas e total em T$, riquezas discriminadas com quantidade e valor, e itens agrupados com quantidade e preço.
+- **Aba Consultar.** Um tesouro por vez, a partir de qualquer tabela (a 8-1 pede ND e coluna). Em cada passo, o mestre informa o valor do dado físico e o motor abre a tabela seguinte. Expressões de dados aceitam o total digitado ou um botão de rolagem. Encantos ou melhorias repetidos e linhas 2D pedem novo valor, com a explicação. “Nova consulta” reinicia.
 
-No exemplo de interface com **ND 2**, **Quantidade 3** e modo **Padrão**, o resultado tem três linhas. Uma célula de item pode mostrar `62 — Equipamento` e, logo abaixo, `55 — Gadanho`. Outra pode mostrar uma poção sorteada após a rolagem na tabela de poções. Uma célula de riqueza pode mostrar a rolagem que leva a `2d4 × 100 T$` e, abaixo, `200 T$`. Se a rolagem indicar uma riqueza menor, a célula também mostra a consulta à tabela correspondente e a riqueza obtida. Esses valores ilustram a apresentação.
+Módulos em `src/treasure/`:
 
-A geração seguirá as regras e tabelas do **Livro Básico** e consultará os itens aplicáveis de todos os livros disponíveis. O planejamento futuro definirá a associação entre fontes e categorias, a procedência dos resultados e as regras de consolidação do rodapé.
+- `tables/basicBook.js`: Tabelas 8-1 a 8-15 do Livro Básico.
+- `tables/threats.js`, `heroes.js`, `gods.js`: listas de itens de Ameaças, Heróis e Deuses de Arton, como tabelas à parte. `tables/index.js` reúne tudo em `ALL_TABLES`.
+- `treasureEngine.js`: motor com funções puras (`startTreasure`, `startTable`, `nextStep`, `applyRoll`, `resolveWithDice`).
+- `dice.js`: expressões de dados (`parseDice`, `rollDice`).
+- `treasureBatch.js`: linhas do lote e rolagem em lote.
+- `treasureSummary.js`: agregação do rodapé.
+- `treasureFormat.js`: textos dos passos e dos resultados.
+- `treasureDialog.js`: a modal com as abas Rolar e Consultar. É importado sob demanda na primeira abertura, e `prefetchTreasureModule` em `main.js` o carrega em tempo ocioso.
+
+Testes: `npm run test:treasure` roda o motor, as tabelas e o lote. `npm run qa:treasure` roda o roteiro Playwright contra um servidor (`QA_APP_URL`). `npm run qa:treasure-offline` abre a modal offline contra o build de produção.
+
+**Próximos passos**
+
+- Ponderar os livros nas tabelas secundárias, por exemplo 70% para o Livro Básico e o restante para as listas de outros livros. As listas já estão separadas por categoria mágica (menor, médio, maior) para essa ponderação.
+- Buscar os preços do Capítulo 3 para itens impressos sem preço.
 
 ---
 
