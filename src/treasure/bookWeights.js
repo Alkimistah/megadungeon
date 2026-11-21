@@ -9,6 +9,8 @@ import { LIST_TABLES } from "./tables/index.js";
 const BASIC_SHARE = 0.7;
 const TIERS = { menor: "menor", médio: "medio", maior: "maior" };
 
+const SERVICES = ["Casamento (por pessoa)", "Cerimônia religiosa", "Sacramento", "Condecoração militar", "Favor da pessoa amada"];
+
 const pool = (others) => ({ basicShare: BASIC_SHARE, others });
 const improvements = (type) => pool([
   { tableId: "herois/melhorias", filter: { appliesTo: type } },
@@ -21,7 +23,9 @@ const specific = (slug, tier) => pool(LIST_TABLES[`herois/${slug}/${TIERS[tier]}
 // Chave = id da tabela do Livro Básico; "material" = sub-rolagem de material especial da 8-5;
 // "8-9/<categoria>" e "8-11/<categoria>" = item específico de um item mágico dessa categoria.
 export const WEIGHTED_POOLS = Object.freeze({
-  "8-3": pool([{ tableId: "ameacas/itens-gerais" }, { tableId: "herois/itens-gerais" }, { tableId: "deuses/itens-gerais" }]),
+  // Serviços (casamento, cerimônia, sacramento, condecoração, favor) não entram no sorteio ponderado.
+  "8-3": pool([{ tableId: "ameacas/itens-gerais" }, { tableId: "herois/itens-gerais", filter: { excludeNames: SERVICES } },
+    { tableId: "deuses/itens-gerais", filter: { excludeNames: SERVICES } }]),
   "8-4/arma": pool([{ tableId: "ameacas/armas" }, { tableId: "herois/armas" }, { tableId: "herois/municoes" }]),
   "8-4/armadura": pool([{ tableId: "ameacas/armaduras" }, { tableId: "herois/armaduras" }]),
   "8-4/esotérico": pool([]), // sem lista de outro livro: 100% Livro Básico
@@ -39,6 +43,7 @@ export const WEIGHTED_POOLS = Object.freeze({
 });
 
 function matches(item, filter) {
+  if (filter?.excludeNames?.includes(item.name)) return false;
   return !filter?.appliesTo || (item.appliesTo ?? []).includes(filter.appliesTo);
 }
 

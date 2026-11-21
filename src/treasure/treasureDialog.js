@@ -4,7 +4,7 @@ import { rollDice, dieRange } from "./dice.js";
 import { buildBatch, rollBatch, listSpecificTables, MAX_QUANTITY, MODE_LABELS, COLUMN_LABELS } from "./treasureBatch.js";
 import { TYPE_ROLLS } from "./tables/basicBook.js";
 import { ALL_TABLES } from "./tables/index.js";
-import { describeStep, describeRowResult, formatRange, stepDepth, formatAmount, formatItemLine, formatComponents, formatBookDraw, parseTypedValue, tableLabel } from "./treasureFormat.js";
+import { describeStep, describeRowResult, formatRange, stepDepth, formatAmount, formatItemLine, formatComponents, formatBookDraw, parseTypedValue, tableLabel, describeBookRowResult } from "./treasureFormat.js";
 import { summarizeGains } from "./treasureSummary.js";
 import { createRng, createRandomSeed } from "../random.js";
 
@@ -41,7 +41,7 @@ export function renderSummary(container, gains) {
   const money = el("p", "treasure-summary-line");
   money.append(el("strong", "", "Dinheiro: "), coins.length ? coins.join(" · ") : "nenhum");
   const total = el("p", "treasure-summary-line treasure-total");
-  total.append(el("strong", "", "Total em dinheiro: "), el("span", "treasure-total-value", `${formatAmount(summary.totalTibars)} T$`));
+  total.append(el("strong", "", "Total em dinheiro: "), el("span", "treasure-total-value", `T$ ${formatAmount(summary.totalTibars)}`));
   const moneyBlock = el("div", "treasure-summary-block");
   moneyBlock.append(money, total);
 
@@ -83,8 +83,9 @@ function renderChain(state) {
     const { roll, result } = describeStep(step);
     const li = el("li", "treasure-step");
     li.style.marginLeft = `${stepDepth(step) * 14}px`;
-    const table = el("span", "treasure-step-table", tableLabel(step.tableId));
-    table.title = step.tableId;
+    const shownId = step.sourceTableId ?? step.tableId;
+    const table = el("span", "treasure-step-table", tableLabel(shownId));
+    table.title = shownId;
     li.append(table, " ", el("span", "treasure-step-roll", roll),
       " → ", el("span", "treasure-step-result", result));
     const draw = formatBookDraw(step);
@@ -225,12 +226,14 @@ function openSlots(state, itemId) {
   return state.pending.filter((r) => r.context?.itemId === itemId && r.context.role === "slot").length;
 }
 
+// Estados a percorrer, em sequência: "both" faz a cadeia de dinheiro e depois a de itens.
 function startConsult({ source, nd, column, mode }) {
-  if (source === "nd") return startTreasure({ challengeRating: nd, column, mode: column === "items" ? "padrão" : mode })[0];
-  return startTable(source);
+  if (source !== "nd") return [startTable(source)];
+  const one = (col) => startTreasure({ challengeRating: nd, column: col, mode: col === "items" ? "padrão" : mode })[0];
+  return column === "both" ? [one("money"), one("items")] : [one(column)];
 }
 
-function renderHistory(state, notes) {
+function renderHistory(state, notes, prefix = "") {
   const list = el("ol", "treasure-cascade treasure-consult-history");
   for (const step of state.steps) {
     const { roll, result } = describeStep(step);
@@ -239,7 +242,7 @@ function renderHistory(state, notes) {
     const table = el("span", "treasure-step-table", tableLabel(step.tableId));
     table.title = step.tableId;
     li.append(table, " ", el("span", "treasure-step-roll", roll), " → ", el("span", "treasure-step-result", result));
-    if (notes.has(step.id)) li.append(" ", el("em", "treasure-note", `(${notes.get(step.id)})`));
+    if (notes.has(prefix + step.id)) li.append(" ", el("em", "treasure-note", `(${notes.get(prefix + step.id)})`));
     list.append(li);
   }
   return list;
@@ -248,7 +251,7 @@ function renderHistory(state, notes) {
 // Linhas impressas de um pedido: tabela d%/1d6 (8-x) ou a rolagem de tipo (TYPE_ROLLS); sem linhas = expressão.
 function bookRows(request) {
   if (request.kind === "table") {
-    return (ALL_TABLES[request.tableId]?.rows ?? []).map((r) => ({ min: r.min, max: r.max, text: describeRowResult(r.result) }));
+    return (ALL_TABLES[request.tableId]?.rows ?? []).map((r) => ({ min: r.min, max: r.max, text: describeBookRowResult(r.result) }));
   }
   const types = TYPE_ROLLS[request.context?.rolls];
   if (request.context?.action === "itemType" && types) return types.map(([min, max, type]) => ({ min, max, text: type }));
@@ -259,7 +262,7 @@ function bookRows(request) {
 function renderBookTable(request, rows) {
   const wrap = el("div", "treasure-book-table-wrap");
   const table = el("table", "treasure-book-table");
-  table.append(el("caption", "", tableLabel(request.tableId)));
+  table.append(el("caption", "treasure-visually-hidden", tableLabel(request.tableId)));
   const head = el("tr");
   head.append(el("th", "", request.die), el("th", "", "Resultado"));
   const thead = el("thead");
@@ -275,7 +278,9 @@ function renderBookTable(request, rows) {
   table.append(body);
   wrap.append(table);
   const highlight = (value) => {
-    const effective = Number.isInteger(value) ? Math.min(rows.at(-1).max, value + (request.bonus ?? 0)) : NaN;
+    const [lo, hi] = dieRange(request.die);
+    const inRange = Number.isInteger(value) && value >= lo && value <= hi;
+    const effective = inRange ? Math.min(rows.at(-1).max, value + (request.bonus ?? 0)) : NaN;
     trs.forEach((tr, i) => {
       const hit = effective >= rows[i].min && effective <= rows[i].max;
       if (hit) tr.setAttribute("aria-current", "true"); else tr.removeAttribute("aria-current");
@@ -309,7 +314,9 @@ function renderResultCard(state) {
 
 function setupConsultTab(panel) {
   panel.replaceChildren();
-  let state = null;
+  let state = null; // estado em andamento; os concluídos ficam em `stages`
+  let stages = []; // estados já concluídos
+  let queued = []; // estados ainda por começar
   let notes = new Map();
   let full = false;
   const setup = el("div", "treasure-consult-setup");
@@ -320,7 +327,7 @@ function setupConsultTab(panel) {
   for (const v of CHALLENGE_RATINGS) nd.append(option(v, challengeRatingLabel(v)));
   nd.value = "1";
   const column = el("select", "treasure-c-column");
-  column.append(option("money", "Dinheiro"), option("items", "Itens"));
+  column.append(option("both", "Dinheiro e itens"), option("money", "Só dinheiro"), option("items", "Só itens"));
   const mode = el("select", "treasure-c-mode");
   mode.append(option("padrão", "Padrão"), option("metade", "Metade"));
   const begin = el("button", "generate-button treasure-c-start", "Começar consulta");
@@ -352,16 +359,25 @@ function setupConsultTab(panel) {
     prompt.hidden = true;
     result.hidden = true;
     if (!state) return;
-    history.append(renderHistory(state, notes));
+    stages.forEach((done, i) => history.append(renderHistory(done, notes, `${i}:`)));
+    history.append(renderHistory(state, notes, `${stages.length}:`));
     const request = nextStep(state);
+    if (!request && queued.length) {
+      stages.push(state);
+      state = queued.shift();
+      render();
+      return;
+    }
     if (!request) {
+      const all = [...stages, state];
+      const gains = all.flatMap((s) => s.gains);
       result.classList.toggle("treasure-result-plain", !full);
-      if (full) renderSummary(result, state.gains);
+      if (full) renderSummary(result, gains);
       else result.replaceChildren(renderResultCard(state));
       result.hidden = false;
       const done = el("p", "treasure-consult-done", "Cadeia concluída.");
-      const outcomes = state.steps.map((s) => describeStep(s).result).filter(Boolean);
-      if (!state.gains.length) done.textContent = `Cadeia concluída. Resultado: ${outcomes.join("; ") || "nada"}.`;
+      const outcomes = all.flatMap((s) => s.steps.map((st) => describeStep(st).result)).filter(Boolean);
+      if (!gains.length) done.textContent = `Cadeia concluída. Resultado: ${outcomes.join("; ") || "nada"}.`;
       history.append(done);
       return;
     }
@@ -411,7 +427,7 @@ function setupConsultTab(panel) {
         const step = next.steps[next.steps.length - 1];
         const owner = step.outcome?.itemId;
         if (step.outcome?.accepted && owner && openSlots(state, owner) - 1 > openSlots(next, owner)) {
-          notes.set(step.id, "ocupa as vagas restantes");
+          notes.set(`${stages.length}:${step.id}`, "ocupa as vagas restantes");
         }
         state = next;
         render();
@@ -424,12 +440,15 @@ function setupConsultTab(panel) {
   };
   begin.addEventListener("click", () => {
     full = source.value === "nd";
-    state = startConsult({ source: source.value, nd: nd.value, column: column.value, mode: mode.value });
+    [state, ...queued] = startConsult({ source: source.value, nd: nd.value, column: column.value, mode: mode.value });
+    stages = [];
     notes = new Map();
     render();
   });
   restart.addEventListener("click", () => {
     state = null;
+    stages = [];
+    queued = [];
     notes = new Map();
     render();
     source.focus();

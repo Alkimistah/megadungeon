@@ -952,8 +952,8 @@ test("pickSource: Livro Básico share stays between 67% and 73% in 10,000 draws"
 });
 
 test("pickSource: other books split 30% in proportion to eligible item counts", () => {
-  const n = { "ameacas/itens-gerais": 44, "herois/itens-gerais": 137, "deuses/itens-gerais": 70 };
-  const total = 44 + 137 + 70;
+  const n = { "ameacas/itens-gerais": 44, "herois/itens-gerais": 135, "deuses/itens-gerais": 67 };
+  const total = 44 + 135 + 67;
   const rng = createRng("proporcao");
   const seen = {};
   for (let i = 0; i < 20000; i++) {
@@ -1230,4 +1230,44 @@ test("formatBookDraw shows the drawn book only when share < 1", () => {
   assert.equal(formatBookDraw({ sourceBook: "Ameaças de Arton", share: 0.124 }), "Livro sorteado: Ameaças de Arton (12,4%)");
   assert.equal(formatBookDraw({ sourceBook: "Livro Básico", share: 1 }), "");
   assert.equal(formatBookDraw({ sourceBook: "Livro Básico" }), "");
+});
+
+// ---------- Ajustes finais ----------
+import { describeBookRowResult } from "../src/treasure/treasureFormat.js";
+import { eligibleItems } from "../src/treasure/bookWeights.js";
+
+test("describeBookRowResult prints table rows as in the book", () => {
+  assert.equal(describeBookRowResult({ kind: "none" }), "—");
+  assert.equal(describeBookRowResult({ kind: "potion", count: 1 }), "1 poção");
+  assert.equal(describeBookRowResult({ kind: "potion", count: "1d3+1" }), "1d3+1 poções");
+  assert.equal(describeBookRowResult({ kind: "wealth", count: 1, tier: "menor" }), "1 riqueza menor");
+  assert.equal(describeBookRowResult({ kind: "wealth", count: "1d3", tier: "média" }), "1d3 riquezas médias");
+  assert.equal(describeBookRowResult({ kind: "wealth", count: "1d3+1", tier: "maior" }), "1d3+1 riquezas maiores");
+  assert.equal(describeBookRowResult({ kind: "superior", improvements: 2 }), "Superior (2 melhorias)");
+  assert.equal(describeBookRowResult({ kind: "superior", improvements: 1 }), "Superior (1 melhoria)");
+  assert.equal(describeBookRowResult({ kind: "magic", tier: "médio" }), "Mágico (médio)");
+  assert.equal(describeBookRowResult({ kind: "diverse" }), "Diverso");
+  assert.equal(describeBookRowResult({ kind: "equipment" }), "Equipamento");
+  assert.equal(describeBookRowResult({ kind: "money", dice: "2d4", multiplier: 100, currency: "T$" }), "2d4x100 T$");
+  assert.equal(describeBookRowResult({ kind: "money", dice: "1d8", multiplier: 10, currency: "TO" }), "1d8x10 TO");
+  // o histórico segue com o texto atual
+  assert.equal(describeRowResult({ kind: "potion", count: 1 }), "Poções: 1");
+});
+
+test("weighted 8-3 pool excludes services but lists keep them", () => {
+  const services = ["Casamento (por pessoa)", "Cerimônia religiosa", "Sacramento", "Condecoração militar", "Favor da pessoa amada"];
+  for (const id of ["deuses/itens-gerais", "herois/itens-gerais"]) {
+    const names = LIST_TABLES[id].items.map((i) => i.name);
+    const eligible = eligibleItems("8-3", id).map((i) => i.name);
+    for (const s of services) assert.ok(!eligible.includes(s), `${id} elegível: ${s}`);
+    assert.ok(eligible.length > 0);
+    for (const s of names.filter((n) => services.includes(n))) assert.ok(names.includes(s));
+  }
+  const all = Object.values(LIST_TABLES).flatMap((t) => t.items.map((i) => i.name));
+  for (const s of services) assert.ok(all.includes(s), `lista mantém ${s}`);
+  const rng = createRng("servicos");
+  for (let i = 0; i < 3000; i++) {
+    const done = resolveWithDice(startTable("8-3"), rng);
+    for (const g of done.gains) assert.ok(!services.includes(g.name), g.name);
+  }
 });

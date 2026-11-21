@@ -100,7 +100,7 @@ try {
   const footerTotal = Number(await page.locator("#treasureFooter").getAttribute("data-total-tibars"));
   assert.equal(Math.round(cellTotal * 10) / 10, footerTotal, "T$ do rodapé igual à soma das células");
   const shown = await page.locator("#treasureFooter .treasure-total-value").innerText();
-  assert.equal(shown.replace(/\s*T\$$/, "").replace(/\./g, "").replace(",", "."), String(footerTotal));
+  assert.equal(shown.replace(/^T\$\s*/, "").replace(/\./g, "").replace(",", "."), String(footerTotal));
   // Rolar de novo substitui o lote.
   await page.locator("#treasureDialog .treasure-roll").click();
   assert.equal(await results.count(), 11);
@@ -118,7 +118,7 @@ try {
   assert.equal(await page.locator("#treasureDialog .treasure-error").innerText(), "");
   assert.match(await results.first().innerText(), /Heróis · Acessórios específicos \(menores\)/);
   const itemLine = await page.locator("#treasureFooter .treasure-item-line").last().innerText();
-  assert.match(itemLine, /^\d+× .+ \(.+\)( — .+)?$/, `item do rodapé com categoria: ${itemLine}`);
+  assert.match(itemLine, /^\d+× .+ \(.+\) — (\+?T\$ [\d.,]+|—)( — .+)?$/, `item do rodapé com categoria: ${itemLine}`);
   const compTexts = await page.locator("#treasureFooter .treasure-component").allInnerTexts();
   assert.ok(compTexts.some(t => / — .+ p\. \d+$/.test(t)), "ao menos um componente com livro e página");
   assert.match(await page.locator("#treasureFooter").innerText(), /Total em dinheiro/);
@@ -172,13 +172,17 @@ try {
   // Rolagem completa: o passo mostra a tabela 8-1 de ND 3 Itens como no livro.
   const bookTable = page.locator(`${C} table.treasure-book-table`);
   assert.equal(await bookTable.count(), 1, "tabela do passo");
-  assert.match(await bookTable.locator("caption").innerText(), /8-1 · Itens ND 3/);
+  assert.match(await bookTable.locator("caption").textContent(), /8-1 · Itens ND 3/);
+  assert.ok((await bookTable.locator("caption").boundingBox()).height <= 1, "legenda visualmente oculta");
   assert.deepEqual(await bookTable.locator("tbody tr td:first-child").allInnerTexts(), ["01–25", "26–35", "36–60", "61–85", "86–100"]);
   assert.match(await bookTable.locator("tbody tr").nth(2).innerText(), /Equipamento/);
   assert.equal(await bookTable.locator("[aria-current=true]").count(), 0, "sem destaque antes do valor");
   await step().fill("40");
   assert.equal(await bookTable.locator("[aria-current=true]").count(), 1, "uma linha destacada");
   assert.match(await bookTable.locator("[aria-current=true]").innerText(), /^36–60\s+Equipamento/);
+  await step().fill("101");
+  assert.equal(await bookTable.locator("[aria-current=true]").count(), 0, "valor fora da faixa não destaca");
+  await step().fill("40");
   mkdirSync(scratchImg, { recursive: true });
   await page.screenshot({ path: shot("ajustes-livro-completo.png") });
   copyFileSync(shot("ajustes-livro-completo.png"), join(scratchImg, "ajustes-livro-completo.png"));
@@ -203,6 +207,24 @@ try {
   assert.match(await page.locator("#treasureDialog .treasure-consult-result").innerText(), /Valor total/, "rolagem completa termina no quadro completo");
   await page.screenshot({ path: shot("treasure-consultar.png") });
   await page.screenshot({ path: shot("ajustes-livro-completo-fim.png") });
+  // Dinheiro e itens (padrão): duas cadeias em sequência, um único quadro de totais.
+  await page.locator("#treasureDialog .treasure-c-reset").click();
+  assert.deepEqual(await page.locator("#treasureDialog .treasure-c-column option").allInnerTexts(), ["Dinheiro e itens", "Só dinheiro", "Só itens"]);
+  await page.locator("#treasureDialog .treasure-c-column").selectOption("both");
+  await page.locator("#treasureDialog .treasure-c-nd").selectOption("5");
+  await page.locator("#treasureDialog .treasure-c-start").click();
+  for (let i = 0; i < 80 && await page.locator(C).isVisible(); i++) {
+    const label = await page.locator(`${C} .treasure-consult-prompt label, ${C} label`).first().innerText();
+    const max = Number(label.match(/a (\d+)\)/)?.[1] ?? "1");
+    await apply(i === 0 ? 30 : 1 + Math.floor(Math.random() * max));
+  }
+  assert.equal(await page.locator(C).isVisible(), false, "as duas cadeias terminaram");
+  const both = await page.locator("#treasureDialog .treasure-consult-result").innerText();
+  assert.match(both, /Total em dinheiro: T\$ [\d.,]+/);
+  assert.doesNotMatch(both, /Dinheiro: nenhum/, "dinheiro da primeira cadeia aparece");
+  assert.match(await page.locator("#treasureDialog .treasure-consult-trail").innerText(), /Dinheiro ND 5[\s\S]*Itens ND 5/, "histórico contínuo");
+  await page.screenshot({ path: shot("ajustes-final-completo.png") });
+  copyFileSync(shot("ajustes-final-completo.png"), join(scratchImg, "ajustes-final-completo.png"));
   // Nova consulta reinicia. ND 4 Itens: 40 -> equipamento 2D com aviso; "rolar" em expressão.
   await page.locator("#treasureDialog .treasure-c-reset").click();
   assert.equal(await page.locator("#treasureDialog .treasure-consult-history .treasure-step").count(), 0);

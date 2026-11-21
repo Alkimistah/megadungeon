@@ -29,6 +29,25 @@ export function describeRowResult(result) {
   }
 }
 
+const TIER_SINGULAR = { menor: "menor", média: "média", maior: "maior" };
+
+// Texto de uma linha como impresso na Tabela 8-1 e afins (só nas linhas da tabela da rolagem completa).
+export function describeBookRowResult(result) {
+  const plural = (count) => count !== 1;
+  switch (result.kind) {
+    case "none": return "—";
+    case "diverse": return "Diverso";
+    case "equipment": return "Equipamento";
+    case "superior": return `Superior (${result.improvements} ${result.improvements > 1 ? "melhorias" : "melhoria"})`;
+    case "magic": return `Mágico (${result.tier})`;
+    case "potion": return `${result.count} ${plural(result.count) ? "poções" : "poção"}`;
+    case "wealth": return `${result.count} ${plural(result.count) ? "riquezas" : "riqueza"} ${(plural(result.count) ? TIER_PLURAL : TIER_SINGULAR)[result.tier] ?? result.tier}`;
+    case "money": return `${result.dice}x${result.multiplier} ${result.currency}`;
+    case "wealthValue": return `${result.dice}x${result.multiplier} T$`;
+    default: return describeRowResult(result);
+  }
+}
+
 function describeOutcome(outcome = {}) {
   if (outcome.currency) return `${fmt(outcome.amount)} ${outcome.currency}${outcome.halved ? " (Metade)" : ""}`;
   if (outcome.count !== undefined) return `Quantidade: ${outcome.count}`;
