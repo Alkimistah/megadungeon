@@ -542,10 +542,14 @@ Testes: `npm run test:treasure` roda o motor, as tabelas e o lote. `npm run test
 
 Pré-cache offline: o plugin `swPrecachePlugin` em `vite.config.js` reescreve `dist/sw.js` ao fim do build, com a lista `PRECACHE` dos arquivos gerados e o nome de cache `mega-dungeon-<BUILD_ID>`. Na instalação, o service worker pré-carrega tudo, então o app funciona offline já na primeira visita. Em `vite dev`, `public/sw.js` roda com lista vazia (BUILD_ID "dev").
 
+Ilhas do arquipélago: as imagens publicadas são WebP de 512 px em `public/assets/icons/islands/`. Os SVGs originais ficam em `assets-src/islands/`, que não é publicada, e `npm run build:islands` refaz a conversão a partir deles. Com isso, o build caiu de cerca de 15 MB para 4 MB. Veja [docs/superpowers/specs/2026-11-21-ilhas-webp-e-quantidade-design.md](docs/superpowers/specs/2026-11-21-ilhas-webp-e-quantidade-design.md).
+
+Quantidade inválida: na aba Gerar tesouros, o erro limpa o lote anterior e marca o campo inválido até ser corrigido.
+
 **Próximos passos**
 
-- Quantidade inválida mantém o lote anterior na tela.
-- Reduzir o pré-cache da primeira visita, hoje com cerca de 15 MB e tudo-ou-nada: otimizar os SVGs pesados das ilhas (até 1,9 MB cada) ou pré-carregar os ícones um a um, tolerando falhas.
+- O pré-cache é tudo-ou-nada: se um arquivo falhar durante a instalação, o service worker não instala. Com cerca de 4 MB, o risco é menor; pré-carregar as imagens uma a uma, tolerando falhas, resolveria de vez.
+- `npm run qa:floors-1-10` para esperando `#missionDialog`, mesmo sem as mudanças recentes. A falha é anterior a esta sessão.
 
 ---
 
