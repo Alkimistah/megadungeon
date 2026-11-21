@@ -512,7 +512,15 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
 2. **Tarefa 5b.** Botão **Sobre o app**, à esquerda no rodapé da tela inicial, que abre uma modal com o texto aprovado no design.
 3. **Tarefa 6.** `CREDITOS.md`, com os ícones do game-icons.net em CC BY 3.0, e a atualização desta seção.
 4. **Correção de interface pedida pelo PO:** o rodapé de ferramentas ocupa mais altura do que precisa. Acima dos botões fica a borda que marca o fim do conteúdo, e o rodapé ainda avança mais uma faixa, tirando espaço da tela. O rodapé deve usar só a altura necessária. Se essa faixa precisar existir, deve ter fundo transparente, para não cobrir nem escurecer o andar em exploração.
-5. **Revisão final do branch inteiro**, a partir de `1c04d27`. Ela deve conferir também estes pontos menores, já anotados:
+5. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
+   - **Atualizar o Encontro manual.** Ele foi feito quando o app tinha bem menos opções. Hoje há muito mais NDs, terrenos e tipos de criatura (catálogo, papéis de ameaça, perfis das três faixas), e os campos da modal precisam refletir isso.
+   - **Tema das ferramentas abertas pela tela inicial.** Abertos pela tela inicial, o Encontro avulso e os Tesouros mostram as cores do perfil ativo, quase sempre o da masmorra. No encontro manual, o PO viu inclusive partes do tema da floresta. Nesse caso, as duas modais devem seguir a paleta da tela inicial (bronze). O tema da faixa vale só quando elas são abertas de dentro de uma expedição.
+   - **Cristais nos tesouros.**
+     - Os cristais são um recurso próprio da campanha da Mega Dungeon e entram no cálculo de dinheiro.
+     - Hoje o app só os menciona como valor de “Entrega/cristais” nas recompensas de missão (`missionDialog.js`) e em textos de missão. Não existe um sistema de cristais com valores.
+     - A ideia é oferecer cristais como opção de rolagem nas duas abas: Gerar tesouros (em lote) e Rolar na mesa (individual).
+     - Antes de implementar, é preciso levantar com o PO as regras dos cristais: o que são, como se obtêm e quanto valem por ND.
+6. **Revisão final do branch inteiro**, a partir de `1c04d27`. Ela deve conferir também estes pontos menores, já anotados:
    - O `aria-label` do `#timeTracker` não é limpo fora da floresta.
    - A mensagem “560px” em `qaLayout.mjs` está desatualizada.
    - O `qaLayout.mjs` fixa os rótulos curtos do contador em vez de usar os do app.
