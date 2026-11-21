@@ -254,12 +254,11 @@ Decisões do PO durante a execução: a modal ocupa a tela inteira, como a do no
 
 ### Pendências adiadas
 
-- Ponderação entre livros nas tabelas secundárias.
-- Preços do Capítulo 3 para itens impressos sem preço nas Tabelas 8-3 e 8-4, e preço de itens mágicos e superiores a partir da Tabela 8-7.
 - Pré-cache dos arquivos no `install` do `public/sw.js`, para o app funcionar offline já na primeira visita. Esta é uma melhoria geral do app.
 - Página do livro também na cascata, que hoje aparece só no rodapé.
 - Na aba Rolar, o rodapé fica vazio quando a linha é uma consulta avulsa às Tabelas 8-5, 8-8 ou 8-10.
 - `renderStep` duplicado entre as duas abas.
 - Navegação por setas nas abas.
 - Quantidade inválida mantém o lote anterior na tela.
-- `schema.js` ausente da lista de módulos do `ARCHITECTURE.md`.
+- Ponderação entre livros, preços do Capítulo 3 e `schema.js` no `ARCHITECTURE.md` foram feitos nos ajustes em [docs/superpowers/plans/2026-11-20-ajustes-tesouros.md](2026-11-20-ajustes-tesouros.md).
+

@@ -509,30 +509,44 @@ O app funciona offline via Service Worker (`public/sw.js`) com cache de todos os
 
 ### Rolagem de tesouros
 
-A modal **Tesouros** rola tesouros do Livro Básico e consulta as tabelas passo a passo. Regras, decisões do PO e critérios de validação estão em [docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md](docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md).
+A modal **Tesouros** rola tesouros e consulta as tabelas passo a passo. Regras, decisões do PO e critérios de validação estão em [docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md](docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md). Os ajustes feitos após o uso no tablet estão em [docs/superpowers/specs/2026-11-20-ajustes-tesouros-design.md](docs/superpowers/specs/2026-11-20-ajustes-tesouros-design.md).
 
 - **Entrada.** Um botão no cabeçalho, com o ícone de baú aberto e junto aos acessos de encontros manuais e missões, abre a modal. Ela ocupa a tela inteira, como a modal do nodo, e as cores seguem o tema do perfil de andares selecionado.
-- **Aba Rolar.** Uma linha por rolagem, com ND, Quantidade (1 a 99), Tipo (Padrão, Metade ou Dobro) e Colunas (Item e Riqueza, Só Item ou Só Riqueza). Uma linha também pode apontar para uma tabela específica, inclusive as listas de outros livros. **Rolar tudo** gera o lote: cada tesouro aparece numerado, com a cascata de passos (valor rolado, linha obtida e tabela seguinte).
-- **Rodapé do lote.** Moedas e total em T$, riquezas discriminadas com quantidade e valor, e itens agrupados com quantidade e preço.
-- **Aba Consultar.** Um tesouro por vez, a partir de qualquer tabela (a 8-1 pede ND e coluna). Em cada passo, o mestre informa o valor do dado físico e o motor abre a tabela seguinte. Expressões de dados aceitam o total digitado ou um botão de rolagem. Encantos ou melhorias repetidos e linhas 2D pedem novo valor, com a explicação. “Nova consulta” reinicia.
+- **Abas.** Estilo de fichário, diferente dos botões do resto do app: **Gerar tesouros** e **Rolar com o livro**.
+- **Aba Gerar tesouros.** Uma linha por rolagem, com ND, Quantidade (1 a 99), Tipo (Padrão, Metade ou Dobro) e o campo **Rolar**: **Itens e dinheiro**, **Só itens** ou **Só dinheiro** (uma dica explica que “dinheiro” são moedas e riquezas, como na Tabela 8-1). Uma linha também pode apontar para uma tabela específica, inclusive as listas de outros livros; uma tabela específica escolhida explicitamente não recebe ponderação. **Rolar tudo** gera o lote: cada tesouro aparece numerado, com a cascata de passos (valor rolado, linha obtida, tabela seguinte e “Livro sorteado”, quando houve ponderação).
+- **Pesos entre livros.** Só nesta aba e só para cadeias que partem da Tabela 8-1: quando uma rolagem cai numa tabela secundária que outros livros ampliam, há 70% de chance para o Livro Básico e 30% para as listas dos outros livros, divididos na proporção do número de itens elegíveis de cada uma. As regras estão em `src/treasure/bookWeights.js` e são aplicadas pela fonte aleatória (`resolveWithDice`).
+- **Rodapé do lote.** Cada item traz preço e componentes com livro e página (base, melhorias, material, encantos). Riquezas e itens ficam em seções separadas, com **Total em riquezas: T$ X** abaixo da lista de riquezas. O rodapé traz moedas, riquezas, itens e a linha **Valor total (dinheiro + riquezas): T$ Y**. Não há faixa fixa de totais.
+- **Preços.** `src/treasure/tables/prices.js` monta o preço de cada item: itens comuns pelas Tabelas 3-3, 3-5 e 3-6 do Capítulo 3; itens superiores somam as melhorias da Tabela 3-7 e o material da Tabela 3-9; itens mágicos encantados somam os encantos da Tabela 8-7; itens dos outros livros usam o preço impresso nas próprias listas.
+- **Aba Rolar com o livro.** Um tesouro por vez, a partir de uma tabela inicial (a 8-1 pede ND e coluna), com dois modos:
+  - **Rolagem completa do livro (Tabela 8-1).** Em cada passo, a modal mostra a tabela daquele passo com as faixas de d% e destaca a linha obtida, dispensando a consulta às páginas. Ao fim, mostra o quadro completo de dinheiro, riquezas e itens. Segue só o Livro Básico, porque os dados físicos usam as faixas impressas.
+  - **Pesquisa avulsa.** Qualquer outra tabela. Mostra só o resultado, com preço, livro e página, sem o quadro de dinheiro, riquezas e itens.
+
+  Expressões de dados aceitam o total digitado ou um botão de rolagem. Encantos ou melhorias repetidos e linhas 2D pedem novo valor, com a explicação. “Nova consulta” reinicia.
 
 Módulos em `src/treasure/`:
 
 - `tables/basicBook.js`: Tabelas 8-1 a 8-15 do Livro Básico.
 - `tables/threats.js`, `heroes.js`, `gods.js`: listas de itens de Ameaças, Heróis e Deuses de Arton, como tabelas à parte. `tables/index.js` reúne tudo em `ALL_TABLES`.
+- `tables/schema.js`: formato comum das tabelas (livro, página, faixas e linhas) usado pelas listas acima.
+- `tables/prices.js`: preços de itens comuns, superiores, mágicos e dos outros livros, com as composições descritas acima.
+- `bookWeights.js`: pesos de 70% e 30% entre o Livro Básico e as listas dos outros livros, por categoria.
 - `treasureEngine.js`: motor com funções puras (`startTreasure`, `startTable`, `nextStep`, `applyRoll`, `resolveWithDice`).
 - `dice.js`: expressões de dados (`parseDice`, `rollDice`).
 - `treasureBatch.js`: linhas do lote e rolagem em lote.
 - `treasureSummary.js`: agregação do rodapé.
 - `treasureFormat.js`: textos dos passos e dos resultados.
-- `treasureDialog.js`: a modal com as abas Rolar e Consultar. É importado sob demanda na primeira abertura, e `prefetchTreasureModule` em `main.js` o carrega em tempo ocioso.
+- `treasureDialog.js`: a modal com as abas Gerar tesouros e Rolar com o livro. É importado sob demanda na primeira abertura, e `prefetchTreasureModule` em `main.js` o carrega em tempo ocioso.
 
 Testes: `npm run test:treasure` roda o motor, as tabelas e o lote. `npm run qa:treasure` roda o roteiro Playwright contra um servidor (`QA_APP_URL`). `npm run qa:treasure-offline` abre a modal offline contra o build de produção.
 
 **Próximos passos**
 
-- Ponderar os livros nas tabelas secundárias, por exemplo 70% para o Livro Básico e o restante para as listas de outros livros. As listas já estão separadas por categoria mágica (menor, médio, maior) para essa ponderação.
-- Buscar os preços do Capítulo 3 para itens impressos sem preço.
+- Pré-cache dos arquivos no `install` do `public/sw.js`, para o app funcionar offline já na primeira visita. Esta é uma melhoria geral do app.
+- Página do livro também na cascata, que hoje aparece só no rodapé.
+- Na aba Rolar com o livro, o rodapé fica vazio quando a linha é uma consulta avulsa às Tabelas 8-5, 8-8 ou 8-10.
+- `renderStep` duplicado entre as duas abas.
+- Navegação por setas nas abas.
+- Quantidade inválida mantém o lote anterior na tela.
 
 ---
 
