@@ -240,16 +240,21 @@ export function materialPriceOf(material, base) {
   return entry?.[materialColumn(base)];
 }
 
-// `armor` ("leve"/"pesada") vem das listas dos outros livros que imprimem essa divisão.
-function materialColumn({ name, category, armor }) {
+// Peso de uma armadura: "leve" ou "pesada" (undefined fora da categoria armadura). `armor` vem das
+// listas dos outros livros que imprimem essa divisão; no Livro Básico, vale LIGHT_ARMOR (Tabela 3-5).
+export function armorWeight({ name, category, armor }) {
+  if (category !== "armadura") return undefined;
+  if (armor) return armor === "leve" ? "leve" : "pesada";
+  const key = normalizeName(name);
+  return LIGHT_ARMOR.has(NAME_ALIASES[key] ?? key) ? "leve" : "pesada";
+}
+
+function materialColumn(base) {
+  const { category } = base;
   if (category === "arma") return "arma";
   if (category === "escudo") return "escudo";
   if (category === "esotérico") return "esotérico";
-  if (category === "armadura") {
-    if (armor) return armor === "leve" ? "armadura leve" : "armadura pesada";
-    const key = normalizeName(name);
-    return LIGHT_ARMOR.has(NAME_ALIASES[key] ?? key) ? "armadura leve" : "armadura pesada";
-  }
+  if (category === "armadura") return `armadura ${armorWeight(base)}`;
   return undefined;
 }
 

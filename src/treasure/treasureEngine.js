@@ -254,7 +254,8 @@ function slotHandler({ result }, request, half, state) {
     const free = ctx.capacity - used;
     const name = normalizeName(result.name);
     const problem = result.kind === "improvement"
-      ? improvementProblem(result.name, { name: ctx.base, category: ctx.category }, taken.map((s) => s.outcome.name))
+      ? improvementProblem(result.name, { name: ctx.base, category: ctx.category, armor: ctx.armor },
+        taken.map((s) => s.outcome.name))
       : null;
     const cause = taken.some((s) => normalizeName(s.outcome.name) === name) ? "repetida"
       : result.special === "counts-as-two" && free < 2 ? "conta como duas"
@@ -351,6 +352,7 @@ const ROW_HANDLERS = {
       const table = superior ? `8-5/${build.type}` : MAGIC_SLOT_TABLES[build.type];
       const noun = superior ? "Melhoria" : "Encanto";
       const context = { itemId: request.id, role: "slot", capacity, category: result.category, base: result.name, noun,
+        ...(result.armor ? { armor: result.armor } : {}),
         ...(superior ? {} : { tier: build.tier }) };
       return {
         outcome: { itemId: request.id, base: true, build },

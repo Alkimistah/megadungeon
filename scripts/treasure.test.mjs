@@ -1287,6 +1287,13 @@ test("stepReference is empty for unknown tables", () => {
 
 // ---------- Restrições de materiais e melhorias (Livro Básico p. 165–167) ----------
 import { materialProblem, improvementProblem, isWoodenWeapon, isFiringWeapon } from "../src/treasure/itemRules.js";
+import { armorWeight } from "../src/treasure/tables/prices.js";
+import { ALL_TABLES as RULE_TABLES } from "../src/treasure/tables/index.js";
+const WOODEN = ["Arco curto", "Arco longo", "Bordão", "Clava", "Lança", "Lança montada", "Pique", "Tacape", "Porrete", "Tetsubo",
+  "Malho", "Clava-grão", "Lança de justa", "Lança de falange", "Arco montado", "Arco de guerra"];
+const NO_MATERIAL = ["Presa de serpente", "Veste de teia de aranha", "Armadura de pedra"];
+// `armor` impresso na lista de outro livro de onde veio o item-base.
+const gainArmor = (gain) => RULE_TABLES[gain.source]?.items?.find((i) => i.name === gain.details.components[0].name)?.armor;
 
 test("Tollon on a Couraça rerolls the material d6 with the reason; the final material is valid", () => {
   const s1 = feed(itemsChain("2"), [95, 4, 31, 41]); // Couraça, Material especial
@@ -1327,9 +1334,12 @@ test("Tollon: rejected on Espada longa and Escudo pesado, accepted on Clava, Esc
 
 test("material rules: wooden weapons by name, light shields only, other materials free", () => {
   for (const name of ["Arco curto", "Arco longo", "Bordão", "Clava", "Lança", "Lança montada", "Pique", "Tacape",
-    "Arco de guerra", "Clava-grão", "Lança de justa"]) assert.ok(isWoodenWeapon(name), name);
-  for (const name of ["Picareta", "Espada longa", "Besta leve", "Flechas (20)", "Porrete"]) assert.ok(!isWoodenWeapon(name), name);
-  assert.equal(materialProblem("madeira Tollon", { name: "Escudo de vime", category: "escudo" }) !== null, true);
+    "Porrete", "Tetsubo", "Malho", "Clava-grão", "Lança de justa", "Lança de falange", "Arco montado", "Arco de guerra"]) {
+    assert.ok(isWoodenWeapon(name), name);
+  }
+  for (const name of ["Picareta", "Espada longa", "Besta leve", "Flechas (20)", "Lança de fogo", "Martelo longo", "Bastão lúdico", "Zarabatana"]) {
+    assert.ok(!isWoodenWeapon(name), name);
+  }
   assert.equal(materialProblem("madeira Tollon", { name: "Armadura de ossos", category: "armadura", armor: "leve" }) !== null, true);
   for (const material of ["aço-rubi", "adamante", "gelo eterno", "matéria vermelha", "mitral", "Casco de monstro", "Lanajuste", "Prata"]) {
     for (const base of [{ name: "Couraça", category: "armadura" }, { name: "Espada longa", category: "arma" }, { name: "Escudo pesado", category: "escudo" }]) {
@@ -1356,16 +1366,16 @@ test("Mira telescópica: rerolls on Espada longa and Funda, accepted on Arco lon
 });
 
 test("Reforçada and Delicada exclude each other: the later one rerolls", () => {
-  const a = feed(itemsChain("5"), [95, 4, 31, 24, 56]); // Couraça: Delicada, depois Reforçada
+  const a = feed(itemsChain("5"), [95, 4, 11, 24, 56]); // Completa: Delicada, depois Reforçada
   assert.equal(a.steps.at(-1).outcome.rejected, "reforçada e delicada");
   assert.equal(a.steps.at(-1).outcome.name, "Reforçada");
-  assert.match(nextStep(a).reason, /\(reforçada e delicada\): um item não pode ser reforçado e delicado; Couraça já é delicada/);
-  const b = feed(itemsChain("5"), [95, 4, 31, 56, 24]); // Reforçada, depois Delicada
+  assert.match(nextStep(a).reason, /\(reforçada e delicada\): um item não pode ser reforçado e delicado; Completa já é delicada/);
+  const b = feed(itemsChain("5"), [95, 4, 11, 56, 24]); // Reforçada, depois Delicada
   assert.equal(b.steps.at(-1).outcome.rejected, "reforçada e delicada");
   assert.equal(b.steps.at(-1).outcome.name, "Delicada");
-  assert.match(nextStep(b).reason, /Couraça já é reforçada/);
-  assert.equal(applyRoll(b, 81).gains[0].name, "Couraça (reforçada, selada)");
-  assert.equal(improvementProblem("Delicada", { name: "Couraça", category: "armadura" }, ["Ajustada"]), null);
+  assert.match(nextStep(b).reason, /Completa já é reforçada/);
+  assert.equal(applyRoll(b, 81).gains[0].name, "Completa (reforçada, selada)");
+  assert.equal(improvementProblem("Delicada", { name: "Completa", category: "armadura" }, ["Ajustada"]), null);
 });
 
 test("seeded mass run: 2000 superior items never break the material and improvement rules", () => {
@@ -1380,6 +1390,9 @@ test("seeded mass run: 2000 superior items never break the material and improvem
       const improvements = gain.details.improvements ?? [];
       const names = improvements.map(normalizeName);
       assert.ok(!(names.includes("reforcada") && names.includes("delicada")), gain.name);
+      assert.ok(!(names.includes("macica") && names.includes("precisa")), gain.name);
+      if (names.includes("delicada")) assert.equal(armorWeight({ ...base, armor: gainArmor(gain) }), "pesada", gain.name);
+      if (names.includes("material especial")) assert.ok(!NO_MATERIAL.includes(base.name), gain.name);
       if (names.includes("mira telescopica")) assert.ok(isFiringWeapon(base.name), gain.name);
       improvements.forEach((name, j) => assert.equal(improvementProblem(name, base, improvements.slice(0, j)), null, gain.name));
       if (gain.details.material) {
@@ -1387,8 +1400,8 @@ test("seeded mass run: 2000 superior items never break the material and improvem
         if (normalizeName(gain.details.material) === "madeira tollon") {
           tollon++;
           assert.notEqual(gain.category, "armadura", gain.name);
-          if (gain.category === "arma") assert.ok(isWoodenWeapon(base.name), gain.name);
-          if (gain.category === "escudo") assert.equal(base.name, "Escudo leve", gain.name);
+          if (gain.category === "arma") assert.ok(WOODEN.includes(base.name), gain.name);
+          if (gain.category === "escudo") assert.ok(["Escudo leve", "Broquel", "Escudo de couro"].includes(base.name), gain.name);
         }
       }
     }
@@ -1401,4 +1414,61 @@ test("a rejected material step shows the material and the reroll note", async ()
   const { describeStep } = await import("../src/treasure/treasureFormat.js");
   const s = applyRoll(feed(itemsChain("2"), [95, 4, 31, 41]), 4);
   assert.deepEqual(describeStep(s.steps.at(-1)), { roll: "1d6 = 4", result: "Resultado: madeira Tollon (recusado: material inválido; rola de novo)" });
+});
+
+test("fix 1: Tollon on the other books' wooden weapons and light shields", () => {
+  const tollon = (name, category) => materialProblem("madeira Tollon", { name, category });
+  assert.equal(tollon("Porrete", "arma"), null);
+  assert.equal(tollon("Malho", "arma"), null);
+  assert.equal(tollon("Lança de fogo", "arma").cause, "material inválido");
+  assert.match(tollon("Lança de fogo", "arma").text, /Lança de fogo não é de madeira/);
+  for (const name of ["Escudo leve", "Broquel", "Escudo de couro"]) assert.equal(tollon(name, "escudo"), null, name);
+  for (const name of ["Escudo pesado", "Escudo torre", "Sagna", "Escudo de vime"]) {
+    assert.equal(tollon(name, "escudo").cause, "material inválido", name);
+    assert.match(tollon(name, "escudo").text, new RegExp(`${name} não é escudo leve`));
+  }
+});
+
+test("fix 1: Delicada only on heavy armor", () => {
+  const couraca = feed(itemsChain("2"), [95, 4, 31, 24]); // Couraça é leve (Tabela 3-5)
+  assert.equal(couraca.steps.at(-1).outcome.rejected, "só armaduras pesadas");
+  assert.match(nextStep(couraca).reason, /\(só armaduras pesadas\): Delicada só em armaduras pesadas; Couraça é armadura leve/);
+  const shield = feed(itemsChain("2"), [95, 4, 56, 24]);
+  assert.equal(shield.steps.at(-1).outcome.rejected, "só armaduras pesadas");
+  assert.match(nextStep(shield).reason, /Delicada só em armaduras pesadas; Escudo leve é escudo/);
+  const full = feed(itemsChain("2"), [95, 4, 11, 24]); // Completa (Armadura completa) é pesada
+  assert.equal(nextStep(full), null);
+  assert.equal(full.gains[0].name, "Completa (delicada)");
+  assert.equal(improvementProblem("Delicada", { name: "Colete fora da lei", category: "armadura", armor: "leve" }, []).cause, "só armaduras pesadas");
+  assert.equal(improvementProblem("Delicada", { name: "Brigantina", category: "armadura", armor: "pesada" }, []), null);
+});
+
+test("fix 1: Maciça and Precisa exclude each other: the later one rerolls", () => {
+  const a = feed(itemsChain("5"), [95, 1, 40, 56, 81]); // Maciça, depois Precisa
+  assert.equal(a.steps.at(-1).outcome.rejected, "maciça e precisa");
+  assert.equal(a.steps.at(-1).outcome.name, "Precisa");
+  assert.match(nextStep(a).reason, /\(maciça e precisa\): uma arma não pode ser maciça e precisa; Espada longa já é maciça/);
+  const b = feed(itemsChain("5"), [95, 1, 40, 81, 56]); // Precisa, depois Maciça
+  assert.equal(b.steps.at(-1).outcome.name, "Maciça");
+  assert.match(nextStep(b).reason, /Espada longa já é precisa/);
+  assert.equal(applyRoll(b, 14).gains[0].name, "Espada longa (precisa, certeira)");
+});
+
+test("fix 1: items that do not accept Material especial reroll the improvement before the d6", () => {
+  for (const name of ["Presa de serpente", "Veste de teia de aranha", "Armadura de pedra"]) {
+    const problem = improvementProblem("Material especial", { name, category: "arma" }, []);
+    assert.equal(problem.cause, "não aceita material", name);
+    assert.match(problem.text, new RegExp(`${name} não aceita material especial`));
+  }
+  assert.equal(improvementProblem("Material especial", { name: "Espada longa", category: "arma" }, []), null);
+  // Ameaças 3-1, item 13 (Presa de serpente) + 1 melhoria: Material especial (recusada), depois Precisa
+  const done = resolveWithDice(itemsChain("2"), scriptedRng([face(95, 100), face(1, 6), 0.71, face(13, 16),
+    0.1, face(66, 100), 0.1, face(81, 100)]));
+  const base = done.steps.find((s) => s.item?.name === "Presa de serpente");
+  assert.ok(base);
+  const rejected = done.steps.find((s) => s.outcome?.rejected);
+  assert.equal(rejected.outcome.rejected, "não aceita material");
+  assert.equal(rejected.outcome.name, "Material especial");
+  assert.ok(!done.steps.some((s) => s.kind === "expression" && s.reason.startsWith("Material especial")), "sem sub-rolagem de material");
+  assert.equal(done.gains[0].details.improvements.join(), "Precisa");
 });
