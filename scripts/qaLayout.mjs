@@ -13,7 +13,7 @@ const VIEWPORTS = [
 // Unico ponto que escolhe a faixa e abre a tela principal.
 async function startRange(page) {
   await page.goto(APP_URL);
-  await page.locator("#floorRangeInput").selectOption("dungeon-1-10");
+  await page.locator(`[data-range="dungeon-1-10"]`).click();
   await page.locator("#rangeConfirm").click();
   await page.locator("#missionDialog").waitFor({ state: "visible" });
   await page.getByRole("button", { name: "Continuar sem missões" }).click();
@@ -160,7 +160,7 @@ async function checkDialogs(browser, viewport) {
   const page = await browser.newPage({ viewport });
   // Quadro de selecao de missoes (abre ao escolher a faixa 1-10).
   await page.goto(APP_URL);
-  await page.locator("#floorRangeInput").selectOption("dungeon-1-10");
+  await page.locator(`[data-range="dungeon-1-10"]`).click();
   await page.locator("#rangeConfirm").click();
   await page.locator("#missionDialog").waitFor({ state: "visible" });
   await checkFullscreenDialog(page, "#missionDialog", "button, input, select", "missoes (selecao)", tag, "missoes-selecao");
@@ -180,7 +180,7 @@ async function checkDialogs(browser, viewport) {
   // Ilha do arquipelago.
   const island = await browser.newPage({ viewport });
   await island.goto(APP_URL);
-  await island.locator("#floorRangeInput").selectOption("archipelago-21-30");
+  await island.locator(`[data-range="archipelago-21-30"]`).click();
   await island.locator("#rangeConfirm").click();
   await island.locator("#missionDialog").waitFor({ state: "visible" });
   await island.getByRole("button", { name: "Continuar sem missões" }).click();

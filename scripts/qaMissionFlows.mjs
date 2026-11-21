@@ -1,5 +1,6 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
 import { createRng } from "../src/random.js";
 import { generateMapData } from "../src/generator.js";
@@ -222,6 +223,20 @@ async function chooseRouteNode(client, nodeIndex) {
   await waitFor(client, "document.querySelector('#nodeDialog')?.open === true", `node chosen ${nodeIndex}`);
 }
 
+// Importa o codigo pelo campo de arquivo, como o usuario faz com o .txt exportado.
+async function importSessionCode(client, sessionCode) {
+  const dir = await mkdtemp(join(tmpdir(), "md-session-"));
+  const file = join(dir, "sessao.txt");
+  await writeFile(file, sessionCode);
+  try {
+    const { root } = await client.send("DOM.getDocument", { depth: 0 });
+    const { nodeId } = await client.send("DOM.querySelector", { nodeId: root.nodeId, selector: "#sessionFile" });
+    await client.send("DOM.setFileInputFiles", { nodeId, files: [file] });
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+}
+
 async function setValue(client, selector, value) {
   await waitFor(client, `Boolean(document.querySelector(${JSON.stringify(selector)}))`, selector);
   await evaluate(client, `
@@ -267,7 +282,7 @@ async function setupPage(width = 1366, height = 900) {
 }
 
 async function startExploration(client, profileId = "forest-11-20") {
-  await setValue(client, "#floorRangeInput", profileId);
+  await click(client, `[data-range="${profileId}"]`);
   await click(client, "#rangeConfirm");
   await waitFor(client, "document.querySelector('#missionDialog')?.open === true", "mission selection dialog");
 }
@@ -444,8 +459,7 @@ async function runNodeMissionAndAdvanceFlow(results) {
   const sessionCode = createNodeMissionSessionCode();
   const client = await setupPage();
   try {
-    await setValue(client, "#seedInput", sessionCode);
-    await click(client, "#rangeConfirm");
+    await importSessionCode(client, sessionCode);
     await waitFor(client, "Boolean(document.querySelector('.mission-node-label'))", "mission node label");
     const pathToMission = await getPathToMissionNode(client);
     if (!pathToMission?.length) {
@@ -536,8 +550,7 @@ async function runSaveLoadFlow(results) {
 
     await client.send("Page.navigate", { url: APP_URL });
     await waitFor(client, "document.querySelector('#rangeDialog')?.open === true", "range dialog after reload");
-    await setValue(client, "#seedInput", sessionCode);
-    await click(client, "#rangeConfirm");
+    await importSessionCode(client, sessionCode);
     await waitFor(client, "document.querySelector('#rangeDialog')?.open === false", "session restored");
     await click(client, "#missionButton");
     await waitFor(client, "document.querySelector('#missionDialog')?.open === true", "tracking after load");

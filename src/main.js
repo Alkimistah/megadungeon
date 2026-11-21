@@ -21,7 +21,7 @@ import { createMissionState } from "./missions/missionState.js";
 import { canRerollNodeCreatures, rerollNodeCreatures, resolveForestAmbush, resolveNodeEncounter } from "./encounterResolver.js";
 import { withCreatureReinforcement } from "./creatureReinforcement.js";
 import { createNodeDialogController } from "./nodeDialog.js";
-import { decodeSessionCode, encodeSessionCode, isSessionCode } from "./sessionCode.js";
+import { decodeSessionCode, encodeSessionCode } from "./sessionCode.js";
 import { loadAutosave, saveAutosave } from "./sessionAutosave.js";
 
 const elements = {
@@ -39,7 +39,6 @@ const elements = {
   floorInput: document.getElementById("floorInput"),
   depthInput: document.getElementById("depthInput"),
   baseDcInput: document.getElementById("baseDcInput"),
-  seedInput: document.getElementById("seedInput"),
   sessionFile: document.getElementById("sessionFile"),
   importSessionFile: document.getElementById("importSessionFile"),
   unknownPathsInput: document.getElementById("unknownPathsInput"),
@@ -71,7 +70,9 @@ const elements = {
   legendPanel: document.getElementById("legendPanel"),
   legendClose: document.getElementById("legendClose"),
   rangeDialog: document.getElementById("rangeDialog"),
-  floorRangeInput: document.getElementById("floorRangeInput"),
+  rangeCards: document.getElementById("rangeCards"),
+  resumeSection: document.getElementById("resumeSection"),
+  resumeDetail: document.getElementById("resumeDetail"),
   initialUnknownPathsField: document.getElementById("initialUnknownPathsField"),
   initialUnknownPathsInput: document.getElementById("initialUnknownPathsInput"),
   rangeConfirm: document.getElementById("rangeConfirm"),
@@ -577,10 +578,13 @@ async function offerSavedExpedition() {
     if (savedExpedition.v !== 1 || !profile?.floors.includes(savedExpedition.floor)) {
       throw new Error("Sessão incompatível.");
     }
-    elements.resumeExpedition.textContent = `Continuar expedição · Andar ${savedExpedition.floor}`;
-    elements.resumeExpedition.hidden = false;
+    const { floors, card } = profile;
+    elements.resumeDetail.textContent = `${card.name} · Andares ${floors[0]}–${floors[floors.length - 1]} · parado no Andar ${savedExpedition.floor}`;
+    elements.resumeSection.hidden = false;
+    selectRange(profile.id);
   } catch {
-    showSessionStatus("Não foi possível ler o salvamento automático. Você pode importar um código de sessão.");
+    savedExpedition = null;
+    showSessionStatus("Não foi possível ler o salvamento automático. Você pode importar o arquivo de sessão.");
   }
 }
 
@@ -811,16 +815,51 @@ function refreshExplorationDisplay({ startSession = false } = {}) {
   if (autosaveActive) void saveCurrentExpedition();
 }
 
-function populateFloorRangeSelect() {
-  elements.floorRangeInput.innerHTML = "";
+let selectedRangeId = FLOOR_RANGES[0].id;
+
+function getSelectedRangeId() {
+  return selectedRangeId;
+}
+
+function renderRangeCards() {
+  elements.rangeCards.innerHTML = "";
 
   FLOOR_RANGES.forEach((floorRange) => {
-    const option = document.createElement("option");
+    const { card } = floorRange;
+    const button = document.createElement("button");
+    const icon = document.createElement("img");
+    const name = document.createElement("b");
+    const floors = document.createElement("span");
+    const tagline = document.createElement("span");
 
-    option.value = floorRange.id;
-    option.textContent = floorRange.label;
-    elements.floorRangeInput.appendChild(option);
+    button.type = "button";
+    button.className = "range-card";
+    button.dataset.range = floorRange.id;
+    button.style.setProperty("--c", floorRange.theme.action);
+    button.setAttribute("aria-pressed", "false");
+    icon.src = card.icon;
+    icon.alt = "";
+    name.textContent = card.name;
+    floors.className = "range-floors";
+    floors.textContent = `Andares ${floorRange.floors[0]}–${floorRange.floors[floorRange.floors.length - 1]}`;
+    tagline.className = "range-tagline";
+    tagline.textContent = card.tagline;
+    button.append(icon, name, floors, tagline);
+    button.addEventListener("click", () => selectRange(floorRange.id));
+    elements.rangeCards.appendChild(button);
   });
+}
+
+function selectRange(rangeId) {
+  const profile = getFloorRange(rangeId);
+
+  selectedRangeId = profile.id;
+  elements.rangeCards.querySelectorAll(".range-card").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.range === profile.id));
+  });
+  elements.rangeDialog.style.setProperty("--range-action", profile.theme.action);
+  elements.rangeConfirm.textContent = `Iniciar ${profile.card.name.toLowerCase()} ›`;
+  syncInitialUnknownPathsVisibility();
 }
 
 function populateFloorSelect(floorRange) {
@@ -1124,10 +1163,6 @@ function bindEvents() {
     setUnknownPathsMode(elements.initialUnknownPathsInput.checked);
   });
 
-  elements.seedInput.addEventListener("input", () => {
-    elements.seedInput.setCustomValidity("");
-  });
-
   elements.importSessionFile.addEventListener("click", () => elements.sessionFile.click());
   elements.sessionFile.addEventListener("change", importSessionFile);
 
@@ -1136,36 +1171,13 @@ function bindEvents() {
       restoreSession(savedExpedition);
       elements.rangeDialog.close();
     } catch {
-      showSessionStatus("Não foi possível continuar a expedição salva. Você pode importar um código de sessão.");
+      showSessionStatus("Não foi possível continuar a expedição salva. Você pode importar o arquivo de sessão.");
     }
   });
 
   elements.rangeConfirm.addEventListener("click", (event) => {
-    const seedValue = elements.seedInput.value.trim();
-
-    elements.seedInput.setCustomValidity("");
-
-    if (seedValue) {
-      if (!isSessionCode(seedValue)) {
-        event.preventDefault();
-        elements.seedInput.setCustomValidity("Cole uma sessão válida iniciada por MD1 ou deixe o campo vazio.");
-        elements.seedInput.reportValidity();
-        return;
-      }
-
-      try {
-        restoreSession(decodeSessionCode(seedValue));
-      } catch {
-        event.preventDefault();
-        elements.seedInput.setCustomValidity("Seed de sessão inválida. Verifique o código informado.");
-        elements.seedInput.reportValidity();
-      }
-
-      return;
-    }
-
     event.preventDefault();
-    applyFloorRange(elements.floorRangeInput.value);
+    applyFloorRange(getSelectedRangeId());
     setUnknownPathsMode(elements.initialUnknownPathsInput.checked);
     currentMapSeed = createRandomSeed();
     elements.rangeDialog.close();
@@ -1186,7 +1198,7 @@ function bindEvents() {
 }
 
 function syncInitialUnknownPathsVisibility() {
-  const selectedProfile = getFloorRange(elements.floorRangeInput.value);
+  const selectedProfile = getFloorRange(getSelectedRangeId());
   elements.initialUnknownPathsField.hidden = selectedProfile.mode !== "node-map" && selectedProfile.mode !== undefined;
 }
 
@@ -1194,14 +1206,14 @@ function boot() {
   bindEvents();
   setupInstallButton();
   registerServiceWorker();
-  populateFloorRangeSelect();
-  elements.floorRangeInput.addEventListener("change", syncInitialUnknownPathsVisibility);
-  syncInitialUnknownPathsVisibility();
+  renderRangeCards();
+  selectRange(getSelectedRangeId());
   applyFloorRange(activeFloorRange.id);
   generateMap({ startSession: false });
 
   window.addEventListener("load", () => {
     elements.rangeDialog.showModal();
+    document.activeElement?.blur();
     void offerSavedExpedition();
     prefetchTreasureModule();
   });

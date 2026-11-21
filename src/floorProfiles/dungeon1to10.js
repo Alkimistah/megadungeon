@@ -30,6 +30,7 @@ const ALLOWED_CREATURE_IDS_BY_FLOOR = buildCumulativeCreatureIdsByFloor();
 export const dungeon1to10Profile = {
   id: "dungeon-1-10",
   label: "Andares de 1 a 10",
+  card: { icon: assetUrl("/assets/icons/game-icons--dungeon-gate.svg"), name: "Masmorra", tagline: "Grande labirinto de corredores e salas" },
   mode: "extended-exploration",
   floors: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   hiddenNodeIcon: assetUrl("/assets/icons/unknown.svg"),

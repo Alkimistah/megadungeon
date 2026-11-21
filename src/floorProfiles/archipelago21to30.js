@@ -1,6 +1,8 @@
+import { assetUrl } from "../assetUrl.js";
 export const archipelago21to30Profile = {
   id: "archipelago-21-30",
   label: "Andares de 21 a 30",
+  card: { icon: assetUrl("/assets/icons/game-icons--island.svg"), name: "Arquipélago", tagline: "Reúna os fragmentos e explore o arquipélago" },
   mode: "archipelago",
   floors: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
   recommendations: {

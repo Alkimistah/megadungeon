@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { chromium } from "@playwright/test";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { prepareForestExpedition, serializeForestExpedition } from "../src/forestExpedition.js";
@@ -55,8 +57,14 @@ async function pageFor(code = null, viewport = { width: 1024, height: 768 }) {
   await page.goto(url);
   await page.locator("#rangeDialog[open]").waitFor();
   if (code) {
-    await page.locator("#seedInput").fill(code);
-    await page.locator("#rangeConfirm").click();
+    const dir = await mkdtemp(join(tmpdir(), "md-session-"));
+    const file = join(dir, "sessao.txt");
+    await writeFile(file, code);
+    try {
+      await page.locator("#sessionFile").setInputFiles(file);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
     await page.locator("#rangeDialog").waitFor({ state: "hidden" });
   }
   return page;
@@ -76,7 +84,7 @@ async function exportSession(page) {
 
 async function newSelection(count) {
   const page = await pageFor();
-  await page.locator("#floorRangeInput").selectOption(profile.id);
+  await page.locator(`[data-range="${profile.id}"]`).click();
   await page.locator("#rangeConfirm").click();
   await page.locator("#missionDialog[open]").waitFor();
   const available = await page.locator(".mission-card.is-selectable").count();
@@ -559,7 +567,7 @@ async function creatureHealthFlow() {
   assert.equal(await reroll.count(), 0);
   assert.match(await units.locator("option").nth(1).innerText(), new RegExp(`${max - 2}/${max} PV`));
   await page.reload();
-  await page.getByRole("button", { name: "Continuar expedição · Andar 14" }).click();
+  await page.locator("#resumeExpedition").filter({ hasText: "parado no Andar 14" }).click();
   await page.locator(".node").nth(nodeIndex).click();
   await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
   assert.equal(await reroll.count(), 1);
@@ -722,7 +730,7 @@ async function offlineFlow() {
   await page.context().setOffline(true);
   await page.reload();
   await page.locator("#rangeDialog[open]").waitFor();
-  await page.locator("#floorRangeInput").selectOption(profile.id);
+  await page.locator(`[data-range="${profile.id}"]`).click();
   await page.locator("#rangeConfirm").click();
   await page.locator(".mission-dialog-actions .generate-button").click();
   await page.locator("#missionDialog").waitFor({ state: "hidden" });

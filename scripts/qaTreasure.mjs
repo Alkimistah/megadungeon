@@ -321,8 +321,8 @@ try {
     p.on("pageerror", error => errors.push(error.message));
     await p.goto(url);
     await p.locator("#rangeDialog[open]").waitFor();
-    const ids = await p.locator("#floorRangeInput option").evaluateAll(os => os.map(o => o.value));
-    await p.locator("#floorRangeInput").selectOption(ids[profileIndex]);
+    const ids = await p.locator("button.range-card").evaluateAll(els => els.map(e => e.dataset.range));
+    await p.locator(`[data-range="${ids[profileIndex]}"]`).click();
     await p.locator("#rangeConfirm").click();
     await p.locator("#rangeDialog").waitFor({ state: "hidden" });
     await p.locator("#missionDialog[open]").waitFor({ timeout: 20000 }).catch(() => {});

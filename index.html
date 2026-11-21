@@ -147,35 +147,54 @@
 
     <dialog id="rangeDialog" aria-labelledby="rangeDialogTitle">
       <form method="dialog" class="range-dialog">
-        <div class="node-dialog-header">
-          <div>
-            <p class="node-dialog-type">Configuração inicial</p>
-            <h2 id="rangeDialogTitle">Escolha a faixa de andares</h2>
-          </div>
+        <div class="home-header">
+          <h1 id="rangeDialogTitle">Mega Dungeon <span>de Práxis</span></h1>
+          <p class="home-subtitle">Gerador de aventuras para Tormenta20</p>
           <button id="installButton" class="install-button" type="button" hidden>Instalar app</button>
         </div>
 
-        <button id="resumeExpedition" class="generate-button" type="button" hidden>Continuar expedição</button>
         <p id="sessionStatus" role="status" hidden></p>
 
-        <label class="range-field">
-          Grupo de andares
-          <select id="floorRangeInput"></select>
-        </label>
+        <section id="resumeSection" class="home-resume" hidden>
+          <button id="resumeExpedition" class="resume-button" type="button">
+            <span class="resume-text">
+              <strong>Continuar expedição</strong>
+              <small id="resumeDetail"></small>
+            </span>
+            <span class="resume-go">Continuar ›</span>
+          </button>
+        </section>
 
-        <label class="range-field seed-field">
-          Seed de sessão
-          <input id="seedInput" type="text" placeholder="Cole uma sessão MD1 ou deixe vazio" />
-        </label>
-        <button id="importSessionFile" type="button">Importar arquivo de sessão</button>
+        <section class="home-section" aria-labelledby="newExpeditionTitle">
+          <h2 id="newExpeditionTitle">Nova expedição</h2>
+          <div id="rangeCards" class="range-cards"></div>
+
+          <label id="initialUnknownPathsField" class="unknown-paths-option">
+            <input id="initialUnknownPathsInput" type="checkbox" />
+            <span class="switch" aria-hidden="true"></span>
+            <span class="option-text">
+              <strong>Caminhos desconhecidos</strong>
+              <small>A rota de cada andar se revela conforme o grupo avança.</small>
+            </span>
+          </label>
+
+          <button id="rangeConfirm" class="range-start" type="submit">Iniciar masmorra ›</button>
+        </section>
+
+        <!-- Ferramentas rápidas: a Tarefa 4 liga os botões e remove o hidden. -->
+        <section class="home-section" aria-labelledby="quickToolsTitle" hidden>
+          <h2 id="quickToolsTitle">Ferramentas rápidas</h2>
+          <div class="quick-tools">
+            <button id="quickTreasure" class="quick-tool" type="button"><img src="/assets/icons/streamline-cyber--treasure-chest-open.svg" alt="" />Rolar tesouros</button>
+            <button id="quickEncounter" class="quick-tool" type="button"><img src="/assets/icons/sword-spin.svg" alt="" />Encontro avulso</button>
+          </div>
+        </section>
+
+        <footer class="home-footer">
+          <!-- A Tarefa 5b acrescenta "Sobre o app" à esquerda. -->
+          <button id="importSessionFile" class="footer-button" type="button">Importar arquivo de sessão</button>
+        </footer>
         <input id="sessionFile" type="file" accept=".txt,text/plain" hidden />
-
-        <label id="initialUnknownPathsField" class="checkbox-field">
-          <input id="initialUnknownPathsInput" type="checkbox" />
-          Caminhos desconhecidos
-        </label>
-
-        <button id="rangeConfirm" type="submit">Iniciar exploração</button>
       </form>
     </dialog>
 

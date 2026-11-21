@@ -1,4 +1,6 @@
-import { mkdir } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { chromium } from "@playwright/test";
 
@@ -54,11 +56,21 @@ function findFloorOneMission() {
   throw new Error("Nao foi possivel gerar uma missao para o andar 1.");
 }
 
+async function importSessionCode(page, sessionCode) {
+  const dir = await mkdtemp(join(tmpdir(), "md-session-"));
+  const file = join(dir, "sessao.txt");
+  await writeFile(file, sessionCode);
+  try {
+    await page.locator("#sessionFile").setInputFiles(file);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+}
+
 async function loadSession(page, sessionCode) {
   await page.goto(APP_URL);
   await page.locator("#rangeDialog").waitFor({ state: "visible" });
-  await page.locator("#seedInput").fill(sessionCode);
-  await page.locator("#rangeConfirm").click();
+  await importSessionCode(page, sessionCode);
   await page.locator("#rangeDialog").waitFor({ state: "hidden" });
 }
 
@@ -76,7 +88,7 @@ async function assertNoHorizontalOverflow(page, selector) {
 async function runMainFlow(browser) {
   const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
   await page.goto(APP_URL);
-  await page.locator("#floorRangeInput").selectOption(dungeon1to10Profile.id);
+  await page.locator(`[data-range="${dungeon1to10Profile.id}"]`).click();
   await page.locator("#rangeConfirm").click();
   await page.locator("#missionDialog").waitFor({ state: "visible" });
 
@@ -133,7 +145,7 @@ async function runInitialFloorSelection(browser) {
   const page = await browser.newPage({ viewport: { width: 1024, height: 768 } });
 
   await page.goto(APP_URL);
-  await page.locator("#floorRangeInput").selectOption(dungeon1to10Profile.id);
+  await page.locator(`[data-range="${dungeon1to10Profile.id}"]`).click();
   await page.locator("#rangeConfirm").click();
   await page.locator("#missionDialog").waitFor({ state: "visible" });
   await page.getByRole("button", { name: "Continuar sem missões" }).click();
