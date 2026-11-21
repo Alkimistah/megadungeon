@@ -55,7 +55,35 @@ Ao entrar numa faixa, o app aplica o tema da faixa, como já faz hoje. A paleta 
    - **Caminhos desconhecidos** vira um interruptor com a explicação “A rota de cada andar se revela conforme o grupo avança.” Ele aparece só nas faixas que suportam a opção, hoje as de modo `node-map` (11–20), com a mesma regra de `syncInitialUnknownPathsVisibility`.
    - **Botão Iniciar.**
 4. **Ferramentas rápidas:** dois botões largos com ícone e nome, **Rolar tesouros** e **Encontro avulso**. Eles abrem as modais de Tesouros e de Encontro manual sem entrar numa faixa. Ao fechar a modal, o usuário volta à tela inicial.
-5. **Rodapé:** apenas o botão **Importar arquivo de sessão**, com borda e ícone, com aparência de botão e não de link.
+5. **Rodapé:** dois botões com borda, com aparência de botão e não de link: **Sobre o app** à esquerda e **Importar arquivo de sessão** à direita, no mesmo estilo.
+
+### Modal “Sobre o app”
+
+O botão **Sobre o app** abre uma modal em tela cheia, que segue o padrão da seção 2 e a paleta da tela inicial, por cima da tela inicial. O texto abaixo é um rascunho do gerente e precisa da revisão do PO antes da implementação. Os títulos são seções da modal.
+
+> **Para que serve**
+> O Mega Dungeon de Práxis é um gerador de aventuras para Tormenta20 pensado para usar na mesa, no tablet do mestre. Ele conduz uma expedição pela Mega Dungeon, andar por andar: sorteia caminhos, cenas, encontros, missões e tesouros, e guarda o progresso para a próxima sessão. O mestre continua no controle; o app cuida das tabelas e da memória da expedição.
+>
+> **As faixas de andares**
+> - **Masmorra (andares 1 a 10).** Um grande labirinto de corredores e salas. Cada andar é uma travessia: o grupo escolhe abordagens de perícia, acumula sucessos e falhas, e cada falha revela uma cena do d100 (encontros, obstáculos, presságios, vantagens). O andar 10 guarda o desafio final da faixa.
+> - **Floresta (andares 11 a 20).** Exploração em florestas, pântanos e colinas, num mapa de nodos com rotas que se ramificam. Cada nodo é uma sala com encontro, armadilha, tesouro ou acampamento. Com **Caminhos desconhecidos**, a rota se revela conforme o grupo avança.
+> - **Arquipélago (andares 21 a 30).** O grupo navega entre ilhas para reunir os fragmentos, administrando os dias de viagem e enfrentando o que cada ilha esconde.
+>
+> **O que cada opção faz**
+> - **Continuar expedição:** retoma a expedição salva exatamente de onde o grupo parou.
+> - **Nova expedição:** escolha a faixa e comece do primeiro andar dela. Se já houver uma expedição salva, o app pergunta antes de substituí-la.
+> - **Rolar tesouros:** gera tesouros pelas tabelas do Livro Básico (e dos livros de apoio), com preços e páginas, sem precisar entrar numa expedição.
+> - **Encontro avulso:** monta um encontro por orçamento de ND, terreno e tipo de criatura, para usar fora da expedição.
+> - **Importar arquivo de sessão:** recupera uma expedição a partir do arquivo `.txt` exportado durante o jogo.
+> - **Instalar app:** coloca o app na tela inicial do aparelho; depois de instalado, ele funciona sem internet.
+>
+> **Como usar na mesa**
+> Durante a expedição, o progresso é salvo automaticamente no aparelho, e só existe uma expedição salva por vez. Ao fim de cada sessão, vale exportar o arquivo de sessão pelo botão no topo da tela, como garantia. Ao vencer o desafio final de uma faixa, o app oferece avançar para a próxima ou encerrar a expedição.
+>
+> **Sobre o projeto**
+> Feito por Práxis para as próprias mesas de Tormenta20. Tormenta20 é um jogo da Jambô Editora; este app é um projeto de fã, sem vínculo oficial. Ícones de game-icons.net (CC BY 3.0); créditos completos no repositório.
+
+A última linha do texto credita os ícones dentro do app, de forma discreta, sem aparecer na tela inicial. Se o PO preferir, ela sai, e o crédito fica só no `CREDITOS.md`.
 
 ### Remoções
 

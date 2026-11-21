@@ -25,6 +25,7 @@ O processo segue `docs/superpowers/processo-de-trabalho.md`.
 | 3. Tela inicial: estrutura, paleta e cartões | sonnet | sonnet |
 | 4. Tela inicial: confirmações e ferramentas rápidas | sonnet | opus |
 | 5. Fim de faixa: Avançar ou Encerrar | sonnet | opus |
+| 5b. Modal Sobre o app | haiku | sonnet |
 | 6. Créditos e documentação | haiku | sonnet |
 | Revisão final | — | opus |
 
@@ -205,6 +206,25 @@ test("getNextFloorRange follows the profile order and ends at the last range", (
 - [ ] **Step 3: Implemente** nos três modos, seguindo o spec (“Regras de expedição” e decisão 5). O nome em “Avançar para <nome>” vem de `card.name` da próxima faixa.
 - [ ] **Step 4:** rode e veja passar. Rode `test:ranges`, `test:floors-1-10`, `test:floors-11-20`, `test:archipelago` e todos os QAs.
 - [ ] **Step 5: Commit.** `feat: avançar ou encerrar a expedição no fim de cada faixa`
+
+### Task 5b: Modal “Sobre o app”
+
+**Files:**
+- Modify: `index.html`, com o botão `#aboutButton` no rodapé de `#rangeDialog` à esquerda e um `<dialog id="aboutDialog">`
+- Modify: `src/main.js`, para abrir e fechar a modal
+- Modify: `src/styles.css`
+- Test: o roteiro da tela inicial
+
+- [ ] **Step 1: QA.** Confira:
+  - `#aboutButton` fica à esquerda e `#importSessionFile` à direita, na mesma linha;
+  - clicar abre `#aboutDialog` em tela cheia, por cima de `#rangeDialog`, que continua `open`;
+  - a modal tem os cinco títulos de seção do spec;
+  - o fundo é `rgb(19, 16, 13)`;
+  - fechar devolve o foco a `#aboutButton`.
+- [ ] **Step 2:** rode e veja falhar.
+- [ ] **Step 3: Implemente** com o texto do spec, seção “Modal ‘Sobre o app’”, palavra por palavra, já com a versão revisada pelo PO.
+- [ ] **Step 4:** rode e veja passar. Salve screenshots em `.playwright-mcp/tela-inicial/final-sobre-*.png`.
+- [ ] **Step 5: Commit.** `feat: modal Sobre o app na tela inicial`
 
 ### Task 6: Créditos e documentação
 
