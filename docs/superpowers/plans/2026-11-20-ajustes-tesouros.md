@@ -183,6 +183,9 @@ Decisões do gerente:
 
 Pendente de decisão do PO: na aba Gerar tesouros, a dica do campo “Rolar” diz “Dinheiro: moedas e riquezas”, mas no rodapé “Dinheiro” e “Total em dinheiro” somam só moedas. Uma alternativa é chamar o rodapé de “Moedas” e “Total em moedas”.
 
-Próximo passo pedido pelo PO: remover a legenda “Dinheiro: moedas e riquezas” abaixo do campo “Rolar”, na aba Gerar tesouros.
+Próximos passos pedidos pelo PO:
+
+- Remover a legenda “Dinheiro: moedas e riquezas” abaixo do campo “Rolar”, na aba Gerar tesouros.
+- Rever o visual das abas. Elas ficam destacadas acima do corpo da modal: logo abaixo há um vão, e a borda que contorna todo o corpo não se liga à aba ativa. A separação entre abas e corpo sugere um fichário sem mostrar um. O ajuste é estético: unir a aba ativa ao painel, com a mesma borda e sem vão, ou buscar outra apresentação que fique melhor na modal em tela inteira.
 
 Pendências que continuam: o pré-cache no `public/sw.js` e a página do livro na cascata, além do texto de cor fixa `#d8c8b7`, que fica para uma revisão geral de cores do app.

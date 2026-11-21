@@ -542,6 +542,7 @@ Testes: `npm run test:treasure` roda o motor, as tabelas e o lote. `npm run qa:t
 **Próximos passos**
 
 - Remover a legenda “Dinheiro: moedas e riquezas” abaixo do campo “Rolar”, na aba Gerar tesouros. Pedido do PO.
+- Rever o visual das abas da modal de tesouros, um ajuste estético pedido pelo PO. As abas ficam soltas acima do corpo: há um vão entre elas e o conteúdo, e a borda que contorna todo o corpo não se liga à aba ativa. O resultado sugere abas de fichário sem parecer uma. A ideia é unir a aba ativa ao painel, com a mesma borda e sem vão, ou testar outra apresentação que combine melhor com a modal em tela inteira.
 - Pré-cache dos arquivos no `install` do `public/sw.js`, para o app funcionar offline já na primeira visita. Esta é uma melhoria geral do app.
 - Página do livro também na cascata, que hoje aparece só no rodapé.
 - `renderStep` duplicado entre as duas abas.
