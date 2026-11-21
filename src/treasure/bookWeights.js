@@ -3,7 +3,7 @@
 // Quando a rolagem cai numa tabela do Livro Básico que outros livros ampliam, há 70% de chance
 // de usar a tabela do Livro Básico; os 30% restantes vão para as listas dos outros livros, na
 // proporção do número de itens elegíveis de cada uma (depois do filtro de `appliesTo`).
-// A aba Rolar com o livro (`applyRoll` com valores digitados) nunca passa por aqui.
+// A aba Rolar na mesa (`applyRoll` com valores digitados) nunca passa por aqui.
 import { LIST_TABLES } from "./tables/index.js";
 
 const BASIC_SHARE = 0.7;

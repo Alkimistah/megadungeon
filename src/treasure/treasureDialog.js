@@ -1,4 +1,4 @@
-// Casca da modal de tesouros e abas Gerar tesouros e Rolar com o livro.
+// Casca da modal de tesouros e abas Gerar tesouros e Rolar na mesa.
 import { CHALLENGE_RATINGS, challengeRatingLabel, startTreasure, startTable, nextStep, applyRoll } from "./treasureEngine.js";
 import { rollDice, dieRange } from "./dice.js";
 import { buildBatch, rollBatch, listSpecificTables, MAX_QUANTITY, MODE_LABELS, COLUMN_LABELS } from "./treasureBatch.js";
@@ -134,8 +134,6 @@ function field(label, control, className) {
   return wrap;
 }
 
-let hintCounter = 0;
-
 function createRow(onRemove) {
   const row = el("div", "treasure-input-row");
   const type = el("select", "treasure-f-kind");
@@ -148,8 +146,6 @@ function createRow(onRemove) {
   const mode = el("select", "treasure-f-mode");
   for (const [v, l] of Object.entries(MODE_LABELS)) mode.append(option(v, l));
   const columns = el("select", "treasure-f-columns");
-  const hintId = `treasureRollHint${++hintCounter}`;
-  columns.setAttribute("aria-describedby", hintId);
   for (const [v, l] of Object.entries(COLUMN_LABELS)) columns.append(option(v, l));
   const table = el("select", "treasure-f-table");
   for (const t of listSpecificTables()) table.append(option(t.id, t.title));
@@ -168,9 +164,6 @@ function createRow(onRemove) {
     if (itemsOnly && mode.value === "metade") mode.value = "padrão";
   };
   const rollField = field("Rolar", columns);
-  const hint = el("small", "treasure-hint", "Dinheiro: moedas e riquezas");
-  hint.id = hintId;
-  rollField.append(hint);
   type.addEventListener("change", sync);
   columns.addEventListener("change", sync);
   row.append(field("Origem", type), field("ND", nd), field("Tabela", table, "treasure-table-field"),
@@ -219,7 +212,7 @@ function setupRollTab(panel) {
   addRow();
 }
 
-// ---------- Aba Rolar com o livro ----------
+// ---------- Aba Rolar na mesa ----------
 
 // Vagas de melhoria/encanto ainda na fila de um item.
 function openSlots(state, itemId) {

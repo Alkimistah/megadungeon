@@ -23,7 +23,7 @@
 // antes de rolar num pedido de um grupo de `WEIGHTED_POOLS`, sorteia a fonte (`pickSource`). Se for outro livro, o valor é 1d<n> na lista
 // elegível, e o passo guarda `item` e uma linha montada a partir dele; a tabela do pedido
 // (`tableId`) continua a do Livro Básico, e `sourceTableId` diz de onde veio. `applyRoll`, com
-// valores digitados (aba Rolar com o livro), nunca sorteia fonte e não grava esses campos.
+// valores digitados (aba Rolar na mesa), nunca sorteia fonte e não grava esses campos.
 //
 // `pending` é uma pilha: os pedidos gerados por um passo entram na frente, então a
 // cadeia avança em profundidade (tipo e valor de uma riqueza antes da seguinte).

@@ -36,7 +36,7 @@ try {
     d.showModal();
   });
   const tabs = page.locator("#treasureDialog [role=tab]");
-  assert.deepEqual(await tabs.allInnerTexts(), ["Gerar tesouros", "Rolar com o livro"]);
+  assert.deepEqual(await tabs.allInnerTexts(), ["Gerar tesouros", "Rolar na mesa"]);
   const panels = page.locator("#treasureDialog [role=tabpanel]");
   assert.equal(await panels.count(), 2);
   assert.equal(await tabs.nth(0).getAttribute("aria-selected"), "true");
@@ -76,15 +76,12 @@ try {
   // Metade fica desativado em "Só Item".
   assert.equal(await rowsLoc.nth(3).locator(".treasure-f-mode").evaluate(s => s.querySelector('option[value=\"metade\"]').disabled), true);
   assert.equal(await page.locator("#treasureFooter").isVisible(), false);
-  // Campo "Rolar" (antes "Colunas"), com opções e dica novas; sem faixa fixa de totais.
+  // Campo "Rolar" (antes "Colunas"), com opções novas; sem legenda e sem faixa fixa de totais.
   const rowField = rowsLoc.nth(0).locator("label", { has: page.locator(".treasure-f-columns") });
-  const hintIds = await page.locator("#treasureDialog .treasure-hint").evaluateAll(els => els.map(e => e.id));
-  assert.equal(hintIds.length, 4);
-  assert.equal(new Set(hintIds).size, 4, `ids das dicas distintos: ${hintIds}`);
-  assert.equal(await page.locator("#treasureDialog .treasure-f-columns").evaluateAll(els => new Set(els.map(e => e.getAttribute("aria-describedby"))).size), 4);
+  assert.equal(await page.locator("#treasureDialog .treasure-hint").count(), 0);
   assert.match(await rowField.innerText(), /^Rolar\b/);
   assert.deepEqual(await rowsLoc.nth(0).locator(".treasure-f-columns option").allInnerTexts(), ["Itens e dinheiro", "Só itens", "Só dinheiro"]);
-  assert.match(await rowField.innerText(), /Dinheiro: moedas e riquezas/);
+  assert.doesNotMatch(await rowField.innerText(), /moedas e riquezas/);
   assert.doesNotMatch(await rowsLoc.nth(0).innerText(), /Colunas/);
   assert.equal(await page.locator("#treasureStrip, .treasure-strip").count(), 0, "faixa fixa removida");
   await page.locator("#treasureDialog .treasure-roll").click();

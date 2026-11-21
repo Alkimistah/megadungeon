@@ -3199,12 +3199,6 @@ details.mission-run-guidance p {
   font-size: 13px;
 }
 
-.treasure-hint {
-  color: #d8c8b7;
-  font-size: 11px;
-  line-height: 1.2;
-}
-
 .treasure-items {
   list-style: none;
   padding-left: 0 !important;
