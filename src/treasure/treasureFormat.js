@@ -90,9 +90,24 @@ export function bookReference(tableId) {
 export function formatItemLine(item) {
   const parts = [`${item.quantity}× ${item.name}${item.category ? ` (${item.category})` : ""}`];
   if (item.price !== undefined) parts.push(formatPrice(item.price));
-  const ref = item.source ? bookReference(item.source) : "";
+  const ref = item.source && !item.components?.length ? bookReference(item.source) : "";
   if (ref) parts.push(ref);
   return parts.join(" — ");
+}
+
+// Uma linha por componente: o primeiro (base) sem marca, os demais com "· ".
+export function formatComponents(components) {
+  return (components ?? []).map((c, i) => {
+    const ref = c.book ? ` — ${c.book}${c.bookPage ? ` p. ${c.bookPage}` : ""}` : "";
+    return `${i ? "· " : ""}${c.name}${ref}`;
+  });
+}
+
+// "Livro sorteado: <livro> (<%>)" só quando houve sorteio (share < 1); senão, vazio.
+export function formatBookDraw(step) {
+  if (!step.sourceBook || !(step.share < 1)) return "";
+  const pct = Math.round(step.share * 1000) / 10;
+  return `Livro sorteado: ${step.sourceBook} (${fmt(pct)}%)`;
 }
 
 // Valor digitado numa consulta; "00" vale 100 no d%. Texto inválido vira NaN.

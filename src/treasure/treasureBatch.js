@@ -9,7 +9,7 @@ import { tableLabel } from "./treasureFormat.js";
 
 export const MAX_QUANTITY = 99;
 const COLUMN_SETS = { both: ["money", "items"], money: ["money"], items: ["items"] };
-export const COLUMN_LABELS = { both: "Item + Riqueza", items: "Só Item", money: "Só Riqueza" };
+export const COLUMN_LABELS = { both: "Itens e dinheiro", items: "Só itens", money: "Só dinheiro" };
 export const MODE_LABELS = { padrão: "Padrão", metade: "Metade", dobro: "Dobro" };
 
 // Tabelas escolhíveis em "Tabela específica": as do Livro Básico (menos as de ND) e as listas dos outros livros.

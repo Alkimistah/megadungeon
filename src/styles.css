@@ -2453,23 +2453,56 @@ svg {
 .treasure-panel {
   min-height: 0;
   overflow-y: auto;
-  padding-bottom: 44px;
+  padding: 14px 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 0 6px 6px 6px;
+  background: var(--surface);
 }
 
+/* Abas de fichário: presas à borda superior do painel; a ativa se funde a ele. */
 .treasure-tabs {
   display: flex;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: 4px;
+  margin-bottom: -1px;
+  padding-left: 10px;
+  position: relative;
+  z-index: 1;
 }
 
 .treasure-tab {
-  padding: 6px 14px;
+  position: relative;
+  margin: 0;
+  padding: 7px 16px 6px;
+  border: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 8px 8px 0 0;
+  background: var(--page);
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  box-shadow: none;
+  opacity: 0.75;
   cursor: pointer;
+  top: 2px;
+}
+
+.treasure-tab:hover {
+  opacity: 1;
+  background: var(--surface-alt);
+}
+
+.treasure-tab:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: -3px;
+  opacity: 1;
 }
 
 .treasure-tab[aria-selected="true"] {
-  border-color: color-mix(in srgb, var(--action) 55%, white 45%);
-  background: var(--action-hover);
+  top: 0;
+  padding-bottom: 8px;
+  background: var(--surface);
+  border-bottom-color: var(--surface);
+  opacity: 1;
   font-weight: 700;
 }
 
@@ -3154,23 +3187,6 @@ details.mission-run-guidance p {
   gap: 4px 16px;
 }
 
-.treasure-strip {
-  position: sticky;
-  bottom: 0;
-  margin: 8px 0 0;
-  padding: 6px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface-alt);
-  color: #f2e6d8;
-  font-size: 13px;
-  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.treasure-strip[hidden] {
-  display: none;
-}
-
 .treasure-footer[hidden] {
   display: none;
 }
@@ -3181,6 +3197,48 @@ details.mission-run-guidance p {
 
 .treasure-summary-block {
   font-size: 13px;
+}
+
+.treasure-hint {
+  color: #d8c8b7;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.treasure-items {
+  list-style: none;
+  padding-left: 0 !important;
+}
+
+.treasure-item {
+  display: grid;
+  margin-bottom: 6px;
+}
+
+.treasure-component {
+  font-size: 12px;
+  color: #d8c8b7;
+  overflow-wrap: anywhere;
+}
+
+.treasure-component-extra {
+  padding-left: 12px;
+}
+
+.treasure-book-draw {
+  color: #d8c8b7;
+}
+
+.treasure-wealth-total {
+  margin-top: 4px !important;
+}
+
+.treasure-grand-total {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 14px;
 }
 
 .treasure-summary-block p {

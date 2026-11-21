@@ -28,10 +28,16 @@ try {
   await page.locator("#treasureDialog[open]").waitFor({ timeout: 5000 });
 
   const tabs = page.locator("#treasureDialog [role=tab]");
-  assert.deepEqual(await tabs.allInnerTexts(), ["Rolar", "Consultar"]);
+  assert.deepEqual(await tabs.allInnerTexts(), ["Gerar tesouros", "Rolar com o livro"]);
   const panels = page.locator("#treasureDialog [role=tabpanel]");
   assert.equal(await panels.count(), 2);
   assert.equal(await tabs.nth(0).getAttribute("aria-selected"), "true");
+  // Setas navegam entre as abas.
+  await tabs.nth(0).focus();
+  await page.keyboard.press("ArrowRight");
+  assert.equal(await tabs.nth(1).getAttribute("aria-selected"), "true", "seta direita seleciona a segunda aba");
+  await page.keyboard.press("ArrowLeft");
+  assert.equal(await tabs.nth(0).getAttribute("aria-selected"), "true", "seta esquerda volta à primeira");
   assert.equal(await panels.nth(0).isVisible(), true);
   assert.equal(await panels.nth(1).isVisible(), false);
 
@@ -62,7 +68,15 @@ try {
   // Metade fica desativado em "Só Item".
   assert.equal(await rowsLoc.nth(3).locator(".treasure-f-mode").evaluate(s => s.querySelector('option[value=\"metade\"]').disabled), true);
   assert.equal(await page.locator("#treasureFooter").isVisible(), false);
+  // Campo "Rolar" (antes "Colunas"), com opções e dica novas; sem faixa fixa de totais.
+  const rowField = rowsLoc.nth(0).locator("label", { has: page.locator(".treasure-f-columns") });
+  assert.match(await rowField.innerText(), /^Rolar\b/);
+  assert.deepEqual(await rowsLoc.nth(0).locator(".treasure-f-columns option").allInnerTexts(), ["Itens e dinheiro", "Só itens", "Só dinheiro"]);
+  assert.match(await rowField.innerText(), /Dinheiro: moedas e riquezas/);
+  assert.doesNotMatch(await rowsLoc.nth(0).innerText(), /Colunas/);
+  assert.equal(await page.locator("#treasureStrip, .treasure-strip").count(), 0, "faixa fixa removida");
   await page.locator("#treasureDialog .treasure-roll").click();
+  assert.match(await page.locator("#treasureDialog .treasure-group h3").last().innerText(), /Só itens/, "cabeçalho com o novo rótulo");
   const results = page.locator("#treasureDialog .treasure-result");
   assert.equal(await results.count(), 11, "11 tesouros");
   const indexes = await results.locator(".treasure-index").allInnerTexts();
@@ -91,17 +105,32 @@ try {
   await page.locator("#treasureDialog .treasure-roll").click();
   assert.equal(await page.locator("#treasureDialog .treasure-error").innerText(), "");
   assert.match(await results.first().innerText(), /Heróis · Acessórios específicos \(menores\)/);
-  const itemLine = await page.locator("#treasureFooter .treasure-summary-block li").last().innerText();
-  assert.match(itemLine, /^\d+× .+ \(.+\) — .*p\. \d+$/, `item do rodapé com categoria e página: ${itemLine}`);
+  const itemLine = await page.locator("#treasureFooter .treasure-item-line").last().innerText();
+  assert.match(itemLine, /^\d+× .+ \(.+\)( — T\$ [\d.,]+)?$/, `item do rodapé com categoria: ${itemLine}`);
+  assert.match(await page.locator("#treasureFooter .treasure-component").last().innerText(), / — .+ p\. \d+$/, "componente com livro e página");
   assert.match(await page.locator("#treasureFooter").innerText(), /Total em dinheiro/);
   await page.locator("#treasureDialog .treasure-roll").click();
-  // Lote cheio de 11+ tesouros para a captura.
+  // Lote cheio de itens de ND alto: totais visíveis e ao menos um item com componentes (melhoria/encanto).
   await rowsLoc.nth(0).locator(".treasure-f-kind").selectOption("nd");
-  await page.locator("#treasureDialog .treasure-roll").click();
+  await rowsLoc.nth(0).locator(".treasure-f-nd").selectOption("20");
+  await rowsLoc.nth(0).locator(".treasure-f-qty").fill("30");
+  let extra = 0;
+  for (let i = 0; i < 6 && !extra; i++) {
+    await page.locator("#treasureDialog .treasure-roll").click();
+    extra = await page.locator("#treasureFooter .treasure-component-extra").count();
+  }
+  assert.ok(extra > 0, "ao menos um item com componentes além da base");
+  const price = await page.locator("#treasureFooter .treasure-item-line", { hasText: "T$" }).count();
+  assert.ok(price > 0, "itens mostram o preço");
+  assert.match(await page.locator("#treasureFooter .treasure-wealth-total").innerText(), /^Total em riquezas: T\$ [\d.,]+$/);
+  assert.match(await page.locator("#treasureFooter .treasure-grand-total").innerText(), /^Valor total \(dinheiro \+ riquezas\): T\$ [\d.,]+$/);
+  const num = t => Number(t.replace(/[^\d,]/g, "").replace(",", "."));
+  const wealthShown = num(await page.locator("#treasureFooter .treasure-wealth-total").innerText());
+  const grandShown = num(await page.locator("#treasureFooter .treasure-grand-total").innerText());
+  const coinsShown = Number(await page.locator("#treasureFooter").getAttribute("data-total-tibars"));
+  assert.equal(Math.round((coinsShown + wealthShown) * 10) / 10, grandShown, "valor total = dinheiro + riquezas");
   await page.locator("#treasurePanelRoll").evaluate(p => { p.scrollTop = p.scrollHeight; });
-  const lastBottom = await results.last().evaluate(e => e.getBoundingClientRect().bottom);
-  const stripTop = await page.locator("#treasureStrip").evaluate(e => e.getBoundingClientRect().top);
-  assert.ok(lastBottom <= stripTop + 1, `último resultado coberto pela faixa (${lastBottom} > ${stripTop})`);
+  assert.equal(await page.locator("#treasureFooter .treasure-grand-total").isVisible(), true);
   await page.screenshot({ path: shot("treasure-rolar.png") });
 
   await tabs.nth(1).click();
@@ -182,7 +211,7 @@ try {
 
   await page.locator("#treasureClose").click();
   await page.locator("#treasureDialog").waitFor({ state: "hidden" });
-  // Tema: as cores da modal seguem o perfil do andar (variáveis --page/--surface-alt/--action-hover).
+  // Tema: as cores da modal seguem o perfil do andar (variáveis --page/--surface/--surface-alt).
   const themeOf = async profileIndex => {
     const p = await browser.newPage({ viewport: { width: 1024, height: 768 }, serviceWorkers: "block" });
     p.on("pageerror", error => errors.push(error.message));
@@ -200,19 +229,31 @@ try {
     });
     await p.waitForTimeout(300);
     await p.evaluate(() => { const d = document.getElementById("treasureDialog"); d.close(); d.showModal(); });
-    await p.locator("#treasureDialog .treasure-roll").click();
+    const row = p.locator("#treasureDialog .treasure-input-row").first();
+    await row.locator(".treasure-f-nd").selectOption("20");
+    await row.locator(".treasure-f-qty").fill("12");
+    for (let i = 0; i < 6; i++) {
+      await p.locator("#treasureDialog .treasure-roll").click();
+      if (await p.locator("#treasureFooter .treasure-component-extra").count()) break;
+    }
+    assert.ok(await p.locator("#treasureFooter .treasure-component-extra").count(), `componentes visíveis (${ids[profileIndex]})`);
     const read = await p.evaluate(() => {
       const root = getComputedStyle(document.documentElement);
       const d = getComputedStyle(document.getElementById("treasureDialog"));
       const card = getComputedStyle(document.querySelector("#treasureDialog .treasure-result"));
       const tab = getComputedStyle(document.querySelector("#treasureDialog [role=tab][aria-selected=true]"));
+      const idle = getComputedStyle(document.querySelector("#treasureDialog [role=tab][aria-selected=false]"));
+      const panel = getComputedStyle(document.querySelector("#treasurePanelRoll"));
       const probe = document.createElement("i");
       const toRgb = v => { probe.style.color = v; document.body.append(probe); const r = getComputedStyle(probe).color; probe.remove(); return r; };
-      return { dialogBg: d.backgroundColor, cardBg: card.backgroundColor, tabBg: tab.backgroundColor,
+      return { dialogBg: d.backgroundColor, cardBg: card.backgroundColor, tabBg: tab.backgroundColor, tabBorder: tab.borderBottomColor, panelBg: panel.backgroundColor, idleBg: idle.backgroundColor,
+        surface: toRgb(root.getPropertyValue("--surface").trim()), page2: toRgb(root.getPropertyValue("--page").trim()),
         page: toRgb(root.getPropertyValue("--page").trim()), alt: toRgb(root.getPropertyValue("--surface-alt").trim()),
         hover: toRgb(root.getPropertyValue("--action-hover").trim()) };
     });
-    await p.screenshot({ path: shot(`treasure-rolar-${ids[profileIndex]}.png`) });
+    await p.locator("#treasureDialog").screenshot({ path: shot(`treasure-rolar-${ids[profileIndex]}.png`) });
+    await p.locator("#treasurePanelRoll").evaluate(el => { el.scrollTop = el.scrollHeight; });
+    await p.locator("#treasureDialog").screenshot({ path: shot(`treasure-rolar-${ids[profileIndex]}-fim.png`) });
     await p.close();
     return { id: ids[profileIndex], ...read };
   };
@@ -222,7 +263,10 @@ try {
   for (const t of [themeA, themeB, themeC]) {
     assert.equal(t.dialogBg, t.page, `fundo da modal = --page (${t.id})`);
     assert.equal(t.cardBg, t.alt, `cartão = --surface-alt (${t.id})`);
-    assert.equal(t.tabBg, t.hover, `aba selecionada = --action-hover (${t.id})`);
+    assert.equal(t.panelBg, t.surface, `painel = --surface (${t.id})`);
+    assert.equal(t.tabBg, t.panelBg, `aba ativa fundida ao painel (${t.id})`);
+    assert.equal(t.tabBorder, t.panelBg, `aba ativa sem borda inferior visível (${t.id})`);
+    assert.equal(t.idleBg, t.page2, `aba inativa rebaixada = --page (${t.id})`);
   }
   assert.notEqual(themeA.dialogBg, themeB.dialogBg, "perfis diferentes têm fundos diferentes");
   assert.notEqual(themeA.cardBg, themeB.cardBg);

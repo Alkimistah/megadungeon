@@ -2,6 +2,7 @@
 //
 // Moedas (TC, T$, TO) são somadas por moeda; riquezas não são moedas e ficam só na
 // lista `wealth`; itens são agrupados por `name` + `source` (tabela de origem), na ordem da primeira aparição.
+// wealthTotal = soma das riquezas; grandTotal = totalTibars + wealthTotal (uma casa decimal).
 // totalTibars = TC / 10 + T$ + TO * 10, arredondado a uma casa decimal.
 export function summarizeGains(gains) {
   const coins = { TC: 0, "T$": 0, TO: 0 };
@@ -14,7 +15,8 @@ export function summarizeGains(gains) {
     } else if (gain.kind === "wealth") {
       wealth.push({ value: gain.value, examples: gain.examples });
     } else if (gain.kind === "item") {
-      const key = `${gain.name}\u0000${gain.source ?? ""}`;
+      const components = gain.details?.components;
+      const key = `${gain.name}\u0000${gain.source ?? ""}\u0000${components ? JSON.stringify(components) : ""}`;
       const existing = itemsByKey.get(key);
       if (existing) {
         existing.quantity += 1;
@@ -24,6 +26,7 @@ export function summarizeGains(gains) {
           category: gain.category,
           ...(gain.source !== undefined ? { source: gain.source } : {}),
           price: gain.price,
+          ...(components ? { components } : {}),
           quantity: 1,
         });
       }
@@ -32,5 +35,9 @@ export function summarizeGains(gains) {
 
   const totalTibars = Math.round((coins.TC / 10 + coins["T$"] + coins.TO * 10) * 10) / 10;
 
-  return { coins, totalTibars, wealth, items: [...itemsByKey.values()] };
+  const round1 = (n) => Math.round(n * 10) / 10;
+  const wealthTotal = round1(wealth.reduce((sum, w) => sum + w.value, 0));
+  const grandTotal = round1(totalTibars + wealthTotal);
+
+  return { coins, totalTibars, wealthTotal, grandTotal, wealth, items: [...itemsByKey.values()] };
 }

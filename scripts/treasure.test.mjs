@@ -840,8 +840,8 @@ test("parseTypedValue maps 00 to 100 only on d%", () => {
 test("batch group heading shows the column choice unless both", () => {
   const label = (columns) => buildBatch([{ challengeRating: "3", quantity: 1, mode: "padrão", columns }])[0].label;
   assert.equal(label("both"), "ND 3, Padrão");
-  assert.equal(label("items"), "ND 3, Padrão, Só Item");
-  assert.equal(label("money"), "ND 3, Padrão, Só Riqueza");
+  assert.equal(label("items"), "ND 3, Padrão, Só itens");
+  assert.equal(label("money"), "ND 3, Padrão, Só dinheiro");
 });
 
 // ---------- Preços (Tabelas 3-3, 3-5, 3-6, 3-7, 3-9) ----------
@@ -1186,4 +1186,48 @@ test("other-book armors carry leve/pesada from the printed sections and use that
   // Heróis 3-3 item 1 (Armadura sensual, leve, T$ 55) + 1 melhoria + adamante leve
   const done = resolveWithDice(itemsChain("2"), scriptedRng([face(95, 100), face(4, 6), 0.99, face(1, 14), 0.1, face(41, 100), 0.1, face(2, 6)]));
   assert.equal(done.gains[0].price, 55 + 300 + 6000);
+});
+
+// ---------- Task 4: totais, componentes e livro sorteado ----------
+import { formatComponents, formatBookDraw } from "../src/treasure/treasureFormat.js";
+
+test("summarizeGains adds wealthTotal and grandTotal with one decimal", () => {
+  const summary = summarizeGains([
+    { kind: "money", amount: 35, currency: "TC" },
+    { kind: "money", amount: 200, currency: "T$" },
+    { kind: "wealth", tier: "média", value: 50.5, amount: 50.5, currency: "T$", examples: "A" },
+    { kind: "wealth", tier: "menor", value: 10.25, amount: 10.25, currency: "T$", examples: "B" },
+  ]);
+  assert.equal(summary.wealthTotal, 60.8);
+  assert.equal(summary.totalTibars, 203.5);
+  assert.equal(summary.grandTotal, 264.3);
+  const empty = summarizeGains([]);
+  assert.equal(empty.wealthTotal, 0);
+  assert.equal(empty.grandTotal, 0);
+});
+
+test("summarizeGains keeps components and does not merge items with different components", () => {
+  const comp = (n) => [{ role: "base", name: "Espada longa", book: "Livro Básico", bookPage: 144 },
+    { role: "melhoria", name: n, book: "Heróis de Arton", bookPage: 240 }];
+  const g = (n) => ({ kind: "item", name: "Espada longa", category: "arma", source: "8-4/arma", price: 18000, details: { components: comp(n) } });
+  const summary = summarizeGains([g("Potencializador"), g("Potencializador"), g("Cruel")]);
+  assert.equal(summary.items.length, 2);
+  assert.equal(summary.items[0].quantity, 2);
+  assert.equal(summary.items[0].components.length, 2);
+});
+
+test("formatComponents prints one line per component, base first, extras indented", () => {
+  assert.deepEqual(formatComponents([
+    { role: "base", name: "Espada longa", book: "Livro Básico", bookPage: 144 },
+    { role: "melhoria", name: "Potencializador", book: "Heróis de Arton", bookPage: 240 },
+    { role: "encanto", name: "Chama", book: "Livro Básico" },
+  ]), ["Espada longa — Livro Básico p. 144", "· Potencializador — Heróis de Arton p. 240", "· Chama — Livro Básico"]);
+  assert.deepEqual(formatComponents(undefined), []);
+});
+
+test("formatBookDraw shows the drawn book only when share < 1", () => {
+  assert.equal(formatBookDraw({ sourceBook: "Heróis de Arton", share: 0.7 }), "Livro sorteado: Heróis de Arton (70%)");
+  assert.equal(formatBookDraw({ sourceBook: "Ameaças de Arton", share: 0.124 }), "Livro sorteado: Ameaças de Arton (12,4%)");
+  assert.equal(formatBookDraw({ sourceBook: "Livro Básico", share: 1 }), "");
+  assert.equal(formatBookDraw({ sourceBook: "Livro Básico" }), "");
 });

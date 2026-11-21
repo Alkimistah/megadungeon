@@ -1,8 +1,8 @@
-// Casca da modal de tesouros e abas Rolar e Consultar.
+// Casca da modal de tesouros e abas Gerar tesouros e Rolar com o livro.
 import { CHALLENGE_RATINGS, challengeRatingLabel, startTreasure, startTable, nextStep, applyRoll } from "./treasureEngine.js";
 import { rollDice, dieRange } from "./dice.js";
 import { buildBatch, rollBatch, listSpecificTables, MAX_QUANTITY, MODE_LABELS, COLUMN_LABELS } from "./treasureBatch.js";
-import { describeStep, stepDepth, formatAmount, formatItemLine, parseTypedValue, tableLabel } from "./treasureFormat.js";
+import { describeStep, stepDepth, formatAmount, formatItemLine, formatComponents, formatBookDraw, parseTypedValue, tableLabel } from "./treasureFormat.js";
 import { summarizeGains } from "./treasureSummary.js";
 import { createRng, createRandomSeed } from "../random.js";
 
@@ -21,6 +21,7 @@ function selectTab(dialog, tabId) {
   for (const tab of dialog.querySelectorAll("[role=tab]")) {
     const selected = tab.id === tabId;
     tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
     const panel = dialog.querySelector(`#${tab.getAttribute("aria-controls")}`);
     if (panel) panel.hidden = !selected;
   }
@@ -28,11 +29,12 @@ function selectTab(dialog, tabId) {
 
 // ---------- Rodapé ----------
 
-// `strip` (opcional) recebe a linha compacta de totais, que a aba mantém fixa no fim da modal.
-export function renderSummary(container, gains, strip) {
+export function renderSummary(container, gains) {
   const summary = summarizeGains(gains);
   container.replaceChildren();
   container.dataset.totalTibars = String(summary.totalTibars);
+  container.dataset.wealthTotal = String(summary.wealthTotal);
+  container.dataset.grandTotal = String(summary.grandTotal);
   const coins = Object.entries(summary.coins).filter(([, n]) => n > 0).map(([c, n]) => `${formatAmount(n)} ${c}`);
   const money = el("p", "treasure-summary-line");
   money.append(el("strong", "", "Dinheiro: "), coins.length ? coins.join(" · ") : "nenhum");
@@ -40,11 +42,6 @@ export function renderSummary(container, gains, strip) {
   total.append(el("strong", "", "Total em dinheiro: "), el("span", "treasure-total-value", `${formatAmount(summary.totalTibars)} T$`));
   const moneyBlock = el("div", "treasure-summary-block");
   moneyBlock.append(money, total);
-  strip?.replaceChildren();
-  strip?.append(el("strong", "", "Dinheiro: "), `${coins.length ? coins.join(" · ") : "nenhum"} · `,
-    el("strong", "treasure-total-value", `Total em dinheiro: ${formatAmount(summary.totalTibars)} T$`),
-    ` · ${summary.wealth.length} ${summary.wealth.length === 1 ? "riqueza" : "riquezas"}`,
-    ` · ${summary.items.reduce((n, i) => n + i.quantity, 0)} itens`);
 
   const wealth = el("div", "treasure-summary-block");
   wealth.append(el("strong", "", "Riquezas"));
@@ -54,17 +51,26 @@ export function renderSummary(container, gains, strip) {
     for (const w of summary.wealth) list.append(el("li", "", `T$ ${formatAmount(w.value)} — ${w.examples}`));
     wealth.append(list);
   }
+  const wealthTotal = el("p", "treasure-summary-line treasure-wealth-total");
+  wealthTotal.append(el("strong", "", "Total em riquezas: "), `T$ ${formatAmount(summary.wealthTotal)}`);
+  wealth.append(wealthTotal);
+
   const items = el("div", "treasure-summary-block");
   items.append(el("strong", "", "Itens"));
   if (!summary.items.length) items.append(el("p", "treasure-muted", "nenhum"));
   else {
-    const list = el("ul");
+    const list = el("ul", "treasure-items");
     for (const it of summary.items) {
-      list.append(el("li", "", formatItemLine(it)));
+      const li = el("li", "treasure-item");
+      li.append(el("span", "treasure-item-line", formatItemLine(it)));
+      for (const line of formatComponents(it.components)) li.append(el("span", `treasure-component${line.startsWith("· ") ? " treasure-component-extra" : ""}`, line));
+      list.append(li);
     }
     items.append(list);
   }
-  container.append(moneyBlock, wealth, items);
+  const grand = el("p", "treasure-summary-line treasure-grand-total");
+  grand.append(el("strong", "", "Valor total (dinheiro + riquezas): "), el("span", "treasure-grand-value", `T$ ${formatAmount(summary.grandTotal)}`));
+  container.append(moneyBlock, wealth, items, grand);
 }
 
 // ---------- Resultados ----------
@@ -79,6 +85,8 @@ function renderChain(state) {
     table.title = step.tableId;
     li.append(table, " ", el("span", "treasure-step-roll", roll),
       " → ", el("span", "treasure-step-result", result));
+    const draw = formatBookDraw(step);
+    if (draw) li.append(" ", el("em", "treasure-book-draw", `(${draw})`));
     list.append(li);
   }
   return list;
@@ -135,6 +143,7 @@ function createRow(onRemove) {
   const mode = el("select", "treasure-f-mode");
   for (const [v, l] of Object.entries(MODE_LABELS)) mode.append(option(v, l));
   const columns = el("select", "treasure-f-columns");
+  columns.setAttribute("aria-describedby", "treasureRollHint");
   for (const [v, l] of Object.entries(COLUMN_LABELS)) columns.append(option(v, l));
   const table = el("select", "treasure-f-table");
   for (const t of listSpecificTables()) table.append(option(t.id, t.title));
@@ -152,10 +161,14 @@ function createRow(onRemove) {
     mode.querySelector('option[value="metade"]').disabled = itemsOnly;
     if (itemsOnly && mode.value === "metade") mode.value = "padrão";
   };
+  const rollField = field("Rolar", columns);
+  const hint = el("small", "treasure-hint", "Dinheiro: moedas e riquezas");
+  hint.id = "treasureRollHint";
+  rollField.append(hint);
   type.addEventListener("change", sync);
   columns.addEventListener("change", sync);
   row.append(field("Origem", type), field("ND", nd), field("Tabela", table, "treasure-table-field"),
-    field("Quantidade", qty), field("Tipo", mode), field("Colunas", columns), remove);
+    field("Quantidade", qty), field("Tipo", mode), rollField, remove);
   sync();
   row.readValue = () => {
     const quantity = Number(qty.value);
@@ -178,9 +191,6 @@ function setupRollTab(panel) {
   const footer = el("div", "treasure-footer");
   footer.id = "treasureFooter";
   footer.hidden = true;
-  const strip = el("p", "treasure-strip");
-  strip.id = "treasureStrip";
-  strip.hidden = true;
 
   const addRow = () => rowsBox.append(createRow((row) => {
     if (rowsBox.children.length > 1) row.remove();
@@ -191,19 +201,19 @@ function setupRollTab(panel) {
     try {
       const batch = rollBatch([...rowsBox.children].map((r) => r.readValue()), createRng(createRandomSeed()));
       renderResults(results, batch);
-      renderSummary(footer, batch.flatMap((g) => g.treasures.flatMap((t) => t.states.flatMap((s) => s.gains))), strip);
-      footer.hidden = strip.hidden = false;
+      renderSummary(footer, batch.flatMap((g) => g.treasures.flatMap((t) => t.states.flatMap((s) => s.gains))));
+      footer.hidden = false;
     } catch (e) {
       error.textContent = e.message;
     }
   });
   const actions = el("div", "treasure-actions");
   actions.append(add, roll);
-  panel.append(rowsBox, actions, error, results, footer, strip);
+  panel.append(rowsBox, actions, error, results, footer);
   addRow();
 }
 
-// ---------- Aba Consultar ----------
+// ---------- Aba Rolar com o livro ----------
 
 // Vagas de melhoria/encanto ainda na fila de um item.
 function openSlots(state, itemId) {
@@ -356,10 +366,20 @@ export function openTreasureDialog(dialog) {
     wired.add(dialog);
     for (const tab of dialog.querySelectorAll("[role=tab]")) {
       tab.addEventListener("click", () => selectTab(dialog, tab.id));
+      tab.addEventListener("keydown", (event) => {
+        const tabs = [...dialog.querySelectorAll("[role=tab]")];
+        const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+        const target = event.key === "Home" ? tabs[0] : event.key === "End" ? tabs.at(-1) : step ? tabs[(tabs.indexOf(tab) + step + tabs.length) % tabs.length] : null;
+        if (!target) return;
+        event.preventDefault();
+        selectTab(dialog, target.id);
+        target.focus();
+      });
     }
     dialog.querySelector("#treasureClose")?.addEventListener("click", () => dialog.close());
     setupRollTab(dialog.querySelector("#treasurePanelRoll"));
     setupConsultTab(dialog.querySelector("#treasurePanelLookup"));
+    selectTab(dialog, "treasureTabRoll");
   }
   if (!dialog.open) dialog.showModal();
 }
