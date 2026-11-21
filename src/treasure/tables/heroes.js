@@ -6,6 +6,8 @@ import { listTable } from "./schema.js";
 // Os itens mágicos específicos trazem a coluna "Categoria" (Média no livro = "médio" no motor).
 const base = { book: "Heróis de Arton" };
 const shield = (name) => (/^(Escudo|Broquel|Sagna)/.test(name) ? "escudo" : "armadura");
+// Tabela 3-3 imprime as seções Armaduras Leves, Armaduras Pesadas e Escudos (PDF 226).
+const LIGHT_3_3 = new Set(["Armadura sensual", "Armadura de folhas", "Armadura de engenhoqueiro goblin", "Cota de moedas", "Colete fora da lei"]);
 
 // Tabela 3-1, PDF 220 e 221 (continuação).
 const TABLE_3_1 = `
@@ -386,7 +388,8 @@ export const HEROES_LISTS = [
   listTable({ ...base, id: "herois/municoes", title: "Heróis, Tabela 3-2: Munições", label: "Heróis · Munições",
     bookPage: 223, pdfPage: 225, category: "arma", text: TABLE_3_2 }),
   listTable({ ...base, id: "herois/armaduras", title: "Heróis, Tabela 3-3: Armaduras & Escudos", label: "Heróis · Armaduras e escudos",
-    bookPage: 224, pdfPage: 226, category: shield, text: TABLE_3_3 }),
+    bookPage: 224, pdfPage: 226, category: shield, text: TABLE_3_3,
+    armor: (name) => (LIGHT_3_3.has(name) ? "leve" : "pesada") }),
   listTable({ ...base, id: "herois/itens-gerais", title: "Heróis, Tabela 3-4: Itens Gerais", label: "Heróis · Itens gerais",
     bookPage: 228, pdfPage: 230, category: "item geral", text: TABLE_3_4 }),
   listTable({ ...base, id: "herois/melhorias", title: "Heróis, Tabela 3-5: Novas Melhorias", label: "Heróis · Novas melhorias",

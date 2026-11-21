@@ -5,6 +5,8 @@ import { listTable } from "./schema.js";
 const BOOK = "Ameaças de Arton";
 const base = { book: BOOK };
 const shield = (name) => (/^Escudo/.test(name) ? "escudo" : "armadura");
+// Tabela 3-2 imprime as seções Armaduras Leves, Armaduras Pesadas e Escudos (PDF 397).
+const LIGHT_3_2 = new Set(["Armadura de ossos", "Veste de teia de aranha"]);
 
 // Tabela 3-1, PDF 396 (Armas Simples, Marciais, de Fogo e Exóticas).
 const TABLE_3_1 = `
@@ -89,7 +91,8 @@ export const THREATS_LISTS = [
   listTable({ ...base, id: "ameacas/armas", title: "Ameaças, Tabela 3-1: Novas Armas", label: "Ameaças · Novas armas",
     bookPage: 394, pdfPage: 396, category: "arma", text: TABLE_3_1 }),
   listTable({ ...base, id: "ameacas/armaduras", title: "Ameaças, Tabela 3-2: Novas Armaduras e Escudos", label: "Ameaças · Novas armaduras e escudos",
-    bookPage: 395, pdfPage: 397, category: shield, text: TABLE_3_2 }),
+    bookPage: 395, pdfPage: 397, category: shield, text: TABLE_3_2,
+    armor: (name) => (LIGHT_3_2.has(name) ? "leve" : "pesada") }),
   listTable({ ...base, id: "ameacas/itens-gerais", title: "Ameaças, Tabela 3-3: Novos Itens Gerais", label: "Ameaças · Novos itens gerais",
     bookPage: 398, pdfPage: 400, category: "item geral", text: TABLE_3_3 }),
   listTable({ ...base, id: "ameacas/materiais", title: "Ameaças, Tabela 3-4: Novos Materiais Especiais", label: "Ameaças · Novos materiais especiais",

@@ -173,6 +173,30 @@ export function basePriceOf(name) {
   return BASE_PRICES.get(key) ?? BASE_PRICES.get(NAME_ALIASES[key]);
 }
 
+// Página impressa de cada item do Capítulo 3, na ordem de RAW. Conferido nas páginas renderizadas:
+// Tabela 3-3 p. 144 (até Tridente) e 145 (de Alabarda); 3-5 p. 153; 3-6 p. 156 (até Dente-de-dragão)
+// e 157 (de Essência abissal).
+const PAGE_STARTS = { Adaga: 144, Alabarda: 145, "Armadura acolchoada": 153, "Água benta": 156, "Essência abissal": 157 };
+export const CHAPTER3_PAGES = (() => {
+  const pages = new Map();
+  let page;
+  for (const line of RAW.trim().split("\n")) {
+    const [name] = line.split("|");
+    page = PAGE_STARTS[name] ?? page;
+    pages.set(normalizeName(name), page);
+  }
+  return pages;
+})();
+
+export function chapter3PageOf(name) {
+  const key = normalizeName(name);
+  return CHAPTER3_PAGES.get(key) ?? CHAPTER3_PAGES.get(NAME_ALIASES[key]);
+}
+
+// Tabela 3-8 (melhorias, p. 165) e 3-9 (materiais especiais, p. 167) do Livro Básico.
+export const IMPROVEMENTS_PAGE = 165;
+export const MATERIALS_PAGE = 167;
+
 // Tabela 3-7 (PDF 170).
 export const IMPROVEMENT_PRICES = Object.freeze({ 1: 300, 2: 3000, 3: 9000, 4: 18000 });
 
@@ -216,11 +240,13 @@ export function materialPriceOf(material, base) {
   return entry?.[materialColumn(base)];
 }
 
-function materialColumn({ name, category }) {
+// `armor` ("leve"/"pesada") vem das listas dos outros livros que imprimem essa divisão.
+function materialColumn({ name, category, armor }) {
   if (category === "arma") return "arma";
   if (category === "escudo") return "escudo";
   if (category === "esotérico") return "esotérico";
   if (category === "armadura") {
+    if (armor) return armor === "leve" ? "armadura leve" : "armadura pesada";
     const key = normalizeName(name);
     return LIGHT_ARMOR.has(NAME_ALIASES[key] ?? key) ? "armadura leve" : "armadura pesada";
   }

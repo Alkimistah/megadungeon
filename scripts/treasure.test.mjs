@@ -1012,9 +1012,9 @@ test("resolveWithDice: other-book improvements reroll duplicates by name and rec
   const base = done.steps.find((s) => s.tableId === "8-4/arma");
   assert.deepEqual([base.sourceBook, base.sourceTableId, base.share], [BASIC, "8-4/arma", 0.7]);
   assert.deepEqual(gain.details.components, [
-    { role: "base", name: "Espada longa", book: BASIC, bookPage: 331 },
+    { role: "base", name: "Espada longa", book: BASIC, bookPage: 144 },
     { role: "melhoria", name: "Canônico", book: "Deuses de Arton", bookPage: 54 },
-    { role: "melhoria", name: "Certeira", book: BASIC, bookPage: 332 },
+    { role: "melhoria", name: "Certeira", book: BASIC, bookPage: 165 },
   ]);
 });
 
@@ -1037,8 +1037,8 @@ test("item gains carry components with book and page, and the computed price", (
   assert.equal(armor.price, 3000 + 300 + 3000);
   assert.equal(armor.details.priceNote, undefined);
   assert.deepEqual(armor.details.components, [
-    { role: "base", name: "Completa", book: BASIC, bookPage: 331 },
-    { role: "melhoria", name: "Material especial", book: BASIC, bookPage: 332 },
+    { role: "base", name: "Completa", book: BASIC, bookPage: 153 },
+    { role: "melhoria", name: "Material especial", book: BASIC, bookPage: 165 },
     { role: "material", name: "Prata", book: "Ameaças de Arton", bookPage: 400 },
   ]);
   // item geral de Deuses pela 8-3
@@ -1105,4 +1105,85 @@ test("performance with book weights: 396 ND 20 Dobro chains (both columns) under
   console.log(`# perf pesos: ${chains} cadeias em ${ms.toFixed(1)} ms`);
   assert.equal(chains, 396);
   assert.ok(ms < 500, `${ms} ms`);
+});
+
+// ---------- Correções da revisão da Task 3 ----------
+import { chapter3PageOf } from "../src/treasure/tables/prices.js";
+
+test("Livro Básico components use the Chapter 3 pages; materials 3-9; enchantments keep 8-8", () => {
+  assert.equal(chapter3PageOf("Adaga"), 144);
+  assert.equal(chapter3PageOf("Tridente"), 144);
+  assert.equal(chapter3PageOf("Alabarda"), 145);
+  assert.equal(chapter3PageOf("Balas (20)"), 145);
+  assert.equal(chapter3PageOf("Couro"), 153);
+  assert.equal(chapter3PageOf("Escudo pesado"), 153);
+  assert.equal(chapter3PageOf("Água benta"), 156);
+  assert.equal(chapter3PageOf("Dente-de-dragão"), 156);
+  assert.equal(chapter3PageOf("Essência abissal"), 157);
+  assert.equal(chapter3PageOf("Riso de Nimb"), 157);
+  const mat = resolveWithDice(itemsChain("2"), scriptedRng([face(95, 100), face(4, 6), 0.1, face(11, 100), 0.1, face(41, 100), 0.1, face(2, 6)]));
+  assert.deepEqual(mat.gains[0].details.components.map((c) => c.bookPage), [153, 165, 167]);
+  const mag = resolveWithDice(itemsChain("9"), scriptedRng([face(100, 100), face(1, 6), 0.1, face(40, 100), face(1, 100)]));
+  assert.deepEqual(mag.gains[0].details.components.map((c) => c.bookPage), [144, BASIC_BOOK_TABLES["8-8"].bookPage]);
+  const div = feed(itemsChain("1"), [50, 10]); // Bálsamo restaurador pela 8-3, com applyRoll
+  assert.deepEqual(div.gains[0].details.components, [{ role: "base", name: "Bálsamo restaurador", book: BASIC, bookPage: 156 }]);
+});
+
+test("a table chosen on purpose is never weighted; chains from 8-1 still reach other books", () => {
+  const rng = createRng("escolhida");
+  for (const id of ["8-13", "8-3", "8-4/arma"]) {
+    for (let i = 0; i < 500; i++) {
+      const done = resolveWithDice(startTable(id), rng);
+      assert.equal(done.gains[0].source, id);
+      for (const s of done.steps) assert.equal(s.sourceBook, undefined);
+    }
+  }
+  for (const tableId of ["8-13", "8-3"]) {
+    const groups = rollBatch([{ tableId, quantity: 99 }, { tableId, quantity: 99 }, { tableId, quantity: 99 }], rng);
+    for (const t of groups.flatMap((g) => g.treasures)) for (const st of t.states) for (const g of st.gains) assert.equal(g.source, tableId);
+  }
+  const sources = new Set();
+  for (let i = 0; i < 300; i++) for (const g of resolveWithDice(itemsChain("1"), rng).gains) sources.add(g.source);
+  assert.ok([...sources].some((src) => ALL_TABLES[src]?.kind === "list"), [...sources].join(", "));
+});
+
+test("superior/magic item with an other-book base takes the origin list as source", () => {
+  const sup = resolveWithDice(itemsChain("2"), scriptedRng([face(95, 100), face(1, 6), 0.7, face(1, 16), 0.1, face(14, 100)]));
+  assert.equal(sup.gains[0].source, "ameacas/armas");
+});
+
+test("shield-only accepts an other-book shield and rerolls on an other-book armor", () => {
+  const shield = resolveWithDice(itemsChain("9"), scriptedRng([face(100, 100), face(3, 6), 0.99, face(14, 14), face(15, 100)]));
+  assert.equal(shield.gains[0].name, "Sagna (animado)");
+  assert.equal(shield.gains[0].category, "escudo");
+  const armor = resolveWithDice(itemsChain("9"), scriptedRng([face(100, 100), face(3, 6), 0.99, face(1, 14), face(15, 100), face(1, 100)]));
+  assert.equal(armor.steps.find((s) => s.outcome?.rejected).outcome.rejected, "apenas escudos");
+  assert.equal(armor.gains[0].name, "Armadura sensual (abascante)");
+});
+
+test("an improvement printed in Livro Básico and another book is a duplicate", () => {
+  const done = resolveWithDice(itemsChain("5"), scriptedRng([
+    face(95, 100), face(6, 6), face(1, 100), // superior 2 melhorias, esotérico: Bolsa de pó (8-4/esotérico sem lista)
+    0.1, face(75, 100), // Livro Básico: Potencializador
+    0.7, face(1, 2), // Heróis: Potencializador → repetida
+    0.1, face(90, 100), // Livro Básico: Vigilante
+  ]));
+  const rejected = done.steps.find((s) => s.outcome?.rejected);
+  assert.equal(rejected.outcome.rejected, "repetida");
+  assert.equal(rejected.sourceTableId, "herois/melhorias");
+  assert.deepEqual(done.gains[0].details.improvements, ["Potencializador", "Vigilante"]);
+});
+
+test("other-book armors carry leve/pesada from the printed sections and use that material column", () => {
+  const by = (id, n) => LIST_TABLES[id].items.find((i) => i.name === n);
+  assert.equal(by("herois/armaduras", "Colete fora da lei").armor, "leve");
+  assert.equal(by("herois/armaduras", "Brigantina").armor, "pesada");
+  assert.equal(by("herois/armaduras", "Broquel").armor, undefined);
+  assert.equal(by("ameacas/armaduras", "Veste de teia de aranha").armor, "leve");
+  assert.equal(by("ameacas/armaduras", "Armadura de quitina").armor, "pesada");
+  assert.equal(materialPriceOf("adamante", { name: "Colete fora da lei", category: "armadura", armor: "leve" }), 6000);
+  assert.equal(materialPriceOf("adamante", { name: "Brigantina", category: "armadura", armor: "pesada" }), 18000);
+  // Heróis 3-3 item 1 (Armadura sensual, leve, T$ 55) + 1 melhoria + adamante leve
+  const done = resolveWithDice(itemsChain("2"), scriptedRng([face(95, 100), face(4, 6), 0.99, face(1, 14), 0.1, face(41, 100), 0.1, face(2, 6)]));
+  assert.equal(done.gains[0].price, 55 + 300 + 6000);
 });

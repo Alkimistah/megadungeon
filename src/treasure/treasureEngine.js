@@ -1,6 +1,6 @@
 // Motor de tesouros: funções puras que resolvem uma cadeia passo a passo.
 //
-// State   = { steps: Step[], gains: Gain[], pending: Request[], half: boolean }
+// State   = { steps: Step[], gains: Gain[], pending: Request[], half: boolean, weighted?: true }
 // Request = { id, tableId, die, bonus, reason, kind: "table"|"expression"|"twoDice", context }
 //   - "table": d% (ou 1d6) numa tabela; o valor informado é o do dado, e o motor
 //     soma `bonus` (+%) com teto no máximo do dado antes de procurar a linha.
@@ -19,8 +19,8 @@
 //           details = { enchantments?, improvements?, material?, creature?, specific?, components }
 //           components = [{ role: "base"|"melhoria"|"encanto"|"material"|"específico", name, book, bookPage }]
 //
-// Pesos entre livros (só em `resolveWithDice`): antes de rolar num pedido de um grupo de
-// `WEIGHTED_POOLS`, sorteia a fonte (`pickSource`). Se for outro livro, o valor é 1d<n> na lista
+// Pesos entre livros (só em `resolveWithDice`, e só nos estados `weighted`, criados por startTreasure):
+// antes de rolar num pedido de um grupo de `WEIGHTED_POOLS`, sorteia a fonte (`pickSource`). Se for outro livro, o valor é 1d<n> na lista
 // elegível, e o passo guarda `item` e uma linha montada a partir dele; a tabela do pedido
 // (`tableId`) continua a do Livro Básico, e `sourceTableId` diz de onde veio. `applyRoll`, com
 // valores digitados (aba Rolar com o livro), nunca sorteia fonte e não grava esses campos.
@@ -35,7 +35,7 @@
 // aceitos do mesmo item; se recusar, a nova rolagem entra como filha do passo recusado.
 // Quando não resta pedido pendente com o prefixo do dono, o motor monta o `Gain`.
 import { BASIC_BOOK_TABLES, TYPE_ROLLS, ENCHANTMENT_COUNT } from "./tables/basicBook.js";
-import { basePriceOf, priceOf, normalizeName } from "./tables/prices.js";
+import { basePriceOf, priceOf, normalizeName, chapter3PageOf, IMPROVEMENTS_PAGE, MATERIALS_PAGE } from "./tables/prices.js";
 import { WEIGHTED_POOLS, pickSource, eligibleItems } from "./bookWeights.js";
 import { ALL_TABLES } from "./tables/index.js";
 import { listDie } from "./tables/schema.js";
@@ -72,8 +72,10 @@ function formatNumber(n) {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
-function createState(rootRequest, half) {
-  return { steps: [], gains: [], pending: [{ ...rootRequest, id: "1" }], half };
+// `weighted`: só as cadeias que começam na Tabela 8-1 (startTreasure) usam os pesos entre livros;
+// uma tabela escolhida de propósito (startTable) rola 100% nela.
+function createState(rootRequest, half, weighted = false) {
+  return { steps: [], gains: [], pending: [{ ...rootRequest, id: "1" }], half, ...(weighted ? { weighted } : {}) };
 }
 
 function tableRequest(tableId, reason, bonus = 0, context = {}) {
@@ -95,7 +97,7 @@ export function startTreasure({ challengeRating, column, mode = "padrão" } = {}
   const base = `Tesouro de ND ${challengeRatingLabel(nd)}, coluna ${COLUMNS[column]}`;
   return Array.from({ length: copies }, (_, i) => {
     const suffix = copies > 1 ? ` (Dobro, ${i + 1} de ${copies})` : half ? " (Metade)" : "";
-    return createState(tableRequest(tableId, base + suffix), half);
+    return createState(tableRequest(tableId, base + suffix), half, true);
   });
 }
 
@@ -167,10 +169,18 @@ function typeRequest(tableId, rolls, build, twoDice) {
     context: { action: "itemType", rolls, build } };
 }
 
-// Livro e página de onde veio uma parte do item: a tabela (ou lista) em que foi rolada.
+// Livro e página de uma parte do item. Outros livros: a página da lista. Livro Básico: a base usa a
+// página do Capítulo 3 (Tabelas 3-3, 3-5 e 3-6), as melhorias a Tabela 3-8 e o material a 3-9;
+// encantos, específicos, acessórios e poções ficam com a página da tabela do Capítulo 8.
 function component(role, name, tableId) {
   const table = ALL_TABLES[tableId];
-  return { role, name, book: table.book, bookPage: table.bookPage };
+  const basic = table.kind !== "list";
+  const page = !basic ? table.bookPage
+    : role === "base" ? chapter3PageOf(name) ?? table.bookPage
+    : role === "melhoria" ? IMPROVEMENTS_PAGE
+    : role === "material" ? MATERIALS_PAGE
+    : table.bookPage;
+  return { role, name, book: table.book, bookPage: page };
 }
 
 // Tabela de onde o passo tirou o resultado: a lista do outro livro, se sorteada, ou a do pedido.
@@ -281,7 +291,7 @@ function buildItemGain(steps, itemId) {
   const price = priceOf(counted, base.row.result);
   return {
     kind: "item", name: `${base.row.result.name} (${segments.join(", ")})`, category: base.row.result.category,
-    source: base.tableId,
+    source: originOf(base),
     ...(price !== undefined ? { price } : {}),
     ...(build.kind === "magic" ? { tier: build.tier } : {}),
     details,
@@ -516,7 +526,7 @@ export function resolveWithDice(state, rng) {
       const chosen = a === b ? a : randomInt(rng, 0, 1) === 0 ? a : b;
       current = applyRoll(current, chosen, { dice: [a, b] });
     } else {
-      const key = poolKeyOf(request);
+      const key = current.weighted ? poolKeyOf(request) : null;
       if (!key) {
         current = advance(current, rollDice(request.die, rng).total);
         continue;
