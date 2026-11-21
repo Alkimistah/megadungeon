@@ -465,10 +465,8 @@ function renderMissionRunContent(mission, onComplete, context = null, profile = 
   const text = createElement(
     "p",
     null,
-    node
-      ? "Esta missão está integrada ao nodo vinculado. Use o encontro do nodo e trate o objetivo da missão como um ponto adicional dentro da mesma cena."
-      : pendingNode
-        ? "Esta missão será integrada a um nodo quando o andar vinculado for gerado. Ela não cria um encontro separado nos andares 11 a 20."
+    pendingNode
+      ? "Esta missão será integrada a um nodo quando o andar vinculado for gerado. Ela não cria um encontro separado nos andares 11 a 20."
       : "Use esta entrada como conteúdo adicional do andar. Abra a cena quando fizer sentido na exploração; resolver a cena não marca a missão automaticamente."
   );
   const objective = createElement("p", "mission-proof");

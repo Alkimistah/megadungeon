@@ -549,7 +549,6 @@ Quantidade inválida: na aba Gerar tesouros, o erro limpa o lote anterior e marc
 **Próximos passos**
 
 - O pré-cache é tudo-ou-nada: se um arquivo falhar durante a instalação, o service worker não instala. Com cerca de 4 MB, o risco é menor; pré-carregar as imagens uma a uma, tolerando falhas, resolveria de vez.
-- `npm run qa:floors-1-10` para esperando `#missionDialog`, mesmo sem as mudanças recentes. A falha é anterior a esta sessão.
 
 ---
 
