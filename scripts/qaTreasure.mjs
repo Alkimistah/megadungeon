@@ -171,7 +171,8 @@ try {
   const price = await page.locator("#treasureFooter .treasure-item-line", { hasText: "T$" }).count();
   assert.ok(price > 0, "itens mostram o preço");
   assert.match(await page.locator("#treasureFooter .treasure-wealth-total").innerText(), /^Total em riquezas: T\$ [\d.,]+$/);
-  assert.match(await page.locator("#treasureFooter .treasure-grand-total").innerText(), /^Valor total \(dinheiro \+ riquezas\): T\$ [\d.,]+$/);
+  assert.match(await page.locator("#treasureFooter .treasure-grand-total").innerText(), /^Valor total \(dinheiro \+ riquezas \+ cristais\): T\$ [\d.,]+$/);
+  assert.equal(await page.locator("#treasureFooter .treasure-crystals").count(), 0, "sem cristais, sem bloco de cristais");
   const num = t => Number(t.replace(/[^\d,]/g, "").replace(",", "."));
   const wealthShown = num(await page.locator("#treasureFooter .treasure-wealth-total").innerText());
   const grandShown = num(await page.locator("#treasureFooter .treasure-grand-total").innerText());
@@ -180,6 +181,89 @@ try {
   await page.locator("#treasurePanelRoll").evaluate(p => { p.scrollTop = p.scrollHeight; });
   assert.equal(await page.locator("#treasureFooter .treasure-grand-total").isVisible(), true);
   await page.screenshot({ path: shot("treasure-rolar.png") });
+
+  // Cristais: Origem "Cristais" mostra ND, Cor (Azul) e Quantidade; esconde Tabela, Tipo e Rolar.
+  const crystalShots = process.env.QA_CRYSTAL_DIR;
+  assert.equal(await page.locator("#treasureDialog .treasure-split-on").isChecked(), false, "divisão desligada por padrão");
+  assert.equal(await page.locator("#treasureDialog .treasure-split-count").inputValue(), "5", "divisão começa em 5");
+  assert.match(await page.locator("#treasureDialog .treasure-split-toggle").innerText(), /Dividir entre jogadores\?/);
+  while (await rowsLoc.count() > 1) await rowsLoc.last().locator(".treasure-remove").click();
+  const first = rowsLoc.nth(0);
+  await first.locator(".treasure-f-kind").selectOption("crystals");
+  assert.equal(await first.locator(".treasure-f-color").inputValue(), "azul", "Cor padrão Azul");
+  assert.deepEqual(await first.locator(".treasure-f-color option").allInnerTexts(), ["Azul", "Verde", "Irregular"]);
+  assert.equal(await first.locator(".treasure-f-color").isVisible(), true);
+  assert.equal(await first.locator(".treasure-f-nd").isVisible(), true);
+  assert.equal(await first.locator(".treasure-f-qty").isVisible(), true);
+  for (const c of [".treasure-f-mode", ".treasure-f-columns", ".treasure-f-table"]) assert.equal(await first.locator(c).isVisible(), false, `${c} escondido`);
+  await first.locator(".treasure-f-kind").selectOption("nd");
+  assert.equal(await first.locator(".treasure-f-color").isVisible(), false, "Cor some fora de Cristais");
+  assert.equal(await first.locator(".treasure-f-mode").isVisible(), true);
+  // Quantidade inválida em linha de cristais.
+  await first.locator(".treasure-f-kind").selectOption("crystals");
+  await first.locator(".treasure-f-qty").fill("0");
+  await page.locator("#treasureDialog .treasure-roll").click();
+  assert.match(await page.locator("#treasureDialog .treasure-error").innerText(), /Quantidade inválida/);
+  assert.equal(await first.locator(".treasure-f-qty").getAttribute("aria-invalid"), "true");
+  // Lote misto: um tesouro e as quatro linhas da última sessão (470).
+  await first.locator(".treasure-f-kind").selectOption("nd");
+  await first.locator(".treasure-f-nd").selectOption("3");
+  await first.locator(".treasure-f-qty").fill("2");
+  const sessao = [["0.25", 6], ["0.5", 4], ["1", 5], ["3", 4]];
+  for (const [nd, q] of sessao) {
+    await page.locator("#treasureDialog .treasure-add").click();
+    const r = rowsLoc.last();
+    await r.locator(".treasure-f-kind").selectOption("crystals");
+    await r.locator(".treasure-f-nd").selectOption(nd);
+    await r.locator(".treasure-f-qty").fill(String(q));
+  }
+  await page.locator("#treasureDialog .treasure-roll").click();
+  assert.equal(await page.locator("#treasureDialog .treasure-error").innerText(), "");
+  assert.equal(await results.count(), 2, "cristais não entram na lista de tesouros");
+  const crystalsBox = page.locator("#treasureFooter .treasure-summary-block .treasure-crystals");
+  assert.equal(await crystalsBox.count(), 1, "bloco de cristais dentro do bloco Dinheiro");
+  assert.match(await page.locator("#treasureFooter .treasure-summary-block").first().innerText(), /Dinheiro:[\s\S]*Total em dinheiro[\s\S]*Total em cristais: T\$ 470/);
+  assert.equal(await page.locator("#treasureFooter .treasure-crystal-line").count(), 4);
+  assert.equal((await page.locator("#treasureFooter .treasure-crystal-line").last().innerText()), "4× cristal azul ND 3 — T$ 75 cada — T$ 300");
+  assert.match(await crystalsBox.locator(".treasure-crystal-total").innerText(), /^Total em cristais: T\$ 470$/);
+  const grandText = await page.locator("#treasureFooter .treasure-grand-total").innerText();
+  assert.match(grandText, /^Valor total \(dinheiro \+ riquezas \+ cristais\): T\$ /);
+  const wealth2 = num(await page.locator("#treasureFooter .treasure-wealth-total").innerText());
+  const money2 = Number(await page.locator("#treasureFooter").getAttribute("data-total-tibars"));
+  const grand2 = num(grandText.split(": ").at(-1));
+  assert.equal(Math.round((money2 + wealth2 + 470) * 10) / 10, grand2, "total = dinheiro + riquezas + cristais");
+  assert.equal(await page.locator("#treasureFooter .treasure-split").count(), 0, "sem divisão por padrão");
+  // Divisão entre 5 jogadores.
+  await page.locator("#treasureDialog .treasure-split-on").check();
+  const split = await page.locator("#treasureFooter .treasure-split").innerText();
+  const each = Math.floor(grand2 / 5);
+  assert.ok(split.startsWith("Por jogador: T$ "), split);
+  assert.equal(num(split.split("T$ ")[1].split(" ")[0].replace(/\./g, "")), each, "por jogador = piso(total/5)");
+  const rest = Math.round((grand2 - each * 5) * 10) / 10;
+  if (rest > 0) assert.match(split, /sobram T\$ /); else assert.doesNotMatch(split, /sobram/);
+  await page.locator("#treasureDialog .treasure-split-count").fill("3");
+  assert.ok((await page.locator("#treasureFooter .treasure-split").innerText()).includes(`T$ ${Math.floor(grand2 / 3).toLocaleString("pt-BR")}`), "divisão muda com o número");
+  await page.locator("#treasureDialog .treasure-split-count").fill("5");
+  await page.locator("#treasureDialog .treasure-split-on").uncheck();
+  assert.equal(await page.locator("#treasureFooter .treasure-split").count(), 0, "desligar remove a linha");
+  // Só cristais é válido.
+  await first.locator(".treasure-remove").click();
+  await page.locator("#treasureDialog .treasure-roll").click();
+  assert.equal(await page.locator("#treasureDialog .treasure-error").innerText(), "");
+  assert.equal(await results.count(), 0);
+  assert.match(await page.locator("#treasureFooter .treasure-crystal-total").innerText(), /T\$ 470$/);
+  assert.match(await page.locator("#treasureFooter").innerText(), /Itens\s+nenhum/);
+  await page.locator("#treasureDialog .treasure-split-on").check();
+  if (crystalShots) {
+    mkdirSync(crystalShots, { recursive: true });
+    for (const vp of [{ width: 1024, height: 768 }, { width: 768, height: 1024 }]) {
+      await page.setViewportSize(vp);
+      await page.locator("#treasurePanelRoll").evaluate(p => { p.scrollTop = p.scrollHeight; });
+      await page.screenshot({ path: join(crystalShots, `rodape-${vp.width}x${vp.height}.png`) });
+    }
+    await page.setViewportSize({ width: 1024, height: 768 });
+  }
+  await page.locator("#treasureDialog .treasure-split-on").uncheck();
 
   await tabs.nth(1).click();
   assert.equal(await tabs.nth(1).getAttribute("aria-selected"), "true");

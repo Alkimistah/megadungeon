@@ -1,11 +1,12 @@
 // Casca da modal de tesouros e abas Gerar tesouros e Rolar na mesa.
 import { CHALLENGE_RATINGS, challengeRatingLabel, startTreasure, startTable, nextStep, applyRoll } from "./treasureEngine.js";
 import { rollDice, dieRange } from "./dice.js";
-import { buildBatch, rollBatch, listSpecificTables, isValidQuantity, MAX_QUANTITY, MODE_LABELS, COLUMN_LABELS } from "./treasureBatch.js";
+import { buildBatch, rollBatch, crystalLinesOf, listSpecificTables, isValidQuantity, MAX_QUANTITY, MODE_LABELS, COLUMN_LABELS } from "./treasureBatch.js";
 import { TYPE_ROLLS } from "./tables/basicBook.js";
 import { ALL_TABLES } from "./tables/index.js";
 import { describeStep, describeRowResult, formatRange, stepDepth, formatAmount, formatItemLine, formatComponents, formatBookDraw, stepReference, parseTypedValue, tableLabel, describeBookRowResult } from "./treasureFormat.js";
-import { summarizeGains } from "./treasureSummary.js";
+import { CRYSTAL_COLORS } from "../economy/crystalValues.js";
+import { summarizeGains, summarizeCrystals, splitAmongPlayers } from "./treasureSummary.js";
 import { createRng, createRandomSeed } from "../random.js";
 
 export { buildBatch };
@@ -31,12 +32,23 @@ function selectTab(dialog, tabId) {
 
 // ---------- Rodapé ----------
 
-export function renderSummary(container, gains) {
+// Linha de cristais do rodapé: "4× cristal azul ND 3 — T$ 75 cada — T$ 300".
+function crystalText(line) {
+  const color = CRYSTAL_COLORS[line.color].label.toLowerCase();
+  const estimate = line.estimate ? " (estimativa)" : "";
+  return `${line.quantity}× cristal ${color} ND ${challengeRatingLabel(String(line.challenge))} — T$ ${formatAmount(line.unitValue)} cada${estimate} — T$ ${formatAmount(line.total)}`;
+}
+
+// `crystals` (linhas de cristais) e `split` (número de jogadores) só vêm da aba Gerar tesouros.
+export function renderSummary(container, gains, { crystals, split } = {}) {
   const summary = summarizeGains(gains);
+  const crystalSummary = crystals ? summarizeCrystals(crystals) : null;
+  const grandTotal = Math.round((summary.grandTotal + (crystalSummary?.total ?? 0)) * 10) / 10;
   container.replaceChildren();
   container.dataset.totalTibars = String(summary.totalTibars);
   container.dataset.wealthTotal = String(summary.wealthTotal);
-  container.dataset.grandTotal = String(summary.grandTotal);
+  container.dataset.grandTotal = String(grandTotal);
+  container.dataset.crystalTotal = String(crystalSummary?.total ?? 0);
   const coins = Object.entries(summary.coins).filter(([, n]) => n > 0).map(([c, n]) => `${formatAmount(n)} ${c}`);
   const money = el("p", "treasure-summary-line");
   money.append(el("strong", "", "Dinheiro: "), coins.length ? coins.join(" · ") : "nenhum");
@@ -44,6 +56,15 @@ export function renderSummary(container, gains) {
   total.append(el("strong", "", "Total em dinheiro: "), el("span", "treasure-total-value", `T$ ${formatAmount(summary.totalTibars)}`));
   const moneyBlock = el("div", "treasure-summary-block");
   moneyBlock.append(money, total);
+  if (crystalSummary?.lines.length) {
+    const box = el("div", "treasure-crystals");
+    const list = el("ul", "treasure-crystal-list");
+    for (const line of crystalSummary.lines) list.append(el("li", "treasure-crystal-line", crystalText(line)));
+    const crystalTotal = el("p", "treasure-summary-line treasure-crystal-total");
+    crystalTotal.append(el("strong", "", "Total em cristais: "), `T$ ${formatAmount(crystalSummary.total)}`);
+    box.append(el("strong", "", "Cristais"), list, crystalTotal);
+    moneyBlock.append(box);
+  }
 
   const wealth = el("div", "treasure-summary-block");
   wealth.append(el("strong", "", "Riquezas"));
@@ -71,8 +92,16 @@ export function renderSummary(container, gains) {
     items.append(list);
   }
   const grand = el("p", "treasure-summary-line treasure-grand-total");
-  grand.append(el("strong", "", "Valor total (dinheiro + riquezas): "), el("span", "treasure-grand-value", `T$ ${formatAmount(summary.grandTotal)}`));
+  const grandLabel = crystals ? "Valor total (dinheiro + riquezas + cristais): " : "Valor total (dinheiro + riquezas): ";
+  grand.append(el("strong", "", grandLabel), el("span", "treasure-grand-value", `T$ ${formatAmount(grandTotal)}`));
   container.append(moneyBlock, wealth, items, grand);
+  if (split) {
+    const { each, remainder } = splitAmongPlayers(grandTotal, split);
+    const line = el("p", "treasure-summary-line treasure-split");
+    line.append(el("strong", "", "Por jogador: "), el("span", "treasure-split-value", `T$ ${formatAmount(each)}`));
+    if (remainder > 0) line.append(el("span", "treasure-split-rest", ` (sobram T$ ${formatAmount(remainder)})`));
+    container.append(line);
+  }
 }
 
 // ---------- Resultados ----------
@@ -141,12 +170,15 @@ function field(label, control, className) {
 function createRow(onRemove) {
   const row = el("div", "treasure-input-row");
   const type = el("select", "treasure-f-kind");
-  type.append(option("nd", "Por ND"), option("table", "Tabela específica"));
+  type.append(option("nd", "Por ND"), option("table", "Tabela específica"), option("crystals", "Cristais"));
   const nd = el("select", "treasure-f-nd");
   for (const v of CHALLENGE_RATINGS) nd.append(option(v, challengeRatingLabel(v)));
   nd.value = "1";
   const qty = el("input", "treasure-f-qty");
   Object.assign(qty, { type: "number", min: 1, max: MAX_QUANTITY, value: 1 });
+  const color = el("select", "treasure-f-color");
+  for (const [v, c] of Object.entries(CRYSTAL_COLORS)) color.append(option(v, c.label));
+  color.value = "azul";
   const mode = el("select", "treasure-f-mode");
   for (const [v, l] of Object.entries(MODE_LABELS)) mode.append(option(v, l));
   const columns = el("select", "treasure-f-columns");
@@ -161,8 +193,11 @@ function createRow(onRemove) {
 
   const sync = () => {
     const byTable = type.value === "table";
-    nd.parentElement.hidden = mode.parentElement.hidden = columns.parentElement.hidden = byTable;
+    const crystals = type.value === "crystals";
+    nd.parentElement.hidden = byTable;
+    mode.parentElement.hidden = columns.parentElement.hidden = byTable || crystals;
     table.parentElement.hidden = !byTable;
+    color.parentElement.hidden = !crystals;
     // Metade não vale para a coluna Itens.
     const itemsOnly = columns.value === "items";
     mode.querySelector('option[value="metade"]').disabled = itemsOnly;
@@ -171,7 +206,7 @@ function createRow(onRemove) {
   const rollField = field("Rolar", columns);
   type.addEventListener("change", sync);
   columns.addEventListener("change", sync);
-  row.append(field("Origem", type), field("ND", nd), field("Tabela", table, "treasure-table-field"),
+  row.append(field("Origem", type), field("ND", nd), field("Cor", color), field("Tabela", table, "treasure-table-field"),
     field("Quantidade", qty), field("Tipo", mode), rollField, remove);
   sync();
   row.markQuantity = () => {
@@ -180,6 +215,7 @@ function createRow(onRemove) {
   };
   row.readValue = () => {
     const quantity = Number(qty.value);
+    if (type.value === "crystals") return { kind: "crystals", challengeRating: nd.value, color: color.value, quantity };
     return type.value === "table"
       ? { tableId: table.value, quantity }
       : { challengeRating: nd.value, quantity, mode: mode.value, columns: columns.value };
@@ -195,6 +231,30 @@ function setupRollTab(panel) {
   add.type = roll.type = "button";
   const error = el("p", "treasure-error");
   error.setAttribute("role", "alert");
+  const splitBox = el("div", "treasure-split-control");
+  const splitOn = el("input", "treasure-split-on");
+  splitOn.type = "checkbox";
+  const splitCount = el("input", "treasure-split-count");
+  Object.assign(splitCount, { type: "number", min: 1, max: 10, value: 5, disabled: true });
+  splitCount.setAttribute("aria-label", "Número de jogadores");
+  const splitLabel = el("label", "treasure-split-toggle");
+  splitLabel.append(splitOn, " Dividir entre jogadores?");
+  const splitPlayers = el("label", "treasure-split-players");
+  splitPlayers.append("Jogadores", splitCount);
+  splitBox.append(splitLabel, splitPlayers);
+  let last = null; // último lote rolado, para refazer o rodapé ao mudar a divisão
+  const players = () => {
+    const n = Number(splitCount.value);
+    const ok = Number.isInteger(n) && n >= 1 && n <= 10;
+    if (splitOn.checked && !ok) splitCount.setAttribute("aria-invalid", "true"); else splitCount.removeAttribute("aria-invalid");
+    return splitOn.checked && ok ? n : null;
+  };
+  const drawFooter = () => {
+    if (!last) return;
+    renderSummary(footer, last.gains, { crystals: last.crystals, split: players() });
+  };
+  splitOn.addEventListener("change", () => { splitCount.disabled = !splitOn.checked; drawFooter(); });
+  splitCount.addEventListener("input", drawFooter);
   const results = el("div", "treasure-results");
   const footer = el("div", "treasure-footer");
   footer.id = "treasureFooter";
@@ -208,19 +268,22 @@ function setupRollTab(panel) {
     error.textContent = "";
     for (const r of rowsBox.children) r.markQuantity();
     try {
-      const batch = rollBatch([...rowsBox.children].map((r) => r.readValue()), createRng(createRandomSeed()));
+      const values = [...rowsBox.children].map((r) => r.readValue());
+      const batch = rollBatch(values, createRng(createRandomSeed()));
       renderResults(results, batch);
-      renderSummary(footer, batch.flatMap((g) => g.treasures.flatMap((t) => t.states.flatMap((s) => s.gains))));
+      last = { gains: batch.flatMap((g) => g.treasures.flatMap((t) => t.states.flatMap((s) => s.gains))), crystals: crystalLinesOf(values) };
+      drawFooter();
       footer.hidden = false;
     } catch (e) {
       error.textContent = e.message;
       results.replaceChildren();
       footer.hidden = true;
+      last = null;
     }
   });
   const actions = el("div", "treasure-actions");
   actions.append(add, roll);
-  panel.append(rowsBox, actions, error, results, footer);
+  panel.append(splitBox, rowsBox, actions, error, results, footer);
   addRow();
 }
 

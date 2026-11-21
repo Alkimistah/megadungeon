@@ -3691,6 +3691,46 @@ details.mission-run-guidance p {
 .treasure-summary-block p {
   margin: 2px 0;
 }
+.treasure-crystals {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.treasure-crystal-list {
+  list-style: none;
+  padding-left: 0 !important;
+}
+
+.treasure-split {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  font-size: 14px;
+}
+
+.treasure-split-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 8px;
+  color: #d8c8b7;
+  font-size: 13px;
+}
+
+.treasure-split-control label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.treasure-split-count {
+  width: 4.5em;
+}
+
+.treasure-split-count[aria-invalid="true"] {
+  border-color: #d9534f;
+}
 
 .treasure-summary-block ul {
   margin: 2px 0;
@@ -3896,4 +3936,11 @@ details.mission-run-guidance p {
 #manualEncounterDialog.is-home-tool .hidden-environment-notice {
   background: rgba(33, 27, 21, 0.6);
   color: #ecdfc4;
+}
+
+.treasure-split-control .treasure-split-on {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
 }
