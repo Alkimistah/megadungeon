@@ -489,7 +489,7 @@ A tela inicial (`#rangeDialog`) não usa esse tema. Ela tem uma paleta própria,
 
 Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md). Plano: [docs/superpowers/plans/2026-11-21-tela-inicial-e-modais.md](docs/superpowers/plans/2026-11-21-tela-inicial-e-modais.md).
 
-**Já entregue (tarefas 1 a 4 do plano):**
+**Já entregue (tarefas 1 a 6 do plano):**
 
 - **Tela inicial.**
   - Leva o título “Mega Dungeon de Práxis” e o subtítulo “Gerador de aventuras para Tormenta20”.
@@ -505,14 +505,19 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
   - Os botões mostram o nome: Recarregar, Encontro, Missões e Tesouros. Abaixo de 640 px, só os ícones aparecem.
   - O tempo de exploração fica à direita. Na faixa 11–20, com o tempo total visível, os rótulos encurtam para “Desde descanso” e “Total”.
 - **QA.** `npm run qa:home` testa a tela inicial e `npm run qa:layout` testa o rodapé e as modais. Os roteiros escolhem a faixa pelos cartões e carregam sessões pelo arquivo (`#sessionFile`).
+- **Fim de faixa.**
+  - Ao fim de cada faixa, o bloco de conclusão oferece **Avançar para <próxima faixa>** (`getNextFloorRange`), que inicia a próxima faixa pela seleção de missões, sem confirmação de substituição, ou **Encerrar expedição**.
+  - **Encerrar expedição** chama `clearAutosave`, zera `savedExpedition`, esconde o Continuar e volta à tela inicial.
+  - A faixa 21–30 mostra só Encerrar.
+  - Os botões ficam em `src/rangeEndActions.js`.
+  - QA: `npm run qa:range-end` e `npm run test:ranges`.
+- **"Sobre o app".** `#aboutButton` fica à esquerda do rodapé da tela inicial e abre `#aboutDialog` em tela cheia, com a paleta da tela inicial. O texto foi aprovado no spec.
+- **Créditos.** Os ícones de terceiros e suas licenças estão em `CREDITOS.md`.
 
-**Ponto de recomeço.** Retome o plano na **tarefa 5**. O ledger está em `.superpowers/sdd/2026-11-21-tela-inicial-e-modais/progress.md`, que é ignorado pelo Git. Se ele se perder, use o `git log` a partir de `1c04d27`. Faltam:
+**Ponto de recomeço.** O plano de tela inicial, modais e rodapé está concluído: as tarefas 1 a 6 estão entregues. Falta a revisão final do branch inteiro, a partir de `1c04d27`, que o gerente está executando agora. O ledger está em `.superpowers/sdd/2026-11-21-tela-inicial-e-modais/progress.md`, que é ignorado pelo Git. Se ele se perder, use o `git log` a partir de `1c04d27`. Continuam abertos:
 
-1. **Tarefa 5.** Fim de faixa com **Avançar para <próxima faixa>** ou **Encerrar expedição**. Encerrar apaga o salvamento automático. Atenção: hoje `savedExpedition` em `main.js` só é lido ao abrir o app. Quando Encerrar voltar à tela inicial, ele precisa ser atualizado ou limpo; senão, o Continuar e a confirmação mostram dados velhos.
-2. **Tarefa 5b.** Botão **Sobre o app**, à esquerda no rodapé da tela inicial, que abre uma modal com o texto aprovado no design.
-3. **Tarefa 6.** `CREDITOS.md`, com os ícones do game-icons.net em CC BY 3.0, e a atualização desta seção.
-4. **Correção de interface pedida pelo PO:** o rodapé de ferramentas ocupa mais altura do que precisa. Acima dos botões fica a borda que marca o fim do conteúdo, e o rodapé ainda avança mais uma faixa, tirando espaço da tela. O rodapé deve usar só a altura necessária. Se essa faixa precisar existir, deve ter fundo transparente, para não cobrir nem escurecer o andar em exploração.
-5. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
+1. **Correção de interface pedida pelo PO:** o rodapé de ferramentas ocupa mais altura do que precisa. Acima dos botões fica a borda que marca o fim do conteúdo, e o rodapé ainda avança mais uma faixa, tirando espaço da tela. O rodapé deve usar só a altura necessária. Se essa faixa precisar existir, deve ter fundo transparente, para não cobrir nem escurecer o andar em exploração.
+2. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
    - **Atualizar o Encontro manual.** Ele foi feito quando o app tinha bem menos opções. Hoje há muito mais NDs, terrenos e tipos de criatura (catálogo, papéis de ameaça, perfis das três faixas), e os campos da modal precisam refletir isso.
    - **Tema das ferramentas abertas pela tela inicial.** Abertos pela tela inicial, o Encontro avulso e os Tesouros mostram as cores do perfil ativo, quase sempre o da masmorra. No encontro manual, o PO viu inclusive partes do tema da floresta. Nesse caso, as duas modais devem seguir a paleta da tela inicial (bronze). O tema da faixa vale só quando elas são abertas de dentro de uma expedição.
    - **Cristais nos tesouros.**
@@ -520,7 +525,7 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
      - Hoje o app só os menciona como valor de “Entrega/cristais” nas recompensas de missão (`missionDialog.js`) e em textos de missão. Não existe um sistema de cristais com valores.
      - A ideia é oferecer cristais como opção de rolagem nas duas abas: Gerar tesouros (em lote) e Rolar na mesa (individual).
      - Antes de implementar, é preciso levantar com o PO as regras dos cristais: o que são, como se obtêm e quanto valem por ND.
-6. **Revisão final do branch inteiro**, a partir de `1c04d27`. Ela deve conferir também estes pontos menores, já anotados:
+3. **Revisão final do branch inteiro**, a partir de `1c04d27`. Ela deve conferir também estes pontos menores, já anotados:
    - O `aria-label` do `#timeTracker` não é limpo fora da floresta.
    - A mensagem “560px” em `qaLayout.mjs` está desatualizada.
    - O `qaLayout.mjs` fixa os rótulos curtos do contador em vez de usar os do app.
