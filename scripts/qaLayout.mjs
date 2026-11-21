@@ -195,7 +195,7 @@ async function checkDialogs(browser, viewport) {
 async function checkNarrow(page) {
   await page.setViewportSize({ width: 480, height: 800 });
   const visible = await page.locator(".floating-tools button span").evaluateAll((els) => els.map((e) => getComputedStyle(e).display !== "none" && e.getBoundingClientRect().width > 0));
-  assert(visible.every((v) => !v), "nomes deveriam sumir abaixo de 560px");
+  assert(visible.every((v) => !v), "nomes deveriam sumir abaixo de 640px");
   const labels = await page.locator(".floating-tools button").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")));
   assert(labels.every(Boolean), "aria-label ausente");
   console.log("ok 480 sem nomes");

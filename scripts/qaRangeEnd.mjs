@@ -169,6 +169,25 @@ try {
     console.log(`ok 1-10 ${mode}`);
   }
 
+  // Encerrar -> Iniciar masmorra na mesma sessao: o estado estendido concluido nao pode sobreviver.
+  {
+    const { page, context } = await openWithSession(browser, dungeonCompletedSession());
+    await waitForAutosave(page, "dungeon-1-10");
+    await checkFinish(page, false);
+    await page.locator("#rangeConfirm").click();
+    await page.locator("#missionDialog").waitFor({ state: "visible" });
+    await page.getByRole("button", { name: "Continuar sem missões" }).click();
+    await page.locator("#missionDialog").waitFor({ state: "hidden" });
+    const saved = await waitForAutosave(page, "dungeon-1-10");
+    assert(saved.floor === 1, `autosave deveria estar no andar 1: ${saved.floor}`);
+    assert(saved.extendedState?.phase !== "completed", `fase nao deveria ser completed: ${saved.extendedState?.phase}`);
+    const text = await page.locator("body").innerText();
+    assert(/Andar 1\b/.test(text), "tela deveria mostrar Andar 1");
+    assert(!text.includes("Andares 1-10 conquistados"), "tela nao deveria mostrar a faixa concluida");
+    await context.close();
+    console.log("ok 1-10 encerrar -> reiniciar masmorra");
+  }
+
   // 11-20.
   for (const mode of ["avancar", "encerrar"]) {
     const { page, dialogs, context } = await openWithSession(browser, forestCompletedSession());

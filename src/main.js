@@ -247,6 +247,7 @@ function advanceToNextRange() {
   const next = getNextFloorRange(activeFloorRange.id);
 
   if (!next) return;
+  autosaveActive = false;
   savedExpedition = null;
   elements.resumeSection.hidden = true;
   closeOpenDialogs();
@@ -559,6 +560,7 @@ function updateTimeTracker() {
   elements.timeTrackerLabel.textContent = forestExpedition ? "Desde descanso" : fullLabel;
   elements.timeTrackerLabel.title = fullLabel;
   elements.totalTimeTracker.hidden = !forestExpedition;
+  if (!forestExpedition) elements.timeTracker.removeAttribute("aria-label");
   if (forestExpedition) {
     const { totalElapsedMinutes, totalElapsedPartial } = state.getExplorationTime();
     const fullTotal = totalElapsedPartial ? "Tempo total (parcial)" : "Tempo total de exploração";
@@ -634,6 +636,8 @@ function confirmReplaceExpedition() {
 }
 
 async function offerSavedExpedition() {
+  elements.rangeConfirm.disabled = true;
+  elements.importSessionFile.disabled = true;
   try {
     savedExpedition = await loadAutosave();
     if (!savedExpedition) return;
@@ -648,6 +652,9 @@ async function offerSavedExpedition() {
   } catch {
     savedExpedition = null;
     showSessionStatus("Não foi possível ler o salvamento automático. Você pode importar o arquivo de sessão.");
+  } finally {
+    elements.rangeConfirm.disabled = false;
+    elements.importSessionFile.disabled = false;
   }
 }
 
@@ -1259,6 +1266,8 @@ function bindEvents() {
     });
   });
 
+  elements.rangeDialog.addEventListener("cancel", (event) => event.preventDefault());
+
   elements.resumeExpedition.addEventListener("click", () => {
     try {
       restoreSession(savedExpedition);
@@ -1289,6 +1298,12 @@ function bindEvents() {
 
 function startNewExpedition(rangeId) {
   applyFloorRange(rangeId);
+  // Descarta fase "completed" de uma expedição anterior; senão o andar fica travado e o mapa não gera.
+  if (activeFloorRange.mode === "extended-exploration") {
+    extendedState.initialize(activeFloorRange, activeFloorRange.floors[0], createRng(createRandomSeed()));
+    syncExtendedFloorControls();
+    elements.floorInput.value = String(activeFloorRange.floors[0]);
+  }
   setUnknownPathsMode(elements.initialUnknownPathsInput.checked);
   currentMapSeed = createRandomSeed();
   if (elements.rangeDialog.open) elements.rangeDialog.close();

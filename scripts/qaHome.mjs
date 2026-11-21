@@ -84,7 +84,7 @@ const readAutosave = (page) => page.evaluate(() => new Promise((resolve, reject)
 
 function trackDialogs(page) {
   const seen = [];
-  page.on("dialog", async (dialog) => { seen.push(dialog.message()); await dialog.dismiss(); });
+  page.on("dialog", async (dialog) => { seen.push(dialog.message()); if (seen.accept) await dialog.accept(); else await dialog.dismiss(); });
   return seen;
 }
 
@@ -182,6 +182,32 @@ async function checkReplaceConfirm(page, dialogs) {
   await page.locator('button.range-card[data-range="forest-11-20"]').click();
 }
 
+async function checkEscAndAccept(page, dialogs) {
+  const before = JSON.parse(await readAutosave(page));
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(200);
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "Esc nao deve fechar a tela inicial");
+
+  // Aceitar a confirmacao: abre a selecao de missoes e, ao confirmar, o autosave passa a ser o da faixa nova.
+  dialogs.length = 0;
+  dialogs.accept = true;
+  await page.locator('button.range-card[data-range="dungeon-1-10"]').click();
+  await page.locator("#rangeConfirm").click();
+  await page.locator("#missionDialog").waitFor({ state: "visible" });
+  assert(dialogs.length === 1 && dialogs[0] === CONFIRM_TEXT, `confirm aceito: ${JSON.stringify(dialogs)}`);
+  await page.getByRole("button", { name: "Continuar sem missões" }).click();
+  await page.locator("#missionDialog").waitFor({ state: "hidden" });
+  let saved = null;
+  for (let i = 0; i < 40; i += 1) {
+    saved = JSON.parse(await readAutosave(page));
+    if (saved?.profile === "dungeon-1-10") break;
+    await page.waitForTimeout(100);
+  }
+  assert(saved?.profile === "dungeon-1-10" && saved.floor === 1, `autosave da faixa nova: ${saved?.profile} andar ${saved?.floor}`);
+  assert(before?.profile === "forest-11-20", "autosave anterior deveria ser da floresta");
+  dialogs.accept = false;
+}
+
 async function shot(page, viewport, name) {
   await page.screenshot({ path: `${SHOT_DIR}/final-${name}-${viewport.tag}.png` });
 }
@@ -224,8 +250,7 @@ try {
     await checkReplaceConfirm(page, dialogs);
     await checkQuickTools(page, viewport);
     await checkAbout(page, viewport);
-    await page.locator("#resumeExpedition").click();
-    await page.locator("#rangeDialog").waitFor({ state: "hidden" });
+    await checkEscAndAccept(page, dialogs);
     await page.context().close();
     console.log(`ok tela inicial ${viewport.tag}`);
   }
