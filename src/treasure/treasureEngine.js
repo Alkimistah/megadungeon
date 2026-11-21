@@ -32,7 +32,8 @@
 // Itens superiores e mágicos: o passo do item base (8-4) é o dono do item. Ele enfileira
 // uma vaga por melhoria ou encanto (`context.itemId` = id do passo base, `role: "slot"`).
 // Cada vaga confere repetição, "conta como duas", "apenas escudos" e as restrições de melhoria
-// (itemRules.js: mira telescópica, reforçada/delicada) contra os passos já aceitos do mesmo item;
+// (itemRules.js: mira telescópica, delicada só em armadura pesada, reforçada/delicada,
+// maciça/precisa e itens que não aceitam material especial) contra os passos já aceitos do mesmo item;
 // se recusar, a nova rolagem entra como filha do passo recusado. A sub-rolagem de material confere
 // o material contra o item-base (madeira Tollon) e, se recusar, rola o d6 de novo do mesmo jeito.
 // Quando não resta pedido pendente com o prefixo do dono, o motor monta o `Gain`.
