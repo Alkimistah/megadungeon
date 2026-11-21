@@ -4,6 +4,7 @@ import { chromium } from "@playwright/test";
 
 const APP_URL = process.env.QA_APP_URL || "http://localhost:5173/megadungeon/";
 const SHOT_DIR = ".playwright-mcp/rodape";
+const SHOT_DIR_MODAIS = ".playwright-mcp/modais";
 const VIEWPORTS = [
   { width: 1024, height: 768 },
   { width: 768, height: 1024 }
@@ -129,6 +130,68 @@ async function checkTotalVariant(page, viewport) {
   }
 }
 
+// Modais em tela cheia: retangulo = viewport, sem cantos arredondados, conteudo no topo.
+async function checkFullscreenDialog(page, selector, firstFieldSelector, label, tag, shot) {
+  const d = await page.evaluate(({ selector, firstFieldSelector }) => {
+    const dialog = document.querySelector(selector);
+    const rect = dialog.getBoundingClientRect();
+    const field = dialog.querySelector(firstFieldSelector);
+    const content = dialog.firstElementChild;
+    return {
+      rect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
+      radius: getComputedStyle(dialog).borderRadius,
+      fieldTop: field ? field.getBoundingClientRect().top : null,
+      contentWidth: content ? content.getBoundingClientRect().width : 0,
+      vw: window.innerWidth,
+      vh: window.innerHeight
+    };
+  }, { selector, firstFieldSelector });
+  const name = `[${tag}] ${label}`;
+  assert(Math.abs(d.rect.top) <= 1 && Math.abs(d.rect.left) <= 1, `${name}: nao comeca em 0,0 (${d.rect.left},${d.rect.top})`);
+  assert(Math.abs(d.rect.width - d.vw) <= 1 && Math.abs(d.rect.height - d.vh) <= 1, `${name}: tamanho ${d.rect.width}x${d.rect.height} != ${d.vw}x${d.vh}`);
+  assert(d.radius === "0px", `${name}: border-radius ${d.radius}`);
+  assert(d.fieldTop !== null && d.fieldTop < 200, `${name}: primeiro campo em top=${d.fieldTop}`);
+  await page.screenshot({ path: `${SHOT_DIR_MODAIS}/final-${shot}-${tag}.png` });
+  console.log(`ok ${name}`);
+}
+
+async function checkDialogs(browser, viewport) {
+  const tag = `${viewport.width}x${viewport.height}`;
+  const page = await browser.newPage({ viewport });
+  // Quadro de selecao de missoes (abre ao escolher a faixa 1-10).
+  await page.goto(APP_URL);
+  await page.locator("#floorRangeInput").selectOption("dungeon-1-10");
+  await page.locator("#rangeConfirm").click();
+  await page.locator("#missionDialog").waitFor({ state: "visible" });
+  await checkFullscreenDialog(page, "#missionDialog", "button, input, select", "missoes (selecao)", tag, "missoes-selecao");
+  await page.getByRole("button", { name: "Continuar sem missões" }).click();
+  await page.locator("#missionDialog").waitFor({ state: "hidden" });
+  // Acompanhamento.
+  await page.locator("#missionButton").click();
+  await page.locator("#missionDialog").waitFor({ state: "visible" });
+  await checkFullscreenDialog(page, "#missionDialog", "button, input, select", "missoes (acompanhamento)", tag, "missoes-acompanhamento");
+  await page.keyboard.press("Escape");
+  await page.locator("#missionDialog").waitFor({ state: "hidden" });
+  // Encontro manual.
+  await page.locator("#manualEncounterButton").click();
+  await page.locator("#manualEncounterDialog").waitFor({ state: "visible" });
+  await checkFullscreenDialog(page, "#manualEncounterDialog", "select, input", "encontro manual", tag, "encontro");
+  await page.close();
+  // Ilha do arquipelago.
+  const island = await browser.newPage({ viewport });
+  await island.goto(APP_URL);
+  await island.locator("#floorRangeInput").selectOption("archipelago-21-30");
+  await island.locator("#rangeConfirm").click();
+  await island.locator("#missionDialog").waitFor({ state: "visible" });
+  await island.getByRole("button", { name: "Continuar sem missões" }).click();
+  await island.locator("#missionDialog").waitFor({ state: "hidden" });
+  await island.locator(".archipelago-island").first().waitFor({ state: "visible" });
+  await island.locator('.archipelago-island:not([aria-disabled="true"])').first().click();
+  await island.locator(".archipelago-dialog").waitFor({ state: "visible" });
+  await checkFullscreenDialog(island, ".archipelago-dialog", "button, select, input", "ilha", tag, "ilha");
+  await island.close();
+}
+
 async function checkNarrow(page) {
   await page.setViewportSize({ width: 480, height: 800 });
   const visible = await page.locator(".floating-tools button span").evaluateAll((els) => els.map((e) => getComputedStyle(e).display !== "none" && e.getBoundingClientRect().width > 0));
@@ -139,6 +202,7 @@ async function checkNarrow(page) {
 }
 
 await mkdir(SHOT_DIR, { recursive: true });
+await mkdir(SHOT_DIR_MODAIS, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || "/usr/bin/google-chrome", args: ["--no-sandbox"] });
 try {
   for (const viewport of VIEWPORTS) {
@@ -151,6 +215,7 @@ try {
     await checkTotalVariant(page, viewport);
     await page.close();
   }
+  for (const viewport of VIEWPORTS) await checkDialogs(browser, viewport);
   console.log("qa:layout passou");
 } finally {
   await browser.close();

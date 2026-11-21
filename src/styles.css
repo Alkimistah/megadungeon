@@ -608,12 +608,17 @@ svg {
 }
 
 .archipelago-dialog {
-  width: min(900px, calc(100vw - 28px));
-  max-height: min(760px, calc(100vh - 28px));
-  padding: 0;
-  border: 1px solid var(--header-border);
-  border-radius: 8px;
-  background: transparent;
+  inset: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: 100vh;
+  box-sizing: border-box;
+  padding: 18px;
+  border: none;
+  border-radius: 0;
+  background: var(--page);
   color: #f2e6d8;
   overflow: auto;
 }
@@ -623,6 +628,10 @@ svg {
 }
 
 .archipelago-dialog .archipelago-detail {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+  box-sizing: border-box;
   border-color: var(--header-border);
   border-radius: 8px;
 }
@@ -1830,9 +1839,12 @@ svg {
 
 #missionDialog,
 #manualEncounterDialog {
-  width: min(820px, calc(100vw - 28px));
-  max-height: min(760px, calc(100vh - 28px));
-  border-radius: 8px;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: 100vh;
+  border: none;
+  border-radius: 0;
 }
 
 #nodeDialog::backdrop,
@@ -1843,7 +1855,9 @@ svg {
 }
 
 #nodeDialog,
-#treasureDialog {
+#treasureDialog,
+#missionDialog,
+#manualEncounterDialog {
   inset: 0;
   margin: 0;
   overflow: hidden;
@@ -2443,6 +2457,15 @@ svg {
 
 .manual-encounter-dialog {
   width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+  box-sizing: border-box;
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.manual-encounter-dialog .manual-encounter-result {
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .manual-encounter-controls {
@@ -2535,15 +2558,11 @@ svg {
 .mission-dialog {
   grid-template-rows: auto minmax(0, 1fr);
   width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
   height: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
-}
-
-#missionDialog {
-  width: min(1240px, calc(100vw - 20px));
-  height: min(840px, calc(100vh - 20px));
-  max-height: min(840px, calc(100vh - 20px));
 }
 
 #missionDialogContent {
@@ -2552,16 +2571,8 @@ svg {
   overflow-y: auto;
 }
 
-#missionDialog.is-selection-mode {
-  width: calc(100vw - 28px);
-  max-width: calc(100vw - 28px);
-  height: calc(100vh - 28px);
-  max-height: calc(100vh - 28px);
-}
-
 #missionDialog.is-selection-mode .mission-dialog {
-  width: 100%;
-  min-height: calc(100vh - 64px);
+  min-height: 0;
 }
 
 .mission-dialog-summary {
