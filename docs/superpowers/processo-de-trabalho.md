@@ -35,7 +35,7 @@ O plano indica o nível de cada tarefa na seção “Execução”.
 
 - **Ledger:** `.superpowers/sdd/<nome-do-plano>/progress.md`, ignorado pelo Git. A primeira linha nomeia o plano. Cada tarefa concluída grava uma linha com a faixa de commits, e cada decisão do gerente vira uma linha `Ruling:` com o motivo e o custo se estiver errada.
 - **Retomada:** leia o ledger e o `git log`, e retome na primeira tarefa sem linha de conclusão. Não refaça o que o ledger marca como concluído.
-- **Ferramentas de PDF:** `pdfjs-dist` e Playwright em uma pasta temporária, conforme a seção “Como retomar” do relatório de Ameaças. Os PDFs ficam em `tmp/livros/`.
+- **Ferramentas de PDF:** ficam em `tools/pdf/` (veja o README da pasta). Rode `npm install` nela na primeira vez. Ela tem `find.mjs`, que busca um termo, `text.mjs`, que extrai o texto por coluna, e `render.mjs`, que gera PNG das páginas. Os PDFs ficam em `tmp/livros/`.
 
 ## Commits e publicação
 
