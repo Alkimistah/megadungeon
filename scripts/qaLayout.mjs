@@ -104,8 +104,12 @@ async function checkTotalVariant(page, viewport) {
     document.getElementById("totalTimeTracker").hidden = false;
     document.getElementById("totalTimeTrackerValue").textContent = "99h 59min";
     document.getElementById("timeTrackerValue").textContent = "99h 59min";
+    // mesmos textos curtos que updateTimeTracker (main.js) usa na faixa 11-20
+    document.getElementById("timeTrackerLabel").textContent = "Desde descanso";
+    document.getElementById("totalTimeTrackerLabel").textContent = "Total (parcial)";
   });
   for (const width of [viewport.width, 600]) {
+    const wantNames = width >= 640;
     await page.setViewportSize({ width, height: viewport.height });
     const d = await page.evaluate(() => {
       const f = document.querySelector(".floating-tools");
@@ -113,6 +117,10 @@ async function checkTotalVariant(page, viewport) {
       const items = [...f.querySelectorAll("button"), document.getElementById("timeTracker")].map((e) => e.getBoundingClientRect());
       return { scrollWidth: f.scrollWidth, clientWidth: f.clientWidth, vw, inside: items.every((r) => r.left >= 0 && r.right <= vw + 0.5), height: f.getBoundingClientRect().height, toolbar: parseFloat(getComputedStyle(document.body).getPropertyValue("--toolbar-height")) };
     });
+    if (wantNames) {
+      const shown = await page.locator(".floating-tools button span").evaluateAll((els) => els.every((e) => getComputedStyle(e).display !== "none" && e.getBoundingClientRect().width > 0));
+      assert(shown, `[total ${width}] nomes dos botoes deveriam estar visiveis`);
+    }
     assert(d.scrollWidth <= d.clientWidth, `[total ${width}] rodape com overflow horizontal ${d.scrollWidth} > ${d.clientWidth}`);
     assert(d.inside, `[total ${width}] itens fora da viewport`);
     assert(d.height <= d.toolbar + 0.5, `[total ${width}] rodape maior que --toolbar-height`);

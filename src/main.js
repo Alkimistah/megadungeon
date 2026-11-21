@@ -28,6 +28,7 @@ const elements = {
   svg: document.getElementById("map"),
   extendedExploration: document.getElementById("extendedExploration"),
   info: document.getElementById("info"),
+  timeTracker: document.getElementById("timeTracker"),
   timeTrackerLabel: document.getElementById("timeTrackerLabel"),
   timeTrackerValue: document.getElementById("timeTrackerValue"),
   totalTimeTracker: document.getElementById("totalTimeTracker"),
@@ -497,11 +498,17 @@ function updateTimeTracker() {
     : state.getElapsedMinutes();
 
   elements.timeTrackerValue.textContent = formatElapsedTime(elapsedMinutes);
-  elements.timeTrackerLabel.textContent = forestExpedition ? "Desde o último descanso" : "Tempo de exploração";
+  const fullLabel = forestExpedition ? "Desde o último descanso" : "Tempo de exploração";
+  elements.timeTrackerLabel.textContent = forestExpedition ? "Desde descanso" : fullLabel;
+  elements.timeTrackerLabel.title = fullLabel;
   elements.totalTimeTracker.hidden = !forestExpedition;
   if (forestExpedition) {
     const { totalElapsedMinutes, totalElapsedPartial } = state.getExplorationTime();
-    elements.totalTimeTrackerLabel.textContent = totalElapsedPartial ? "Tempo total (parcial)" : "Tempo total de exploração";
+    const fullTotal = totalElapsedPartial ? "Tempo total (parcial)" : "Tempo total de exploração";
+    elements.totalTimeTrackerLabel.textContent = totalElapsedPartial ? "Total (parcial)" : "Total";
+    elements.totalTimeTrackerLabel.title = fullTotal;
+    elements.totalTimeTracker.title = fullTotal;
+    elements.timeTracker.setAttribute("aria-label", `${fullLabel}: ${formatElapsedTime(elapsedMinutes)}. ${fullTotal}: ${formatElapsedTime(totalElapsedMinutes)}`);
     elements.totalTimeTrackerValue.textContent = formatElapsedTime(totalElapsedMinutes);
   }
 }

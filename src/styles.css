@@ -239,7 +239,7 @@ button:disabled:hover {
   filter: brightness(0) invert(1);
 }
 
-@media (max-width: 559px) {
+@media (max-width: 639px) {
   .floating-tools .reload-button {
     width: 46px;
     padding: 0;
@@ -250,26 +250,14 @@ button:disabled:hover {
   }
 }
 
-/* Com o tempo total visível (faixa 11–20) o contador é mais largo: nomes somem antes. */
-@media (max-width: 899px) {
-  .floating-tools:has(#totalTimeTracker:not([hidden])) .reload-button {
-    width: 46px;
-    padding: 0;
-  }
-
-  .floating-tools:has(#totalTimeTracker:not([hidden])) .reload-button span {
-    display: none;
-  }
-}
-
 .time-tracker {
   display: grid;
   grid-auto-flow: column;
   grid-template-rows: auto auto;
-  column-gap: 14px;
+  column-gap: 10px;
   row-gap: 2px;
-  min-width: 142px;
-  padding: 4px 11px;
+  min-width: 0;
+  padding: 4px 8px;
   border: 1px solid var(--header-border);
   border-radius: 8px;
   background: color-mix(in srgb, var(--panel) 92%, transparent);
@@ -290,7 +278,7 @@ button:disabled:hover {
   display: grid;
   gap: 2px;
   grid-row: 1 / span 2;
-  padding-left: 12px;
+  padding-left: 8px;
   border-left: 1px solid var(--header-border);
 }
 
