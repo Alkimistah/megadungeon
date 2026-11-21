@@ -544,7 +544,7 @@ Pré-cache offline: o plugin `swPrecachePlugin` em `vite.config.js` reescreve `d
 **Próximos passos**
 
 - Quantidade inválida mantém o lote anterior na tela.
-- Reduzir o pré-cache da primeira visita, hoje com cerca de 18 MB e tudo-ou-nada: otimizar os SVGs pesados (o favicon tem 2,9 MB) ou pré-carregar os ícones um a um, tolerando falhas.
+- Reduzir o pré-cache da primeira visita, hoje com cerca de 15 MB e tudo-ou-nada: otimizar os SVGs pesados das ilhas (até 1,9 MB cada) ou pré-carregar os ícones um a um, tolerando falhas.
 
 ---
 
