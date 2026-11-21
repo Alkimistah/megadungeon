@@ -41,3 +41,15 @@ export function summarizeGains(gains) {
 
   return { coins, totalTibars, wealthTotal, grandTotal, wealth, items: [...itemsByKey.values()] };
 }
+
+// Cristais: linhas de crystalLine() e o total delas.
+export function summarizeCrystals(lines) {
+  return { lines, total: lines.reduce((sum, l) => sum + l.total, 0) };
+}
+
+// Divisão igual entre jogadores, em tibares inteiros (para baixo); `remainder` é o que sobra.
+export function splitAmongPlayers(total, players) {
+  const each = Math.floor(total / players);
+  const remainder = Math.round((total - each * players) * 10) / 10;
+  return { each, remainder };
+}

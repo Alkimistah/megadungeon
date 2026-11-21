@@ -1473,3 +1473,54 @@ test("fix 1: items that do not accept Material especial reroll the improvement b
   assert.ok(!done.steps.some((s) => s.kind === "expression" && s.reason.startsWith("Material especial")), "sem sub-rolagem de material");
   assert.equal(done.gains[0].details.improvements.join(), "Precisa");
 });
+
+// ---------- Cristais ----------
+import { getCrystalValueByChallenge, getCrystalValueTable, CRYSTAL_COLORS, crystalLine } from "../src/economy/crystalValues.js";
+import { crystalLinesOf } from "../src/treasure/treasureBatch.js";
+import { summarizeCrystals, splitAmongPlayers } from "../src/treasure/treasureSummary.js";
+
+test("cristais: valores de ND 1/4 a 10 não mudam e ND 11 a 20 seguem o spec", () => {
+  const old = [5, 10, 20, 40, 75, 120, 200, 300, 450, 650, 900, 1200];
+  const table = getCrystalValueTable();
+  assert.deepEqual(table.slice(0, 12).map((e) => e.value), old);
+  assert.deepEqual(table.slice(12).map((e) => [e.challenge, e.value]),
+    [[11, 1600], [12, 2000], [13, 2600], [14, 3400], [15, 4400], [16, 5700], [17, 7400], [18, 9600], [19, 12500], [20, 16000]]);
+  assert.equal(getCrystalValueByChallenge(15), 4400);
+  assert.equal(getCrystalValueByChallenge("1/4"), 5);
+  assert.equal(getCrystalValueByChallenge(25), 16000);
+});
+
+test("cristais: multiplicadores 1, 5 e 10", () => {
+  assert.deepEqual(Object.fromEntries(Object.entries(CRYSTAL_COLORS).map(([k, v]) => [k, v.multiplier])), { azul: 1, verde: 5, irregular: 10 });
+  assert.equal(CRYSTAL_COLORS.irregular.label, "Irregular");
+});
+
+test("cristais: linhas verde e irregular", () => {
+  const green = crystalLine({ challenge: 3, color: "verde", quantity: 1 });
+  assert.equal(green.total, 375);
+  assert.equal(green.estimate, false);
+  const irr = crystalLine({ challenge: 2, color: "irregular", quantity: 1 });
+  assert.equal(irr.total, 400);
+  assert.equal(irr.estimate, true);
+  assert.equal(crystalLine({ challenge: 3, color: "azul", quantity: 4 }).unitValue, 75);
+});
+
+test("cristais: última sessão do PO soma 470", () => {
+  const rows = [["0.25", 6], ["0.5", 4], ["1", 5], ["3", 4]].map(([challengeRating, quantity]) => ({ kind: "crystals", challengeRating, color: "azul", quantity }));
+  assert.deepEqual(buildBatch(rows), []);
+  assert.deepEqual(rollBatch(rows, createRng(1)), []);
+  const lines = crystalLinesOf(rows);
+  assert.equal(lines.length, 4);
+  assert.equal(summarizeCrystals(lines).total, 470);
+});
+
+test("cristais: quantidade inválida lança RangeError", () => {
+  assert.throws(() => buildBatch([{ kind: "crystals", challengeRating: "1", color: "azul", quantity: 0 }]), RangeError);
+  assert.throws(() => crystalLinesOf([{ kind: "crystals", challengeRating: "1", color: "azul", quantity: 100 }]), RangeError);
+  assert.throws(() => crystalLinesOf([{ kind: "crystals", challengeRating: "1", color: "roxo", quantity: 1 }]), RangeError);
+});
+
+test("cristais: divisão entre jogadores arredonda para baixo e informa o resto", () => {
+  assert.deepEqual(splitAmongPlayers(470, 5), { each: 94, remainder: 0 });
+  assert.deepEqual(splitAmongPlayers(473.5, 4), { each: 118, remainder: 1.5 });
+});

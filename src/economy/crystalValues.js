@@ -10,8 +10,25 @@ const CRYSTAL_VALUES_BY_CHALLENGE = new Map([
   [7, 450],
   [8, 650],
   [9, 900],
-  [10, 1200]
+  [10, 1200],
+  [11, 1600],
+  [12, 2000],
+  [13, 2600],
+  [14, 3400],
+  [15, 4400],
+  [16, 5700],
+  [17, 7400],
+  [18, 9600],
+  [19, 12500],
+  [20, 16000]
 ]);
+
+// Cor do cristal: azul (comum), verde (raro, chefes) e irregular (estimativa, depende da negociação).
+export const CRYSTAL_COLORS = {
+  azul: { label: "Azul", multiplier: 1 },
+  verde: { label: "Verde", multiplier: 5 },
+  irregular: { label: "Irregular", multiplier: 10 }
+};
 
 function normalizeChallenge(challenge) {
   if (challenge === "1/4") return 0.25;
@@ -42,4 +59,14 @@ export function getCrystalValueTable() {
     challenge,
     value
   }));
+}
+
+// Linha de cristais: quantidade × valor do ND × multiplicador da cor. Irregular é só estimativa.
+export function crystalLine({ challenge, color, quantity }) {
+  const entry = CRYSTAL_COLORS[color];
+  if (!entry) throw new RangeError(`Cor de cristal inválida: ${color}`);
+  const base = getCrystalValueByChallenge(challenge);
+  if (base === null) throw new RangeError(`ND inválido: ${challenge}`);
+  const unitValue = base * entry.multiplier;
+  return { challenge, color, quantity, unitValue, total: unitValue * quantity, estimate: color === "irregular" };
 }
