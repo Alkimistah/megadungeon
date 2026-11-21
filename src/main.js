@@ -72,6 +72,9 @@ const elements = {
   legendPanel: document.getElementById("legendPanel"),
   legendClose: document.getElementById("legendClose"),
   rangeDialog: document.getElementById("rangeDialog"),
+  aboutButton: document.getElementById("aboutButton"),
+  aboutDialog: document.getElementById("aboutDialog"),
+  aboutClose: document.getElementById("aboutClose"),
   rangeCards: document.getElementById("rangeCards"),
   resumeSection: document.getElementById("resumeSection"),
   resumeDetail: document.getElementById("resumeDetail"),
@@ -1224,6 +1227,9 @@ function bindEvents() {
     setUnknownPathsMode(elements.initialUnknownPathsInput.checked);
   });
 
+  elements.aboutButton.addEventListener("click", () => elements.aboutDialog.showModal());
+  elements.aboutClose.addEventListener("click", () => elements.aboutDialog.close());
+  elements.aboutDialog.addEventListener("close", () => elements.aboutButton.focus());
   elements.importSessionFile.addEventListener("click", () => elements.sessionFile.click());
   elements.sessionFile.addEventListener("change", importSessionFile);
 

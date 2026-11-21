@@ -14,6 +14,7 @@ const RANGES = [
   { id: "archipelago-21-30", name: "Arquipélago", floors: "Andares 21–30", tagline: "Reúna os fragmentos e explore o arquipélago", action: "rgb(47, 111, 115)", unknownPaths: false }
 ];
 const HOME_BG = "rgb(19, 16, 13)";
+const ABOUT_TITLES = ["Para que serve", "As faixas de andares", "O que cada opção faz", "Como usar na mesa", "Sobre o projeto"];
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -123,6 +124,41 @@ async function checkQuickTools(page, viewport) {
   assert((await text(page, "#resumeExpedition")) === resumeBefore, "o Continuar mudou depois das ferramentas");
 }
 
+async function checkAbout(page, viewport) {
+  const aboutBox = await page.locator("#aboutButton").boundingBox();
+  const importBox = await page.locator("#importSessionFile").boundingBox();
+  assert(aboutBox && importBox, "botoes do rodape ausentes");
+  assert(Math.abs(aboutBox.y - importBox.y) < 4, "Sobre o app e Importar devem estar na mesma linha");
+  assert(aboutBox.x + aboutBox.width <= importBox.x, "Sobre o app deve ficar a esquerda de Importar");
+  assert((await text(page, "#aboutButton")) === "Sobre o app", "rotulo do botao Sobre o app");
+  await shot(page, viewport, "rodape");
+
+  await page.locator("#aboutButton").click();
+  await page.locator("#aboutDialog[open]").waitFor();
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "tela inicial deve continuar aberta sob a modal Sobre");
+  const box = await page.locator("#aboutDialog").boundingBox();
+  assert(box && box.x === 0 && box.y === 0 && box.width === viewport.width && box.height === viewport.height, `modal Sobre nao esta em tela cheia: ${JSON.stringify(box)}`);
+  const bg = await page.locator("#aboutDialog").evaluate((el) => getComputedStyle(el).backgroundColor);
+  assert(bg === HOME_BG, `fundo da modal Sobre: ${bg}`);
+  const titles = (await page.locator("#aboutDialog h2").allInnerTexts()).map((t) => t.trim());
+  assert(JSON.stringify(titles) === JSON.stringify(ABOUT_TITLES), `titulos da modal Sobre: ${JSON.stringify(titles)}`);
+  const aboutText = await text(page, "#aboutDialog");
+  assert(!/game-icons|Lorc|Delapouite/.test(aboutText), "a modal Sobre nao deve creditar icones");
+  await shot(page, viewport, "sobre");
+
+  await page.locator("#aboutClose").click();
+  await page.locator("#aboutDialog").waitFor({ state: "hidden" });
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "fechar Sobre nao deve fechar a tela inicial");
+  assert((await page.evaluate(() => document.activeElement?.id)) === "aboutButton", "foco deveria voltar a #aboutButton ao fechar pelo X");
+
+  await page.locator("#aboutButton").click();
+  await page.locator("#aboutDialog[open]").waitFor();
+  await page.keyboard.press("Escape");
+  await page.locator("#aboutDialog").waitFor({ state: "hidden" });
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "Esc na modal Sobre nao deve fechar a tela inicial");
+  assert((await page.evaluate(() => document.activeElement?.id)) === "aboutButton", "foco deveria voltar a #aboutButton ao fechar com Esc");
+}
+
 async function checkReplaceConfirm(page, dialogs) {
   const before = await readAutosave(page);
   const resumeBefore = await text(page, "#resumeExpedition");
@@ -187,6 +223,7 @@ try {
     await shot(page, viewport, "ferramentas");
     await checkReplaceConfirm(page, dialogs);
     await checkQuickTools(page, viewport);
+    await checkAbout(page, viewport);
     await page.locator("#resumeExpedition").click();
     await page.locator("#rangeDialog").waitFor({ state: "hidden" });
     await page.context().close();
