@@ -1,4 +1,6 @@
-const CACHE_NAME = "mega-dungeon-v3";
+const BUILD_ID = "dev";
+const PRECACHE = [];
+const CACHE_NAME = `mega-dungeon-${BUILD_ID}`;
 const BASE_URL = new URL(self.registration.scope).pathname;
 const ASSETS = [BASE_URL, BASE_URL + "index.html", BASE_URL + "manifest.webmanifest"];
 
@@ -6,7 +8,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll([...ASSETS, ...PRECACHE.map((p) => BASE_URL + p)]))
   );
 });
 
@@ -40,6 +42,6 @@ self.addEventListener("fetch", (event) => {
 
         return networkResponse;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => caches.match(event.request, { ignoreVary: true }))
   );
 });

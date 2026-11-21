@@ -28,7 +28,9 @@ try {
   const reloadRange = await page.locator("#rangeDialog[open]").waitFor({ timeout: 4000 }).then(() => true, () => false);
   if (reloadRange) await passRangeDialog(page);
   await page.waitForFunction(async () => {
-    const cache = await caches.open("mega-dungeon-v3");
+    const name = (await caches.keys()).find(key => key.startsWith("mega-dungeon-"));
+    if (!name) return false;
+    const cache = await caches.open(name);
     const urls = (await cache.keys()).map(request => request.url);
     return urls.some(u => /\/assets\/.*\.js$/.test(u)) && urls.some(u => /\/assets\/.*\.css$/.test(u));
   }, null, { timeout: 10000 });
@@ -57,7 +59,35 @@ try {
   assert.equal(await page.locator("#treasureDialog .treasure-result").count() >= 1, true, "Rolar tudo offline não gerou resultado");
   assert.deepEqual(errors, [], "erros de JavaScript na página");
 
-  console.log(`OK offline: recarga sem rede, modal de tesouros abriu (service worker controlando: sim; faixa na recarga online: ${reloadRange ? "sim" : "não"}; faixa na recarga offline: ${offlineRange ? "sim" : "não"}). pageerrors: 0`);
+  // 5) Primeira visita: contexto novo, sem recarga online; o pré-cache do install precisa bastar.
+  const fresh = await browser.newContext({ viewport: { width: 1024, height: 768 } });
+  const firstPage = await fresh.newPage();
+  firstPage.on("pageerror", error => errors.push(error.message));
+  await firstPage.goto(url);
+  await passRangeDialog(firstPage);
+  const controlled = await swControls(firstPage).then(() => true, () => false);
+  if (!controlled) {
+    await firstPage.reload();
+    await swControls(firstPage);
+  }
+  await firstPage.waitForFunction(async () => {
+    const name = (await caches.keys()).find(key => key.startsWith("mega-dungeon-"));
+    if (!name) return false;
+    const urls = (await (await caches.open(name)).keys()).map(request => request.url);
+    return urls.some(u => /treasureDialog.*\.js$/.test(u));
+  }, null, { timeout: 15000 });
+  await fresh.setOffline(true);
+  await firstPage.reload();
+  if (await firstPage.locator("#rangeDialog[open]").waitFor({ timeout: 4000 }).then(() => true, () => false)) await passRangeDialog(firstPage);
+  await firstPage.evaluate(() => {
+    document.querySelectorAll("dialog[open]").forEach(d => d.close());
+    document.getElementById("treasureButton").click();
+  });
+  await firstPage.locator("#treasureDialog[open]").waitFor({ timeout: 5000 });
+  await firstPage.locator("#treasureDialog button", { hasText: "Rolar tudo" }).first().waitFor({ timeout: 5000 });
+  assert.deepEqual(errors, [], "erros de JavaScript na primeira visita");
+
+  console.log(`OK offline: recarga sem rede, modal de tesouros abriu (service worker controlando: sim; faixa na recarga online: ${reloadRange ? "sim" : "não"}; faixa na recarga offline: ${offlineRange ? "sim" : "não"}). pageerrors: 0. Primeira visita offline: OK`);
 } catch (error) {
   console.error("FALHA offline:", error.message);
   if (errors.length) console.error("pageerrors:", errors);

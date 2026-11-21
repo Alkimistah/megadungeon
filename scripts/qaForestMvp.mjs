@@ -713,7 +713,9 @@ async function offlineFlow() {
   await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
   await page.reload();
   await page.waitForFunction(async () => {
-    const cache = await caches.open("mega-dungeon-v3");
+    const name = (await caches.keys()).find(key => key.startsWith("mega-dungeon-"));
+    if (!name) return false;
+    const cache = await caches.open(name);
     const urls = (await cache.keys()).map(request => request.url);
     return urls.some(url => /\/assets\/.*\.js$/.test(url)) && urls.some(url => /\/assets\/.*\.css$/.test(url));
   });
