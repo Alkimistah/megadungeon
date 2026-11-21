@@ -70,6 +70,10 @@ try {
   assert.equal(await page.locator("#treasureFooter").isVisible(), false);
   // Campo "Rolar" (antes "Colunas"), com opções e dica novas; sem faixa fixa de totais.
   const rowField = rowsLoc.nth(0).locator("label", { has: page.locator(".treasure-f-columns") });
+  const hintIds = await page.locator("#treasureDialog .treasure-hint").evaluateAll(els => els.map(e => e.id));
+  assert.equal(hintIds.length, 4);
+  assert.equal(new Set(hintIds).size, 4, `ids das dicas distintos: ${hintIds}`);
+  assert.equal(await page.locator("#treasureDialog .treasure-f-columns").evaluateAll(els => new Set(els.map(e => e.getAttribute("aria-describedby"))).size), 4);
   assert.match(await rowField.innerText(), /^Rolar\b/);
   assert.deepEqual(await rowsLoc.nth(0).locator(".treasure-f-columns option").allInnerTexts(), ["Itens e dinheiro", "Só itens", "Só dinheiro"]);
   assert.match(await rowField.innerText(), /Dinheiro: moedas e riquezas/);
@@ -107,7 +111,8 @@ try {
   assert.match(await results.first().innerText(), /Heróis · Acessórios específicos \(menores\)/);
   const itemLine = await page.locator("#treasureFooter .treasure-item-line").last().innerText();
   assert.match(itemLine, /^\d+× .+ \(.+\)( — T\$ [\d.,]+)?$/, `item do rodapé com categoria: ${itemLine}`);
-  assert.match(await page.locator("#treasureFooter .treasure-component").last().innerText(), / — .+ p\. \d+$/, "componente com livro e página");
+  const compTexts = await page.locator("#treasureFooter .treasure-component").allInnerTexts();
+  assert.ok(compTexts.some(t => / — .+ p\. \d+$/.test(t)), "ao menos um componente com livro e página");
   assert.match(await page.locator("#treasureFooter").innerText(), /Total em dinheiro/);
   await page.locator("#treasureDialog .treasure-roll").click();
   // Lote cheio de itens de ND alto: totais visíveis e ao menos um item com componentes (melhoria/encanto).

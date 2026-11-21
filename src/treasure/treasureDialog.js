@@ -131,6 +131,8 @@ function field(label, control, className) {
   return wrap;
 }
 
+let hintCounter = 0;
+
 function createRow(onRemove) {
   const row = el("div", "treasure-input-row");
   const type = el("select", "treasure-f-kind");
@@ -143,7 +145,8 @@ function createRow(onRemove) {
   const mode = el("select", "treasure-f-mode");
   for (const [v, l] of Object.entries(MODE_LABELS)) mode.append(option(v, l));
   const columns = el("select", "treasure-f-columns");
-  columns.setAttribute("aria-describedby", "treasureRollHint");
+  const hintId = `treasureRollHint${++hintCounter}`;
+  columns.setAttribute("aria-describedby", hintId);
   for (const [v, l] of Object.entries(COLUMN_LABELS)) columns.append(option(v, l));
   const table = el("select", "treasure-f-table");
   for (const t of listSpecificTables()) table.append(option(t.id, t.title));
@@ -163,7 +166,7 @@ function createRow(onRemove) {
   };
   const rollField = field("Rolar", columns);
   const hint = el("small", "treasure-hint", "Dinheiro: moedas e riquezas");
-  hint.id = "treasureRollHint";
+  hint.id = hintId;
   rollField.append(hint);
   type.addEventListener("change", sync);
   columns.addEventListener("change", sync);

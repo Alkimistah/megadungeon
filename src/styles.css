@@ -2486,7 +2486,7 @@ svg {
   top: 2px;
 }
 
-.treasure-tab:hover {
+.treasure-tab:not([aria-selected="true"]):hover {
   opacity: 1;
   background: var(--surface-alt);
 }
