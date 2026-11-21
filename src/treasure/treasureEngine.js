@@ -31,8 +31,10 @@
 //
 // Itens superiores e mágicos: o passo do item base (8-4) é o dono do item. Ele enfileira
 // uma vaga por melhoria ou encanto (`context.itemId` = id do passo base, `role: "slot"`).
-// Cada vaga confere repetição, "conta como duas" e "apenas escudos" contra os passos já
-// aceitos do mesmo item; se recusar, a nova rolagem entra como filha do passo recusado.
+// Cada vaga confere repetição, "conta como duas", "apenas escudos" e as restrições de melhoria
+// (itemRules.js: mira telescópica, reforçada/delicada) contra os passos já aceitos do mesmo item;
+// se recusar, a nova rolagem entra como filha do passo recusado. A sub-rolagem de material confere
+// o material contra o item-base (madeira Tollon) e, se recusar, rola o d6 de novo do mesmo jeito.
 // Quando não resta pedido pendente com o prefixo do dono, o motor monta o `Gain`.
 import { BASIC_BOOK_TABLES, TYPE_ROLLS, ENCHANTMENT_COUNT } from "./tables/basicBook.js";
 import { basePriceOf, priceOf, normalizeName, chapter3PageOf, IMPROVEMENTS_PAGE, MATERIALS_PAGE } from "./tables/prices.js";
@@ -41,6 +43,7 @@ import { ALL_TABLES } from "./tables/index.js";
 import { listDie } from "./tables/schema.js";
 import { dieRange, rollDice } from "./dice.js";
 import { randomInt } from "../random.js";
+import { materialProblem, improvementProblem } from "./itemRules.js";
 
 export const CHALLENGE_RATINGS = Object.freeze(["0.25", "0.5", ...Array.from({ length: 20 }, (_, i) => String(i + 1))]);
 export const MODES = Object.freeze(["padrão", "metade", "dobro"]);
@@ -201,12 +204,30 @@ function itemGainFrom(result, origin, tableId) {
   };
 }
 
-function subrollRequest(tableId, result, itemId) {
+const optionList = (options) => options.map((option, i) => `${i + 1} ${option}`).join(", ");
+
+// `slotId` = id do passo da melhoria ou do encanto que pediu a sub-rolagem (a opção se liga a ele
+// mesmo depois de um material recusado e rolado de novo).
+function subrollRequest(tableId, result, itemId, slotId) {
   const { die, options } = result.subroll;
-  const list = options.map((option, i) => `${i + 1} ${option}`).join(", ");
-  return expressionRequest(tableId, die, `${result.name}: ${die} (${list})`,
-    { action: "subroll", options: [...options], ...(result.kind === "improvement" ? { subroll: "material" } : {}),
-      ...(itemId ? { itemId } : {}) });
+  return expressionRequest(tableId, die, `${result.name}: ${die} (${optionList(options)})`,
+    { action: "subroll", options: [...options], name: result.name, slotId,
+      ...(result.kind === "improvement" ? { subroll: "material" } : {}), ...(itemId ? { itemId } : {}) });
+}
+
+// Resultado da sub-rolagem que sorteou `option`. Material que não serve para o item-base (vindo da
+// Tabela 8-5 ou da lista de outro livro) é recusado, e o d6 é rolado de novo como filho do passo.
+function subrollOutcome(option, request, state) {
+  const { context } = request;
+  const owner = context.itemId ? { itemId: context.itemId } : {};
+  const base = context.subroll === "material" && context.itemId
+    ? state.steps.find((s) => s.id === context.itemId)?.row?.result : undefined;
+  const problem = base ? materialProblem(option, base) : null;
+  if (!problem) return { outcome: { ...owner, ...(context.slotId ? { slotId: context.slotId } : {}), option } };
+  const { id, ...again } = request; // eslint-disable-line no-unused-vars
+  const reason = `${context.name ?? "Material especial"} de novo no ${request.die} (${problem.cause}): ${problem.text}. `
+    + `${request.die} (${optionList(context.options)})`;
+  return { outcome: { ...owner, rejected: problem.cause, name: option }, children: [{ ...again, reason }] };
 }
 
 // Passos aceitos (melhorias ou encantos) do item cujo passo base tem id `itemId`.
@@ -232,13 +253,17 @@ function slotHandler({ result }, request, half, state) {
     used = taken.reduce((n, s) => n + s.outcome.slots, 0);
     const free = ctx.capacity - used;
     const name = normalizeName(result.name);
+    const problem = result.kind === "improvement"
+      ? improvementProblem(result.name, { name: ctx.base, category: ctx.category }, taken.map((s) => s.outcome.name))
+      : null;
     const cause = taken.some((s) => normalizeName(s.outcome.name) === name) ? "repetida"
       : result.special === "counts-as-two" && free < 2 ? "conta como duas"
       : result.special === "shield-only" && ctx.category !== "escudo" ? "apenas escudos"
-      : null;
+      : problem?.cause ?? null;
     if (cause) {
       const { id, ...again } = request; // eslint-disable-line no-unused-vars
-      const reason = `${ctx.noun} de novo na Tabela ${request.tableId} (${cause}): ${REROLL_TEXT[cause](result.name, ctx, free)}`;
+      const text = REROLL_TEXT[cause] ? REROLL_TEXT[cause](result.name, ctx, free) : problem.text;
+      const reason = `${ctx.noun} de novo na Tabela ${request.tableId} (${cause}): ${text}`;
       return { outcome: { ...owner, rejected: cause, name: result.name }, children: [{ ...again, reason }] };
     }
   }
@@ -253,7 +278,7 @@ function slotHandler({ result }, request, half, state) {
   const slots = result.special === "counts-as-two" ? 2 : 1;
   return {
     outcome: { ...owner, accepted: true, name: result.name, slots },
-    children: result.subroll ? [subrollRequest(request.tableId, result, itemId)] : [],
+    children: result.subroll ? [subrollRequest(request.tableId, result, itemId, request.id)] : [],
     prune: itemId && used + slots >= ctx.capacity ? itemId : undefined,
   };
 }
@@ -269,7 +294,7 @@ function buildItemGain(steps, itemId) {
   if (replacement) return itemGainFrom(replacement.row.result, originOf(replacement), replacement.tableId);
   const base = steps.find((s) => s.id === itemId);
   const { build } = base.outcome;
-  const options = new Map(own.filter((s) => s.outcome.option !== undefined).map((s) => [s.parentId, s]));
+  const options = new Map(own.filter((s) => s.outcome.option !== undefined).map((s) => [s.outcome.slotId ?? s.parentId, s]));
   const accepted = own.filter((s) => s.outcome.accepted);
   const superior = build.kind === "superior";
   const details = { [superior ? "improvements" : "enchantments"]: accepted.map((s) => s.outcome.name) };
@@ -399,9 +424,7 @@ const EXPRESSION_HANDLERS = {
     }
     return { children: [child], outcome: { type } };
   },
-  subroll: (total, { context }) => ({
-    outcome: { ...(context.itemId ? { itemId: context.itemId } : {}), option: context.options[total - 1] },
-  }),
+  subroll: (total, request, half, state) => subrollOutcome(request.context.options[total - 1], request, state),
 };
 
 function notSupported(what) {
@@ -461,8 +484,7 @@ function advance(state, value, extra, source) {
       step.row = structuredClone(row);
     } else {
       // Sub-rolagem de material especial: o material vem da lista do outro livro.
-      const { itemId } = request.context;
-      resolved = { outcome: { ...(itemId ? { itemId } : {}), option: item.name } };
+      resolved = subrollOutcome(item.name, request, state);
     }
     if (resolved.outcome) step.outcome = resolved.outcome;
   } else if (request.kind === "table") {

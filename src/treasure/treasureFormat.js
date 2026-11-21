@@ -53,6 +53,7 @@ function describeOutcome(outcome = {}) {
   if (outcome.count !== undefined) return `Quantidade: ${outcome.count}`;
   if (outcome.type) return `Tipo: ${outcome.type}`;
   if (outcome.option !== undefined) return `Resultado: ${outcome.option}`;
+  if (outcome.rejected) return `Resultado: ${outcome.name}${rowOutcomeNote(outcome)}`;
   return "";
 }
 
