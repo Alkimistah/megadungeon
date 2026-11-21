@@ -531,7 +531,11 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
 Continuam abertos:
 
 1. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
-   - **Atualizar o Encontro manual.** Ele foi feito quando o app tinha bem menos opções. Hoje há muito mais NDs, terrenos e tipos de criatura (catálogo, papéis de ameaça, perfis das três faixas), e os campos da modal precisam refletir isso.
+   - **Encontros e ecologia das criaturas:** é um projeto em 4 fases. O design está em [docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md](docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md).
+     - Fase 1, etiquetas das 574 fichas. O plano está em [docs/superpowers/plans/2026-11-21-ecologia-fase-1-etiquetas.md](docs/superpowers/plans/2026-11-21-ecologia-fase-1-etiquetas.md), e é o **ponto de recomeço**.
+     - Fase 2, gerador por etiquetas.
+     - Fase 3, encontro manual novo.
+     - Fase 4, cadastro do Bestiário de Arton, cujo PDF já está em `tmp/livros/`.
 2. **Origem de ícones a confirmar com o PO.** O `CREDITOS.md` lista numa seção própria os ícones sem origem confirmada: `boss`, `camp`, `elite`, `trap`, `treasure`, `normal`, `unknown`, `hidden-forest`, `archipelago-boat`, `close-modal`, `earth-arrow-left`, `info` e `expand-*`. Se vierem do game-icons.net, passam para a seção Game Icons.
 3. **Pontos menores, sem urgência:**
    - o `qaLayout.mjs` fixa os rótulos curtos do contador;
