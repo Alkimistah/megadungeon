@@ -1,6 +1,6 @@
 import { assetUrl } from "./assetUrl.js";
 
-const UNEXPLORED_ISLAND_ICON = "/assets/icons/islands/ilha-nao-explorada.svg";
+const UNEXPLORED_ISLAND_ICON = "/assets/icons/islands/ilha-nao-explorada.webp";
 
 function byFloor(islands) {
   return new Map(islands.map((island) => [island.floor, island]));

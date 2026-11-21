@@ -85,7 +85,7 @@ function hydrateSessionIslands(profile, sessionIslands) {
     const theme = themesById.get(island.themeId);
     return [floor, {
       ...island,
-      icon: island.icon || theme?.icon,
+      icon: theme?.icon || island.icon,
       narrative: island.narrative || theme?.narrative
     }];
   }));

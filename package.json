@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
+    "build:islands": "node scripts/buildIslands.mjs",
     "test:floors-1-10": "node scripts/validateFloors1to10.mjs",
     "test:missions": "node scripts/sampleMissionGeneration.mjs",
     "test:floors-11-20": "node scripts/validateForestMvp.test.mjs",
     "test:sw": "node --test scripts/swPrecache.test.mjs",
+    "test:archipelago": "node --test scripts/archipelagoState.test.mjs",
     "test:treasure": "node scripts/treasure.test.mjs",
     "qa:floors-11-20": "node scripts/qaForestMvp.mjs",
     "qa:floors-1-10": "node scripts/qaFloors1to10.mjs",
