@@ -156,3 +156,31 @@ O processo segue `docs/superpowers/processo-de-trabalho.md`.
 - [ ] **Step 1.** Atualizar a seção “Rolagem de tesouros” do `ARCHITECTURE.md` (abas, pesos, preços) e tirar das pendências do plano anterior o que foi feito.
 - [ ] **Step 2.** Rodar `test:floors-1-10`, `test:missions`, `test:floors-11-20`, `test:treasure`, `qa:treasure`, `qa:treasure-offline` e `build`.
 - [ ] **Step 3.** Commit `docs: registra os ajustes da rolagem de tesouros`.
+
+## Resultado da execução
+
+As seis tarefas foram concluídas. A revisão final pediu duas correções importantes e alguns acabamentos, todos aplicados em `1eb881e`:
+
+- A rolagem completa ganhou a opção padrão “Dinheiro e itens”, que segue as duas colunas da Tabela 8-1 em sequência e termina num quadro único.
+- A documentação foi corrigida.
+- Serviços (Casamento, Cerimônia religiosa, Sacramento, Condecoração militar e Favor da pessoa amada) saíram do sorteio ponderado de itens diversos.
+- As tabelas da rolagem completa usam o texto impresso no livro.
+- Um valor fora do dado não destaca nenhuma linha.
+- Os totais aparecem como “T$ X”.
+
+Decisões do gerente:
+
+- Itens específicos de outros livros só entram quando há lista da mesma categoria do item mágico.
+- As munições de Heróis entram no grupo das armas.
+- Uma “Tabela específica” escolhida explicitamente não recebe peso.
+- No Livro Básico, cada componente traz uma página:
+  - a base, a página do Capítulo 3;
+  - as melhorias, a p. 165;
+  - o material, a p. 167.
+- O preço “—” de arma equivale a zero quando o item tem melhorias, material ou encantos.
+- Na Tabela 3-9, o material marcado com “—” não acrescenta preço.
+- Em `appliesTo`, “ferramenta” e “vestuário” aparecem como no livro.
+
+Pendente de decisão do PO: na aba Gerar tesouros, a dica do campo “Rolar” diz “Dinheiro: moedas e riquezas”, mas no rodapé “Dinheiro” e “Total em dinheiro” somam só moedas. Uma alternativa é chamar o rodapé de “Moedas” e “Total em moedas”.
+
+Pendências que continuam: o pré-cache no `public/sw.js` e a página do livro na cascata, além do texto de cor fixa `#d8c8b7`, que fica para uma revisão geral de cores do app.
