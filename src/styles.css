@@ -224,7 +224,8 @@ button:disabled:hover {
   padding: 0 12px;
   border: 1px solid var(--header-border);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  /* Rodapé transparente (versão A do PO): só o contorno, o ícone e o texto. */
+  background: transparent;
   font-size: 13px;
 }
 
@@ -257,7 +258,7 @@ button:disabled:hover {
   padding: 4px 8px;
   border: 1px solid var(--header-border);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  background: transparent;
 }
 
 .time-tracker span {

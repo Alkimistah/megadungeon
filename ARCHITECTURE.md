@@ -520,13 +520,13 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
 - `autosaveActive` fica desligado durante o Avançar;
 - `#rangeConfirm` e `#importSessionFile` ficam desabilitados até a leitura do salvamento;
 - o `aria-label` do contador é limpo fora da floresta;
-- o rodapé de ferramentas, a pedido do PO, deixou de sobrar espaço: o `body` virou uma coluna de altura `100dvh` e o `main` ocupa todo o espaço entre o cabeçalho e o rodapé, sem o antigo `calc(100vh - 98px …)`. A faixa do rodapé é transparente e sem borda, e só os botões e o contador têm fundo. O `qa:layout` confere que não há espaço vazio entre o andar e o rodapé.
+- o rodapé de ferramentas, a pedido do PO, deixou de sobrar espaço: o `body` virou uma coluna de altura `100dvh` e o `main` ocupa todo o espaço entre o cabeçalho e o rodapé, sem o antigo `calc(100vh - 98px …)`. A faixa do rodapé é transparente e sem borda, e só os botões e o contador têm fundo. O `qa:layout` confere que não há espaço vazio entre o andar e o rodapé. Os botões e o contador também ficaram sem fundo, só com o contorno, que foi a versão A escolhida pelo PO;
+- o Tesouros e o Encontro avulso abertos pela tela inicial recebem a classe `is-home-tool` e usam a paleta bronze. Abertos de dentro de uma expedição, mantêm o tema da faixa.
 
 Continuam abertos:
 
 1. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
    - **Atualizar o Encontro manual.** Ele foi feito quando o app tinha bem menos opções. Hoje há muito mais NDs, terrenos e tipos de criatura (catálogo, papéis de ameaça, perfis das três faixas), e os campos da modal precisam refletir isso.
-   - **Tema das ferramentas abertas pela tela inicial.** Abertos pela tela inicial, o Encontro avulso e os Tesouros mostram as cores do perfil ativo, quase sempre o da masmorra. No encontro manual, o PO viu inclusive partes do tema da floresta. Nesse caso, as duas modais devem seguir a paleta da tela inicial (bronze). O tema da faixa vale só quando elas são abertas de dentro de uma expedição.
    - **Cristais nos tesouros.**
      - Os cristais são um recurso próprio da campanha da Mega Dungeon e entram no cálculo de dinheiro.
      - Hoje o app só os menciona como valor de “Entrega/cristais” nas recompensas de missão (`missionDialog.js`) e em textos de missão. Não existe um sistema de cristais com valores.

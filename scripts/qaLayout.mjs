@@ -93,6 +93,10 @@ async function checkAtRest(page, viewport) {
       footerTop,
       footerBg: footerStyle.backgroundColor,
       footerBorder: footerStyle.borderTopWidth,
+      itemStyles: [...footer.querySelectorAll(".reload-button, .time-tracker")].map((el) => {
+        const cs = getComputedStyle(el);
+        return { id: el.id || el.className, bg: cs.backgroundColor, border: cs.borderTopWidth };
+      }),
       mainBottom: document.querySelector("main").getBoundingClientRect().bottom,
       containerBottom: container.getBoundingClientRect().bottom,
       pageScroll: document.documentElement.scrollHeight - window.innerHeight
@@ -105,6 +109,11 @@ async function checkAtRest(page, viewport) {
   assert(data.footerTop - data.containerBottom <= 2, `[${tag}] espaco vazio entre o andar e o rodape: ${data.footerTop - data.containerBottom}px`);
   assert(/rgba\(0, 0, 0, 0\)|transparent/.test(data.footerBg), `[${tag}] fundo do rodape deveria ser transparente: ${data.footerBg}`);
   assert(data.footerBorder === "0px", `[${tag}] rodape nao deveria ter borda superior: ${data.footerBorder}`);
+  // Versão A escolhida pelo PO: botões e contador sem fundo, só com o contorno.
+  for (const item of data.itemStyles) {
+    assert(/rgba\(0, 0, 0, 0\)|transparent/.test(item.bg), `[${tag}] ${item.id} deveria ter fundo transparente: ${item.bg}`);
+    assert(item.border !== "0px", `[${tag}] ${item.id} deveria manter o contorno`);
+  }
 }
 
 // Tempo total visivel (faixa 11-20): forca a exibicao e confere que cabe.
