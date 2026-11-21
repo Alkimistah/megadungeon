@@ -43,3 +43,13 @@ export async function saveAutosave(session) {
     transaction.objectStore(STORE_NAME).put(session, SESSION_KEY);
   });
 }
+
+export async function clearAutosave() {
+  const database = await openDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(STORE_NAME, "readwrite");
+    transaction.oncomplete = () => resolve();
+    transaction.onabort = () => reject(transaction.error);
+    transaction.objectStore(STORE_NAME).delete(SESSION_KEY);
+  });
+}

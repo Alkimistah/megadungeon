@@ -1,4 +1,5 @@
 import { assetUrl } from "./assetUrl.js";
+import { createRangeEndActions } from "./rangeEndActions.js";
 
 const UNEXPLORED_ISLAND_ICON = "/assets/icons/islands/ilha-nao-explorada.webp";
 
@@ -70,6 +71,7 @@ export function createArchipelagoRenderer({
   container,
   getMissionsForFloor = () => [],
   getSnapshot,
+  getRangeEnd = () => null,
   onCompleteIsland,
   onExploreIsland,
   onOpenMission = () => {},
@@ -275,6 +277,10 @@ export function createArchipelagoRenderer({
       })
     );
     panel.appendChild(actions);
+    if (island.floor === 30 && island.completed) {
+      const rangeEnd = getRangeEnd();
+      if (rangeEnd) panel.appendChild(createRangeEndActions(rangeEnd));
+    }
     panel.appendChild(renderObjectiveList(island, snapshot));
     islandDialog.appendChild(panel);
   }
@@ -321,6 +327,15 @@ export function createArchipelagoRenderer({
       renderSummary(snapshot),
       renderMap(snapshot)
     );
+    const bossIsland = snapshot.islands.find((island) => island.floor === 30);
+    const rangeEnd = bossIsland?.completed ? getRangeEnd() : null;
+    if (rangeEnd) {
+      const section = document.createElement("section");
+      section.className = "archipelago-detail range-end-block";
+      section.innerHTML = "<h2>Arquipélago concluído</h2>";
+      section.appendChild(createRangeEndActions(rangeEnd));
+      container.appendChild(section);
+    }
     renderDialog(snapshot);
   }
 

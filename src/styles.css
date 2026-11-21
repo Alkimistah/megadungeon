@@ -3761,3 +3761,25 @@ details.mission-run-guidance p {
   border: 0;
   background: none;
 }
+
+.range-end-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 12px;
+  pointer-events: auto;
+}
+
+.range-end-actions[hidden] { display: none; }
+
+.range-end-finish {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-alt);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}

@@ -1,4 +1,4 @@
-export { FLOOR_PROFILES as FLOOR_RANGES, getFloorProfile as getFloorRange } from "./floorProfiles/index.js";
+export { FLOOR_PROFILES as FLOOR_RANGES, getFloorProfile as getFloorRange, getNextFloorRange } from "./floorProfiles/index.js";
 
 export function applyTheme(theme) {
   const root = document.documentElement;

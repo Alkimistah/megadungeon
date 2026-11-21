@@ -1,7 +1,7 @@
 import "./styles.css";
 import { assetUrl } from "./assetUrl.js";
 import { createExplorationState } from "./appState.js";
-import { FLOOR_RANGES, applyTheme, getFloorRange } from "./floorRanges.js";
+import { FLOOR_RANGES, applyTheme, getFloorRange, getNextFloorRange } from "./floorRanges.js";
 import { formatElapsedTime } from "./format.js";
 import { generateMapData } from "./generator.js";
 import { getNodeMapGuidance } from "./nodeProgressPresentation.js";
@@ -22,7 +22,8 @@ import { canRerollNodeCreatures, rerollNodeCreatures, resolveForestAmbush, resol
 import { withCreatureReinforcement } from "./creatureReinforcement.js";
 import { createNodeDialogController } from "./nodeDialog.js";
 import { decodeSessionCode, encodeSessionCode } from "./sessionCode.js";
-import { loadAutosave, saveAutosave } from "./sessionAutosave.js";
+import { createRangeEndActions } from "./rangeEndActions.js";
+import { clearAutosave, loadAutosave, saveAutosave } from "./sessionAutosave.js";
 
 const elements = {
   svg: document.getElementById("map"),
@@ -63,6 +64,7 @@ const elements = {
   manualEncounterTrapModeInput: document.getElementById("manualEncounterTrapModeInput"),
   advanceNodeFloorButton: document.getElementById("advanceNodeFloorButton"),
   nodeMapGuidance: document.getElementById("nodeMapGuidance"),
+  rangeEndActions: document.getElementById("rangeEndActions"),
   settingsToggle: document.getElementById("settingsToggle"),
   settingsToggleIcon: document.getElementById("settingsToggleIcon"),
   settingsPanel: document.getElementById("settingsPanel"),
@@ -219,6 +221,53 @@ function syncNodeFloorAdvanceControl() {
     : isTopLevelRouteChosen() ? "Faixa concluída" : "Último andar";
   elements.nodeMapGuidance.textContent = isNodeMapMode()
     ? getNodeMapGuidance(state.getLevels(), state, hasNextNodeMapFloor(), renderedNodeMapFloor === Number(elements.floorInput.value)) : "";
+
+  const rangeEnd = isNodeMapMode() && !hasNextNodeMapFloor() && isTopLevelRouteChosen() ? getRangeEnd() : null;
+  elements.rangeEndActions.replaceChildren();
+  elements.rangeEndActions.hidden = !rangeEnd;
+  if (rangeEnd) elements.rangeEndActions.appendChild(createRangeEndActions(rangeEnd));
+}
+
+// Opções de fim de faixa: avançar para a próxima (se existir) ou encerrar a expedição.
+function getRangeEnd() {
+  const next = getNextFloorRange(activeFloorRange.id);
+
+  return {
+    nextName: next?.card.name || null,
+    onAdvance: next ? () => advanceToNextRange() : null,
+    onFinish: () => void finishExpedition()
+  };
+}
+
+// Mesmo fluxo de uma expedição nova, sem a confirmação de substituição (a faixa anterior já terminou).
+function advanceToNextRange() {
+  const next = getNextFloorRange(activeFloorRange.id);
+
+  if (!next) return;
+  savedExpedition = null;
+  elements.resumeSection.hidden = true;
+  closeOpenDialogs();
+  startNewExpedition(next.id);
+}
+
+function closeOpenDialogs() {
+  document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
+}
+
+async function finishExpedition() {
+  autosaveActive = false;
+  try {
+    await clearAutosave();
+  } catch {
+    // Sem salvamento acessível, a tela inicial segue sem Continuar.
+  }
+  savedExpedition = null;
+  elements.resumeSection.hidden = true;
+  elements.sessionStatus.hidden = true;
+  selectRange(FLOOR_RANGES[0].id);
+  closeOpenDialogs();
+  elements.rangeDialog.showModal();
+  document.activeElement?.blur();
 }
 
 function advanceNodeMapFloor() {
@@ -378,6 +427,7 @@ const extendedExplorationRenderer = createExtendedExplorationRenderer({
   container: elements.extendedExploration,
   getActiveMissions: () => missionState.getSelected(),
   getSnapshot: () => extendedState.getSnapshot(),
+  getRangeEnd,
   getMissionsForFloor: (floor) => missionState.getMissionsForFloor(floor),
   onEncounterAdjusted: () => {
     if (autosaveActive) void saveCurrentExpedition();
@@ -437,6 +487,7 @@ const archipelagoRenderer = createArchipelagoRenderer({
   container: elements.extendedExploration,
   getMissionsForFloor: (floor) => missionState.getMissionsForFloor(floor),
   getSnapshot: () => archipelagoState.getSnapshot(),
+  getRangeEnd,
   onCompleteIsland: (floor) => {
     archipelagoState.completeIsland(floor);
     refreshExplorationDisplay();
@@ -1214,11 +1265,7 @@ function bindEvents() {
   elements.rangeConfirm.addEventListener("click", (event) => {
     event.preventDefault();
     if (!confirmReplaceExpedition()) return;
-    applyFloorRange(getSelectedRangeId());
-    setUnknownPathsMode(elements.initialUnknownPathsInput.checked);
-    currentMapSeed = createRandomSeed();
-    elements.rangeDialog.close();
-    openMissionSelectionForNewExploration();
+    startNewExpedition(getSelectedRangeId());
   });
 
   document.addEventListener("click", (event) => {
@@ -1232,6 +1279,14 @@ function bindEvents() {
 
     setLegendOpen(false);
   });
+}
+
+function startNewExpedition(rangeId) {
+  applyFloorRange(rangeId);
+  setUnknownPathsMode(elements.initialUnknownPathsInput.checked);
+  currentMapSeed = createRandomSeed();
+  if (elements.rangeDialog.open) elements.rangeDialog.close();
+  openMissionSelectionForNewExploration();
 }
 
 function syncInitialUnknownPathsVisibility() {

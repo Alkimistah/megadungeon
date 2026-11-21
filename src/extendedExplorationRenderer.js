@@ -1,6 +1,7 @@
 import { formatChallengeRating } from "./challenge.js";
 import { createEncounterCombatPage, getDefaultEncounterItemKey } from "./nodeDialog.js";
 import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
+import { createRangeEndActions } from "./rangeEndActions.js";
 import { createTacticalMapPanel } from "./tacticalMapRenderer.js";
 
 function createElement(tagName, className = null, text = null) {
@@ -721,13 +722,14 @@ function createBossPanel(snapshot, selectedEncounterItemByScene, onResolveBossEn
   return section;
 }
 
-function createCompletedPanel(snapshot) {
+function createCompletedPanel(snapshot, rangeEnd) {
   const section = createElement("section", "extended-panel boss-panel");
   const summary = snapshot.completedSummary;
 
   section.appendChild(createElement("h3", null, summary.title));
   section.appendChild(createElement("p", "result-detail", summary.text));
   section.appendChild(createElement("p", "final-treasure", `Recompensa principal: ${summary.reward}.`));
+  if (rangeEnd) section.appendChild(createRangeEndActions(rangeEnd));
 
   return section;
 }
@@ -752,6 +754,7 @@ export function createExtendedExplorationRenderer({
   container,
   getActiveMissions = () => [],
   getSnapshot,
+  getRangeEnd = () => null,
   getMissionsForFloor = () => [],
   onOpenMission = () => {},
   onAdvanceFloor,
@@ -806,7 +809,7 @@ export function createExtendedExplorationRenderer({
         render();
       }, onEncounterAdjusted));
     } else if (snapshot.phase === "completed") {
-      left.appendChild(createCompletedPanel(snapshot));
+      left.appendChild(createCompletedPanel(snapshot, getRangeEnd()));
     } else {
       left.appendChild(createApproachControls(
         snapshot,
