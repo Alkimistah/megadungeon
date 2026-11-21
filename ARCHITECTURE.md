@@ -521,17 +521,17 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
 - `#rangeConfirm` e `#importSessionFile` ficam desabilitados até a leitura do salvamento;
 - o `aria-label` do contador é limpo fora da floresta;
 - o rodapé de ferramentas, a pedido do PO, deixou de sobrar espaço: o `body` virou uma coluna de altura `100dvh` e o `main` ocupa todo o espaço entre o cabeçalho e o rodapé, sem o antigo `calc(100vh - 98px …)`. A faixa do rodapé é transparente e sem borda, e só os botões e o contador têm fundo. O `qa:layout` confere que não há espaço vazio entre o andar e o rodapé. Os botões e o contador também ficaram sem fundo, só com o contorno, que foi a versão A escolhida pelo PO;
-- o Tesouros e o Encontro avulso abertos pela tela inicial recebem a classe `is-home-tool` e usam a paleta bronze. Abertos de dentro de uma expedição, mantêm o tema da faixa.
+- o Tesouros e o Encontro avulso abertos pela tela inicial recebem a classe `is-home-tool` e usam a paleta bronze. Abertos de dentro de uma expedição, mantêm o tema da faixa;
+- **cristais na aba Gerar tesouros** ([docs/superpowers/specs/2026-11-21-cristais-design.md](docs/superpowers/specs/2026-11-21-cristais-design.md)):
+  - a origem **Cristais** tem ND, Cor (Azul por padrão; Verde vale 5× e Irregular 10×, marcado como estimativa) e Quantidade, e convive com as outras linhas do lote;
+  - o bloco de cristais fica logo abaixo de Dinheiro, com **Total em cristais**, e o valor total passa a somar os cristais;
+  - **Dividir entre jogadores?**, de 1 a 10, mostra **Por jogador**, com o valor arredondado para baixo e o resto informado;
+  - a tabela de `src/economy/crystalValues.js` vai agora até o ND 20. Isso também corrige as recompensas de missão acima do ND 10, que antes ficavam zeradas no ND 11.
 
 Continuam abertos:
 
 1. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
    - **Atualizar o Encontro manual.** Ele foi feito quando o app tinha bem menos opções. Hoje há muito mais NDs, terrenos e tipos de criatura (catálogo, papéis de ameaça, perfis das três faixas), e os campos da modal precisam refletir isso.
-   - **Cristais nos tesouros.**
-     - Os cristais são um recurso próprio da campanha da Mega Dungeon e entram no cálculo de dinheiro.
-     - Hoje o app só os menciona como valor de “Entrega/cristais” nas recompensas de missão (`missionDialog.js`) e em textos de missão. Não existe um sistema de cristais com valores.
-     - A ideia é oferecer cristais como opção de rolagem nas duas abas: Gerar tesouros (em lote) e Rolar na mesa (individual).
-     - Antes de implementar, é preciso levantar com o PO as regras dos cristais: o que são, como se obtêm e quanto valem por ND.
 2. **Origem de ícones a confirmar com o PO.** O `CREDITOS.md` lista numa seção própria os ícones sem origem confirmada: `boss`, `camp`, `elite`, `trap`, `treasure`, `normal`, `unknown`, `hidden-forest`, `archipelago-boat`, `close-modal`, `earth-arrow-left`, `info` e `expand-*`. Se vierem do game-icons.net, passam para a seção Game Icons.
 3. **Pontos menores, sem urgência:**
    - o `qaLayout.mjs` fixa os rótulos curtos do contador;
