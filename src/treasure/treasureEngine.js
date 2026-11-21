@@ -11,12 +11,19 @@
 //   - "list": 1d<n> numa lista de itens de outro livro (Ameaças, Heróis, Deuses); o valor v
 //     (1 a n) dá o v-ésimo item na ordem impressa. Não tem bônus nem desdobramento.
 // Step    = { id, parentId, tableId, die, kind, reason, value, bonus, effective?, row?, item?, outcome?,
-//             dice?, chosen? }   (`row` é uma cópia da linha; `item` é o item da lista, só em "list";
-//             `dice`/`chosen` só em 2D)
+//             dice?, chosen?, sourceBook?, sourceTableId?, share? }   (`row` é uma cópia da linha; `item` é
+//             o item da lista, em "list" e quando a fonte sorteada é outro livro; `dice`/`chosen` só em 2D)
 // Gain    = { kind: "money", amount, currency }
 //         | { kind: "wealth", tier, value, amount, currency: "T$", examples }
-//         | { kind: "item", name, category, price?, tier?, details }
-//           details = { enchantments?, improvements?, material?, creature?, specific? }
+//         | { kind: "item", name, category, source, price?, tier?, details }
+//           details = { enchantments?, improvements?, material?, creature?, specific?, components }
+//           components = [{ role: "base"|"melhoria"|"encanto"|"material"|"específico", name, book, bookPage }]
+//
+// Pesos entre livros (só em `resolveWithDice`): antes de rolar num pedido de um grupo de
+// `WEIGHTED_POOLS`, sorteia a fonte (`pickSource`). Se for outro livro, o valor é 1d<n> na lista
+// elegível, e o passo guarda `item` e uma linha montada a partir dele; a tabela do pedido
+// (`tableId`) continua a do Livro Básico, e `sourceTableId` diz de onde veio. `applyRoll`, com
+// valores digitados (aba Rolar com o livro), nunca sorteia fonte e não grava esses campos.
 //
 // `pending` é uma pilha: os pedidos gerados por um passo entram na frente, então a
 // cadeia avança em profundidade (tipo e valor de uma riqueza antes da seguinte).
@@ -28,7 +35,8 @@
 // aceitos do mesmo item; se recusar, a nova rolagem entra como filha do passo recusado.
 // Quando não resta pedido pendente com o prefixo do dono, o motor monta o `Gain`.
 import { BASIC_BOOK_TABLES, TYPE_ROLLS, ENCHANTMENT_COUNT } from "./tables/basicBook.js";
-import { basePriceOf, priceOf } from "./tables/prices.js";
+import { basePriceOf, priceOf, normalizeName } from "./tables/prices.js";
+import { WEIGHTED_POOLS, pickSource, eligibleItems } from "./bookWeights.js";
 import { ALL_TABLES } from "./tables/index.js";
 import { listDie } from "./tables/schema.js";
 import { dieRange, rollDice } from "./dice.js";
@@ -159,13 +167,27 @@ function typeRequest(tableId, rolls, build, twoDice) {
     context: { action: "itemType", rolls, build } };
 }
 
-function itemGainFrom(result, tableId) {
+// Livro e página de onde veio uma parte do item: a tabela (ou lista) em que foi rolada.
+function component(role, name, tableId) {
+  const table = ALL_TABLES[tableId];
+  return { role, name, book: table.book, bookPage: table.bookPage };
+}
+
+// Tabela de onde o passo tirou o resultado: a lista do outro livro, se sorteada, ou a do pedido.
+const originOf = (step) => step.sourceTableId ?? step.tableId;
+
+// `origin` = tabela ou lista de onde o item veio; `tableId` = tabela do pedido (Livro Básico).
+function itemGainFrom(result, origin, tableId) {
   const price = result.price !== undefined ? result.price : basePriceOf(result.name);
+  const specific = SPECIFIC_TABLES.includes(tableId);
   return {
-    kind: "item", name: result.name, category: result.category, source: tableId,
+    kind: "item", name: result.name, category: result.category, source: origin,
     ...(price !== undefined ? { price } : {}),
     ...(result.tier !== undefined ? { tier: result.tier } : {}),
-    details: SPECIFIC_TABLES.includes(tableId) ? { specific: true } : {},
+    details: {
+      ...(specific ? { specific: true } : {}),
+      components: [component(specific ? "específico" : "base", result.name, origin)],
+    },
   };
 }
 
@@ -173,7 +195,8 @@ function subrollRequest(tableId, result, itemId) {
   const { die, options } = result.subroll;
   const list = options.map((option, i) => `${i + 1} ${option}`).join(", ");
   return expressionRequest(tableId, die, `${result.name}: ${die} (${list})`,
-    { action: "subroll", options: [...options], ...(itemId ? { itemId } : {}) });
+    { action: "subroll", options: [...options], ...(result.kind === "improvement" ? { subroll: "material" } : {}),
+      ...(itemId ? { itemId } : {}) });
 }
 
 // Passos aceitos (melhorias ou encantos) do item cujo passo base tem id `itemId`.
@@ -198,7 +221,8 @@ function slotHandler({ result }, request, half, state) {
     const taken = acceptedSlots(state.steps, itemId);
     used = taken.reduce((n, s) => n + s.outcome.slots, 0);
     const free = ctx.capacity - used;
-    const cause = taken.some((s) => s.outcome.name === result.name) ? "repetida"
+    const name = normalizeName(result.name);
+    const cause = taken.some((s) => normalizeName(s.outcome.name) === name) ? "repetida"
       : result.special === "counts-as-two" && free < 2 ? "conta como duas"
       : result.special === "shield-only" && ctx.category !== "escudo" ? "apenas escudos"
       : null;
@@ -212,7 +236,7 @@ function slotHandler({ result }, request, half, state) {
     return {
       outcome: { ...owner, specific: true, name: result.name },
       children: [tableRequest(result.next, `${result.name}: role na Tabela ${result.next}; o item troca e os encantos são descartados`,
-        0, itemId ? { itemId, role: "specific" } : {})],
+        0, itemId ? { itemId, role: "specific", ...(ctx.tier ? { tier: ctx.tier } : {}) } : {})],
       prune: itemId,
     };
   }
@@ -232,18 +256,25 @@ function lowerFirst(text) {
 function buildItemGain(steps, itemId) {
   const own = steps.filter((s) => s.outcome?.itemId === itemId);
   const replacement = own.find((s) => s.outcome.specificItem);
-  if (replacement) return itemGainFrom(replacement.row.result, replacement.tableId);
+  if (replacement) return itemGainFrom(replacement.row.result, originOf(replacement), replacement.tableId);
   const base = steps.find((s) => s.id === itemId);
   const { build } = base.outcome;
-  const options = new Map(own.filter((s) => s.outcome.option !== undefined).map((s) => [s.parentId, s.outcome.option]));
+  const options = new Map(own.filter((s) => s.outcome.option !== undefined).map((s) => [s.parentId, s]));
   const accepted = own.filter((s) => s.outcome.accepted);
-  const details = { [build.kind === "superior" ? "improvements" : "enchantments"]: accepted.map((s) => s.outcome.name) };
+  const superior = build.kind === "superior";
+  const details = { [superior ? "improvements" : "enchantments"]: accepted.map((s) => s.outcome.name) };
+  const components = [component("base", base.row.result.name, originOf(base))];
   const segments = accepted.map((s) => {
-    const option = options.get(s.id);
-    if (option === undefined) return lowerFirst(s.outcome.name);
-    details[s.row.result.kind === "improvement" ? "material" : "creature"] = option;
+    components.push(component(superior ? "melhoria" : "encanto", s.outcome.name, originOf(s)));
+    const optionStep = options.get(s.id);
+    if (optionStep === undefined) return lowerFirst(s.outcome.name);
+    const option = optionStep.outcome.option;
+    const isMaterial = s.row.result.kind === "improvement";
+    details[isMaterial ? "material" : "creature"] = option;
+    if (isMaterial) components.push(component("material", option, originOf(optionStep)));
     return `${lowerFirst(s.outcome.name)}: ${option}`;
   });
+  details.components = components;
   const counted = { ...details };
   if (details.improvements) counted.improvementCount = accepted.reduce((n, s) => n + s.outcome.slots, 0);
   if (details.enchantments) counted.enchantmentCount = accepted.reduce((n, s) => n + s.outcome.slots, 0);
@@ -277,14 +308,15 @@ const ROW_HANDLERS = {
         { action: "potionCount", bonus })],
     };
   },
-  item: ({ result }, request) => {
+  item: ({ result }, request, half, state, origin) => {
     const { build, itemId } = request.context ?? {};
     if (build) {
       const superior = build.kind === "superior";
       const capacity = superior ? build.improvements : ENCHANTMENT_COUNT[build.tier];
       const table = superior ? `8-5/${build.type}` : MAGIC_SLOT_TABLES[build.type];
       const noun = superior ? "Melhoria" : "Encanto";
-      const context = { itemId: request.id, role: "slot", capacity, category: result.category, base: result.name, noun };
+      const context = { itemId: request.id, role: "slot", capacity, category: result.category, base: result.name, noun,
+        ...(superior ? {} : { tier: build.tier }) };
       return {
         outcome: { itemId: request.id, base: true, build },
         children: Array.from({ length: capacity }, (_, i) =>
@@ -292,7 +324,7 @@ const ROW_HANDLERS = {
       };
     }
     if (itemId) return { outcome: { itemId, specificItem: true } };
-    return { gains: [itemGainFrom(result, request.tableId)] };
+    return { gains: [itemGainFrom(result, origin, request.tableId)] };
   },
   improvement: slotHandler,
   enchantment: slotHandler,
@@ -377,34 +409,65 @@ function checkTwoDice(dice, value, min, max) {
   if (!valid) throw new RangeError(`Dados 2D inválidos: ${JSON.stringify(dice)} com o valor escolhido ${value}.`);
 }
 
+// Resultado de linha montado a partir de um item de lista de outro livro.
+function listRowResult(item, tableId) {
+  if (tableId.startsWith("8-5/")) return { kind: "improvement", name: item.name };
+  const { appliesTo, ...rest } = item; // eslint-disable-line no-unused-vars
+  return { kind: "item", ...structuredClone(rest) };
+}
+
 // Registra o valor do pedido atual e devolve um novo estado. Não altera `state`.
 // `extra` ({ dice: [a, b] }) vale só para os pedidos 2D, e é opcional.
 export function applyRoll(state, value, extra) {
+  return advance(state, value, extra);
+}
+
+// `source` (só de `resolveWithDice`) = { book, tableId, share, items? }: a fonte sorteada; com
+// `items` (lista elegível de outro livro), `value` é a posição na lista (1 a n).
+function advance(state, value, extra, source) {
   const request = nextStep(state);
   if (!request) throw new Error("A cadeia de tesouro já terminou.");
-  const [min, max] = dieRange(request.die);
+  const list = source?.items;
+  const die = list ? listDie(list.length) : request.die;
+  const [min, max] = dieRange(die);
   if (!Number.isInteger(value) || value < min || value > max) {
-    throw new RangeError(`Valor inválido para ${request.die}: ${value} (de ${min} a ${max}).`);
+    throw new RangeError(`Valor inválido para ${die}: ${value} (de ${min} a ${max}).`);
   }
   if (request.kind === "twoDice" && extra?.dice !== undefined) checkTwoDice(extra.dice, value, min, max);
 
   const step = {
-    id: request.id, parentId: parentOf(request.id), tableId: request.tableId, die: request.die,
+    id: request.id, parentId: parentOf(request.id), tableId: request.tableId, die,
     kind: request.kind, reason: request.reason, value, bonus: request.bonus,
   };
+  if (source) Object.assign(step, { sourceBook: source.book, sourceTableId: source.tableId, share: source.share });
+  const origin = source?.tableId ?? request.tableId;
   let resolved;
-  if (request.kind === "table") {
+  if (list) {
+    const item = list[value - 1];
+    step.item = structuredClone(item);
+    if (request.kind === "table") {
+      const row = { min: value, max: value, result: listRowResult(item, request.tableId) };
+      resolved = ROW_HANDLERS[row.result.kind](row, request, state.half, state, origin);
+      step.row = structuredClone(row);
+    } else {
+      // Sub-rolagem de material especial: o material vem da lista do outro livro.
+      const { itemId } = request.context;
+      resolved = { outcome: { ...(itemId ? { itemId } : {}), option: item.name } };
+    }
+    if (resolved.outcome) step.outcome = resolved.outcome;
+  } else if (request.kind === "table") {
     const effective = Math.min(max, value + request.bonus);
     const row = BASIC_BOOK_TABLES[request.tableId].rows.find((r) => r.min <= effective && effective <= r.max);
     const handler = ROW_HANDLERS[row.result.kind];
     if (!handler) throw notSupported(`${row.result.kind} (${request.tableId}, ${row.min}-${row.max})`);
-    resolved = handler(row, request, state.half, state);
+    resolved = handler(row, request, state.half, state, origin);
     Object.assign(step, { effective, row: structuredClone(row) });
     if (resolved.outcome) step.outcome = resolved.outcome;
   } else if (request.kind === "list") {
     const item = ALL_TABLES[request.tableId].items[value - 1];
     step.item = structuredClone(item);
-    resolved = { gains: [{ kind: "item", ...structuredClone(item), source: request.tableId, details: {} }] };
+    resolved = { gains: [{ kind: "item", ...structuredClone(item), source: request.tableId,
+      details: { components: [component("base", item.name, request.tableId)] } }] };
   } else if (request.kind === "expression" || request.kind === "twoDice") {
     const handler = EXPRESSION_HANDLERS[request.context?.action];
     if (!handler) throw notSupported(`expressão ${request.context?.action}`);
@@ -430,7 +493,18 @@ export function applyRoll(state, value, extra) {
   return { ...state, steps, gains, pending };
 }
 
-// Resolve a cadeia inteira com dados aleatórios (aba Rolar).
+const BASIC_BOOK = BASIC_BOOK_TABLES["8-3"].book;
+
+// Grupo de pesos do pedido, ou null quando a rolagem fica só no Livro Básico.
+function poolKeyOf(request) {
+  if (request.kind === "expression") return request.context?.subroll === "material" ? "material" : null;
+  if (request.kind !== "table") return null;
+  const { tableId, context } = request;
+  if (SPECIFIC_TABLES.includes(tableId)) return context?.tier ? `${tableId}/${context.tier}` : null;
+  return WEIGHTED_POOLS[tableId] ? tableId : null;
+}
+
+// Resolve a cadeia inteira com dados aleatórios (aba Gerar tesouros), com os pesos entre livros.
 export function resolveWithDice(state, rng) {
   let current = state;
   for (let request = nextStep(current), n = 0; request; request = nextStep(current), n++) {
@@ -442,7 +516,15 @@ export function resolveWithDice(state, rng) {
       const chosen = a === b ? a : randomInt(rng, 0, 1) === 0 ? a : b;
       current = applyRoll(current, chosen, { dice: [a, b] });
     } else {
-      current = applyRoll(current, rollDice(request.die, rng).total);
+      const key = poolKeyOf(request);
+      if (!key) {
+        current = advance(current, rollDice(request.die, rng).total);
+        continue;
+      }
+      const { tableId, share } = pickSource(key, { tableId: request.tableId }, rng);
+      const items = tableId === request.tableId ? undefined : eligibleItems(key, tableId);
+      const source = { book: items ? ALL_TABLES[tableId].book : BASIC_BOOK, tableId, share, ...(items ? { items } : {}) };
+      current = advance(current, rollDice(items ? listDie(items.length) : request.die, rng).total, undefined, source);
     }
   }
   return current;

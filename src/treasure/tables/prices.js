@@ -2,6 +2,7 @@
 // 3-6 (itens gerais, PDF 162-163), 3-7 (melhorias, PDF 170) e 3-9 (materiais, PDF 173).
 // Valores impressos como "T$ 1.500" viram número (1500); "—" continua texto.
 import { ENCHANTMENT_PRICES } from "./basicBook.js";
+import { THREATS_LISTS } from "./threats.js";
 
 export function normalizeName(name) {
   return String(name).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
@@ -189,12 +190,30 @@ export const MATERIAL_PRICES = Object.freeze(Object.fromEntries(
   Object.entries(MATERIAL_ROWS).map(([m, vals]) => [m, Object.freeze(Object.fromEntries(COLUMNS.map((c, i) => [c, vals[i]])))]),
 ));
 
+// Ameaças de Arton, Tabela 3-4: o preço de cada material vem impresso como um texto com as
+// cinco colunas ("Arma +T$ 750; Armadura leve +T$ 750; ..."). Vira a mesma estrutura da 3-9.
+const COLUMN_LABELS = ["Arma", "Armadura leve", "Armadura pesada", "Escudo", "Esotérico"];
+export function parseMaterialPriceText(text) {
+  const parts = String(text).split(";").map((p) => p.trim());
+  if (parts.length !== COLUMNS.length) throw new Error(`Preço de material ilegível: ${text}`);
+  return Object.fromEntries(parts.map((part, i) => {
+    const match = part.match(/^(.+?) \+T\$ (\d{1,3}(?:\.\d{3})*)$/);
+    if (!match || match[1] !== COLUMN_LABELS[i]) throw new Error(`Preço de material ilegível: ${text}`);
+    return [COLUMNS[i], Number(match[2].replaceAll(".", ""))];
+  }));
+}
+
+const OTHER_MATERIAL_PRICES = Object.fromEntries(THREATS_LISTS.find((l) => l.id === "ameacas/materiais").items
+  .map((item) => [normalizeName(item.name), Object.freeze(parseMaterialPriceText(item.price))]));
+
 const LIGHT_ARMOR = new Set(["armadura acolchoada", "armadura de couro", "couro batido", "gibao de peles", "couraca"].map(normalizeName));
 
-function materialPrice(material, base) {
+// Preço adicional do material (Tabela 3-9 ou Ameaças 3-4) para o item-base `{ name, category }`.
+export function materialPriceOf(material, base) {
   const key = normalizeName(material);
-  const entry = Object.entries(MATERIAL_PRICES).find(([name]) => normalizeName(name) === key);
-  return entry?.[1][materialColumn(base)];
+  const entry = Object.entries(MATERIAL_PRICES).find(([name]) => normalizeName(name) === key)?.[1]
+    ?? OTHER_MATERIAL_PRICES[key];
+  return entry?.[materialColumn(base)];
 }
 
 function materialColumn({ name, category }) {
@@ -208,11 +227,12 @@ function materialColumn({ name, category }) {
   return undefined;
 }
 
-// Preço de um item composto. `base` = { name, category } do item-base; `details` como no Gain
+// Preço de um item composto. `base` = { name, category, price? } do item-base (`price` = preço
+// impresso na lista de outro livro; sem ele, vale o Capítulo 3 do Livro Básico); `details` como no Gain
 // (improvements/enchantments/material); improvementCount/enchantmentCount substituem o tamanho
 // das listas quando há melhoria ou encanto que conta como dois.
 export function priceOf(details, base) {
-  const basePrice = basePriceOf(base.name);
+  const basePrice = base.price !== undefined ? base.price : basePriceOf(base.name);
   if (basePrice === undefined) return undefined;
   const improvements = details?.improvementCount ?? details?.improvements?.length ?? 0;
   const enchantments = details?.enchantmentCount ?? details?.enchantments?.length ?? 0;
@@ -221,7 +241,7 @@ export function priceOf(details, base) {
   let total = typeof basePrice === "number" ? basePrice : 0;
   if (improvements > 0) total += IMPROVEMENT_PRICES[Math.min(improvements, 4)];
   if (details?.material) {
-    const extra = materialPrice(details.material, base);
+    const extra = materialPriceOf(details.material, base);
     if (typeof extra === "number") total += extra;
   }
   if (enchantments > 0) total += ENCHANTMENT_PRICES[Math.min(enchantments, 3)].price;

@@ -300,7 +300,8 @@ function scriptedRng(fractions, fallback = createRng("roteiro")) {
 
 const itemsChain = (nd) => startTreasure({ challengeRating: nd, column: "items", mode: "padrão" })[0];
 const itemGain = (name, category, details = {}, extra = {}) => ({ kind: "item", name, category, ...extra, details });
-const stripSource = (gains) => gains.map(({ source, ...g }) => g);
+// Tira `source` e `details.components` (conferidos nos testes de pesos entre livros).
+const stripSource = (gains) => gains.map(({ source, details: { components, ...details }, ...g }) => ({ ...g, details }));
 
 test("diverse: d% on 8-3 gives an item with its Chapter 3 price", () => {
   const s1 = applyRoll(itemsChain("1"), 50);
@@ -497,9 +498,9 @@ test("2D in Consultar: the GM enters the chosen die", () => {
 
 test("2D in Rolar: equal dice need no draw; different dice pick one with equal chance", () => {
   const s1 = applyRoll(itemsChain("4"), 31);
-  const same = scriptedRng([face(3, 6), face(3, 6), face(40, 100)]);
+  const same = scriptedRng([face(3, 6), face(3, 6), 0.1, face(40, 100)]); // 0.1: fonte = Livro Básico
   const a = resolveWithDice(s1, same);
-  assert.equal(same.calls, 3);
+  assert.equal(same.calls, 4);
   const typeStep = a.steps.find((s) => s.kind === "twoDice");
   assert.deepEqual(typeStep.dice, [3, 3]);
   assert.equal(typeStep.chosen, 3);
@@ -759,7 +760,8 @@ test("listDie builds 1d<n> and the engine yields the v-th item", () => {
   assert.equal(request.die, "1d23");
   const first = applyRoll(state, 1);
   assert.equal(nextStep(first), null);
-  assert.deepEqual(first.gains, [{ kind: "item", source: "herois/acessorios/menor", name: "Algibeira mordedora", category: "acessório", price: 1000, tier: "menor", details: {} }]);
+  assert.deepEqual(first.gains, [{ kind: "item", source: "herois/acessorios/menor", name: "Algibeira mordedora", category: "acessório", price: 1000, tier: "menor",
+    details: { components: [{ role: "base", name: "Algibeira mordedora", book: "Heróis de Arton", bookPage: 265 }] } }]);
   const lastItem = applyRoll(state, 23);
   assert.equal(lastItem.gains[0].name, LIST_TABLES["herois/acessorios/menor"].items[22].name);
   assert.equal(lastItem.gains[0].name, "Saco dos ventos silenciosos");
@@ -768,7 +770,8 @@ test("listDie builds 1d<n> and the engine yields the v-th item", () => {
   assert.throws(() => applyRoll(state, 24), RangeError);
   assert.throws(() => applyRoll(state, 1.5), RangeError);
   const melhoria = applyRoll(startTable("deuses/melhorias"), 3).gains[0];
-  assert.deepEqual(melhoria, { kind: "item", source: "deuses/melhorias", name: "Inscrito", category: "melhoria", appliesTo: ["armadura", "ferramenta", "vestuário"], details: {} });
+  assert.deepEqual(melhoria, { kind: "item", source: "deuses/melhorias", name: "Inscrito", category: "melhoria", appliesTo: ["armadura", "ferramenta", "vestuário"],
+    details: { components: [{ role: "base", name: "Inscrito", book: "Deuses de Arton", bookPage: 54 }] } });
 });
 
 test("resolveWithDice picks uniformly from a list and is reproducible", () => {
@@ -922,4 +925,184 @@ test("improvement lists: printed order, categories and appliesTo from the printe
       assert.equal(i.subroll, undefined, i.name);
     }
   }
+});
+
+// ---------- Pesos entre livros (ajustes, Task 3) ----------
+import { WEIGHTED_POOLS, pickSource } from "../src/treasure/bookWeights.js";
+import { parseMaterialPriceText, materialPriceOf } from "../src/treasure/tables/prices.js";
+
+const BASIC = "Livro Básico";
+const fixed = (x) => () => x;
+
+test("pickSource: Livro Básico below 0.7, another book from 0.7 up", () => {
+  assert.deepEqual(pickSource("8-3", { tableId: "8-3" }, fixed(0.69)), { tableId: "8-3", share: 0.7 });
+  const other = pickSource("8-3", { tableId: "8-3" }, fixed(0.7));
+  assert.notEqual(other.tableId, "8-3");
+  assert.equal(ALL_TABLES[other.tableId].kind, "list");
+  assert.equal(pickSource("8-3", { tableId: "8-3" }, fixed(0.999)).tableId, "deuses/itens-gerais");
+  assert.equal(pickSource("8-3", { tableId: "8-3" }, fixed(0.7)).tableId, "ameacas/itens-gerais");
+  assert.equal(WEIGHTED_POOLS["8-3"].basicShare, 0.7);
+});
+
+test("pickSource: Livro Básico share stays between 67% and 73% in 10,000 draws", () => {
+  const rng = createRng("pesos");
+  let basic = 0;
+  for (let i = 0; i < 10000; i++) if (pickSource("8-4/arma", { tableId: "8-4/arma" }, rng).tableId === "8-4/arma") basic++;
+  assert.ok(basic >= 6700 && basic <= 7300, `${basic}`);
+});
+
+test("pickSource: other books split 30% in proportion to eligible item counts", () => {
+  const n = { "ameacas/itens-gerais": 44, "herois/itens-gerais": 137, "deuses/itens-gerais": 70 };
+  const total = 44 + 137 + 70;
+  const rng = createRng("proporcao");
+  const seen = {};
+  for (let i = 0; i < 20000; i++) {
+    const { tableId, share } = pickSource("8-3", { tableId: "8-3" }, rng);
+    if (tableId === "8-3") continue;
+    assert.ok(Math.abs(share - 0.3 * n[tableId] / total) < 1e-12, tableId);
+    seen[tableId] = (seen[tableId] ?? 0) + 1;
+  }
+  const others = Object.values(seen).reduce((a, b) => a + b, 0);
+  for (const [id, count] of Object.entries(n)) {
+    assert.ok(Math.abs(seen[id] / others - count / total) < 0.03, `${id}: ${seen[id] / others}`);
+  }
+  // 8-5 filtra por appliesTo: armas = 6 de Heróis + 3 de Deuses
+  const imp = new Set();
+  for (let i = 0; i < 2000; i++) imp.add(JSON.stringify(pickSource("8-5/arma", { tableId: "8-5/arma" }, rng)));
+  const shares = [...imp].map((s) => JSON.parse(s)).filter((s) => s.tableId !== "8-5/arma");
+  assert.deepEqual(shares.map((s) => s.tableId).sort(), ["deuses/melhorias", "herois/melhorias"]);
+  assert.ok(Math.abs(shares.find((s) => s.tableId === "herois/melhorias").share - 0.3 * 6 / 9) < 1e-12);
+});
+
+test("pickSource: category without list is 100% Livro Básico", () => {
+  for (const key of ["8-9/menor", "8-11/menor", "8-4/esotérico", "8-12", "8-8"]) {
+    for (const x of [0, 0.5, 0.7, 0.999]) {
+      assert.deepEqual(pickSource(key, { tableId: key.split("/")[0] === "8-4" ? key : key.split("/")[0] }, fixed(x)).share, 1, key);
+    }
+  }
+  // cadeia com esotérico: o passo de 8-4/esotérico nunca sorteia outro livro
+  const rng = scriptedRng([face(70, 100), face(6, 6), 0.99]);
+  const done = resolveWithDice(itemsChain("1"), rng);
+  const eso = done.steps.find((s) => s.tableId === "8-4/esotérico");
+  assert.equal(eso.sourceBook, BASIC);
+  assert.equal(eso.share, 1);
+  assert.equal(done.gains[0].category, "esotérico");
+});
+
+test("resolveWithDice: other-book improvements reroll duplicates by name and record their source", () => {
+  const rng = scriptedRng([
+    face(95, 100), face(1, 6), // superior 2 melhorias, arma
+    0.1, face(40, 100), // Livro Básico: Espada longa
+    0.99, face(2, 3), // Deuses: Canônico
+    0.99, face(2, 3), // Canônico de novo: repetida
+    0.1, face(14, 100), // Livro Básico: Certeira
+  ]);
+  const done = resolveWithDice(itemsChain("5"), rng);
+  assert.equal(nextStep(done), null);
+  const [gain] = done.gains;
+  assert.equal(gain.name, "Espada longa (canônico, certeira)");
+  assert.deepEqual(gain.details.improvements, ["Canônico", "Certeira"]);
+  assert.equal(gain.price, 15 + 3000);
+  const rejected = done.steps.find((s) => s.outcome?.rejected);
+  assert.equal(rejected.outcome.rejected, "repetida");
+  assert.equal(rejected.sourceBook, "Deuses de Arton");
+  assert.equal(rejected.sourceTableId, "deuses/melhorias");
+  assert.ok(Math.abs(rejected.share - 0.3 * 3 / 9) < 1e-12);
+  assert.equal(rejected.die, "1d3");
+  const base = done.steps.find((s) => s.tableId === "8-4/arma");
+  assert.deepEqual([base.sourceBook, base.sourceTableId, base.share], [BASIC, "8-4/arma", 0.7]);
+  assert.deepEqual(gain.details.components, [
+    { role: "base", name: "Espada longa", book: BASIC, bookPage: 331 },
+    { role: "melhoria", name: "Canônico", book: "Deuses de Arton", bookPage: 54 },
+    { role: "melhoria", name: "Certeira", book: BASIC, bookPage: 332 },
+  ]);
+});
+
+test("Ameaças material prices parse into the per-type columns", () => {
+  assert.deepEqual(parseMaterialPriceText("Arma +T$ 600; Armadura leve +T$ 1.500; Armadura pesada +T$ 3.000; Escudo +T$ 1.500; Esotérico +T$ 400"),
+    { arma: 600, "armadura leve": 1500, "armadura pesada": 3000, escudo: 1500, esotérico: 400 });
+  assert.throws(() => parseMaterialPriceText("Arma +T$ 600"));
+  assert.equal(materialPriceOf("Casco de monstro", { name: "Espada longa", category: "arma" }), 750);
+  assert.equal(materialPriceOf("adamante", { name: "Completa", category: "armadura" }), 18000);
+});
+
+test("item gains carry components with book and page, and the computed price", () => {
+  // material de Ameaças numa armadura completa
+  const mat = resolveWithDice(itemsChain("2"), scriptedRng([
+    face(95, 100), face(4, 6), 0.1, face(11, 100), 0.1, face(41, 100), 0.99, face(3, 3),
+  ]));
+  const [armor] = mat.gains;
+  assert.equal(armor.name, "Completa (material especial: Prata)");
+  assert.equal(armor.details.material, "Prata");
+  assert.equal(armor.price, 3000 + 300 + 3000);
+  assert.equal(armor.details.priceNote, undefined);
+  assert.deepEqual(armor.details.components, [
+    { role: "base", name: "Completa", book: BASIC, bookPage: 331 },
+    { role: "melhoria", name: "Material especial", book: BASIC, bookPage: 332 },
+    { role: "material", name: "Prata", book: "Ameaças de Arton", bookPage: 400 },
+  ]);
+  // item geral de Deuses pela 8-3
+  const div = resolveWithDice(itemsChain("1"), scriptedRng([face(50, 100), 0.99, face(1, 70)]));
+  assert.equal(div.gains[0].name, "Água benta concentrada");
+  assert.equal(div.gains[0].price, 60);
+  assert.equal(div.gains[0].source, "deuses/itens-gerais");
+  assert.deepEqual(div.gains[0].details.components, [{ role: "base", name: "Água benta concentrada", book: "Deuses de Arton", bookPage: 50 }]);
+  // arma de outro livro como base de item superior: preço da lista
+  const sup = resolveWithDice(itemsChain("2"), scriptedRng([face(95, 100), face(1, 6), 0.7, face(1, 16), 0.1, face(14, 100)]));
+  assert.equal(sup.gains[0].name, "Porrete (certeira)");
+  assert.equal(sup.gains[0].price, 2 + 300);
+  assert.equal(sup.gains[0].details.components[0].book, "Ameaças de Arton");
+  // específica de Heróis da mesma categoria do item mágico (médio)
+  const spec = resolveWithDice(itemsChain("13"), scriptedRng([face(100, 100), face(1, 6), 0.1, face(40, 100), face(1, 100), face(95, 100), 0.99, face(1, 6)]));
+  const [s] = spec.gains;
+  assert.equal(s.source, "herois/armas-especificas/medio");
+  assert.equal(s.tier, "médio");
+  assert.equal(s.details.specific, true);
+  assert.deepEqual(s.details.components, [{ role: "específico", name: s.name, book: "Heróis de Arton", bookPage: 257 }]);
+  // poção: só Livro Básico, componente base com a página da 8-12
+  const pot = resolveWithDice(itemsChain("1"), scriptedRng([face(95, 100), face(1, 100)]));
+  assert.deepEqual(pot.gains[0].details.components, [{ role: "base", name: pot.gains[0].name, book: BASIC, bookPage: BASIC_BOOK_TABLES["8-12"].bookPage }]);
+  // encanto
+  const mag = resolveWithDice(itemsChain("9"), scriptedRng([face(100, 100), face(1, 6), 0.1, face(40, 100), face(1, 100)]));
+  assert.deepEqual(mag.gains[0].details.components.map((c) => c.role), ["base", "encanto"]);
+});
+
+test("applyRoll never records a source book other than Livro Básico", () => {
+  const rng = createRng("livro");
+  for (const nd of ["2", "5", "9", "13", "17", "20"]) {
+    for (let i = 0; i < 60; i++) {
+      let s = itemsChain(nd);
+      for (let r = nextStep(s); r; r = nextStep(s)) {
+        const [min, max] = dieRange(r.die);
+        s = applyRoll(s, randomIntIn(rng, min, max));
+      }
+      for (const step of s.steps) {
+        assert.ok(step.sourceBook === undefined || step.sourceBook === BASIC);
+        assert.ok(step.sourceTableId === undefined || !ALL_TABLES[step.sourceTableId] || ALL_TABLES[step.sourceTableId].kind !== "list");
+      }
+      for (const g of s.gains) for (const c of g.details.components) assert.equal(c.book, BASIC);
+    }
+  }
+});
+
+function randomIntIn(rng, min, max) {
+  return Math.floor(rng() * (max - min + 1)) + min;
+}
+
+test("performance with book weights: 396 ND 20 Dobro chains (both columns) under 500 ms", () => {
+  const rng = createRng("desempenho-pesos");
+  const t0 = performance.now();
+  let chains = 0;
+  for (const column of ["money", "items"]) {
+    for (let i = 0; i < 99; i++) {
+      for (const state of startTreasure({ challengeRating: "20", column, mode: "dobro" })) {
+        resolveWithDice(state, rng);
+        chains++;
+      }
+    }
+  }
+  const ms = performance.now() - t0;
+  console.log(`# perf pesos: ${chains} cadeias em ${ms.toFixed(1)} ms`);
+  assert.equal(chains, 396);
+  assert.ok(ms < 500, `${ms} ms`);
 });
