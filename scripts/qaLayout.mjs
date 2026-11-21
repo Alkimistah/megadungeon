@@ -80,6 +80,47 @@ async function checkFooter(page, viewport) {
   console.log(`ok ${tag}`);
 }
 
+// Sem rolar: o conteudo em repouso nao pode ficar atras do rodape.
+async function checkAtRest(page, viewport) {
+  const tag = `${viewport.width}x${viewport.height}`;
+  const data = await page.evaluate(() => {
+    const footerTop = document.querySelector(".floating-tools").getBoundingClientRect().top;
+    const container = document.getElementById("container");
+    return {
+      footerTop,
+      mainBottom: document.querySelector("main").getBoundingClientRect().bottom,
+      containerBottom: container.getBoundingClientRect().bottom,
+      pageScroll: document.documentElement.scrollHeight - window.innerHeight
+    };
+  });
+  assert(data.mainBottom <= data.footerTop + 1, `[${tag}] main (${data.mainBottom}) atras do rodape (${data.footerTop})`);
+  assert(data.containerBottom <= data.footerTop + 1, `[${tag}] #container (${data.containerBottom}) atras do rodape (${data.footerTop})`);
+  assert(data.pageScroll <= 1, `[${tag}] pagina com rolagem vertical causada pelo rodape: ${data.pageScroll}`);
+}
+
+// Tempo total visivel (faixa 11-20): forca a exibicao e confere que cabe.
+async function checkTotalVariant(page, viewport) {
+  await page.evaluate(() => {
+    document.getElementById("totalTimeTracker").hidden = false;
+    document.getElementById("totalTimeTrackerValue").textContent = "99h 59min";
+    document.getElementById("timeTrackerValue").textContent = "99h 59min";
+  });
+  for (const width of [viewport.width, 600]) {
+    await page.setViewportSize({ width, height: viewport.height });
+    const d = await page.evaluate(() => {
+      const f = document.querySelector(".floating-tools");
+      const vw = document.documentElement.clientWidth;
+      const items = [...f.querySelectorAll("button"), document.getElementById("timeTracker")].map((e) => e.getBoundingClientRect());
+      return { scrollWidth: f.scrollWidth, clientWidth: f.clientWidth, vw, inside: items.every((r) => r.left >= 0 && r.right <= vw + 0.5), height: f.getBoundingClientRect().height, toolbar: parseFloat(getComputedStyle(document.body).getPropertyValue("--toolbar-height")) };
+    });
+    assert(d.scrollWidth <= d.clientWidth, `[total ${width}] rodape com overflow horizontal ${d.scrollWidth} > ${d.clientWidth}`);
+    assert(d.inside, `[total ${width}] itens fora da viewport`);
+    assert(d.height <= d.toolbar + 0.5, `[total ${width}] rodape maior que --toolbar-height`);
+    await page.screenshot({ path: `${SHOT_DIR}/rodape-total-${width}x${viewport.height}.png` });
+    console.log(`ok total ${width}`);
+  }
+}
+
 async function checkNarrow(page) {
   await page.setViewportSize({ width: 480, height: 800 });
   const visible = await page.locator(".floating-tools button span").evaluateAll((els) => els.map((e) => getComputedStyle(e).display !== "none" && e.getBoundingClientRect().width > 0));
@@ -95,8 +136,11 @@ try {
   for (const viewport of VIEWPORTS) {
     const page = await browser.newPage({ viewport });
     await startRange(page);
+    await checkAtRest(page, viewport);
     await checkFooter(page, viewport);
     if (viewport.width === 1024) await checkNarrow(page);
+    await page.setViewportSize(viewport);
+    await checkTotalVariant(page, viewport);
     await page.close();
   }
   console.log("qa:layout passou");
