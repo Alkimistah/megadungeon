@@ -59,7 +59,7 @@ Ao entrar numa faixa, o app aplica o tema da faixa, como já faz hoje. A paleta 
 
 ### Modal “Sobre o app”
 
-O botão **Sobre o app** abre uma modal em tela cheia, que segue o padrão da seção 2 e a paleta da tela inicial, por cima da tela inicial. O texto abaixo é um rascunho do gerente e precisa da revisão do PO antes da implementação. Os títulos são seções da modal.
+O botão **Sobre o app** abre uma modal em tela cheia, que segue o padrão da seção 2 e a paleta da tela inicial, por cima da tela inicial. O texto abaixo foi aprovado pelo PO. Os títulos são as seções da modal.
 
 > **Para que serve**
 > O Mega Dungeon de Práxis é um gerador de aventuras para Tormenta20 pensado para usar na mesa, no tablet do mestre. Ele conduz uma expedição pela Mega Dungeon, andar por andar: sorteia caminhos, cenas, encontros, missões e tesouros, e guarda o progresso para a próxima sessão. O mestre continua no controle; o app cuida das tabelas e da memória da expedição.
@@ -81,9 +81,9 @@ O botão **Sobre o app** abre uma modal em tela cheia, que segue o padrão da se
 > Durante a expedição, o progresso é salvo automaticamente no aparelho, e só existe uma expedição salva por vez. Ao fim de cada sessão, vale exportar o arquivo de sessão pelo botão no topo da tela, como garantia. Ao vencer o desafio final de uma faixa, o app oferece avançar para a próxima ou encerrar a expedição.
 >
 > **Sobre o projeto**
-> Feito por Práxis para as próprias mesas de Tormenta20. Tormenta20 é um jogo da Jambô Editora; este app é um projeto de fã, sem vínculo oficial. Ícones de game-icons.net (CC BY 3.0); créditos completos no repositório.
+> O app nasceu para a Mega Dungeon de Práxis, a masmorra que se estende sob a cidade de Práxis, e acompanha as expedições dessa campanha. As faixas, porém, servem para qualquer aventura parecida: a Masmorra funciona para outras explorações de masmorras, e a Floresta e o Arquipélago para explorações nos ermos. Basta escolher a faixa de andares cujo nível e ambiente combinam com a exploração da sua mesa. Tormenta20 é um jogo da Jambô Editora; este app é um projeto de fã, sem vínculo oficial.
 
-A última linha do texto credita os ícones dentro do app, de forma discreta, sem aparecer na tela inicial. Se o PO preferir, ela sai, e o crédito fica só no `CREDITOS.md`.
+O texto foi revisado pelo PO: Práxis é a cidade onde fica a Mega Dungeon, e o crédito dos ícones fica só no `CREDITOS.md`.
 
 ### Remoções
 
