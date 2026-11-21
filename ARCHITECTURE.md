@@ -514,7 +514,14 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
 - **"Sobre o app".** `#aboutButton` fica à esquerda do rodapé da tela inicial e abre `#aboutDialog` em tela cheia, com a paleta da tela inicial. O texto foi aprovado no spec.
 - **Créditos.** Os ícones de terceiros e suas licenças estão em `CREDITOS.md`.
 
-**Ponto de recomeço.** O plano de tela inicial, modais e rodapé está concluído: as tarefas 1 a 6 estão entregues. Falta a revisão final do branch inteiro, a partir de `1c04d27`, que o gerente está executando agora. O ledger está em `.superpowers/sdd/2026-11-21-tela-inicial-e-modais/progress.md`, que é ignorado pelo Git. Se ele se perder, use o `git log` a partir de `1c04d27`. Continuam abertos:
+**Ponto de recomeço.** O plano de tela inicial, modais e rodapé está concluído, com a revisão final do branch (`1c04d27..`) e uma rodada de correções. As correções foram:
+- uma Masmorra nova volta a começar depois de “Encerrar expedição”, com o estado estendido reiniciado em `startNewExpedition`;
+- Esc não fecha mais a tela inicial (`cancel` e `keydown` barrados), o que impedia sobrescrever a expedição salva sem aviso;
+- `autosaveActive` fica desligado durante o Avançar;
+- `#rangeConfirm` e `#importSessionFile` ficam desabilitados até a leitura do salvamento;
+- o `aria-label` do contador é limpo fora da floresta.
+
+Continuam abertos:
 
 1. **Correção de interface pedida pelo PO:** o rodapé de ferramentas ocupa mais altura do que precisa. Acima dos botões fica a borda que marca o fim do conteúdo, e o rodapé ainda avança mais uma faixa, tirando espaço da tela. O rodapé deve usar só a altura necessária. Se essa faixa precisar existir, deve ter fundo transparente, para não cobrir nem escurecer o andar em exploração.
 2. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
@@ -525,14 +532,13 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
      - Hoje o app só os menciona como valor de “Entrega/cristais” nas recompensas de missão (`missionDialog.js`) e em textos de missão. Não existe um sistema de cristais com valores.
      - A ideia é oferecer cristais como opção de rolagem nas duas abas: Gerar tesouros (em lote) e Rolar na mesa (individual).
      - Antes de implementar, é preciso levantar com o PO as regras dos cristais: o que são, como se obtêm e quanto valem por ND.
-3. **Revisão final do branch inteiro**, a partir de `1c04d27`. Ela deve conferir também estes pontos menores, já anotados:
-   - O `aria-label` do `#timeTracker` não é limpo fora da floresta.
-   - A mensagem “560px” em `qaLayout.mjs` está desatualizada.
-   - O `qaLayout.mjs` fixa os rótulos curtos do contador em vez de usar os do app.
-   - O `blur()` depois de abrir a tela inicial enfraquece o foco inicial para leitores de tela.
-   - O `qaMissionFlows.mjs` aceita qualquer diálogo do navegador sem conferir o texto.
-   - O `qaHome` não testa o aceite da confirmação ao clicar em Iniciar.
-   - O `openQuickTool` localiza o diálogo pelo que estiver aberto, em vez de recebê-lo como parâmetro.
+3. **Origem de ícones a confirmar com o PO.** O `CREDITOS.md` lista numa seção própria os ícones sem origem confirmada: `boss`, `camp`, `elite`, `trap`, `treasure`, `normal`, `unknown`, `hidden-forest`, `archipelago-boat`, `close-modal`, `earth-arrow-left`, `info` e `expand-*`. Se vierem do game-icons.net, passam para a seção Game Icons.
+4. **Pontos menores, sem urgência:**
+   - o `qaLayout.mjs` fixa os rótulos curtos do contador;
+   - o `blur()` ao abrir a tela inicial enfraquece o foco inicial para leitores de tela;
+   - o `qaMissionFlows.mjs` aceita qualquer diálogo sem conferir o texto;
+   - o `openQuickTool` acha o diálogo pelo que estiver aberto;
+   - o Avançar para a 11–20 usa o valor do interruptor de caminhos desconhecidos que ficou na tela inicial, sem perguntar.
 
 ---
 

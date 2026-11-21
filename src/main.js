@@ -1267,6 +1267,11 @@ function bindEvents() {
   });
 
   elements.rangeDialog.addEventListener("cancel", (event) => event.preventDefault());
+  // O Chrome só deixa o "cancel" ser cancelado de novo após uma interação; um segundo Esc seguido fecharia a
+  // tela inicial. Barrar a tecla na própria tela cobre esse caso. Modais abertas por cima recebem o Esc antes.
+  elements.rangeDialog.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") event.preventDefault();
+  });
 
   elements.resumeExpedition.addEventListener("click", () => {
     try {

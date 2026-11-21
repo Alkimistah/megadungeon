@@ -184,9 +184,13 @@ async function checkReplaceConfirm(page, dialogs) {
 
 async function checkEscAndAccept(page, dialogs) {
   const before = JSON.parse(await readAutosave(page));
+  // Dois Esc seguidos: o Chrome só deixa cancelar o "cancel" de novo após interação, então o segundo Esc
+  // também precisa ser barrado.
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(100);
   await page.keyboard.press("Escape");
   await page.waitForTimeout(200);
-  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "Esc nao deve fechar a tela inicial");
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "Esc (duas vezes) nao deve fechar a tela inicial");
 
   // Aceitar a confirmacao: abre a selecao de missoes e, ao confirmar, o autosave passa a ser o da faixa nova.
   dialogs.length = 0;
