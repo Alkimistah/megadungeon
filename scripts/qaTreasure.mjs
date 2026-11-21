@@ -48,6 +48,28 @@ try {
   assert.equal(await tabs.nth(0).getAttribute("aria-selected"), "true", "seta esquerda volta à primeira");
   assert.equal(await panels.nth(0).isVisible(), true);
   assert.equal(await panels.nth(1).isVisible(), false);
+  // Seletor segmentado: controle compacto com borda e cantos arredondados; painel com os quatro cantos arredondados.
+  for (const vp of [{ width: 1024, height: 768 }, { width: 768, height: 1024 }]) {
+    await page.setViewportSize(vp);
+    const g = await page.evaluate(() => {
+      const tabsEl = document.querySelector("#treasureDialog .treasure-tabs");
+      const panel = document.getElementById("treasurePanelRoll");
+      const ts = getComputedStyle(tabsEl);
+      const [t0, t1] = [...tabsEl.querySelectorAll("[role=tab]")];
+      return { border: ts.borderTopWidth, radius: parseFloat(ts.borderTopLeftRadius), tabsW: tabsEl.getBoundingClientRect().width, panelW: panel.getBoundingClientRect().width,
+        top0: Math.round(t0.getBoundingClientRect().top), top1: Math.round(t1.getBoundingClientRect().top),
+        activeBg: getComputedStyle(t0).backgroundColor, idleBg: getComputedStyle(t1).backgroundColor,
+        corners: ["TopLeft", "TopRight", "BottomLeft", "BottomRight"].map(c => parseFloat(getComputedStyle(panel)[`border${c}Radius`])) };
+    });
+    const at = `(${vp.width}x${vp.height})`;
+    assert.notEqual(g.border, "0px", `controle tem borda ${at}`);
+    assert.ok(g.radius > 0, `controle arredondado ${at}`);
+    assert.ok(g.tabsW < g.panelW, `controle não ocupa a linha inteira ${at}`);
+    assert.equal(g.top0, g.top1, `abas na mesma linha ${at}`);
+    assert.notEqual(g.activeBg, g.idleBg, `aba ativa com fundo diferente ${at}`);
+    assert.ok(g.corners.every(c => c > 0), `painel com quatro cantos arredondados ${at}`);
+  }
+  await page.setViewportSize({ width: 1024, height: 768 });
 
   // A seleção de missões reabre sozinha ao fechar e pode ficar por cima: reabre a modal de tesouros no topo.
   await page.waitForTimeout(500);
@@ -313,7 +335,7 @@ try {
       return { dialogBg: d.backgroundColor, cardBg: card.backgroundColor, tabBg: tab.backgroundColor, tabBorder: tab.borderBottomColor, panelBg: panel.backgroundColor, idleBg: idle.backgroundColor,
         surface: toRgb(root.getPropertyValue("--surface").trim()), page2: toRgb(root.getPropertyValue("--page").trim()),
         page: toRgb(root.getPropertyValue("--page").trim()), alt: toRgb(root.getPropertyValue("--surface-alt").trim()),
-        hover: toRgb(root.getPropertyValue("--action-hover").trim()) };
+        hover: toRgb(root.getPropertyValue("--action-hover").trim()), action: toRgb(root.getPropertyValue("--action").trim()) };
     });
     await p.locator("#treasureDialog").screenshot({ path: shot(`treasure-rolar-${ids[profileIndex]}.png`) });
     await p.locator("#treasurePanelRoll").evaluate(el => { el.scrollTop = el.scrollHeight; });
@@ -328,9 +350,8 @@ try {
     assert.equal(t.dialogBg, t.page, `fundo da modal = --page (${t.id})`);
     assert.equal(t.cardBg, t.alt, `cartão = --surface-alt (${t.id})`);
     assert.equal(t.panelBg, t.surface, `painel = --surface (${t.id})`);
-    assert.equal(t.tabBg, t.panelBg, `aba ativa fundida ao painel (${t.id})`);
-    assert.equal(t.tabBorder, t.panelBg, `aba ativa sem borda inferior visível (${t.id})`);
-    assert.equal(t.idleBg, t.page2, `aba inativa rebaixada = --page (${t.id})`);
+    assert.equal(t.tabBg, t.action, `aba ativa = --action (${t.id})`);
+    assert.notEqual(t.idleBg, t.tabBg, `aba inativa difere da ativa (${t.id})`);
   }
   assert.notEqual(themeA.dialogBg, themeB.dialogBg, "perfis diferentes têm fundos diferentes");
   assert.notEqual(themeA.cardBg, themeB.cardBg);
