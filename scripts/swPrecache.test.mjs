@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
-import { buildIdOf, injectPrecache } from "../build/swPrecache.js";
+import { buildIdOf, injectPrecache, listDistFiles } from "../build/swPrecache.js";
 
 const src = readFileSync("public/sw.js", "utf8");
 
@@ -21,4 +23,14 @@ test("cache name changes when content changes", () => {
 });
 test("public sw.js carries both markers", () => {
   assert.doesNotThrow(() => injectPrecache(readFileSync("public/sw.js", "utf8"), [], "x"));
+});
+test("listDistFiles lists assets with / separators and skips excluded files", () => {
+  const dir = mkdtempSync(join(tmpdir(), "swp-"));
+  try {
+    mkdirSync(join(dir, "assets", "icons"), { recursive: true });
+    for (const f of ["sw.js", "index.html", "manifest.webmanifest", "assets/a.js", "assets/a.js.map", "assets/icons/x.svg"]) writeFileSync(join(dir, f), "x");
+    assert.deepEqual(listDistFiles(dir), ["assets/a.js", "assets/icons/x.svg"]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

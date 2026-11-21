@@ -7,6 +7,7 @@ import { startTreasure, startTable, nextStep, applyRoll, resolveWithDice } from 
 import { BASE_PRICES, NAME_ALIASES, IMPROVEMENT_PRICES, MATERIAL_PRICES, normalizeName, basePriceOf, priceOf } from "../src/treasure/tables/prices.js";
 import { createRng } from "../src/random.js";
 import { summarizeGains } from "../src/treasure/treasureSummary.js";
+import { stepReference } from "../src/treasure/treasureFormat.js";
 
 const row = (id, min) => BASIC_BOOK_TABLES[id].rows.find((r) => r.min === min);
 
@@ -1271,8 +1272,6 @@ test("weighted 8-3 pool excludes services but lists keep them", () => {
     for (const g of done.gains) assert.ok(!services.includes(g.name), g.name);
   }
 });
-
-import { stepReference } from "../src/treasure/treasureFormat.js";
 
 test("stepReference shows only the page for basic book tables", () => {
   assert.equal(stepReference({ tableId: "8-1/1/money" }), "p. 328");

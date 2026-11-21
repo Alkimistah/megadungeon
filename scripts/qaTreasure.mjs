@@ -219,6 +219,7 @@ try {
   await apply(40);
   assert.match(await page.locator("#treasureDialog .treasure-consult-history").innerText(), /Equipamento/);
   assert.ok(await page.locator("#treasureDialog .treasure-consult-history .treasure-step-ref").count() >= 1, "página no histórico");
+  assert.match(await page.locator("#treasureDialog .treasure-consult-history .treasure-step-ref").first().innerText(), /^\((.+ )?p\. \d+\)$/, "formato da página no histórico");
   assert.match(await page.locator(`${C} .treasure-consult-reason`).innerText(), /Tipo do equipamento/);
   await apply(2);
   assert.match(await page.locator(`${C} .treasure-consult-step`).innerText(), /8-4/, "abre na 8-4 de armas");

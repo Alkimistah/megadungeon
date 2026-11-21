@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const BUILD_ID_LINE = /^const BUILD_ID = "[^"]*";$/m;
@@ -52,6 +52,7 @@ export function swPrecachePlugin() {
       const entries = [...files, "index.html", "manifest.webmanifest"].map(path => ({ path, content: readFileSync(join(outDir, path)) }));
       const buildId = buildIdOf(entries);
       const swPath = join(outDir, "sw.js");
+      if (!existsSync(swPath)) throw new Error(`swPrecache: ${swPath} não encontrado; public/sw.js existe?`);
       writeFileSync(swPath, injectPrecache(readFileSync(swPath, "utf8"), files, buildId));
       console.log(`sw precache: ${files.length} arquivos, build ${buildId}`);
     }

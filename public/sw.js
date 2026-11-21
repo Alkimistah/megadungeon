@@ -8,7 +8,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll([...ASSETS, ...PRECACHE.map((p) => BASE_URL + p)]))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll([...ASSETS, ...PRECACHE.map((p) => BASE_URL + p)].map((u) => new Request(u, { cache: "reload" }))))
   );
 });
 
@@ -42,6 +42,7 @@ self.addEventListener("fetch", (event) => {
 
         return networkResponse;
       })
+      // O hosting/preview envia Vary: Origin; o pré-cache guarda sem Origin, então o match precisa ignorar o Vary.
       .catch(() => caches.match(event.request, { ignoreVary: true }))
   );
 });

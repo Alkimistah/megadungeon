@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import { chromium } from "@playwright/test";
 
-// Roteiro offline: a modal de tesouros precisa abrir sem rede depois de uma recarga.
-// Segue o contrato offline de scripts/qaForestMvp.mjs (offlineFlow): controle do service worker, recarga online
-// para os assets passarem pelo SW, recarga sem rede. Roda contra o build de produção (vite preview).
+// Roteiro offline: a modal de tesouros precisa abrir sem rede. Dois cenários, contra o build de produção (vite preview):
+// 1) visita recorrente: segue o contrato de scripts/qaForestMvp.mjs (offlineFlow): controle do service worker,
+//    recarga online para os assets passarem pelo SW, recarga sem rede;
+// 2) primeira visita: contexto novo sem recarga online; o pré-cache do install precisa bastar (inclui um ícone
+//    do PRECACHE que a primeira tela nunca requisitou).
 const url = process.env.QA_APP_URL || "http://localhost:4174/megadungeon/";
 const browser = await chromium.launch({ headless: true, executablePath: process.env.QA_CHROME || "/usr/bin/google-chrome", args: ["--no-sandbox"] });
 const errors = [];
@@ -67,6 +69,7 @@ try {
   await passRangeDialog(firstPage);
   const controlled = await swControls(firstPage).then(() => true, () => false);
   if (!controlled) {
+    console.log("NOTA: service worker não controlou a primeira carga; recarga de fallback executada");
     await firstPage.reload();
     await swControls(firstPage);
   }
@@ -76,6 +79,14 @@ try {
     const urls = (await (await caches.open(name)).keys()).map(request => request.url);
     return urls.some(u => /treasureDialog.*\.js$/.test(u));
   }, null, { timeout: 15000 });
+  // Um ícone do PRECACHE que a página não requisitou precisa estar no cache (só o install pode tê-lo posto).
+  const unrequested = await firstPage.evaluate(async () => {
+    const requested = new Set(performance.getEntriesByType("resource").map(e => e.name));
+    const name = (await caches.keys()).find(key => key.startsWith("mega-dungeon-"));
+    const urls = (await (await caches.open(name)).keys()).map(request => request.url);
+    return urls.find(u => /\/assets\/icons\//.test(u) && !requested.has(u)) ?? null;
+  });
+  assert.ok(unrequested, "nenhum ícone de assets/icons/ pré-cacheado sem ter sido requisitado pela página");
   await fresh.setOffline(true);
   await firstPage.reload();
   if (await firstPage.locator("#rangeDialog[open]").waitFor({ timeout: 4000 }).then(() => true, () => false)) await passRangeDialog(firstPage);
