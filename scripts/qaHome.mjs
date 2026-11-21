@@ -70,10 +70,16 @@ async function checkSelection(page) {
 
 const CONFIRM_TEXT = "A expedição em andamento (Floresta, Andar 11) será substituída. Continuar?";
 
-const readAutosave = (page) => page.evaluate(async () => {
-  const { loadAutosave } = await import("/megadungeon/src/sessionAutosave.js");
-  return JSON.stringify(await loadAutosave());
-});
+// Lê o IndexedDB direto (mesmo banco e chave de src/sessionAutosave.js) para funcionar também contra o build de produção.
+const readAutosave = (page) => page.evaluate(() => new Promise((resolve, reject) => {
+  const request = indexedDB.open("mega-dungeon", 1);
+  request.onerror = () => reject(request.error);
+  request.onsuccess = () => {
+    const get = request.result.transaction("autosaves", "readonly").objectStore("autosaves").get("current");
+    get.onsuccess = () => { request.result.close(); resolve(JSON.stringify(get.result)); };
+    get.onerror = () => reject(get.error);
+  };
+}));
 
 function trackDialogs(page) {
   const seen = [];
