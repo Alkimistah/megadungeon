@@ -2,7 +2,9 @@
 import { CHALLENGE_RATINGS, challengeRatingLabel, startTreasure, startTable, nextStep, applyRoll } from "./treasureEngine.js";
 import { rollDice, dieRange } from "./dice.js";
 import { buildBatch, rollBatch, listSpecificTables, MAX_QUANTITY, MODE_LABELS, COLUMN_LABELS } from "./treasureBatch.js";
-import { describeStep, stepDepth, formatAmount, formatItemLine, formatComponents, formatBookDraw, parseTypedValue, tableLabel } from "./treasureFormat.js";
+import { TYPE_ROLLS } from "./tables/basicBook.js";
+import { ALL_TABLES } from "./tables/index.js";
+import { describeStep, describeRowResult, formatRange, stepDepth, formatAmount, formatItemLine, formatComponents, formatBookDraw, parseTypedValue, tableLabel } from "./treasureFormat.js";
 import { summarizeGains } from "./treasureSummary.js";
 import { createRng, createRandomSeed } from "../random.js";
 
@@ -243,13 +245,76 @@ function renderHistory(state, notes) {
   return list;
 }
 
+// Linhas impressas de um pedido: tabela d%/1d6 (8-x) ou a rolagem de tipo (TYPE_ROLLS); sem linhas = expressão.
+function bookRows(request) {
+  if (request.kind === "table") {
+    return (ALL_TABLES[request.tableId]?.rows ?? []).map((r) => ({ min: r.min, max: r.max, text: describeRowResult(r.result) }));
+  }
+  const types = TYPE_ROLLS[request.context?.rolls];
+  if (request.context?.action === "itemType" && types) return types.map(([min, max, type]) => ({ min, max, text: type }));
+  return [];
+}
+
+// Tabela como no livro: faixa e resultado de cada linha. `highlight(value)` marca a linha obtida.
+function renderBookTable(request, rows) {
+  const wrap = el("div", "treasure-book-table-wrap");
+  const table = el("table", "treasure-book-table");
+  table.append(el("caption", "", tableLabel(request.tableId)));
+  const head = el("tr");
+  head.append(el("th", "", request.die), el("th", "", "Resultado"));
+  const thead = el("thead");
+  thead.append(head);
+  table.append(thead);
+  const body = el("tbody");
+  const trs = rows.map((row) => {
+    const tr = el("tr");
+    tr.append(el("td", "treasure-book-range", formatRange(row.min, row.max, request.die)), el("td", "", row.text));
+    body.append(tr);
+    return tr;
+  });
+  table.append(body);
+  wrap.append(table);
+  const highlight = (value) => {
+    const effective = Number.isInteger(value) ? Math.min(rows.at(-1).max, value + (request.bonus ?? 0)) : NaN;
+    trs.forEach((tr, i) => {
+      const hit = effective >= rows[i].min && effective <= rows[i].max;
+      if (hit) tr.setAttribute("aria-current", "true"); else tr.removeAttribute("aria-current");
+      if (hit) {
+        const top = tr.offsetTop - wrap.clientHeight / 2 + tr.offsetHeight / 2;
+        if (wrap.scrollTo) wrap.scrollTo({ top: Math.max(0, top) });
+      }
+    });
+  };
+  return { wrap, highlight };
+}
+
+// Cartão do resultado da pesquisa avulsa: o que foi rolado, sem o quadro de totais.
+function renderResultCard(state) {
+  const card = el("div", "treasure-result-card");
+  const lines = [];
+  const summary = summarizeGains(state.gains);
+  for (const it of summary.items) {
+    lines.push(el("p", "treasure-item-line", formatItemLine(it)));
+    for (const line of formatComponents(it.components)) lines.push(el("p", `treasure-component${line.startsWith("· ") ? " treasure-component-extra" : ""}`, line));
+  }
+  for (const w of summary.wealth) lines.push(el("p", "treasure-item-line", `Riqueza: T$ ${formatAmount(w.value)} — ${w.examples}`));
+  for (const [coin, n] of Object.entries(summary.coins)) if (n > 0) lines.push(el("p", "treasure-item-line", `${formatAmount(n)} ${coin}`));
+  if (!lines.length) {
+    const last = state.steps.map((st) => describeStep(st).result).filter(Boolean);
+    lines.push(el("p", "treasure-item-line", last.length ? last.at(-1) : "Nada"));
+  }
+  card.append(...lines);
+  return card;
+}
+
 function setupConsultTab(panel) {
   panel.replaceChildren();
   let state = null;
   let notes = new Map();
+  let full = false;
   const setup = el("div", "treasure-consult-setup");
   const source = el("select", "treasure-c-source");
-  source.append(option("nd", "Tabela 8-1 por ND"));
+  source.append(option("nd", "Rolagem completa do livro (Tabela 8-1)"));
   for (const t of listSpecificTables()) source.append(option(t.id, t.title));
   const nd = el("select", "treasure-c-nd");
   for (const v of CHALLENGE_RATINGS) nd.append(option(v, challengeRatingLabel(v)));
@@ -290,7 +355,9 @@ function setupConsultTab(panel) {
     history.append(renderHistory(state, notes));
     const request = nextStep(state);
     if (!request) {
-      renderSummary(result, state.gains);
+      result.classList.toggle("treasure-result-plain", !full);
+      if (full) renderSummary(result, state.gains);
+      else result.replaceChildren(renderResultCard(state));
       result.hidden = false;
       const done = el("p", "treasure-consult-done", "Cadeia concluída.");
       const outcomes = state.steps.map((s) => describeStep(s).result).filter(Boolean);
@@ -323,6 +390,13 @@ function setupConsultTab(panel) {
       controls.append(roll);
     }
     prompt.append(head, why);
+    const rows = full ? bookRows(request) : [];
+    let bookTable = null;
+    if (rows.length) {
+      bookTable = renderBookTable(request, rows);
+      prompt.append(bookTable.wrap);
+      input.addEventListener("input", () => bookTable.highlight(parseTypedValue(input.value, request.die)));
+    }
     if (request.kind === "twoDice") {
       prompt.append(el("p", "treasure-consult-warning", "Linha 2D: role dois dados, escolha um deles e digite o dado escolhido."));
     }
@@ -349,6 +423,7 @@ function setupConsultTab(panel) {
     input.focus();
   };
   begin.addEventListener("click", () => {
+    full = source.value === "nd";
     state = startConsult({ source: source.value, nd: nd.value, column: column.value, mode: mode.value });
     notes = new Map();
     render();

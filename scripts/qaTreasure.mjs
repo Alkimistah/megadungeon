@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, copyFileSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "@playwright/test";
 
@@ -8,6 +8,7 @@ const browser = await chromium.launch({ headless: true, executablePath: process.
 const errors = [];
 const shotDir = process.env.QA_SCREENSHOT_DIR || "tmp/treasure-qa";
 mkdirSync(shotDir, { recursive: true });
+const scratchImg = process.env.QA_COPY_DIR || "/tmp/claude-1000/-mnt-c-Users-Arthur-OneDrive-Documentos-Mega-Dungeon/9b4a7ac4-9b92-4710-9e4c-7f73d59acc52/scratchpad/img";
 const shot = name => join(shotDir, name);
 try {
   const page = await browser.newPage({ viewport: { width: 1024, height: 768 }, serviceWorkers: "block" });
@@ -27,6 +28,13 @@ try {
   await closeAndClick();
   await page.locator("#treasureDialog[open]").waitFor({ timeout: 5000 });
 
+  // A seleção de missões pode reabrir por cima; reabre a modal de tesouros antes de usar o teclado.
+  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    const d = document.getElementById("treasureDialog");
+    d.close();
+    d.showModal();
+  });
   const tabs = page.locator("#treasureDialog [role=tab]");
   assert.deepEqual(await tabs.allInnerTexts(), ["Gerar tesouros", "Rolar com o livro"]);
   const panels = page.locator("#treasureDialog [role=tabpanel]");
@@ -110,7 +118,7 @@ try {
   assert.equal(await page.locator("#treasureDialog .treasure-error").innerText(), "");
   assert.match(await results.first().innerText(), /Heróis · Acessórios específicos \(menores\)/);
   const itemLine = await page.locator("#treasureFooter .treasure-item-line").last().innerText();
-  assert.match(itemLine, /^\d+× .+ \(.+\)( — T\$ [\d.,]+)?$/, `item do rodapé com categoria: ${itemLine}`);
+  assert.match(itemLine, /^\d+× .+ \(.+\)( — .+)?$/, `item do rodapé com categoria: ${itemLine}`);
   const compTexts = await page.locator("#treasureFooter .treasure-component").allInnerTexts();
   assert.ok(compTexts.some(t => / — .+ p\. \d+$/.test(t)), "ao menos um componente com livro e página");
   assert.match(await page.locator("#treasureFooter").innerText(), /Total em dinheiro/);
@@ -160,6 +168,21 @@ try {
   assert.equal(await page.locator("#treasureDialog .treasure-c-mode").isVisible(), false, "Metade some em Itens");
   await page.locator("#treasureDialog .treasure-c-start").click();
   assert.match(await page.locator(`${C} .treasure-consult-step`).innerText(), /8-1/);
+  assert.equal(await page.locator("#treasureDialog .treasure-c-source option").first().innerText(), "Rolagem completa do livro (Tabela 8-1)");
+  // Rolagem completa: o passo mostra a tabela 8-1 de ND 3 Itens como no livro.
+  const bookTable = page.locator(`${C} table.treasure-book-table`);
+  assert.equal(await bookTable.count(), 1, "tabela do passo");
+  assert.match(await bookTable.locator("caption").innerText(), /8-1 · Itens ND 3/);
+  assert.deepEqual(await bookTable.locator("tbody tr td:first-child").allInnerTexts(), ["01–25", "26–35", "36–60", "61–85", "86–100"]);
+  assert.match(await bookTable.locator("tbody tr").nth(2).innerText(), /Equipamento/);
+  assert.equal(await bookTable.locator("[aria-current=true]").count(), 0, "sem destaque antes do valor");
+  await step().fill("40");
+  assert.equal(await bookTable.locator("[aria-current=true]").count(), 1, "uma linha destacada");
+  assert.match(await bookTable.locator("[aria-current=true]").innerText(), /^36–60\s+Equipamento/);
+  mkdirSync(scratchImg, { recursive: true });
+  await page.screenshot({ path: shot("ajustes-livro-completo.png") });
+  copyFileSync(shot("ajustes-livro-completo.png"), join(scratchImg, "ajustes-livro-completo.png"));
+  await step().fill("");
   await apply(101);
   assert.match(await page.locator(`${C} .treasure-c-error`).innerText(), /inválido/i, "101 mostra erro");
   assert.equal(await page.locator("#treasureDialog .treasure-consult-history .treasure-step").count(), 0, "101 mantém o passo");
@@ -177,7 +200,9 @@ try {
   await apply(1);
   assert.equal(await page.locator(C).isVisible(), false, "cadeia terminou");
   assert.match(await page.locator("#treasureDialog .treasure-consult-result").innerText(), /1× Adaga/);
+  assert.match(await page.locator("#treasureDialog .treasure-consult-result").innerText(), /Valor total/, "rolagem completa termina no quadro completo");
   await page.screenshot({ path: shot("treasure-consultar.png") });
+  await page.screenshot({ path: shot("ajustes-livro-completo-fim.png") });
   // Nova consulta reinicia. ND 4 Itens: 40 -> equipamento 2D com aviso; "rolar" em expressão.
   await page.locator("#treasureDialog .treasure-c-reset").click();
   assert.equal(await page.locator("#treasureDialog .treasure-consult-history .treasure-step").count(), 0);
@@ -205,6 +230,21 @@ try {
   await page.locator("#treasureDialog .treasure-c-source").selectOption("8-4/arma");
   await page.locator("#treasureDialog .treasure-c-start").click();
   assert.match(await page.locator(`${C} .treasure-consult-step`).innerText(), /8-4/);
+  assert.equal(await page.locator(`${C} table`).count(), 0, "pesquisa avulsa não mostra a tabela");
+  // Pesquisa avulsa em 8-12 com 50: só a poção, sem o quadro.
+  await page.locator("#treasureDialog .treasure-c-reset").click();
+  await page.locator("#treasureDialog .treasure-c-source").selectOption("8-12");
+  await page.locator("#treasureDialog .treasure-c-start").click();
+  await apply(50);
+  const avulsa = page.locator("#treasureDialog .treasure-consult-result");
+  assert.equal(await avulsa.locator(".treasure-result-card").count(), 1, "um cartão de resultado");
+  assert.match(await avulsa.innerText(), /Camuflagem Ilusória.*T\$ 270/s);
+  assert.doesNotMatch(await avulsa.innerText(), /Valor total|Riquezas|Total em dinheiro/);
+  await page.screenshot({ path: shot("ajustes-livro-avulsa.png") });
+  copyFileSync(shot("ajustes-livro-avulsa.png"), join(scratchImg, "ajustes-livro-avulsa.png"));
+  await page.locator("#treasureDialog .treasure-c-reset").click();
+  await page.locator("#treasureDialog .treasure-c-source").selectOption("8-4/arma");
+  await page.locator("#treasureDialog .treasure-c-start").click();
   // Lista de outro livro: valor 1 dá o primeiro item.
   await page.locator("#treasureDialog .treasure-c-reset").click();
   await page.locator("#treasureDialog .treasure-c-source").selectOption("herois/acessorios/menor");

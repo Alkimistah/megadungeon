@@ -3342,3 +3342,58 @@ details.mission-run-guidance p {
 
 
 }
+
+.treasure-book-table-wrap {
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.treasure-book-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.treasure-book-table caption {
+  padding: 6px 8px;
+  text-align: left;
+  font-weight: 700;
+}
+
+.treasure-book-table th,
+.treasure-book-table td {
+  padding: 4px 8px;
+  text-align: left;
+  border-top: 1px solid var(--border);
+}
+
+.treasure-book-range {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.treasure-book-table tr[aria-current="true"] {
+  background: var(--action-hover);
+  font-weight: 700;
+}
+
+.treasure-result-card {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-alt);
+}
+
+.treasure-result-card p {
+  margin: 0 0 4px;
+}
+
+.treasure-footer.treasure-result-plain {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+}

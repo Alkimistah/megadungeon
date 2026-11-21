@@ -116,3 +116,9 @@ export function parseTypedValue(text, die) {
   if (die === "d%" && t === "00") return 100;
   return /^-?\d+$/.test(t) ? Number(t) : NaN;
 }
+
+// Faixa como impressa: "01–30" no d%, "1–3" no 1d6, "05" (d%) ou "6" quando é um só valor.
+export function formatRange(min, max, die) {
+  const pad = (n) => (die === "d%" && n < 10 ? `0${n}` : String(n));
+  return min === max ? pad(min) : `${pad(min)}–${pad(max)}`;
+}
