@@ -1,7 +1,7 @@
 // Casca da modal de tesouros e abas Gerar tesouros e Rolar na mesa.
 import { CHALLENGE_RATINGS, challengeRatingLabel, startTreasure, startTable, nextStep, applyRoll } from "./treasureEngine.js";
 import { rollDice, dieRange } from "./dice.js";
-import { buildBatch, rollBatch, listSpecificTables, MAX_QUANTITY, MODE_LABELS, COLUMN_LABELS } from "./treasureBatch.js";
+import { buildBatch, rollBatch, listSpecificTables, isValidQuantity, MAX_QUANTITY, MODE_LABELS, COLUMN_LABELS } from "./treasureBatch.js";
 import { TYPE_ROLLS } from "./tables/basicBook.js";
 import { ALL_TABLES } from "./tables/index.js";
 import { describeStep, describeRowResult, formatRange, stepDepth, formatAmount, formatItemLine, formatComponents, formatBookDraw, stepReference, parseTypedValue, tableLabel, describeBookRowResult } from "./treasureFormat.js";
@@ -153,6 +153,7 @@ function createRow(onRemove) {
   for (const [v, l] of Object.entries(COLUMN_LABELS)) columns.append(option(v, l));
   const table = el("select", "treasure-f-table");
   for (const t of listSpecificTables()) table.append(option(t.id, t.title));
+  qty.addEventListener("input", () => qty.removeAttribute("aria-invalid"));
   const remove = el("button", "icon-button treasure-remove", "✕");
   Object.assign(remove, { type: "button" });
   remove.setAttribute("aria-label", "Remover rolagem");
@@ -173,6 +174,10 @@ function createRow(onRemove) {
   row.append(field("Origem", type), field("ND", nd), field("Tabela", table, "treasure-table-field"),
     field("Quantidade", qty), field("Tipo", mode), rollField, remove);
   sync();
+  row.markQuantity = () => {
+    if (isValidQuantity(Number(qty.value))) qty.removeAttribute("aria-invalid");
+    else qty.setAttribute("aria-invalid", "true");
+  };
   row.readValue = () => {
     const quantity = Number(qty.value);
     return type.value === "table"
@@ -201,6 +206,7 @@ function setupRollTab(panel) {
   add.addEventListener("click", addRow);
   roll.addEventListener("click", () => {
     error.textContent = "";
+    for (const r of rowsBox.children) r.markQuantity();
     try {
       const batch = rollBatch([...rowsBox.children].map((r) => r.readValue()), createRng(createRandomSeed()));
       renderResults(results, batch);
@@ -208,6 +214,8 @@ function setupRollTab(panel) {
       footer.hidden = false;
     } catch (e) {
       error.textContent = e.message;
+      results.replaceChildren();
+      footer.hidden = true;
     }
   });
   const actions = el("div", "treasure-actions");

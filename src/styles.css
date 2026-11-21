@@ -3115,6 +3115,10 @@ details.mission-run-guidance p {
   color: #ff9b87;
 }
 
+.treasure-f-qty[aria-invalid="true"] {
+  border-color: #ff9b87;
+}
+
 
 .treasure-group h3 {
   margin: 12px 0 6px;

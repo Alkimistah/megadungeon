@@ -124,6 +124,21 @@ try {
   // Rolar de novo substitui o lote.
   await page.locator("#treasureDialog .treasure-roll").click();
   assert.equal(await results.count(), 11);
+  // Quantidade inválida: some o lote anterior, o rodapé e o campo fica marcado.
+  const badQty = rowsLoc.nth(1).locator(".treasure-f-qty");
+  await badQty.fill("0");
+  await page.locator("#treasureDialog .treasure-roll").click();
+  assert.match(await page.locator("#treasureDialog .treasure-error").innerText(), /Quantidade inválida/, "erro visível");
+  assert.equal(await results.count(), 0, "resultado anterior some com erro");
+  assert.equal(await page.locator("#treasureFooter").isVisible(), false, "rodapé some com erro");
+  assert.equal(await badQty.getAttribute("aria-invalid"), "true", "campo inválido marcado");
+  assert.equal(await rowsLoc.nth(0).locator(".treasure-f-qty").getAttribute("aria-invalid"), null, "campo válido não marcado");
+  await badQty.fill("2");
+  assert.equal(await badQty.getAttribute("aria-invalid"), null, "marca some ao corrigir");
+  await page.locator("#treasureDialog .treasure-roll").click();
+  assert.equal(await page.locator("#treasureDialog .treasure-error").innerText(), "");
+  assert.ok(await results.count() > 0, "rolar de novo traz o resultado");
+  assert.equal(await page.locator("#treasureFooter").isVisible(), true);
   // Remover linha.
   await rowsLoc.nth(3).locator(".treasure-remove").click();
   assert.equal(await rowsLoc.count(), 3);

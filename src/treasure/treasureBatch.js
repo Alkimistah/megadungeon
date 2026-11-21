@@ -17,9 +17,13 @@ export function listSpecificTables() {
   return Object.values(ALL_TABLES).filter((t) => !t.id.startsWith("8-1/"));
 }
 
+export function isValidQuantity(q) {
+  return Number.isInteger(q) && q >= 1 && q <= MAX_QUANTITY;
+}
+
 function checkQuantity(row) {
   const q = row.quantity;
-  if (!Number.isInteger(q) || q < 1 || q > MAX_QUANTITY) throw new RangeError(`Quantidade inválida: ${q} (de 1 a ${MAX_QUANTITY})`);
+  if (!isValidQuantity(q)) throw new RangeError(`Quantidade inválida: ${q} (de 1 a ${MAX_QUANTITY})`);
 }
 
 function startRow(row) {
