@@ -3871,3 +3871,28 @@ details.mission-run-guidance p {
   font: inherit;
   cursor: pointer;
 }
+
+/* Ferramentas rápidas abertas da tela inicial: paleta bronze em vez do tema da faixa. */
+#treasureDialog.is-home-tool,
+#manualEncounterDialog.is-home-tool {
+  --page: #13100d;
+  --header: #1b1611;
+  --header-border: #4b3c2b;
+  --surface: #1b1611;
+  --surface-alt: #211b15;
+  --panel: #211b15;
+  --border: #4b3c2b;
+  --border-soft: #3a2e20;
+  --action: #7a5a32;
+  --action-hover: #8c6a3c;
+  --scrollbar-track: #1b1611;
+  --scrollbar-thumb: #b48a4e;
+  --map-glow: rgba(180, 138, 78, 0.18);
+  color: #ecdfc4;
+}
+
+#treasureDialog.is-home-tool .hidden-environment-notice,
+#manualEncounterDialog.is-home-tool .hidden-environment-notice {
+  background: rgba(33, 27, 21, 0.6);
+  color: #ecdfc4;
+}

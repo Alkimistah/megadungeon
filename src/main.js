@@ -1244,7 +1244,13 @@ function bindEvents() {
     return open().finally(() => {
       const dialogs = [elements.treasureDialog, elements.manualEncounterDialog];
       const dialog = dialogs.find((item) => item.open);
-      dialog?.addEventListener("close", () => button.focus(), { once: true });
+      if (!dialog) return;
+      // Aberta da tela inicial, a ferramenta usa a paleta bronze dela e não o tema da faixa ativa.
+      dialog.classList.add("is-home-tool");
+      dialog.addEventListener("close", () => {
+        dialog.classList.remove("is-home-tool");
+        button.focus();
+      }, { once: true });
     });
   };
 

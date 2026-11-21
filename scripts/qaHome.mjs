@@ -124,6 +124,41 @@ async function checkQuickTools(page, viewport) {
   assert((await text(page, "#resumeExpedition")) === resumeBefore, "o Continuar mudou depois das ferramentas");
 }
 
+const bgOf = (page, selector) => page.locator(selector).first().evaluate((el) => getComputedStyle(el).backgroundColor);
+const HOME_ACTION = "rgb(122, 90, 50)";
+
+// Ferramentas abertas da tela inicial usam a paleta bronze, mesmo com a expedicao salva sendo da Floresta.
+async function checkToolsPalette(page, viewport) {
+  await page.locator("#quickTreasure").click();
+  await page.locator("#treasureDialog[open]").waitFor();
+  assert(await page.locator("#treasureDialog").evaluate((el) => el.classList.contains("is-home-tool")), "tesouros sem is-home-tool");
+  assert((await bgOf(page, "#treasureDialog")) === HOME_BG, `fundo dos tesouros na tela inicial: ${await bgOf(page, "#treasureDialog")}`);
+  assert((await bgOf(page, "#treasureDialog .treasure-roll")) === HOME_ACTION, `botao Rolar tudo: ${await bgOf(page, "#treasureDialog .treasure-roll")}`);
+  await page.screenshot({ path: `.playwright-mcp/ferramentas-bronze/tesouros-${viewport.tag}.png` });
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(200);
+  assert(!(await page.locator("#treasureDialog").evaluate((el) => el.open || el.classList.contains("is-home-tool"))), "tesouros deveriam fechar e perder is-home-tool");
+
+  await page.locator("#quickEncounter").click();
+  await page.locator("#manualEncounterDialog[open]").waitFor();
+  assert(await page.locator("#manualEncounterDialog").evaluate((el) => el.classList.contains("is-home-tool")), "encontro sem is-home-tool");
+  assert((await bgOf(page, "#manualEncounterDialog")) === HOME_BG, `fundo do encontro na tela inicial: ${await bgOf(page, "#manualEncounterDialog")}`);
+  assert((await bgOf(page, "#manualEncounterForm button[type=submit]")) === HOME_ACTION, `botao Gerar encontro: ${await bgOf(page, "#manualEncounterForm button[type=submit]")}`);
+  await page.screenshot({ path: `.playwright-mcp/ferramentas-bronze/encontro-${viewport.tag}.png` });
+  await page.locator("#manualEncounterClose").click();
+  await page.waitForTimeout(200);
+  assert(!(await page.locator("#manualEncounterDialog").evaluate((el) => el.classList.contains("is-home-tool"))), "encontro deveria perder is-home-tool");
+
+  // Dentro da expedicao o tema da faixa continua valendo.
+  await page.locator("#resumeExpedition").click();
+  await page.locator("#rangeDialog").waitFor({ state: "hidden" });
+  await page.locator("#treasureButton").click();
+  await page.locator("#treasureDialog[open]").waitFor();
+  assert(!(await page.locator("#treasureDialog").evaluate((el) => el.classList.contains("is-home-tool"))), "tesouros da expedicao nao devem ter is-home-tool");
+  assert((await bgOf(page, "#treasureDialog")) !== HOME_BG, "tesouros da expedicao deveriam usar o tema da faixa");
+  await page.keyboard.press("Escape");
+}
+
 async function checkAbout(page, viewport) {
   const aboutBox = await page.locator("#aboutButton").boundingBox();
   const importBox = await page.locator("#importSessionFile").boundingBox();
@@ -217,6 +252,7 @@ async function shot(page, viewport, name) {
 }
 
 await mkdir(SHOT_DIR, { recursive: true });
+await mkdir(".playwright-mcp/ferramentas-bronze", { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || "/usr/bin/google-chrome", args: ["--no-sandbox"] });
 try {
   for (const viewport of VIEWPORTS) {
@@ -251,6 +287,13 @@ try {
     assert(dialogBg === HOME_BG, `fundo apos usar a 11-20 e recarregar: ${dialogBg}`);
     await shot(page, viewport, "floresta-com-continuar");
     await shot(page, viewport, "ferramentas");
+    if (viewport.tag === "paisagem") {
+      await checkToolsPalette(page, viewport);
+      await page.waitForTimeout(500);
+      await page.reload();
+      await page.locator("#rangeDialog[open]").waitFor();
+      await page.locator("#resumeExpedition").waitFor({ state: "visible" });
+    }
     await checkReplaceConfirm(page, dialogs);
     await checkQuickTools(page, viewport);
     await checkAbout(page, viewport);
