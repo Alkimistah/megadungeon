@@ -37,6 +37,11 @@ class CdpClient {
         else resolveCommand(message.result || {});
         return;
       }
+      // A confirmacao de substituicao (Tarefa 4) bloqueia a pagina: aceita.
+      if (message.method === "Page.javascriptDialogOpening") {
+        void this.send("Page.handleJavaScriptDialog", { accept: true });
+        return;
+      }
       this.events.push(message);
     });
   }

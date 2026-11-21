@@ -75,6 +75,8 @@ const elements = {
   resumeDetail: document.getElementById("resumeDetail"),
   initialUnknownPathsField: document.getElementById("initialUnknownPathsField"),
   initialUnknownPathsInput: document.getElementById("initialUnknownPathsInput"),
+  quickEncounter: document.getElementById("quickEncounter"),
+  quickTreasure: document.getElementById("quickTreasure"),
   rangeConfirm: document.getElementById("rangeConfirm"),
   resumeExpedition: document.getElementById("resumeExpedition"),
   sessionStatus: document.getElementById("sessionStatus"),
@@ -570,6 +572,13 @@ function showSessionStatus(message) {
   elements.sessionStatus.hidden = false;
 }
 
+// Verdadeiro quando não há expedição salva ou o usuário aceita substituí-la.
+function confirmReplaceExpedition() {
+  if (!savedExpedition) return true;
+  const profile = FLOOR_RANGES.find(({ id }) => id === savedExpedition.profile);
+  return window.confirm(`A expedição em andamento (${profile.card.name}, Andar ${savedExpedition.floor}) será substituída. Continuar?`);
+}
+
 async function offerSavedExpedition() {
   try {
     savedExpedition = await loadAutosave();
@@ -775,6 +784,7 @@ async function importSessionFile() {
   if (!file) return;
 
   elements.sessionFile.value = "";
+  if (!confirmReplaceExpedition()) return;
   elements.importSessionFile.disabled = true;
   elements.sessionStatus.hidden = true;
   try {
@@ -1166,6 +1176,32 @@ function bindEvents() {
   elements.importSessionFile.addEventListener("click", () => elements.sessionFile.click());
   elements.sessionFile.addEventListener("change", importSessionFile);
 
+  const openQuickTool = (button, open) => {
+    return open().finally(() => {
+      const dialogs = [elements.treasureDialog, elements.manualEncounterDialog];
+      const dialog = dialogs.find((item) => item.open);
+      dialog?.addEventListener("close", () => button.focus(), { once: true });
+    });
+  };
+
+  elements.quickTreasure.addEventListener("click", () => {
+    void openQuickTool(elements.quickTreasure, async () => {
+      try {
+        const { openTreasureDialog } = await import("./treasure/treasureDialog.js");
+        openTreasureDialog(elements.treasureDialog);
+      } catch (error) {
+        console.error("Falha ao carregar o módulo de tesouros", error);
+        showTreasureLoadError();
+      }
+    });
+  });
+
+  elements.quickEncounter.addEventListener("click", () => {
+    void openQuickTool(elements.quickEncounter, async () => {
+      manualEncounterDialogController.openStandalone(getFloorRange(getSelectedRangeId()));
+    });
+  });
+
   elements.resumeExpedition.addEventListener("click", () => {
     try {
       restoreSession(savedExpedition);
@@ -1177,6 +1213,7 @@ function bindEvents() {
 
   elements.rangeConfirm.addEventListener("click", (event) => {
     event.preventDefault();
+    if (!confirmReplaceExpedition()) return;
     applyFloorRange(getSelectedRangeId());
     setUnknownPathsMode(elements.initialUnknownPathsInput.checked);
     currentMapSeed = createRandomSeed();

@@ -45,9 +45,8 @@ async function checkStructure(page) {
     }
   }
   assert((await text(page, "#initialUnknownPathsField")).includes("A rota de cada andar se revela conforme o grupo avança."), "explicacao do interruptor ausente");
-  // As ferramentas rapidas ficam ocultas ate a Tarefa 4 ligar os botoes.
-  assert((await page.locator("#quickTreasure").count()) === 1 && (await page.locator("#quickEncounter").count()) === 1, "marcacao das ferramentas rapidas ausente");
-  assert(!(await page.locator("#quickTreasure").isVisible()) && !(await page.locator("#quickEncounter").isVisible()), "ferramentas rapidas deveriam estar ocultas");
+  assert((await page.locator("#quickTreasure").isVisible()) && (await page.locator("#quickEncounter").isVisible()), "ferramentas rapidas deveriam estar visiveis");
+  assert((await text(page, "#quickTreasure")) === "Rolar tesouros" && (await text(page, "#quickEncounter")) === "Encontro avulso", "rotulos das ferramentas rapidas");
   assert((await text(page, "#importSessionFile")).includes("Importar arquivo de sessão"), "botao de importar ausente");
 }
 
@@ -69,6 +68,78 @@ async function checkSelection(page) {
   }
 }
 
+const CONFIRM_TEXT = "A expedição em andamento (Floresta, Andar 11) será substituída. Continuar?";
+
+const readAutosave = (page) => page.evaluate(async () => {
+  const { loadAutosave } = await import("/megadungeon/src/sessionAutosave.js");
+  return JSON.stringify(await loadAutosave());
+});
+
+function trackDialogs(page) {
+  const seen = [];
+  page.on("dialog", async (dialog) => { seen.push(dialog.message()); await dialog.dismiss(); });
+  return seen;
+}
+
+async function checkQuickTools(page, viewport) {
+  const before = await readAutosave(page);
+  assert(before && before !== "null", "autosave deveria existir antes das ferramentas");
+  const resumeBefore = await text(page, "#resumeExpedition");
+
+  // Tesouros por cima da tela inicial.
+  await page.locator("#quickTreasure").click();
+  await page.locator("#treasureDialog[open]").waitFor();
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "tela inicial deveria continuar aberta sob os tesouros");
+  await shot(page, viewport, "ferramentas-tesouro");
+  const rollButton = page.locator("#treasurePanelRoll button[type=submit], #treasurePanelRoll button").first();
+  await rollButton.click();
+  await page.waitForTimeout(300);
+  await page.keyboard.press("Escape");
+  await page.locator("#treasureDialog[open]").waitFor({ state: "detached" }).catch(() => {});
+  assert(!(await page.locator("#treasureDialog").evaluate((el) => el.open)), "Esc deveria fechar os tesouros");
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "Esc nao deve fechar a tela inicial");
+  assert((await page.evaluate(() => document.activeElement?.id)) === "quickTreasure", "foco deveria voltar a #quickTreasure");
+
+  // Encontro avulso por cima da tela inicial.
+  await page.locator("#quickEncounter").click();
+  await page.locator("#manualEncounterDialog[open]").waitFor();
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "tela inicial deveria continuar aberta sob o encontro");
+  await page.locator("#manualEncounterForm button[type=submit]").first().click();
+  await page.waitForTimeout(500);
+  assert((await page.locator("#manualEncounterResult").innerText()).trim().length > 40, "encontro avulso nao gerou resultado");
+  await shot(page, viewport, "ferramentas-encontro");
+  await page.locator("#manualEncounterClose").click();
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "fechar o encontro nao deve fechar a tela inicial");
+  assert((await page.evaluate(() => document.activeElement?.id)) === "quickEncounter", "foco deveria voltar a #quickEncounter");
+
+  await page.waitForTimeout(500);
+  assert((await readAutosave(page)) === before, "as ferramentas rapidas alteraram o autosave");
+  assert((await text(page, "#resumeExpedition")) === resumeBefore, "o Continuar mudou depois das ferramentas");
+}
+
+async function checkReplaceConfirm(page, dialogs) {
+  const before = await readAutosave(page);
+  const resumeBefore = await text(page, "#resumeExpedition");
+  dialogs.length = 0;
+  await page.locator('button.range-card[data-range="dungeon-1-10"]').click();
+  await page.locator("#rangeConfirm").click();
+  await page.waitForTimeout(300);
+  assert(dialogs.length === 1 && dialogs[0] === CONFIRM_TEXT, `confirm ao iniciar: ${JSON.stringify(dialogs)}`);
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "tela inicial deveria continuar aberta apos cancelar");
+  assert(await page.locator("#missionDialog").isHidden(), "cancelar nao deve abrir missoes");
+
+  dialogs.length = 0;
+  await page.locator("#sessionFile").setInputFiles({ name: "sessao.txt", mimeType: "text/plain", buffer: Buffer.from("MD1:lixo") });
+  await page.waitForTimeout(400);
+  assert(dialogs.length === 1 && dialogs[0] === CONFIRM_TEXT, `confirm ao importar: ${JSON.stringify(dialogs)}`);
+  assert(await page.locator("#sessionStatus").isHidden(), "cancelar a importacao nao deve ler o arquivo");
+  assert(await page.locator("#rangeDialog").evaluate((el) => el.open), "tela inicial deveria continuar aberta apos cancelar importacao");
+  await page.waitForTimeout(300);
+  assert((await readAutosave(page)) === before, "autosave mudou apos cancelar");
+  assert((await text(page, "#resumeExpedition")) === resumeBefore, "Continuar mudou apos cancelar");
+  await page.locator('button.range-card[data-range="forest-11-20"]').click();
+}
+
 async function shot(page, viewport, name) {
   await page.screenshot({ path: `${SHOT_DIR}/final-${name}-${viewport.tag}.png` });
 }
@@ -79,15 +150,21 @@ try {
   for (const viewport of VIEWPORTS) {
     // Sem expedicao salva.
     const page = await openHome(browser, viewport);
+    const dialogs = trackDialogs(page);
     assert(await page.locator("#resumeExpedition").isHidden(), "Continuar deveria estar oculto sem expedicao salva");
     assert((await page.locator('button.range-card[data-range="dungeon-1-10"]').getAttribute("aria-pressed")) === "true", "Masmorra deveria vir escolhida");
     await checkStructure(page);
     await shot(page, viewport, "masmorra-sem-continuar");
     await checkSelection(page);
+    // Sem expedicao salva, importar nao pede confirmacao (o arquivo invalido so gera o erro).
+    await page.locator("#sessionFile").setInputFiles({ name: "x.txt", mimeType: "text/plain", buffer: Buffer.from("lixo") });
+    await page.locator("#sessionStatus").waitFor({ state: "visible" });
+    assert(dialogs.length === 0, `confirm inesperado sem expedicao salva: ${JSON.stringify(dialogs)}`);
 
     // Inicia a Floresta e recarrega: a expedicao salva aparece no Continuar.
     await page.locator('button.range-card[data-range="forest-11-20"]').click();
     await page.locator("#rangeConfirm").click();
+    assert(dialogs.length === 0, "confirm inesperado ao iniciar sem expedicao salva");
     await page.locator("#missionDialog").waitFor({ state: "visible" });
     await page.getByRole("button", { name: "Continuar sem missões" }).click();
     await page.locator("#missionDialog").waitFor({ state: "hidden" });
@@ -101,6 +178,9 @@ try {
     const dialogBg = await page.locator("#rangeDialog").evaluate((el) => getComputedStyle(el).backgroundColor);
     assert(dialogBg === HOME_BG, `fundo apos usar a 11-20 e recarregar: ${dialogBg}`);
     await shot(page, viewport, "floresta-com-continuar");
+    await shot(page, viewport, "ferramentas");
+    await checkReplaceConfirm(page, dialogs);
+    await checkQuickTools(page, viewport);
     await page.locator("#resumeExpedition").click();
     await page.locator("#rangeDialog").waitFor({ state: "hidden" });
     await page.context().close();

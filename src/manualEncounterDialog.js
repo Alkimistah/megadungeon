@@ -178,6 +178,9 @@ export function createManualEncounterDialogController({
 }) {
   let currentNode = null;
   let selectedItemKey = null;
+  // Perfil avulso (ferramentas rápidas da tela inicial): sem sessão ativa.
+  let standaloneProfile = null;
+  const currentProfile = () => standaloneProfile || getProfile();
 
   function renderResult() {
     resultElement.innerHTML = "";
@@ -194,14 +197,14 @@ export function createManualEncounterDialogController({
     resultElement.appendChild(createEncounterCombatPage(currentNode, selectedItemKey, (nextKey) => {
       selectedItemKey = nextKey;
       renderResult();
-    }, getActiveMissions(), (missionId, delta) => {
-      onAdjustMissionProgress?.(missionId, delta);
+    }, standaloneProfile ? [] : getActiveMissions(), (missionId, delta) => {
+      if (!standaloneProfile) onAdjustMissionProgress?.(missionId, delta);
       renderResult();
     }, { onEncounterAdjusted: renderResult }));
   }
 
   function generateEncounter() {
-    const profile = getProfile();
+    const profile = currentProfile();
     const seed = createRandomSeed();
     const rng = createRng(`manual-${seed}`);
     const fixedCreature = getCreatureById(creatureInput.value);
@@ -224,7 +227,7 @@ export function createManualEncounterDialogController({
   }
 
   function syncProfileOptions() {
-    populateTerrainOptions(terrainInput, getProfile());
+    populateTerrainOptions(terrainInput, currentProfile());
   }
 
   populateChallengeOptions(challengeInput);
@@ -245,6 +248,24 @@ export function createManualEncounterDialogController({
   syncProfileOptions();
   renderResult();
 
+  function openStandalone(profile) {
+    standaloneProfile = profile;
+    currentNode = null;
+    selectedItemKey = null;
+    renderResult();
+    syncProfileOptions();
+    if (!dialogElement.open) dialogElement.showModal();
+  }
+
+  dialogElement.addEventListener("close", () => {
+    if (!standaloneProfile) return;
+    standaloneProfile = null;
+    currentNode = null;
+    selectedItemKey = null;
+    renderResult();
+    syncProfileOptions();
+  });
+
   openButton.addEventListener("click", () => {
     syncProfileOptions();
     if (!dialogElement.open) dialogElement.showModal();
@@ -261,6 +282,7 @@ export function createManualEncounterDialogController({
 
   return {
     generateEncounter,
+    openStandalone,
     syncProfileOptions
   };
 }
