@@ -4,6 +4,7 @@ import { validateTable } from "../src/treasure/tables/schema.js";
 import { BASIC_BOOK_TABLES, TYPE_ROLLS, ENCHANTMENT_COUNT, ENCHANTMENT_PRICES } from "../src/treasure/tables/basicBook.js";
 import { parseDice, rollDice, dieRange } from "../src/treasure/dice.js";
 import { startTreasure, startTable, nextStep, applyRoll, resolveWithDice } from "../src/treasure/treasureEngine.js";
+import { BASE_PRICES, NAME_ALIASES, IMPROVEMENT_PRICES, MATERIAL_PRICES, normalizeName, basePriceOf, priceOf } from "../src/treasure/tables/prices.js";
 import { createRng } from "../src/random.js";
 import { summarizeGains } from "../src/treasure/treasureSummary.js";
 
@@ -301,14 +302,14 @@ const itemsChain = (nd) => startTreasure({ challengeRating: nd, column: "items",
 const itemGain = (name, category, details = {}, extra = {}) => ({ kind: "item", name, category, ...extra, details });
 const stripSource = (gains) => gains.map(({ source, ...g }) => g);
 
-test("diverse: d% on 8-3 gives an item without price", () => {
+test("diverse: d% on 8-3 gives an item with its Chapter 3 price", () => {
   const s1 = applyRoll(itemsChain("1"), 50);
   assert.equal(nextStep(s1).tableId, "8-3");
   assert.equal(nextStep(s1).die, "d%");
   const done = applyRoll(s1, 10);
   assert.equal(nextStep(done), null);
-  assert.deepEqual(stripSource(done.gains), [itemGain("Bálsamo restaurador", "diverso")]);
-  assert.equal("price" in done.gains[0], false);
+  assert.deepEqual(stripSource(done.gains), [itemGain("Bálsamo restaurador", "diverso", {}, { price: 10 })]);
+  assert.equal(done.gains[0].price, 10);
 });
 
 test("equipment: type 2 (arma) and d% 40 on 8-4 gives Espada longa", () => {
@@ -323,11 +324,11 @@ test("equipment: type 2 (arma) and d% 40 on 8-4 gives Espada longa", () => {
   assert.equal(nextStep(s2).tableId, "8-4/arma");
   const done = applyRoll(s2, 40);
   assert.equal(nextStep(done), null);
-  assert.deepEqual(stripSource(done.gains), [itemGain("Espada longa", "arma")]);
+  assert.deepEqual(stripSource(done.gains), [itemGain("Espada longa", "arma", {}, { price: 15 })]);
   assert.deepEqual(done.steps.map((s) => s.parentId), [null, "1", "1.1"]);
   const armor = feed(itemsChain("1"), [70, 5, 60]);
-  assert.deepEqual(stripSource(armor.gains), [itemGain("Escudo leve", "escudo")]);
-  assert.deepEqual(stripSource(feed(itemsChain("1"), [70, 6, 1]).gains), [itemGain("Bolsa de pó", "esotérico")]);
+  assert.deepEqual(stripSource(armor.gains), [itemGain("Escudo leve", "escudo", {}, { price: 5 })]);
+  assert.deepEqual(stripSource(feed(itemsChain("1"), [70, 6, 1]).gains), [itemGain("Bolsa de pó", "esotérico", {}, { price: 300 })]);
 });
 
 test("superior with 2 improvements: 8-5 twice, duplicates and counts-as-two reroll as children", () => {
@@ -349,7 +350,7 @@ test("superior with 2 improvements: 8-5 twice, duplicates and counts-as-two rero
   assert.match(nextStep(s4).reason, /conta como duas/);
   const done = applyRoll(s4, 81); // Precisa
   assert.equal(nextStep(done), null);
-  assert.deepEqual(stripSource(done.gains), [itemGain("Espada longa (certeira, precisa)", "arma", { improvements: ["Certeira", "Precisa"] })]);
+  assert.deepEqual(stripSource(done.gains), [itemGain("Espada longa (certeira, precisa)", "arma", { improvements: ["Certeira", "Precisa"] }, { price: 3015 })]);
   const ids = done.steps.map((s) => s.id);
   assert.equal(new Set(ids).size, ids.length);
 });
@@ -357,7 +358,7 @@ test("superior with 2 improvements: 8-5 twice, duplicates and counts-as-two rero
 test("superior: counts-as-two fills both slots; on a 1-improvement item it rerolls", () => {
   const atroz = feed(itemsChain("5"), [95, 1, 40, 1]);
   assert.equal(nextStep(atroz), null);
-  assert.deepEqual(stripSource(atroz.gains), [itemGain("Espada longa (atroz)", "arma", { improvements: ["Atroz"] })]);
+  assert.deepEqual(stripSource(atroz.gains), [itemGain("Espada longa (atroz)", "arma", { improvements: ["Atroz"] }, { price: 3015 })]);
   const s1 = feed(itemsChain("2"), [95, 1, 1]);
   assert.equal(s1.pending.length, 1);
   const s2 = applyRoll(s1, 91); // Pungente
@@ -377,7 +378,7 @@ test("material sub-roll is a step of its own", () => {
   assert.equal(step.parentId, s1.steps.at(-1).id);
   assert.equal(step.outcome.option, "adamante");
   assert.deepEqual(stripSource(done.gains), [itemGain("Completa (material especial: adamante)", "armadura",
-    { improvements: ["Material especial"], material: "adamante" })]);
+    { improvements: ["Material especial"], material: "adamante" }, { price: 21300 })]);
 });
 
 test("potions: 1d3+1 with +% adds 20 to each 8-12 d%", () => {
@@ -410,7 +411,7 @@ test("magic minor weapon: one enchantment on 8-8", () => {
   assert.equal(s1.pending.length, 1);
   assert.equal(nextStep(s1).tableId, "8-8");
   const done = applyRoll(s1, 1);
-  assert.deepEqual(stripSource(done.gains), [itemGain("Espada longa (ameaçadora)", "arma", { enchantments: ["Ameaçadora"] }, { tier: "menor" })]);
+  assert.deepEqual(stripSource(done.gains), [itemGain("Espada longa (ameaçadora)", "arma", { enchantments: ["Ameaçadora"] }, { tier: "menor", price: 18015 })]);
   // tipo 3 = armadura, 4-6 = acessório na rolagem de mágico
   assert.equal(nextStep(feed(itemsChain("9"), [100, 3])).tableId, "8-4/armadura");
   assert.equal(nextStep(feed(itemsChain("9"), [100, 4])).tableId, "8-13");
@@ -422,10 +423,10 @@ test("magic: counts-as-two rerolls on a minor item and is accepted on a medium o
   assert.match(nextStep(s1).reason, /conta como duas/);
   assert.equal(nextStep(s1).tableId, "8-8");
   const done = applyRoll(s1, 54);
-  assert.deepEqual(stripSource(done.gains), [itemGain("Espada longa (formidável)", "arma", { enchantments: ["Formidável"] }, { tier: "menor" })]);
+  assert.deepEqual(stripSource(done.gains), [itemGain("Espada longa (formidável)", "arma", { enchantments: ["Formidável"] }, { tier: "menor", price: 18015 })]);
   const medium = feed(itemsChain("13"), [100, 1, 40, 65]);
   assert.equal(nextStep(medium), null);
-  assert.deepEqual(stripSource(medium.gains), [itemGain("Espada longa (magnífica)", "arma", { enchantments: ["Magnífica"] }, { tier: "médio" })]);
+  assert.deepEqual(stripSource(medium.gains), [itemGain("Espada longa (magnífica)", "arma", { enchantments: ["Magnífica"] }, { tier: "médio", price: 36015 })]);
 });
 
 test("magic: 'specific' swaps the item for 8-9 and discards enchantments", () => {
@@ -449,9 +450,9 @@ test("magic armor: shield-only rerolls on armor, not on shields", () => {
   assert.equal(nextStep(s1).tableId, "8-10");
   assert.equal(s1.steps.at(-1).outcome.rejected, "apenas escudos");
   assert.match(nextStep(s1).reason, /apenas escudos/);
-  assert.deepEqual(stripSource(applyRoll(s1, 1).gains), [itemGain("Completa (abascante)", "armadura", { enchantments: ["Abascante"] }, { tier: "menor" })]);
+  assert.deepEqual(stripSource(applyRoll(s1, 1).gains), [itemGain("Completa (abascante)", "armadura", { enchantments: ["Abascante"] }, { tier: "menor", price: 21000 })]);
   const shield = feed(itemsChain("9"), [100, 3, 56, 15]);
-  assert.deepEqual(stripSource(shield.gains), [itemGain("Escudo leve (animado)", "escudo", { enchantments: ["Animado"] }, { tier: "menor" })]);
+  assert.deepEqual(stripSource(shield.gains), [itemGain("Escudo leve (animado)", "escudo", { enchantments: ["Animado"] }, { tier: "menor", price: 18005 })]);
 });
 
 test("magic: duplicate enchantment rerolls; Anticriatura rolls the creature", () => {
@@ -464,7 +465,7 @@ test("magic: duplicate enchantment rerolls; Anticriatura rolls the creature", ()
   const done = feed(s2, [5, 54]);
   assert.equal(nextStep(done), null);
   assert.deepEqual(stripSource(done.gains), [itemGain("Espada longa (ameaçadora, anticriatura: morto-vivo, formidável)", "arma",
-    { enchantments: ["Ameaçadora", "Anticriatura", "Formidável"], creature: "morto-vivo" }, { tier: "maior" })]);
+    { enchantments: ["Ameaçadora", "Anticriatura", "Formidável"], creature: "morto-vivo" }, { tier: "maior", price: 72015 })]);
 });
 
 test("magic medium accessory: d% on 8-14", () => {
@@ -838,4 +839,57 @@ test("batch group heading shows the column choice unless both", () => {
   assert.equal(label("both"), "ND 3, Padrão");
   assert.equal(label("items"), "ND 3, Padrão, Só Item");
   assert.equal(label("money"), "ND 3, Padrão, Só Riqueza");
+});
+
+// ---------- Preços (Tabelas 3-3, 3-5, 3-6, 3-7, 3-9) ----------
+
+const longSword = { name: "Espada longa", category: "arma" };
+
+test("every 8-3 and 8-4 item resolves to a base price", () => {
+  const missing = [];
+  for (const id of ["8-3", "8-4/arma", "8-4/armadura", "8-4/esotérico"]) {
+    for (const r of BASIC_BOOK_TABLES[id].rows) if (basePriceOf(r.result.name) === undefined) missing.push(`${id}: ${r.result.name}`);
+  }
+  assert.deepEqual(missing, []);
+  for (const alias of Object.keys(NAME_ALIASES)) assert.ok(BASE_PRICES.has(NAME_ALIASES[alias]), alias);
+  assert.equal(normalizeName("Bálsamo  Restaurador"), "balsamo restaurador");
+});
+
+test("printed prices are transcribed", () => {
+  assert.equal(basePriceOf("Espada longa"), 15);
+  assert.equal(basePriceOf("Pedras (20)"), 0.5);
+  assert.equal(basePriceOf("Armadura completa"), 3000);
+  assert.equal(basePriceOf("Tomo hermético"), 1500);
+  assert.equal(basePriceOf("Clava"), "—");
+  assert.deepEqual(IMPROVEMENT_PRICES, { 1: 300, 2: 3000, 3: 9000, 4: 18000 });
+  assert.equal(MATERIAL_PRICES["gelo eterno"].arma, 600);
+  assert.equal(MATERIAL_PRICES.mitral["armadura pesada"], 12000);
+});
+
+test("priceOf adds improvements, material and enchantments", () => {
+  assert.equal(priceOf({}, longSword), 15);
+  assert.equal(priceOf({ improvements: ["Certeira", "Precisa"] }, longSword), 15 + 3000);
+  assert.equal(priceOf({ improvements: ["Atroz"], improvementCount: 2 }, longSword), 15 + 3000);
+  assert.equal(priceOf({ enchantments: ["A", "B"] }, longSword), 15 + 36000);
+  assert.equal(priceOf({ enchantments: ["A"], enchantmentCount: 2 }, longSword), 15 + 36000);
+  assert.equal(priceOf({ improvements: ["Material especial"], material: "adamante" }, longSword), 15 + 300 + 3000);
+  assert.equal(priceOf({ improvements: ["Material especial"], material: "adamante" }, { name: "Completa", category: "armadura" }), 3000 + 300 + 18000);
+  assert.equal(priceOf({ improvements: ["Material especial"], material: "mitral" }, { name: "Escudo leve", category: "escudo" }), 5 + 300 + 1500);
+  assert.equal(priceOf({ improvements: ["Material especial"], material: "aço-rubi" }, { name: "Varinha arcana", category: "esotérico" }), 100 + 300 + 6000);
+  assert.equal(priceOf({}, { name: "Clava", category: "arma" }), "—");
+  assert.equal(priceOf({ improvements: ["Certeira"] }, { name: "Clava", category: "arma" }), "—");
+  assert.equal(priceOf({}, { name: "Inexistente", category: "arma" }), undefined);
+});
+
+test("engine gains carry a computed price; potions and specific items keep table price", () => {
+  const plain = feed(itemsChain("1"), [50, 10]);
+  assert.equal(plain.gains[0].price, 10); // Bálsamo restaurador
+  const sup = feed(itemsChain("5"), [95, 1, 40, 14, 81]); // Espada longa certeira, precisa
+  assert.equal(sup.gains[0].price, 15 + 3000);
+  const atroz = feed(itemsChain("5"), [95, 1, 40, 1]);
+  assert.equal(atroz.gains[0].price, 15 + 3000);
+  const adam = feed(itemsChain("2"), [95, 4, 11, 41, 2]); // Completa, material especial: adamante
+  assert.equal(adam.gains[0].price, 3000 + 300 + 18000);
+  assert.equal(row("8-12", 37).result.price, 120);
+  assert.equal(row("8-9", 61).result.price, 90000);
 });

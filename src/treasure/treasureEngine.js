@@ -28,6 +28,7 @@
 // aceitos do mesmo item; se recusar, a nova rolagem entra como filha do passo recusado.
 // Quando não resta pedido pendente com o prefixo do dono, o motor monta o `Gain`.
 import { BASIC_BOOK_TABLES, TYPE_ROLLS, ENCHANTMENT_COUNT } from "./tables/basicBook.js";
+import { basePriceOf, priceOf } from "./tables/prices.js";
 import { ALL_TABLES } from "./tables/index.js";
 import { listDie } from "./tables/schema.js";
 import { dieRange, rollDice } from "./dice.js";
@@ -159,9 +160,10 @@ function typeRequest(tableId, rolls, build, twoDice) {
 }
 
 function itemGainFrom(result, tableId) {
+  const price = result.price !== undefined ? result.price : basePriceOf(result.name);
   return {
     kind: "item", name: result.name, category: result.category, source: tableId,
-    ...(result.price !== undefined ? { price: result.price } : {}),
+    ...(price !== undefined ? { price } : {}),
     ...(result.tier !== undefined ? { tier: result.tier } : {}),
     details: SPECIFIC_TABLES.includes(tableId) ? { specific: true } : {},
   };
@@ -242,9 +244,14 @@ function buildItemGain(steps, itemId) {
     details[s.row.result.kind === "improvement" ? "material" : "creature"] = option;
     return `${lowerFirst(s.outcome.name)}: ${option}`;
   });
+  const counted = { ...details };
+  if (details.improvements) counted.improvementCount = accepted.reduce((n, s) => n + s.outcome.slots, 0);
+  if (details.enchantments) counted.enchantmentCount = accepted.reduce((n, s) => n + s.outcome.slots, 0);
+  const price = priceOf(counted, base.row.result);
   return {
     kind: "item", name: `${base.row.result.name} (${segments.join(", ")})`, category: base.row.result.category,
     source: base.tableId,
+    ...(price !== undefined ? { price } : {}),
     ...(build.kind === "magic" ? { tier: build.tier } : {}),
     details,
   };
