@@ -481,6 +481,42 @@ function applyTheme(profile) {
 
 Variáveis controladas: cor de fundo, painéis, header, ações, scrollbar, e 7 cores de colunas para diferenciar caminhos verticais no mapa.
 
+A tela inicial (`#rangeDialog`) não usa esse tema. Ela tem uma paleta própria, sempre escura, com fundo `#13100d`, texto pergaminho `#ecdfc4` e destaque bronze `#b48a4e`. As variáveis `--home-*` ficam no escopo de `#rangeDialog`, então `applyTheme` não as alcança.
+
+---
+
+## Tela inicial, modais e rodapé
+
+Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md). Plano: [docs/superpowers/plans/2026-11-21-tela-inicial-e-modais.md](docs/superpowers/plans/2026-11-21-tela-inicial-e-modais.md).
+
+**Já entregue (tarefas 1 a 3 do plano):**
+
+- **Tela inicial.**
+  - Leva o título “Mega Dungeon de Práxis” e o subtítulo “Gerador de aventuras para Tormenta20”.
+  - **Continuar expedição** só aparece com uma expedição salva e mostra a faixa e o andar.
+  - **Nova expedição** usa três cartões de faixa (`button.range-card[data-range]`, com `aria-pressed`), montados a partir de `card: { icon, name, tagline }` nos perfis.
+  - **Caminhos desconhecidos** virou um interruptor e só aparece nas faixas em mapa de nodos.
+  - **Importar arquivo de sessão** fica no rodapé da tela. O campo de colar o código de sessão foi removido, e o `.txt` cobre a recuperação.
+  - A seção “Ferramentas rápidas” já está no HTML com `hidden`, à espera da tarefa 4.
+- **Modais em tela cheia.** Missões (seleção e acompanhamento), Encontro manual e a ilha do arquipélago seguem o padrão de Nodo e Tesouros: `100vw × 100vh`, sem cantos e com o conteúdo no topo, limitado a cerca de 1100 px.
+- **Rodapé de ferramentas.**
+  - `.floating-tools` agora é um rodapé fixo, com fundo e borda próprios, e a página reserva o espaço dele (`--toolbar-height`).
+  - Os botões mostram o nome: Recarregar, Encontro, Missões e Tesouros. Abaixo de 640 px, só os ícones aparecem.
+  - O tempo de exploração fica à direita. Na faixa 11–20, com o tempo total visível, os rótulos encurtam para “Desde descanso” e “Total”.
+- **QA.** `npm run qa:home` testa a tela inicial e `npm run qa:layout` testa o rodapé e as modais. Os roteiros escolhem a faixa pelos cartões e carregam sessões pelo arquivo (`#sessionFile`).
+
+**Ponto de recomeço.** Retome o plano na **tarefa 4**. O ledger está em `.superpowers/sdd/2026-11-21-tela-inicial-e-modais/progress.md`, que é ignorado pelo Git. Se ele se perder, use o `git log` a partir de `1c04d27`. Faltam:
+
+1. **Tarefa 4.** Confirmação de substituição ao iniciar ou importar com uma expedição salva, e as ferramentas rápidas: Rolar tesouros e Encontro avulso, sem mexer no salvamento. A tarefa também tira o `hidden` dessa seção.
+2. **Tarefa 5.** Fim de faixa com **Avançar para <próxima faixa>** ou **Encerrar expedição**. Encerrar apaga o salvamento automático.
+3. **Tarefa 5b.** Botão **Sobre o app**, à esquerda no rodapé da tela inicial, que abre uma modal com o texto aprovado no design.
+4. **Tarefa 6.** `CREDITOS.md`, com os ícones do game-icons.net em CC BY 3.0, e a atualização desta seção.
+5. **Revisão final do branch inteiro**, a partir de `1c04d27`. Ela deve conferir também estes pontos menores, já anotados:
+   - O `aria-label` do `#timeTracker` não é limpo fora da floresta.
+   - A mensagem “560px” em `qaLayout.mjs` está desatualizada.
+   - O `qaLayout.mjs` fixa os rótulos curtos do contador em vez de usar os do app.
+   - O `blur()` depois de abrir a tela inicial enfraquece o foco inicial para leitores de tela.
+
 ---
 
 ## PWA
