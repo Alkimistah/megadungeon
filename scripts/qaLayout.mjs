@@ -85,10 +85,14 @@ async function checkFooter(page, viewport) {
 async function checkAtRest(page, viewport) {
   const tag = `${viewport.width}x${viewport.height}`;
   const data = await page.evaluate(() => {
-    const footerTop = document.querySelector(".floating-tools").getBoundingClientRect().top;
+    const footer = document.querySelector(".floating-tools");
+    const footerTop = footer.getBoundingClientRect().top;
+    const footerStyle = getComputedStyle(footer);
     const container = document.getElementById("container");
     return {
       footerTop,
+      footerBg: footerStyle.backgroundColor,
+      footerBorder: footerStyle.borderTopWidth,
       mainBottom: document.querySelector("main").getBoundingClientRect().bottom,
       containerBottom: container.getBoundingClientRect().bottom,
       pageScroll: document.documentElement.scrollHeight - window.innerHeight
@@ -97,6 +101,10 @@ async function checkAtRest(page, viewport) {
   assert(data.mainBottom <= data.footerTop + 1, `[${tag}] main (${data.mainBottom}) atras do rodape (${data.footerTop})`);
   assert(data.containerBottom <= data.footerTop + 1, `[${tag}] #container (${data.containerBottom}) atras do rodape (${data.footerTop})`);
   assert(data.pageScroll <= 1, `[${tag}] pagina com rolagem vertical causada pelo rodape: ${data.pageScroll}`);
+  // Pedido do PO: sem faixa sobrando entre o fim do andar e o rodapé, e a faixa do rodapé transparente e sem borda.
+  assert(data.footerTop - data.containerBottom <= 2, `[${tag}] espaco vazio entre o andar e o rodape: ${data.footerTop - data.containerBottom}px`);
+  assert(/rgba\(0, 0, 0, 0\)|transparent/.test(data.footerBg), `[${tag}] fundo do rodape deveria ser transparente: ${data.footerBg}`);
+  assert(data.footerBorder === "0px", `[${tag}] rodape nao deveria ter borda superior: ${data.footerBorder}`);
 }
 
 // Tempo total visivel (faixa 11-20): forca a exibicao e confere que cabe.

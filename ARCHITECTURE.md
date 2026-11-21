@@ -519,12 +519,12 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
 - Esc não fecha mais a tela inicial (`cancel` e `keydown` barrados), o que impedia sobrescrever a expedição salva sem aviso;
 - `autosaveActive` fica desligado durante o Avançar;
 - `#rangeConfirm` e `#importSessionFile` ficam desabilitados até a leitura do salvamento;
-- o `aria-label` do contador é limpo fora da floresta.
+- o `aria-label` do contador é limpo fora da floresta;
+- o rodapé de ferramentas, a pedido do PO, deixou de sobrar espaço: o `body` virou uma coluna de altura `100dvh` e o `main` ocupa todo o espaço entre o cabeçalho e o rodapé, sem o antigo `calc(100vh - 98px …)`. A faixa do rodapé é transparente e sem borda, e só os botões e o contador têm fundo. O `qa:layout` confere que não há espaço vazio entre o andar e o rodapé.
 
 Continuam abertos:
 
-1. **Correção de interface pedida pelo PO:** o rodapé de ferramentas ocupa mais altura do que precisa. Acima dos botões fica a borda que marca o fim do conteúdo, e o rodapé ainda avança mais uma faixa, tirando espaço da tela. O rodapé deve usar só a altura necessária. Se essa faixa precisar existir, deve ter fundo transparente, para não cobrir nem escurecer o andar em exploração.
-2. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
+1. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
    - **Atualizar o Encontro manual.** Ele foi feito quando o app tinha bem menos opções. Hoje há muito mais NDs, terrenos e tipos de criatura (catálogo, papéis de ameaça, perfis das três faixas), e os campos da modal precisam refletir isso.
    - **Tema das ferramentas abertas pela tela inicial.** Abertos pela tela inicial, o Encontro avulso e os Tesouros mostram as cores do perfil ativo, quase sempre o da masmorra. No encontro manual, o PO viu inclusive partes do tema da floresta. Nesse caso, as duas modais devem seguir a paleta da tela inicial (bronze). O tema da faixa vale só quando elas são abertas de dentro de uma expedição.
    - **Cristais nos tesouros.**
@@ -532,8 +532,8 @@ Continuam abertos:
      - Hoje o app só os menciona como valor de “Entrega/cristais” nas recompensas de missão (`missionDialog.js`) e em textos de missão. Não existe um sistema de cristais com valores.
      - A ideia é oferecer cristais como opção de rolagem nas duas abas: Gerar tesouros (em lote) e Rolar na mesa (individual).
      - Antes de implementar, é preciso levantar com o PO as regras dos cristais: o que são, como se obtêm e quanto valem por ND.
-3. **Origem de ícones a confirmar com o PO.** O `CREDITOS.md` lista numa seção própria os ícones sem origem confirmada: `boss`, `camp`, `elite`, `trap`, `treasure`, `normal`, `unknown`, `hidden-forest`, `archipelago-boat`, `close-modal`, `earth-arrow-left`, `info` e `expand-*`. Se vierem do game-icons.net, passam para a seção Game Icons.
-4. **Pontos menores, sem urgência:**
+2. **Origem de ícones a confirmar com o PO.** O `CREDITOS.md` lista numa seção própria os ícones sem origem confirmada: `boss`, `camp`, `elite`, `trap`, `treasure`, `normal`, `unknown`, `hidden-forest`, `archipelago-boat`, `close-modal`, `earth-arrow-left`, `info` e `expand-*`. Se vierem do game-icons.net, passam para a seção Game Icons.
+3. **Pontos menores, sem urgência:**
    - o `qaLayout.mjs` fixa os rótulos curtos do contador;
    - o `blur()` ao abrir a tela inicial enfraquece o foco inicial para leitores de tela;
    - o `qaMissionFlows.mjs` aceita qualquer diálogo sem conferir o texto;

@@ -23,6 +23,11 @@ html {
 
 body {
   --toolbar-height: 64px;
+  /* Coluna da altura da tela: o cabeçalho tem altura própria e o andar (main) ocupa todo o resto até o
+     rodapé, sem número fixo para a altura do cabeçalho. */
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
   margin: 0;
   padding-bottom: var(--toolbar-height);
   box-sizing: border-box;
@@ -199,8 +204,9 @@ button:disabled:hover {
   gap: 12px;
   height: var(--toolbar-height);
   padding: 8px 14px;
-  border-top: 1px solid var(--border);
-  background: var(--panel);
+  /* Faixa transparente: só os botões e o contador têm fundo, para não cobrir nem escurecer o andar. */
+  border-top: 0;
+  background: transparent;
 }
 
 .floating-tools-buttons {
@@ -274,7 +280,8 @@ button:disabled:hover {
 }
 
 main {
-  height: calc(100vh - 98px - var(--toolbar-height));
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 #container {
@@ -3481,10 +3488,6 @@ details.mission-run-guidance p {
 
   .encounter-detail-card {
     max-height: 420px;
-  }
-
-  main {
-    height: calc(100vh - 112px - var(--toolbar-height));
   }
 
   .header-main {
