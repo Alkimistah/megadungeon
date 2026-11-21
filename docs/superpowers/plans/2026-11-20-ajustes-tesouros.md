@@ -183,4 +183,6 @@ Decisões do gerente:
 
 Pendente de decisão do PO: na aba Gerar tesouros, a dica do campo “Rolar” diz “Dinheiro: moedas e riquezas”, mas no rodapé “Dinheiro” e “Total em dinheiro” somam só moedas. Uma alternativa é chamar o rodapé de “Moedas” e “Total em moedas”.
 
+Próximo passo pedido pelo PO: remover a legenda “Dinheiro: moedas e riquezas” abaixo do campo “Rolar”, na aba Gerar tesouros.
+
 Pendências que continuam: o pré-cache no `public/sw.js` e a página do livro na cascata, além do texto de cor fixa `#d8c8b7`, que fica para uma revisão geral de cores do app.

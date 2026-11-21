@@ -541,6 +541,7 @@ Testes: `npm run test:treasure` roda o motor, as tabelas e o lote. `npm run qa:t
 
 **Próximos passos**
 
+- Remover a legenda “Dinheiro: moedas e riquezas” abaixo do campo “Rolar”, na aba Gerar tesouros. Pedido do PO.
 - Pré-cache dos arquivos no `install` do `public/sw.js`, para o app funcionar offline já na primeira visita. Esta é uma melhoria geral do app.
 - Página do livro também na cascata, que hoje aparece só no rodapé.
 - `renderStep` duplicado entre as duas abas.
