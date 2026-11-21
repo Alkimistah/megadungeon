@@ -1334,10 +1334,11 @@ test("Tollon: rejected on Espada longa and Escudo pesado, accepted on Clava, Esc
 
 test("material rules: wooden weapons by name, light shields only, other materials free", () => {
   for (const name of ["Arco curto", "Arco longo", "Bordão", "Clava", "Lança", "Lança montada", "Pique", "Tacape",
-    "Porrete", "Tetsubo", "Malho", "Clava-grão", "Lança de justa", "Lança de falange", "Arco montado", "Arco de guerra"]) {
+    "Porrete", "Tetsubo", "Malho", "Clava-grão", "Lança de justa", "Lança de falange", "Arco montado", "Arco de guerra",
+    "Zarabatana", "Bastão lúdico"]) {
     assert.ok(isWoodenWeapon(name), name);
   }
-  for (const name of ["Picareta", "Espada longa", "Besta leve", "Flechas (20)", "Lança de fogo", "Martelo longo", "Bastão lúdico", "Zarabatana"]) {
+  for (const name of ["Picareta", "Espada longa", "Besta leve", "Flechas (20)", "Lança de fogo", "Martelo longo"]) {
     assert.ok(!isWoodenWeapon(name), name);
   }
   assert.equal(materialProblem("madeira Tollon", { name: "Armadura de ossos", category: "armadura", armor: "leve" }) !== null, true);

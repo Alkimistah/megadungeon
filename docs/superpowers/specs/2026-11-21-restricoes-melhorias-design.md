@@ -24,9 +24,9 @@ Os outros materiais do Livro Básico (aço-rubi, adamante, gelo eterno, matéria
 
 - **Armas de madeira (lista explícita, conferida nos livros a pedido do PO):**
   - **Livro Básico:** Arco curto, Arco longo, Bordão, Clava, Lança, Lança montada, Pique, Tacape.
-  - **Ameaças de Arton:** Porrete (“pedaço sólido de madeira”, p. 393) e Tetsubo (“versão mais pesada do tacape”, reforçada com anéis de metal, p. 394).
-  - **Heróis de Arton:** Malho (“pode ser fabricado de madeira Tollon”, p. 221), Clava-grão (cultivada a partir de sementes), Lança de justa, Lança de falange, Arco montado e Arco de guerra.
-  - **Ficam de fora:** Lança de fogo (arma de fogo), Martelo longo (cabeça de metal), Bastão lúdico e Zarabatana (o texto não diz o material).
+  - **Ameaças de Arton:** Porrete (“pedaço sólido de madeira”, p. 393), Tetsubo (“versão mais pesada do tacape”, reforçada com anéis de metal, p. 394) e Zarabatana (tradicionalmente de madeira; decisão do PO).
+  - **Heróis de Arton:** Malho (“pode ser fabricado de madeira Tollon”, p. 221), Bastão lúdico (um taco, pela ilustração e pela descrição; decisão do PO), Clava-grão (cultivada a partir de sementes), Lança de justa, Lança de falange, Arco montado e Arco de guerra.
+  - **Ficam de fora:** Lança de fogo (arma de fogo), Martelo longo (cabeça de metal).
 - **Escudos leves:** Escudo leve (Livro Básico), Broquel (“pode ser usado para atacar como um escudo leve”, Heróis p. 225–226) e Escudo de couro (armação de madeira, “muito leve para ser usado como arma”, Ameaças p. 395). Escudo pesado, Escudo torre, Sagna (“ataca como escudo pesado”) e Escudo de vime não recebem Tollon.
 - **Armas de disparo:** definidas pela classificação do Livro Básico, conferida na p. 142–145. A funda fica de fora.
 - **Nas combinações proibidas (reforçada/delicada, maciça/precisa), rola de novo a melhoria que chegou por último.**

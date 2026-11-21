@@ -7,13 +7,13 @@ import { normalizeName, armorWeight } from "./tables/prices.js";
 const nameSet = (names) => new Set(names.map(normalizeName));
 
 // Armas de madeira (p. 167: arcos, bordões, clavas, lanças, piques e tacapes), lista conferida nos
-// livros (decisão do gerente). Ameaças: Porrete (p. 393) e Tetsubo (p. 394). Heróis: Malho (p. 221),
-// Clava-grão, Lança de justa, Lança de falange, Arco montado e Arco de guerra. Ficam de fora Lança de
-// fogo, Martelo longo, Bastão lúdico e Zarabatana.
+// livros com o PO. Ameaças: Porrete (p. 393), Tetsubo (p. 394) e Zarabatana. Heróis: Bastão lúdico,
+// Malho (p. 221), Clava-grão, Lança de justa, Lança de falange, Arco montado e Arco de guerra.
+// Ficam de fora Lança de fogo e Martelo longo.
 const WOODEN_WEAPONS = nameSet([
   "Arco curto", "Arco longo", "Bordão", "Clava", "Lança", "Lança montada", "Pique", "Tacape",
-  "Porrete", "Tetsubo",
-  "Malho", "Clava-grão", "Lança de justa", "Lança de falange", "Arco montado", "Arco de guerra",
+  "Porrete", "Tetsubo", "Zarabatana",
+  "Bastão lúdico", "Malho", "Clava-grão", "Lança de justa", "Lança de falange", "Arco montado", "Arco de guerra",
 ]);
 
 export function isWoodenWeapon(name) {
