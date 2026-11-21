@@ -213,15 +213,17 @@ function materialColumn({ name, category }) {
 // das listas quando há melhoria ou encanto que conta como dois.
 export function priceOf(details, base) {
   const basePrice = basePriceOf(base.name);
-  if (basePrice === undefined || typeof basePrice === "string") return basePrice;
-  let total = basePrice;
+  if (basePrice === undefined) return undefined;
   const improvements = details?.improvementCount ?? details?.improvements?.length ?? 0;
+  const enchantments = details?.enchantmentCount ?? details?.enchantments?.length ?? 0;
+  // "—" é gratuito (Clava, Bordão...): sozinho continua "—"; com extras soma a partir de 0.
+  if (typeof basePrice === "string" && (basePrice !== "—" || (!improvements && !details?.material && !enchantments))) return basePrice;
+  let total = typeof basePrice === "number" ? basePrice : 0;
   if (improvements > 0) total += IMPROVEMENT_PRICES[Math.min(improvements, 4)];
   if (details?.material) {
     const extra = materialPrice(details.material, base);
     if (typeof extra === "number") total += extra;
   }
-  const enchantments = details?.enchantmentCount ?? details?.enchantments?.length ?? 0;
   if (enchantments > 0) total += ENCHANTMENT_PRICES[Math.min(enchantments, 3)].price;
   return total;
 }

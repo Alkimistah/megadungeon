@@ -877,7 +877,10 @@ test("priceOf adds improvements, material and enchantments", () => {
   assert.equal(priceOf({ improvements: ["Material especial"], material: "mitral" }, { name: "Escudo leve", category: "escudo" }), 5 + 300 + 1500);
   assert.equal(priceOf({ improvements: ["Material especial"], material: "aço-rubi" }, { name: "Varinha arcana", category: "esotérico" }), 100 + 300 + 6000);
   assert.equal(priceOf({}, { name: "Clava", category: "arma" }), "—");
-  assert.equal(priceOf({ improvements: ["Certeira"] }, { name: "Clava", category: "arma" }), "—");
+  const clava = { name: "Clava", category: "arma" };
+  assert.equal(priceOf({ improvements: ["Certeira"] }, clava), 300);
+  assert.equal(priceOf({ improvements: ["Material especial"], material: "adamante" }, clava), 300 + 3000);
+  assert.equal(priceOf({ enchantments: ["A"] }, clava), 18000);
   assert.equal(priceOf({}, { name: "Inexistente", category: "arma" }), undefined);
 });
 
