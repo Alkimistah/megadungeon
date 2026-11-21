@@ -1271,3 +1271,17 @@ test("weighted 8-3 pool excludes services but lists keep them", () => {
     for (const g of done.gains) assert.ok(!services.includes(g.name), g.name);
   }
 });
+
+import { stepReference } from "../src/treasure/treasureFormat.js";
+
+test("stepReference shows only the page for basic book tables", () => {
+  assert.equal(stepReference({ tableId: "8-1/1/money" }), "p. 328");
+});
+test("stepReference uses the drawn source table", () => {
+  const id = Object.keys(ALL_TABLES).find((k) => ALL_TABLES[k].book && ALL_TABLES[k].book !== "Livro Básico");
+  const t = ALL_TABLES[id];
+  assert.equal(stepReference({ tableId: "8-3", sourceTableId: id }), `${t.book} p. ${t.bookPage}`);
+});
+test("stepReference is empty for unknown tables", () => {
+  assert.equal(stepReference({ tableId: "nao-existe" }), "");
+});

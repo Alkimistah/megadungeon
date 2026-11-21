@@ -98,6 +98,15 @@ export function tableLabel(tableId) {
   return title ? title.replace(/^(Tabela [\d-]+): /, "$1 · ") : `Tabela ${tableId}`;
 }
 
+// Página do passo: "p. N" no Livro Básico, "<livro> p. N" em outro livro, vazio sem livro.
+export function stepReference(step) {
+  const table = ALL_TABLES[step.sourceTableId ?? step.tableId];
+  if (!table?.book) return "";
+  const page = table.bookPage ? `p. ${table.bookPage}` : "";
+  if (table.book === "Livro Básico") return page;
+  return page ? `${table.book} ${page}` : table.book;
+}
+
 // "Livro p. N" da tabela de origem; vazio quando a tabela não tem livro/página.
 export function bookReference(tableId) {
   const table = ALL_TABLES[tableId];

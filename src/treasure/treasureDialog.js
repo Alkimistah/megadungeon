@@ -4,7 +4,7 @@ import { rollDice, dieRange } from "./dice.js";
 import { buildBatch, rollBatch, listSpecificTables, MAX_QUANTITY, MODE_LABELS, COLUMN_LABELS } from "./treasureBatch.js";
 import { TYPE_ROLLS } from "./tables/basicBook.js";
 import { ALL_TABLES } from "./tables/index.js";
-import { describeStep, describeRowResult, formatRange, stepDepth, formatAmount, formatItemLine, formatComponents, formatBookDraw, parseTypedValue, tableLabel, describeBookRowResult } from "./treasureFormat.js";
+import { describeStep, describeRowResult, formatRange, stepDepth, formatAmount, formatItemLine, formatComponents, formatBookDraw, stepReference, parseTypedValue, tableLabel, describeBookRowResult } from "./treasureFormat.js";
 import { summarizeGains } from "./treasureSummary.js";
 import { createRng, createRandomSeed } from "../random.js";
 
@@ -77,21 +77,25 @@ export function renderSummary(container, gains) {
 
 // ---------- Resultados ----------
 
+function renderStep(step, { note, draw } = {}) {
+  const { roll, result } = describeStep(step);
+  const li = el("li", "treasure-step");
+  li.style.marginLeft = `${stepDepth(step) * 14}px`;
+  const shownId = step.sourceTableId ?? step.tableId;
+  const table = el("span", "treasure-step-table", tableLabel(shownId));
+  table.title = shownId;
+  li.append(table, " ");
+  const ref = stepReference(step);
+  if (ref) li.append(el("span", "treasure-step-ref", `(${ref})`), " ");
+  li.append(el("span", "treasure-step-roll", roll), " → ", el("span", "treasure-step-result", result));
+  if (draw) li.append(" ", el("em", "treasure-book-draw", `(${draw})`));
+  if (note) li.append(" ", el("em", "treasure-note", `(${note})`));
+  return li;
+}
+
 function renderChain(state) {
   const list = el("ol", "treasure-cascade");
-  for (const step of state.steps) {
-    const { roll, result } = describeStep(step);
-    const li = el("li", "treasure-step");
-    li.style.marginLeft = `${stepDepth(step) * 14}px`;
-    const shownId = step.sourceTableId ?? step.tableId;
-    const table = el("span", "treasure-step-table", tableLabel(shownId));
-    table.title = shownId;
-    li.append(table, " ", el("span", "treasure-step-roll", roll),
-      " → ", el("span", "treasure-step-result", result));
-    const draw = formatBookDraw(step);
-    if (draw) li.append(" ", el("em", "treasure-book-draw", `(${draw})`));
-    list.append(li);
-  }
+  for (const step of state.steps) list.append(renderStep(step, { draw: formatBookDraw(step) }));
   return list;
 }
 
@@ -228,16 +232,7 @@ function startConsult({ source, nd, column, mode }) {
 
 function renderHistory(state, notes, prefix = "") {
   const list = el("ol", "treasure-cascade treasure-consult-history");
-  for (const step of state.steps) {
-    const { roll, result } = describeStep(step);
-    const li = el("li", "treasure-step");
-    li.style.marginLeft = `${stepDepth(step) * 14}px`;
-    const table = el("span", "treasure-step-table", tableLabel(step.tableId));
-    table.title = step.tableId;
-    li.append(table, " ", el("span", "treasure-step-roll", roll), " → ", el("span", "treasure-step-result", result));
-    if (notes.has(prefix + step.id)) li.append(" ", el("em", "treasure-note", `(${notes.get(prefix + step.id)})`));
-    list.append(li);
-  }
+  for (const step of state.steps) list.append(renderStep(step, { note: notes.get(prefix + step.id) }));
   return list;
 }
 

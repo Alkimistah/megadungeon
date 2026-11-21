@@ -3219,6 +3219,11 @@ details.mission-run-guidance p {
   color: #d8c8b7;
 }
 
+.treasure-step-ref {
+  color: #d8c8b7;
+  font-size: 12px;
+}
+
 .treasure-wealth-total {
   margin-top: 4px !important;
 }

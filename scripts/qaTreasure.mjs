@@ -114,6 +114,7 @@ try {
   assert.deepEqual(indexes, Array.from({ length: 11 }, (_, i) => `${i + 1}.`));
   assert.equal(await page.locator("#treasureDialog .treasure-cascade").count(), 21, "21 cadeias");
   assert.ok(await page.locator("#treasureDialog .treasure-step").count() >= 21);
+  assert.match(await page.locator("#treasureDialog .treasure-cascade .treasure-step-ref").first().innerText(), /^\(p\. \d+\)$/, "página na cascata");
   assert.equal(await page.locator("#treasureFooter").isVisible(), true, "rodapé visível");
   const cellTotal = (await results.evaluateAll(els => els.map(e => Number(e.dataset.tibars)))).reduce((a, b) => a + b, 0);
   const footerTotal = Number(await page.locator("#treasureFooter").getAttribute("data-total-tibars"));
@@ -217,6 +218,7 @@ try {
   assert.notEqual(await page.locator(`${C} .treasure-c-error`).innerText(), "", "0 mostra erro");
   await apply(40);
   assert.match(await page.locator("#treasureDialog .treasure-consult-history").innerText(), /Equipamento/);
+  assert.ok(await page.locator("#treasureDialog .treasure-consult-history .treasure-step-ref").count() >= 1, "página no histórico");
   assert.match(await page.locator(`${C} .treasure-consult-reason`).innerText(), /Tipo do equipamento/);
   await apply(2);
   assert.match(await page.locator(`${C} .treasure-consult-step`).innerText(), /8-4/, "abre na 8-4 de armas");
