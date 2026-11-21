@@ -70,7 +70,7 @@ export function validateListTable(list) {
 
 // Monta uma lista a partir do texto impresso: uma linha por item, "Nome|preço" (preço opcional).
 // `category` pode ser função do nome (listas mistas de armaduras e escudos).
-export function listTable({ id, title, label, book, bookPage, pdfPage, category, tier, text }) {
+export function listTable({ id, title, label, book, bookPage, pdfPage, category, tier, text, appliesTo }) {
   const items = text.trim().split("\n").map((line) => {
     const [name, price] = line.split("|");
     const cat = typeof category === "function" ? category(name) : category;
@@ -79,6 +79,7 @@ export function listTable({ id, title, label, book, bookPage, pdfPage, category,
       ...(price !== undefined ? { price: parsePrice(price) } : {}),
       category: cat,
       ...(tier ? { tier } : {}),
+      ...(appliesTo ? { appliesTo: [...appliesTo[name]] } : {}),
     };
   });
   const list = {

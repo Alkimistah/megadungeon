@@ -356,6 +356,30 @@ function perTier(slug, table, name, labelName, category, bookPage, pdfPage, text
   }));
 }
 
+// Tabela 3-5, PDF 242 (p. 240). Não traz notas de rodapé: nenhuma melhoria "conta como duas" nem pede material.
+// Seções impressas: armas; armaduras e escudos; esotéricos; ferramentas e vestuário; qualquer das categorias acima.
+const TABLE_3_5 = `
+Farpada
+Fósforo
+Guarda
+Incendiária
+Pressurizada
+Balístico
+Injetora
+Prudente
+Potencializador
+Brasonado
+Usado
+Deslumbrante`;
+const ALL_KINDS = ["arma", "armadura", "esotérico", "ferramenta", "vestuário"];
+const TABLE_3_5_APPLIES = {
+  Farpada: ["arma"], Fósforo: ["arma"], Guarda: ["arma"], Incendiária: ["arma"], Pressurizada: ["arma"],
+  Balístico: ["armadura"], Injetora: ["armadura"], Prudente: ["armadura"],
+  Potencializador: ["esotérico"],
+  Brasonado: ["ferramenta", "vestuário"], Usado: ["ferramenta", "vestuário"],
+  Deslumbrante: ALL_KINDS,
+};
+
 export const HEROES_LISTS = [
   listTable({ ...base, id: "herois/armas", title: "Heróis, Tabela 3-1: Armas", label: "Heróis · Armas",
     bookPage: 218, pdfPage: 220, category: "arma", text: TABLE_3_1 }),
@@ -365,6 +389,8 @@ export const HEROES_LISTS = [
     bookPage: 224, pdfPage: 226, category: shield, text: TABLE_3_3 }),
   listTable({ ...base, id: "herois/itens-gerais", title: "Heróis, Tabela 3-4: Itens Gerais", label: "Heróis · Itens gerais",
     bookPage: 228, pdfPage: 230, category: "item geral", text: TABLE_3_4 }),
+  listTable({ ...base, id: "herois/melhorias", title: "Heróis, Tabela 3-5: Novas Melhorias", label: "Heróis · Novas melhorias",
+    bookPage: 240, pdfPage: 242, category: "melhoria", text: TABLE_3_5, appliesTo: TABLE_3_5_APPLIES }),
   ...perTier("armas-especificas", "3-9", "Armas Específicas", "Armas específicas", "arma", 257, 259, TABLE_3_9),
   ...perTier("armaduras-especificas", "3-10", "Armaduras & Escudos Específicos", "Armaduras e escudos específicos", shield, 259, 261, TABLE_3_10),
   ...perTier("esotericos", "3-11", "Esotéricos Específicos", "Esotéricos específicos", "esotérico", 262, 264, TABLE_3_11),

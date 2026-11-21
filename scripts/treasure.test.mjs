@@ -696,7 +696,7 @@ const LIST_COUNTS = {
   "herois/armaduras-especificas/medio": 4, "herois/armaduras-especificas/maior": 6,
   "herois/esotericos/medio": 1, "herois/esotericos/maior": 3,
   "herois/acessorios/menor": 23, "herois/acessorios/medio": 30, "herois/acessorios/maior": 11,
-  "deuses/itens-gerais": 70, "deuses/melhorias": 5,
+  "deuses/itens-gerais": 70, "deuses/melhorias": 5, "herois/melhorias": 12,
 };
 
 test("other-book lists have the printed item counts and valid shape", () => {
@@ -768,7 +768,7 @@ test("listDie builds 1d<n> and the engine yields the v-th item", () => {
   assert.throws(() => applyRoll(state, 24), RangeError);
   assert.throws(() => applyRoll(state, 1.5), RangeError);
   const melhoria = applyRoll(startTable("deuses/melhorias"), 3).gains[0];
-  assert.deepEqual(melhoria, { kind: "item", source: "deuses/melhorias", name: "Inscrito", category: "melhoria", details: {} });
+  assert.deepEqual(melhoria, { kind: "item", source: "deuses/melhorias", name: "Inscrito", category: "melhoria", appliesTo: ["armadura", "ferramenta", "vestuário"], details: {} });
 });
 
 test("resolveWithDice picks uniformly from a list and is reproducible", () => {
@@ -895,4 +895,31 @@ test("engine gains carry a computed price; potions and specific items keep table
   assert.equal(adam.gains[0].price, 3000 + 300 + 18000);
   assert.equal(row("8-12", 37).result.price, 120);
   assert.equal(row("8-9", 61).result.price, 90000);
+});
+
+test("improvement lists: printed order, categories and appliesTo from the printed sections", () => {
+  const her = LIST_TABLES["herois/melhorias"];
+  assert.equal(her.label, "Heróis · Novas melhorias");
+  assert.equal(her.pdfPage, 242);
+  assert.equal(her.tier, undefined);
+  assert.deepEqual(her.items.map((i) => i.name), ["Farpada", "Fósforo", "Guarda", "Incendiária", "Pressurizada",
+    "Balístico", "Injetora", "Prudente", "Potencializador", "Brasonado", "Usado", "Deslumbrante"]);
+  const by = (list, n) => list.items.find((i) => i.name === n);
+  assert.deepEqual(by(her, "Farpada").appliesTo, ["arma"]);
+  assert.deepEqual(by(her, "Prudente").appliesTo, ["armadura"]);
+  assert.deepEqual(by(her, "Potencializador").appliesTo, ["esotérico"]);
+  assert.deepEqual(by(her, "Brasonado").appliesTo, ["ferramenta", "vestuário"]);
+  assert.deepEqual(by(her, "Deslumbrante").appliesTo, ["arma", "armadura", "esotérico", "ferramenta", "vestuário"]);
+  const gods = LIST_TABLES["deuses/melhorias"];
+  assert.deepEqual(by(gods, "Conduíte").appliesTo, ["arma"]);
+  assert.deepEqual(by(gods, "Inscrito").appliesTo, ["armadura", "ferramenta", "vestuário"]);
+  assert.deepEqual(by(gods, "Canônico").appliesTo, ["arma", "armadura", "esotérico", "ferramenta", "vestuário"]);
+  for (const list of [her, gods]) {
+    for (const i of list.items) {
+      assert.equal(i.category, "melhoria", i.name);
+      assert.ok(i.appliesTo.length > 0, i.name);
+      assert.equal(i.special, undefined, i.name);
+      assert.equal(i.subroll, undefined, i.name);
+    }
+  }
 });

@@ -85,9 +85,19 @@ Inscrito
 Canônico
 Devotado`;
 
+// Seções impressas: armas; armaduras, escudos, ferramentas e vestuários; todas as categorias.
+const ALL_KINDS = ["arma", "armadura", "esotérico", "ferramenta", "vestuário"];
+const TABLE_1_4_APPLIES = {
+  Conduíte: ["arma"],
+  Diligente: ["armadura", "ferramenta", "vestuário"],
+  Inscrito: ["armadura", "ferramenta", "vestuário"],
+  Canônico: ALL_KINDS,
+  Devotado: ALL_KINDS,
+};
+
 export const GODS_LISTS = [
   listTable({ ...base, id: "deuses/itens-gerais", title: "Deuses, Tabela 1-3: Itens Gerais", label: "Deuses · Itens gerais",
     bookPage: 50, pdfPage: 52, category: "item geral", text: TABLE_1_3 }),
   listTable({ ...base, id: "deuses/melhorias", title: "Deuses, Tabela 1-4: Melhorias", label: "Deuses · Melhorias",
-    bookPage: 54, pdfPage: 56, category: "melhoria", text: TABLE_1_4 }),
+    bookPage: 54, pdfPage: 56, category: "melhoria", text: TABLE_1_4, appliesTo: TABLE_1_4_APPLIES }),
 ];
