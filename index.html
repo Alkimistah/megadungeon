@@ -59,18 +59,19 @@
       </div>
     </header>
     <div class="floating-tools" aria-label="Ferramentas globais">
-      <button id="reloadAppButton" class="reload-button" type="button" aria-label="Recarregar aplicativo"><img src="/assets/icons/return-arrow.svg" alt="" /></button>
-      <button id="manualEncounterButton" class="reload-button" type="button" aria-label="Gerar encontro manual"><img src="/assets/icons/sword-spin.svg" alt="" /></button>
-      <button id="missionButton" class="reload-button" type="button" aria-label="Ver missões selecionadas" title="Missões"><img src="/assets/icons/game-icons--tied-scroll.svg" alt="" /></button>
-      <button id="treasureButton" class="reload-button" type="button" aria-label="Rolar tesouros" title="Tesouros"><img src="/assets/icons/streamline-cyber--treasure-chest-open.svg" alt="" /></button>
-    </div>
-
-    <div id="timeTracker" class="time-tracker" aria-live="polite">
-      <span id="timeTrackerLabel">Tempo de exploração</span>
-      <strong id="timeTrackerValue">0min</strong>
-      <div id="totalTimeTracker" class="time-tracker-total" hidden>
-        <span id="totalTimeTrackerLabel">Tempo total de exploração</span>
-        <strong id="totalTimeTrackerValue">0min</strong>
+      <div class="floating-tools-buttons">
+        <button id="reloadAppButton" class="reload-button" type="button" aria-label="Recarregar aplicativo"><img src="/assets/icons/return-arrow.svg" alt="" /><span>Recarregar</span></button>
+        <button id="manualEncounterButton" class="reload-button" type="button" aria-label="Gerar encontro manual"><img src="/assets/icons/sword-spin.svg" alt="" /><span>Encontro</span></button>
+        <button id="missionButton" class="reload-button" type="button" aria-label="Ver missões selecionadas" title="Missões"><img src="/assets/icons/game-icons--tied-scroll.svg" alt="" /><span>Missões</span></button>
+        <button id="treasureButton" class="reload-button" type="button" aria-label="Rolar tesouros" title="Tesouros"><img src="/assets/icons/streamline-cyber--treasure-chest-open.svg" alt="" /><span>Tesouros</span></button>
+      </div>
+      <div id="timeTracker" class="time-tracker" aria-live="polite">
+        <span id="timeTrackerLabel">Tempo de exploração</span>
+        <strong id="timeTrackerValue">0min</strong>
+        <div id="totalTimeTracker" class="time-tracker-total" hidden>
+          <span id="totalTimeTrackerLabel">Tempo total de exploração</span>
+          <strong id="totalTimeTrackerValue">0min</strong>
+        </div>
       </div>
     </div>
     <p id="autosaveError" role="status" hidden>O progresso recente não foi salvo no aplicativo. Exporte a sessão para guardar uma cópia.</p>

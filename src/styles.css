@@ -22,7 +22,10 @@ html {
 }
 
 body {
+  --toolbar-height: 64px;
   margin: 0;
+  padding-bottom: var(--toolbar-height);
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
   background: var(--page);
   color: #f2e6d8;
@@ -194,9 +197,22 @@ button:disabled:hover {
 
 .floating-tools {
   position: fixed;
-  left: 14px;
-  bottom: 14px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 20;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: var(--toolbar-height);
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.floating-tools-buttons {
   display: flex;
   gap: 8px;
 }
@@ -205,13 +221,14 @@ button:disabled:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
+  gap: 8px;
   height: 46px;
-  padding: 0;
+  min-width: 46px;
+  padding: 0 12px;
   border: 1px solid var(--header-border);
   border-radius: 8px;
   background: color-mix(in srgb, var(--panel) 92%, transparent);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
+  font-size: 13px;
 }
 
 .floating-tools .reload-button:hover {
@@ -222,19 +239,28 @@ button:disabled:hover {
   filter: brightness(0) invert(1);
 }
 
+@media (max-width: 559px) {
+  .floating-tools .reload-button {
+    width: 46px;
+    padding: 0;
+  }
+
+  .floating-tools .reload-button span {
+    display: none;
+  }
+}
+
 .time-tracker {
-  position: fixed;
-  right: 14px;
-  bottom: 14px;
-  z-index: 20;
   display: grid;
-  gap: 2px;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto;
+  column-gap: 14px;
+  row-gap: 2px;
   min-width: 142px;
-  padding: 9px 11px;
+  padding: 4px 11px;
   border: 1px solid var(--header-border);
   border-radius: 8px;
   background: color-mix(in srgb, var(--panel) 92%, transparent);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
 }
 
 .time-tracker span {
@@ -251,13 +277,13 @@ button:disabled:hover {
 .time-tracker-total {
   display: grid;
   gap: 2px;
-  margin-top: 4px;
-  padding-top: 5px;
-  border-top: 1px solid var(--header-border);
+  grid-row: 1 / span 2;
+  padding-left: 12px;
+  border-left: 1px solid var(--header-border);
 }
 
 main {
-  height: calc(100vh - 98px);
+  height: calc(100vh - 98px - var(--toolbar-height));
 }
 
 #container {
