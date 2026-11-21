@@ -81,7 +81,7 @@ O botão **Sobre o app** abre uma modal em tela cheia, que segue o padrão da se
 > Durante a expedição, o progresso é salvo automaticamente no aparelho, e só existe uma expedição salva por vez. Ao fim de cada sessão, vale exportar o arquivo de sessão pelo botão no topo da tela, como garantia. Ao vencer o desafio final de uma faixa, o app oferece avançar para a próxima ou encerrar a expedição.
 >
 > **Sobre o projeto**
-> O app nasceu para a Mega Dungeon de Práxis, a masmorra que se estende sob a cidade de Práxis, e acompanha as expedições dessa campanha. As faixas, porém, servem para qualquer aventura parecida: a Masmorra funciona para outras explorações de masmorras, e a Floresta e o Arquipélago para explorações nos ermos. Basta escolher a faixa de andares cujo nível e ambiente combinam com a exploração da sua mesa. Tormenta20 é um jogo da Jambô Editora; este app é um projeto de fã, sem vínculo oficial.
+> O app nasceu para a Mega Dungeon de Práxis, a masmorra que fica na cidade de Práxis, e acompanha as expedições dessa campanha. As faixas, porém, servem para qualquer aventura parecida: a Masmorra funciona para outras explorações de masmorras, e a Floresta e o Arquipélago para explorações nos ermos. Basta escolher a faixa de andares cujo nível e ambiente combinam com a exploração da sua mesa. Tormenta20 é um jogo da Jambô Editora; este app é um projeto de fã, sem vínculo oficial.
 
 O texto foi revisado pelo PO: Práxis é a cidade onde fica a Mega Dungeon, e o crédito dos ícones fica só no `CREDITOS.md`.
 
