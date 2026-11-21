@@ -509,15 +509,15 @@ O app funciona offline via Service Worker (`public/sw.js`) com cache de todos os
 
 ### Rolagem de tesouros
 
-A modal **Tesouros** rola tesouros e consulta as tabelas passo a passo. Regras, decisões do PO e critérios de validação estão em [docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md](docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md). Os ajustes feitos após o uso no tablet estão em [docs/superpowers/specs/2026-11-20-ajustes-tesouros-design.md](docs/superpowers/specs/2026-11-20-ajustes-tesouros-design.md).
+A modal **Tesouros** rola tesouros e consulta as tabelas passo a passo. Regras, decisões do PO e critérios de validação estão em [docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md](docs/superpowers/specs/2026-11-20-rolagem-de-tesouros-design.md). Os ajustes feitos após o uso no tablet estão em [docs/superpowers/specs/2026-11-20-ajustes-tesouros-design.md](docs/superpowers/specs/2026-11-20-ajustes-tesouros-design.md), e o acabamento das abas, da cascata e do pré-cache offline em [docs/superpowers/specs/2026-11-21-acabamento-tesouros-design.md](docs/superpowers/specs/2026-11-21-acabamento-tesouros-design.md).
 
 - **Entrada.** Um botão no cabeçalho, com o ícone de baú aberto e junto aos acessos de encontros manuais e missões, abre a modal. Ela ocupa a tela inteira, como a modal do nodo, e as cores seguem o tema do perfil de andares selecionado.
-- **Abas.** Estilo de fichário, diferente dos botões do resto do app: **Gerar tesouros** e **Rolar com o livro**.
-- **Aba Gerar tesouros.** Uma linha por rolagem, com ND, Quantidade (1 a 99), Tipo (Padrão, Metade ou Dobro) e o campo **Rolar**: **Itens e dinheiro**, **Só itens** ou **Só dinheiro** (uma dica explica que “dinheiro” são moedas e riquezas, como na Tabela 8-1). Uma linha também pode apontar para uma tabela específica, inclusive as listas de outros livros; uma tabela específica escolhida explicitamente não recebe ponderação. **Rolar tudo** gera o lote: cada tesouro aparece numerado, com a cascata de passos (valor rolado, linha obtida, tabela seguinte e “Livro sorteado”, quando houve ponderação).
+- **Abas.** Seletor segmentado: **Gerar tesouros** e **Rolar na mesa**. É um controle único, com borda e cantos arredondados; a opção ativa fica preenchida com a cor de ação do tema, e o painel abaixo tem borda própria com os quatro cantos arredondados.
+- **Aba Gerar tesouros.** Uma linha por rolagem, com ND, Quantidade (1 a 99), Tipo (Padrão, Metade ou Dobro) e o campo **Rolar**: **Itens e dinheiro**, **Só itens** ou **Só dinheiro**, sem legenda abaixo. Uma linha também pode apontar para uma tabela específica, inclusive as listas de outros livros; uma tabela específica escolhida explicitamente não recebe ponderação. **Rolar tudo** gera o lote: cada tesouro aparece numerado, com a cascata de passos (valor rolado, linha obtida, tabela seguinte e “Livro sorteado”, quando houve ponderação). Cada passo mostra também a página do livro ao lado do nome da tabela, entre parênteses: **(p. N)** no Livro Básico e **(<Livro> p. N)** nos outros livros.
 - **Pesos entre livros.** Só nesta aba e só para cadeias que partem da Tabela 8-1: quando uma rolagem cai numa tabela secundária que outros livros ampliam, há 70% de chance para o Livro Básico e 30% para as listas dos outros livros, divididos na proporção do número de itens elegíveis de cada uma. Serviços de Heróis e Deuses (casamento, cerimônia religiosa, sacramento, condecoração militar, favor da pessoa amada) ficam fora do sorteio ponderado da Tabela 8-3, mas continuam nas listas para “Tabela específica”. As regras estão em `src/treasure/bookWeights.js` e são aplicadas pela fonte aleatória (`resolveWithDice`).
 - **Rodapé do lote.** Cada item traz preço e componentes com livro e página (base, melhorias, material, encantos). Riquezas e itens ficam em seções separadas, com **Total em riquezas: T$ X** abaixo da lista de riquezas. O rodapé traz moedas, riquezas, itens e a linha **Valor total (dinheiro + riquezas): T$ Y**. Não há faixa fixa de totais.
 - **Preços.** `src/treasure/tables/prices.js` monta o preço de cada item: itens comuns pelas Tabelas 3-3, 3-5 e 3-6 do Capítulo 3; itens superiores somam as melhorias da Tabela 3-7 e o material da Tabela 3-9; itens mágicos encantados somam os encantos da Tabela 8-7; itens dos outros livros usam o preço impresso nas próprias listas.
-- **Aba Rolar com o livro.** Um tesouro por vez, a partir de uma tabela inicial (a 8-1 pede ND e coluna), com dois modos:
+- **Aba Rolar na mesa.** Os dados são rolados na mesa e o resultado é digitado na modal. Um tesouro por vez, a partir de uma tabela inicial (a 8-1 pede ND e coluna), com dois modos:
   - **Rolagem completa do livro (Tabela 8-1).** Em cada passo, a modal mostra a tabela daquele passo com as faixas de d% e destaca a linha obtida, dispensando a consulta às páginas. A coluna padrão é "Dinheiro e itens": a cadeia de dinheiro e depois a de itens, em histórico contínuo (também há "Só dinheiro" e "Só itens"). As linhas da tabela usam o texto impresso no livro. Ao fim, mostra o quadro completo de dinheiro, riquezas e itens. Segue só o Livro Básico, porque os dados físicos usam as faixas impressas.
   - **Pesquisa avulsa.** Qualquer outra tabela. Mostra só o resultado, com preço, livro e página, sem o quadro de dinheiro, riquezas e itens.
 
@@ -535,18 +535,16 @@ Módulos em `src/treasure/`:
 - `treasureBatch.js`: linhas do lote e rolagem em lote.
 - `treasureSummary.js`: agregação do rodapé.
 - `treasureFormat.js`: textos dos passos e dos resultados.
-- `treasureDialog.js`: a modal com as abas Gerar tesouros e Rolar com o livro. É importado sob demanda na primeira abertura, e `prefetchTreasureModule` em `main.js` o carrega em tempo ocioso.
+- `treasureDialog.js`: a modal com as abas Gerar tesouros e Rolar na mesa. As duas abas usam um único `renderStep` privado para desenhar os passos da cascata. A modal é importada sob demanda na primeira abertura, e `prefetchTreasureModule` em `main.js` a carrega em tempo ocioso.
 
-Testes: `npm run test:treasure` roda o motor, as tabelas e o lote. `npm run qa:treasure` roda o roteiro Playwright contra um servidor (`QA_APP_URL`). `npm run qa:treasure-offline` abre a modal offline contra o build de produção.
+Testes: `npm run test:treasure` roda o motor, as tabelas e o lote. `npm run test:sw` testa os helpers do pré-cache de `build/swPrecache.js`. `npm run qa:treasure` roda o roteiro Playwright contra um servidor (`QA_APP_URL`). `npm run qa:treasure-offline` abre a modal offline contra o build de produção, com um cenário de primeira visita.
+
+Pré-cache offline: o plugin `swPrecachePlugin` em `vite.config.js` reescreve `dist/sw.js` ao fim do build, com a lista `PRECACHE` dos arquivos gerados e o nome de cache `mega-dungeon-<BUILD_ID>`. Na instalação, o service worker pré-carrega tudo, então o app funciona offline já na primeira visita. Em `vite dev`, `public/sw.js` roda com lista vazia (BUILD_ID "dev").
 
 **Próximos passos**
 
-- Remover a legenda “Dinheiro: moedas e riquezas” abaixo do campo “Rolar”, na aba Gerar tesouros. Pedido do PO.
-- Rever o visual das abas da modal de tesouros, um ajuste estético pedido pelo PO. As abas ficam soltas acima do corpo: há um vão entre elas e o conteúdo, e a borda que contorna todo o corpo não se liga à aba ativa. O resultado sugere abas de fichário sem parecer uma. A ideia é unir a aba ativa ao painel, com a mesma borda e sem vão, ou testar outra apresentação que combine melhor com a modal em tela inteira.
-- Pré-cache dos arquivos no `install` do `public/sw.js`, para o app funcionar offline já na primeira visita. Esta é uma melhoria geral do app.
-- Página do livro também na cascata, que hoje aparece só no rodapé.
-- `renderStep` duplicado entre as duas abas.
 - Quantidade inválida mantém o lote anterior na tela.
+- Reduzir o pré-cache da primeira visita, hoje com cerca de 18 MB e tudo-ou-nada: otimizar os SVGs pesados (o favicon tem 2,9 MB) ou pré-carregar os ícones um a um, tolerando falhas.
 
 ---
 
