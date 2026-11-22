@@ -26,7 +26,8 @@ const CRYSTAL_VALUES_BY_CHALLENGE = new Map([
 // Cor do cristal: azul (comum), verde (raro, chefes) e irregular (estimativa, depende da negociação).
 export const CRYSTAL_COLORS = {
   azul: { label: "Azul", multiplier: 1 },
-  verde: { label: "Verde", multiplier: 5 },
+  "verde-2x": { label: "Verde 2×", multiplier: 2 },
+  verde: { label: "Verde 5×", multiplier: 5 },
   irregular: { label: "Irregular", multiplier: 10 }
 };
 

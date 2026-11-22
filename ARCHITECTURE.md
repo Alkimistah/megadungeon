@@ -540,11 +540,28 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
 
 ### Retomada da ecologia
 
-A fase 1 etiquetou as 574 fichas do catálogo original. A fase 2 integrou a ecologia aos sorteios da Floresta e adicionou a seleção de livros por sessão. O Arquipélago tem contextos configurados para ilhas, costa e mar aberto. A ligação dos objetivos das ilhas ao gerador de combates ainda está pendente.
+A fase 1 etiquetou as 574 fichas do catálogo original. A fase 2 integrou a ecologia aos sorteios da Floresta e adicionou a seleção de livros por sessão. O Arquipélago tem contextos configurados para ilhas, costa e mar aberto. A Ilha Manguezal já usa o contexto ecológico e os livros habilitados nos combates de setor.
 
 A fase 3 entregou a busca, os filtros de catálogo e a composição manual de encontros. Foram verificados o build, os testes de ecologia, os andares 1–30 e as missões, além da QA no Chrome na tela inicial e na Floresta. [Plano do encontro manual](docs/superpowers/plans/2026-11-22-ecologia-fase-3-encontro-manual.md)
 
 **Fase 4 — Bestiário de Arton.** As 181 entradas do apêndice «Criaturas por ND» (p. 188 do PDF) foram cruzadas com o catálogo anterior. As fichas publicadas de criaturas transformadas, como a Mantícora Zumbi e os Condenados da Legio Precita, têm estatísticas próprias e foram cadastradas com IDs próprios. Quando o apêndice e o bloco divergiam, foi usado o bloco, incluindo o ND 8 do Ancião das Rochas. Os papéis vêm dos ícones impressos e as fontes registram a página impressa e o intervalo no PDF. As etiquetas foram cadastradas com `reviewed: false` e os cartões locais para revisão estão em `tmp/ecologia/bestiario/cartoes.html`. [Design da ecologia](docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md)
+
+### Retomada do Arquipélago
+
+O piloto da Ilha Manguezal cobre o fluxo do desembarque ao fragmento. `archipelagoPilot.js` concentra as variantes de setor e as composições do guardião. `archipelagoState.js` registra os resultados, a reabertura e o confronto do Centro. `archipelagoRenderer.js` apresenta as zonas da ilha e as fichas em modais de tela inteira. O piloto reutiliza o mapa tático atual. [Estado, decisões e próximos passos](REQUISITOS_ANDARES_21_A_30.md#retomada-do-arquipélago)
+
+Retomar pelo teste completo do Manguezal em mesa, antes de cadastrar outra ilha. As sessões locais `tmp/floors-21-30/piloto-manguezal.txt` e `tmp/floors-21-30/piloto-manguezal-combates.txt` abrem, respectivamente, o Manguezal nas ilhas 23 e 24. A segunda tem quatro combates de setor. A geração normal pode sortear o tema em qualquer uma das quatro ilhas iniciais.
+
+### Melhorias futuras dos mapas táticos
+
+A revisão dos mapas táticos fica pausada enquanto o ciclo do Arquipélago é validado em mesa. A comparação abaixo serve de referência para uma retomada própria.
+
+Na retomada, avaliar também se vale reestruturar a grade compartilhada. Comparar o aproveitamento do gerador e do renderizador atuais com outra abordagem de código para montar cenas. Um caminho a testar é representar o mapa-base, os efeitos de terreno e clima e as posições das peças como partes independentes da cena. Usar a mesma cena que hoje exige adaptação na mesa para comparar a coerência entre descrição e grade, a facilidade de criar variações e a atualização das posições durante o combate. A escolha de ferramenta fica para depois dessa comparação.
+
+A primeira comparação está em `tmp/mapas-taticos/comparacao.html`. O protótipo local usa o terreno do gerador atual e mantém as mesmas posições de duas cenas sintéticas. No pântano com neblina, a grade atual encobre três quadrados de terreno. Na floresta com tempestade, encobre um e desenha dois símbolos de armadilha em um encontro com zero armadilhas. O protótipo mostra o clima no cabeçalho da cena e sobrepõe peças e objetivos ao terreno. A comparação com a missão da bússola do andar 14 está em `tmp/mapas-taticos/comparacao-cena-real.html`. O encontro foi reconstruído a partir da sessão recuperada. Seis quadrados de terreno ficam encobertos na grade atual. A sobreposição preserva a posição da bússola e permite consultar terreno e armadilha juntos. A decisão sobre mapas-base fixos segue aberta.
+
+- **Repaginar a geração.** Explorar um conjunto pequeno de mapas fixos com variações por ambiente e poucas adições de terreno ou clima por cena. A dor na mesa é conciliar o que a ficha do encontro descreve com o que a grade mostra, especialmente quando o mapa repete um efeito ou coloca um obstáculo sem função clara. Na retomada, partir de cenas reais que exigiram adaptação manual e verificar se cada adição tem efeito tático claro, combina com o mapa escolhido e aparece de forma coerente na descrição e na legenda.
+- **Movimentar jogadores e inimigos durante a sessão.** Ideia de prioridade menor que a revisão da geração. Na grade atual, as posições iniciais são marcadores da cena. Ao retomar, conferir se há algum protótipo anterior e estudar a movimentação de peças sobre a grade, mantendo o terreno e os objetivos em suas posições.
 
 Continuam abertos:
 

@@ -234,7 +234,7 @@ Modelo inicial recomendado:
 
 Esse modelo preserva liberdade de mesa sem exigir um subsistema pesado para cada ilha.
 
-Regra de reset: objetivos/encontros resolvidos durante uma exploração só contam para concluir a ilha naquele mesmo dia. Ao descansar no barco, qualquer ilha parcialmente resolvida perde seu progresso parcial. Exemplo: se a ilha 21 tem 4 objetivos e o grupo resolve 3 antes de descansar, ao voltar em outro dia precisa resolver novamente os 4 objetivos.
+As ilhas que ainda usam o fluxo anterior reiniciam o progresso parcial após o descanso. No fluxo de setores, já aplicado ao Manguezal, os resultados são preservados. Ao retornar, há uma chance de reabrir um setor resolvido com um novo objetivo. Veja [Retomada do Arquipélago](#retomada-do-arquipélago).
 
 ### 8. Tempo, Descanso e Viagem Entre Ilhas
 
@@ -729,17 +729,36 @@ Criar ou separar:
 - Mapa estratégico do arquipélago renderizado em pirâmide, com 4 ilhas iniciais, 3 intermediárias, 2 avançadas e ilha 30 no topo.
 - Barco exibido na base da pirâmide com ícone próprio e ação de descanso ao clicar.
 - Modal de ilha implementada para exibir estado, dificuldade, ND base, descrição narrativa, objetivos e ações.
-- Títulos das ilhas ficam ocultos até a ilha ser visitada ou concluída.
+- Com Caminhos desconhecidos ligado, a identidade e os objetivos da ilha aparecem após iniciar a exploração. Desligado, o mestre pode abrir a prévia da ilha e consultar os setores sem gastar o dia.
 - Ilha 30 fica bloqueada até a obtenção dos 9 fragmentos.
 - Conclusão de ilhas 21 a 29 concede fragmentos e atualiza o progresso global.
 - Exploração de ilha consome 8 horas e bloqueia nova exploração até o próximo descanso.
-- Descanso no barco reseta esforço do dia, contador de tempo de exploração e progresso parcial de ilhas não concluídas.
-- Estado do arquipélago preserva ilhas, temas, objetivos, visitas, conclusões, fragmentos, clima diário, exploração ativa e log.
+- Descanso no barco reseta o esforço do dia e o contador de tempo de exploração. No Manguezal, o progresso persiste e o retorno pode reabrir um setor. As demais ilhas usam a regra anterior de reinício do progresso parcial.
+- Estado do arquipélago preserva ilhas, temas, objetivos, visitas, conclusões, fragmentos, exploração ativa e log. O piloto também preserva os encontros sorteados e o combate iniciado no Centro.
 - Temas das ilhas 21 a 29 são sorteados por seed a partir de pools separados por dificuldade.
 - Ilha 30 usa tema fixo de ilha dos dinossauros.
 - Ícones SVG de barco, ilha não explorada e temas de ilha foram integrados ao mapa.
 - Ícones de ilhas visitadas/em andamento usam coloração branca; ilhas concluídas usam coloração esverdeada.
 - Alguns SVGs de ilha tiveram fundos opacos e linhas removidos para evitar blocos coloridos no mapa.
+
+O piloto atual da Ilha Manguezal aparece em novas expedições quando o tema é sorteado. Os setores Norte, Sul, Leste e Oeste podem ser explorados em ordem livre. Cada setor recebe um objetivo por seed. Uma ilha pode ter de zero a quatro combates antes do guardião. O mestre registra sucesso ou falha, e ambos liberam progresso rumo ao Centro. O sucesso concede uma indicação de XP e tesouro uma vez por setor e enfraquece a ficha do guardião.
+
+O Centro só abre depois dos quatro resultados. O app sorteia uma das composições curadas de ND 8 e mantém a escolha na sessão. O mestre pode conferir as fichas ajustadas antes de confirmar o combate. Antes de confirmar o combate, pode retornar ao barco. Depois de começar, só vitória ou derrota encerram o combate. A vitória concede o fragmento e um cristal verde 2× de ND 8. A derrota não concede recompensa.
+
+No retorno, a chance inicial de reabertura é de 10% por setor resolvido. Se a rolagem for bem-sucedida, um setor sorteado perde o resultado e recebe uma variante diferente. As recompensas anteriores continuam registradas. Enquanto o setor estiver pendente, o Centro fica bloqueado. O resultado novo substitui o enfraquecimento anterior. O estado, os encontros e o combate do Centro são guardados no código de sessão.
+
+As próximas ilhas usam o desenho de seis setores nas intermediárias e oito nas avançadas. Cada sucesso representa, respectivamente, um sexto ou um oitavo do enfraquecimento disponível. O piloto inicial usa quatro partes. Cada guardião precisa de um limite próprio de enfraquecimento e de validação dos dois extremos.
+
+### Retomada do Arquipélago
+
+O Manguezal tem 19 variantes de setor. São 12 combates de ND 6 e sete testes estendidos de ND 2 ou 3. Cada setor começa com 70% de chance de combate. Os combates concedem o XP do encontro e o tesouro indicado nas fichas das criaturas. Os testes indicam XP e tesouro conforme seu ND. A recompensa de sucesso é registrada uma vez por setor.
+
+A arte da ilha tem quatro zonas que se encontram nas diagonais, cores suaves sorteadas sem repetição pela seed, indicadores visuais de sucesso e falha e um Centro vermelho semitransparente. O botão **Explorar ilha** fica abaixo da arte e o progresso fica no rodapé. O retorno sinaliza visualmente o setor reaberto e informa quando uma penalidade do guardião foi removida. Os encontros abrem em outra modal de tela inteira, com fichas abertas e ícone do mapa no centro do rodapé.
+
+1. **Testar o Manguezal em mesa.** Comparar o tempo de jogo e a pressão de uma ilha com muitos combates com uma ilha de testes estendidos. Conferir XP, tesouro, retorno depois de descanso, recuperação de saves e o guardião com zero e quatro sucessos. A chance de reabertura e os ajustes de ficha são valores iniciais de calibragem.
+2. **Adicionar um segundo tema inicial.** Reaproveitar o ciclo de quatro setores. Criar variantes em que o tema mude as decisões, testes e consequências. Curar composições do guardião e definir o limite de enfraquecimento antes de expandir os demais temas.
+3. **Expandir o ciclo para as demais dificuldades.** Aplicar seis setores às ilhas intermediárias e oito às avançadas. Definir a distribuição de ND e recompensas, a duração esperada e a composição da Ilha 30 com o Rei Tirano ND 11.
+4. **Retomar as missões e a apresentação final.** Depois de fechar os objetivos e encontros das ilhas, adaptar vínculos de missões, revisar arte e validar a campanha completa no tablet. A revisão da grade tática segue como uma frente própria.
 
 ### Pendências Conhecidas
 
@@ -781,7 +800,7 @@ Criar ou separar:
 - O grupo pode explorar apenas 1 ilha por descanso.
 - O barco é o acampamento e reseta o esforço do dia ao descansar.
 - O descanso no barco reseta o contador de tempo de exploração.
-- Ilha parcialmente resolvida reseta ao descansar; para ficar OK, a ilha deve ser concluída inteira no mesmo dia.
+- O Manguezal preserva o progresso depois do descanso, com possibilidade de reabertura no retorno. Ilhas com objetivos provisórios ainda reiniciam o progresso parcial.
 - O clima gerado para a ilha persiste pelo dia inteiro de exploração.
 - O descanso gera novos climas diários por ilha.
 - Antes de explorar, o grupo pode tentar identificar o clima de uma ilha com teste apropriado.

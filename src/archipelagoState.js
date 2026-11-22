@@ -1,4 +1,12 @@
-import { pick } from "./random.js";
+import { createRng, pick } from "./random.js";
+import {
+  createIslandPilot, createIslandPilotScene, createMangroveCombat, createMangroveGuardian, createMangroveSector,
+  GUARDIAN_COMPOSITIONS, reopenMangroveSector
+} from "./archipelagoPilot.js";
+import { getEncounterForSave } from "./encounterCreatureHealth.js";
+import { crystalLine } from "./economy/crystalValues.js";
+
+const hasSectors = island => island?.pilot === "mangrove-sectors";
 
 function shuffle(rng, items) {
   const copy = [...items];
@@ -57,6 +65,7 @@ function createGeneratedIslands(profile, rng) {
     const difficulty = getDifficulty(profile, floor);
     const theme = pickedThemes[difficulty][usedByDifficulty[difficulty]] || pick(rng, profile.archipelago.themePools[difficulty]);
     usedByDifficulty[difficulty] += 1;
+    const baseChallenge = getBaseChallenge(profile, floor);
 
     return [floor, {
       floor,
@@ -66,8 +75,9 @@ function createGeneratedIslands(profile, rng) {
       icon: theme.icon,
       narrative: theme.narrative,
       difficulty,
-      baseChallenge: getBaseChallenge(profile, floor),
-      objectives: createPlaceholderObjectives(profile, floor, theme)
+      baseChallenge,
+      objectives: createPlaceholderObjectives(profile, floor, theme),
+      ...createIslandPilot(floor, theme.id, profile.recommendations.baseDcByFloor[floor], rng)
     }];
   }));
 }
@@ -85,6 +95,11 @@ function hydrateSessionIslands(profile, sessionIslands) {
     const theme = themesById.get(island.themeId);
     return [floor, {
       ...island,
+      ...(hasSectors(island) ? {
+        objectives: island.objectives.map((objective, index) => island.outcomes?.[objective.id]
+          ? objective
+          : createMangroveSector(Number(floor), index, objective.variant, profile.recommendations.baseDcByFloor[floor]))
+      } : {}),
       icon: theme?.icon || island.icon,
       narrative: island.narrative || theme?.narrative
     }];
@@ -146,23 +161,70 @@ export function createArchipelagoState(profile, rng = Math.random) {
     log = sessionState?.log || ["Arquipélago gerado. As ilhas iniciais estão acessíveis."];
   }
 
-  function exploreIsland(floor) {
-    if (!isIslandAvailable(floor) || daySpent || completedFloors.has(floor)) return false;
+  function exploreIsland(floor, { mapSeed, rng } = {}) {
+    const island = islands[floor];
+    if (!island || !isIslandAvailable(floor) || daySpent || completedFloors.has(floor) || island.defeated) return false;
+
+    let reopened = null;
+    if (hasSectors(island)) {
+      island.visits = (island.visits || 0) + 1;
+      if (island.visits > 1) {
+        const roll = rng ?? createRng(`${mapSeed}:ilha-${floor}:visita-${island.visits}`);
+        reopened = reopenMangroveSector(island, roll, activeProfile.recommendations.baseDcByFloor[floor]);
+      }
+    }
 
     visitedFloors.add(floor);
     daySpent = true;
     elapsedMinutes += activeProfile.archipelago.explorationMinutes;
     activeExploration = {
       floor,
-      resolvedObjectiveIds: []
+      resolvedObjectiveIds: [],
+      ...(hasSectors(island) ? { mapSeed } : {}),
+      ...(reopened ? { reopenedSector: reopened } : {})
     };
-    log = [`Ilha ${floor} explorada. O esforço do dia foi gasto.`, ...log].slice(0, 8);
+    if (islands[floor].pilot === "mangrove") {
+      activeExploration.scene = createIslandPilotScene(islands[floor], activeProfile, mapSeed);
+    }
+    log = [reopened
+      ? `Ilha ${floor}: o setor ${reopened.name} reabriu com um novo objetivo.`
+      : `Ilha ${floor} explorada. O esforço do dia foi gasto.`, ...log].slice(0, 8);
     return true;
   }
 
-  function resolveObjective(floor, objectiveId) {
+  function openSector(floor, objectiveId) {
+    const island = islands[floor];
+    if (!hasSectors(island) || activeExploration?.floor !== floor || activeExploration.guardianScene ||
+      island.outcomes?.[objectiveId]) return false;
+    const objective = island.objectives.find(item => item.id === objectiveId);
+    if (!objective) return false;
+    if (objective.type === "combate") {
+      island.scenes ??= {};
+      island.scenes[objectiveId] ??= createMangroveCombat(island, objective, activeProfile, activeExploration.mapSeed);
+    }
+    return true;
+  }
+
+  function resolveObjective(floor, objectiveId, outcome) {
     if (activeExploration?.floor !== floor) return false;
+    const island = islands[floor];
+    if (hasSectors(island)) {
+      if (!["success", "failure"].includes(outcome) || !openSector(floor, objectiveId)) return false;
+      island.outcomes ??= {};
+      island.outcomes[objectiveId] = outcome;
+      if (outcome === "success") {
+        island.earnedRewards ??= {};
+        island.earnedRewards[objectiveId] = true;
+      }
+      const sector = island.objectives.find(item => item.id === objectiveId);
+      log = [`Setor ${sector.name} da ilha ${floor}: ${outcome === "success" ? "sucesso" : "falha"}.`, ...log].slice(0, 8);
+      return true;
+    }
     if (activeExploration.resolvedObjectiveIds.includes(objectiveId)) return false;
+    if (islands[floor].pilot) {
+      const next = islands[floor].objectives.find(objective => !activeExploration.resolvedObjectiveIds.includes(objective.id));
+      if (next?.id !== objectiveId) return false;
+    }
 
     activeExploration = {
       ...activeExploration,
@@ -172,10 +234,36 @@ export function createArchipelagoState(profile, rng = Math.random) {
     return true;
   }
 
+  function previewGuardian(island) {
+    const seed = activeExploration?.mapSeed;
+    const composition = island.guardianComposition ??
+      Math.floor(createRng(`${seed}:guardiao:${island.floor}`)() * GUARDIAN_COMPOSITIONS.length);
+    return createMangroveGuardian(island, composition, activeProfile, seed);
+  }
+
+  function startGuardian(floor) {
+    const island = islands[floor];
+    if (!hasSectors(island) || activeExploration?.floor !== floor || activeExploration.guardianScene ||
+      !island.objectives.every(item => island.outcomes?.[item.id])) return false;
+    activeExploration.guardianScene = previewGuardian(island);
+    log = [`Combate do Centro iniciado na ilha ${floor}.`, ...log].slice(0, 8);
+    return true;
+  }
+
+  function loseGuardian(floor) {
+    if (activeExploration?.floor !== floor || !activeExploration.guardianScene) return false;
+    islands[floor].defeated = true;
+    activeExploration = null;
+    log = [`O grupo foi derrotado no Centro da ilha ${floor}.`, ...log].slice(0, 8);
+    return true;
+  }
+
   function completeIsland(floor) {
     const island = islands[floor];
     const resolved = new Set(activeExploration?.floor === floor ? activeExploration.resolvedObjectiveIds : []);
-    const allResolved = island.objectives.every((objective) => resolved.has(objective.id));
+    const allResolved = hasSectors(island)
+      ? activeExploration?.floor === floor && Boolean(activeExploration.guardianScene)
+      : island?.objectives.every((objective) => resolved.has(objective.id));
 
     if (!allResolved) return false;
 
@@ -186,14 +274,22 @@ export function createArchipelagoState(profile, rng = Math.random) {
   }
 
   function restAtBoat() {
+    if (activeExploration?.guardianScene) return false;
     daySpent = false;
     elapsedMinutes = 0;
-    if (activeExploration) {
+    if (hasSectors(islands[activeExploration?.floor])) {
+      const island = islands[activeExploration.floor];
+      for (const [id, scene] of Object.entries(island.scenes ?? {})) {
+        if (!island.outcomes?.[id]) scene.resolvedEncounter = getEncounterForSave(scene.resolvedEncounter);
+      }
+      log = [`Descanso no barco. O progresso da ilha ${activeExploration.floor} foi guardado.`, ...log].slice(0, 8);
+    } else if (activeExploration) {
       log = [`Descanso no barco. O progresso parcial da ilha ${activeExploration.floor} foi perdido.`, ...log].slice(0, 8);
     } else {
       log = ["Descanso no barco. O grupo pode explorar outra ilha.", ...log].slice(0, 8);
     }
     activeExploration = null;
+    return true;
   }
 
   function getSnapshot() {
@@ -222,10 +318,33 @@ export function createArchipelagoState(profile, rng = Math.random) {
         available: isIslandAvailable(floor),
         visited: visitedFloors.has(floor),
         completed: completedFloors.has(floor),
-        status: getIslandStatus(floor),
-        objectives: islands[floor].objectives.map((objective) => ({
+        status: islands[floor].defeated ? "grupo derrotado" : getIslandStatus(floor),
+        ...(hasSectors(islands[floor]) ? {
+          guardian: {
+            ready: islands[floor].objectives.every(item => islands[floor].outcomes?.[item.id]),
+            preview: activeExploration?.floor === floor && !activeExploration.guardianScene &&
+              islands[floor].objectives.every(item => islands[floor].outcomes?.[item.id])
+              ? previewGuardian(islands[floor]) : null,
+            effects: islands[floor].objectives.filter(item => islands[floor].outcomes?.[item.id] === "success").map(item => item.effect),
+            scene: activeExploration?.floor === floor ? activeExploration.guardianScene : null,
+            crystal: completedFloors.has(floor) ? crystalLine({ challenge: islands[floor].baseChallenge, color: "verde-2x", quantity: 1 }) : null
+          }
+        } : {}),
+        objectives: islands[floor].objectives.map((objective, index, objectives) => ({
           ...objective,
-          resolved: activeExploration?.floor === floor && activeResolved.has(objective.id)
+          resolved: (Boolean(islands[floor].pilot) && completedFloors.has(floor)) ||
+            (activeExploration?.floor === floor && activeResolved.has(objective.id)),
+          ...(islands[floor].pilot === "mangrove" ? {
+            available: index === 0 ||
+              (activeExploration?.floor === floor && activeResolved.has(objectives[index - 1].id))
+          } : {}),
+          ...(objective.type === "combate" && activeExploration?.floor === floor
+            ? { scene: hasSectors(islands[floor]) ? islands[floor].scenes?.[objective.id] : activeExploration.scene } : {}),
+          ...(hasSectors(islands[floor]) ? {
+            resolved: Boolean(islands[floor].outcomes?.[objective.id]),
+            outcome: islands[floor].outcomes?.[objective.id],
+            rewardEarned: Boolean(islands[floor].earnedRewards?.[objective.id])
+          } : {})
         }))
       })),
       islandRows: activeProfile.archipelago.islandRows,
@@ -247,7 +366,12 @@ export function createArchipelagoState(profile, rng = Math.random) {
       islands,
       visitedFloors: [...visitedFloors],
       completedFloors: [...completedFloors],
-      activeExploration,
+      activeExploration: activeExploration?.scene
+        ? {
+          ...activeExploration,
+          scene: { ...activeExploration.scene, resolvedEncounter: getEncounterForSave(activeExploration.scene.resolvedEncounter) }
+        }
+        : activeExploration,
       daySpent,
       elapsedMinutes,
       log
@@ -255,7 +379,10 @@ export function createArchipelagoState(profile, rng = Math.random) {
     getElapsedMinutes: () => elapsedMinutes,
     getSnapshot,
     initialize,
+    loseGuardian,
+    openSector,
     resolveObjective,
-    restAtBoat
+    restAtBoat,
+    startGuardian
   };
 }

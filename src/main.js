@@ -510,8 +510,11 @@ const extendedExplorationRenderer = createExtendedExplorationRenderer({
 
 const archipelagoRenderer = createArchipelagoRenderer({
   container: elements.extendedExploration,
+  getUnknownPaths: () => state.isUnknownPathsEnabled(),
+  onEncounterAdjusted: () => { if (autosaveActive) void saveCurrentExpedition(); },
   getMissionsForFloor: (floor) => missionState.getMissionsForFloor(floor),
   getSnapshot: () => archipelagoState.getSnapshot(),
+  getMapSeed: () => currentMapSeed,
   getRangeEnd,
   onCompleteIsland: (floor) => {
     archipelagoState.completeIsland(floor);
@@ -519,13 +522,26 @@ const archipelagoRenderer = createArchipelagoRenderer({
     updateInfo();
   },
   onExploreIsland: (floor) => {
-    archipelagoState.exploreIsland(floor);
+    archipelagoState.exploreIsland(floor, { mapSeed: currentMapSeed });
     refreshExplorationDisplay();
     updateInfo();
   },
   onOpenMission: openMissionById,
-  onResolveObjective: (floor, objectiveId) => {
-    archipelagoState.resolveObjective(floor, objectiveId);
+  onOpenSector: (floor, objectiveId) => {
+    if (archipelagoState.openSector(floor, objectiveId) && autosaveActive) void saveCurrentExpedition();
+  },
+  onStartGuardian: (floor) => {
+    archipelagoState.startGuardian(floor);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onLoseGuardian: (floor) => {
+    archipelagoState.loseGuardian(floor);
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onResolveObjective: (floor, objectiveId, outcome) => {
+    archipelagoState.resolveObjective(floor, objectiveId, outcome);
     refreshExplorationDisplay();
     updateInfo();
   },
@@ -603,6 +619,7 @@ function getCurrentSession() {
       profile: activeFloorRange.id,
       floor: snapshot.activeExploration?.floor || 21,
       mapSeed: currentMapSeed,
+      unknownPaths: state.isUnknownPathsEnabled(),
       disabledCreatureBooks,
       missions: missionState.exportSessionState(),
       archipelagoState: archipelagoState.exportSessionState()
@@ -820,6 +837,7 @@ function restoreSession(session) {
 
   if (isArchipelagoMode()) {
     renderedNodeMapFloor = null;
+    setUnknownPathsMode(Boolean(session.unknownPaths));
     archipelagoState.initialize(
       activeFloorRange,
       createRng(currentMapSeed),
@@ -1381,7 +1399,10 @@ function startNewExpedition(rangeId) {
 
 function syncInitialUnknownPathsVisibility() {
   const selectedProfile = getFloorRange(getSelectedRangeId());
-  elements.initialUnknownPathsField.hidden = selectedProfile.mode !== "node-map" && selectedProfile.mode !== undefined;
+  elements.initialUnknownPathsField.hidden = selectedProfile.mode === "extended-exploration";
+  document.getElementById("initialUnknownPathsHint").textContent = selectedProfile.mode === "archipelago"
+    ? "O tema e os objetivos de cada ilha se revelam ao iniciar a exploração."
+    : "A rota de cada andar se revela conforme o grupo avança.";
 }
 
 function boot() {

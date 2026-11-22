@@ -1490,8 +1490,8 @@ test("cristais: valores de ND 1/4 a 10 não mudam e ND 11 a 20 seguem o spec", (
   assert.equal(getCrystalValueByChallenge(25), 16000);
 });
 
-test("cristais: multiplicadores 1, 5 e 10", () => {
-  assert.deepEqual(Object.fromEntries(Object.entries(CRYSTAL_COLORS).map(([k, v]) => [k, v.multiplier])), { azul: 1, verde: 5, irregular: 10 });
+test("cristais: multiplicadores 1, 2, 5 e 10", () => {
+  assert.deepEqual(Object.fromEntries(Object.entries(CRYSTAL_COLORS).map(([k, v]) => [k, v.multiplier])), { azul: 1, "verde-2x": 2, verde: 5, irregular: 10 });
   assert.equal(CRYSTAL_COLORS.irregular.label, "Irregular");
 });
 

@@ -766,7 +766,7 @@ function createTrapDetail(node, item, presentation) {
   return section;
 }
 
-function createEncounterDetail(node, selectedKey, missions, onAdjustMissionProgress, trapPresentations, { onSetReinforcement, onEncounterAdjusted }) {
+function createEncounterDetail(node, selectedKey, missions, onAdjustMissionProgress, trapPresentations, { onSetReinforcement, onEncounterAdjusted, readOnly = false }) {
   const panel = document.createElement("div");
   const selectedItem = node.resolvedEncounter.items.find((item, index) =>
     getEncounterItemKey(item, index) === selectedKey
@@ -783,7 +783,7 @@ function createEncounterDetail(node, selectedKey, missions, onAdjustMissionProgr
         missions,
         onAdjustMissionProgress,
         setReinforcement,
-        chimeraBoss
+        readOnly ? null : chimeraBoss
           ? createChimeraCombatControls(node, selectedItem, onEncounterAdjusted, setReinforcement)
           : createCreatureHealthControls(node, selectedItem, missions, onEncounterAdjusted),
         chimeraBoss
