@@ -97,7 +97,7 @@ for (const [id, entry] of Object.entries(ecologyByCreatureId)) {
 }
 
 export function getCreatureEcology(id) {
-  return ecologyByCreatureId[id] || NEUTRAL_ECOLOGY;
+  return Object.hasOwn(ecologyByCreatureId, id) ? ecologyByCreatureId[id] : NEUTRAL_ECOLOGY;
 }
 
 function withEcology(creature) {

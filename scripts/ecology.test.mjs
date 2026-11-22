@@ -32,9 +32,10 @@ test("every ecology entry points to a catalog creature and is valid", () => {
   }
 });
 test("creatures without entry get the neutral ecology", () => {
-  const sample = creatureCatalog.find((c) => !ecologyByCreatureId[c.id]);
-  assert.deepEqual(sample.ecology, NEUTRAL_ECOLOGY);
   assert.deepEqual(getCreatureEcology("nao-existe"), NEUTRAL_ECOLOGY);
+  assert.deepEqual(getCreatureEcology("constructor"), NEUTRAL_ECOLOGY);
+  const withEntry = creatureCatalog.find((c) => Object.hasOwn(ecologyByCreatureId, c.id));
+  if (withEntry) assert.deepEqual(withEntry.ecology, ecologyByCreatureId[withEntry.id]);
 });
 
 // ---- Tarefa 2: rascunho automático ----
@@ -190,4 +191,48 @@ test("vocabulary sheet has one column per category with the vocabulary labels", 
   assert.deepEqual(names, ["terrenos", "lugares", "condicoes", "grupo", "raridade", "so_manual", "revisado"]);
   assert.equal(rows[0].terrenos, "Aquático");
   assert.equal(rows.map((r) => r.lugares).filter(Boolean).length, 13);
+});
+
+// ---- Tarefa 5: aplicação da planilha ----
+import { buildEcologyFromRows, applyEcologySheet } from "./ecology/apply.mjs";
+import { writeFileSync as writeFileSyncT, readFileSync as readFileSyncT } from "node:fs";
+
+test("csv round trip preserves quotes, commas and accents", () => {
+  const dir = mkdtempSync(join(tmpdir(), "eco-"));
+  const rows = [{ nome: 'Glop "grande"', citacao: "pântanos, rios; lagos", terrenos: "Pântano, Aquático" }];
+  writeCsv(rows, join(dir, "a.csv")); assert.deepEqual(readCsv(join(dir, "a.csv")), rows);
+});
+test("apply rejects unknown tags with row and creature", () => {
+  assert.throws(() => buildEcologyFromRows([{ id: "glop", nome: "Glop", terrenos: "Lava" }]), /linha 2.*glop.*Lava/i);
+});
+test("apply accepts labels without accents and extra spaces", () => {
+  const eco = buildEcologyFromRows([{ id: "glop", nome: "Glop", terrenos: " pantano , Aquático", lugares: "", condicoes: "", grupo: "Bando", raridade: "comum", so_manual: "", revisado: "x" }]);
+  assert.deepEqual(eco.glop.terrains, ["aquatico", "pantano"]);
+  assert.equal(eco.glop.reviewed, true);
+  assert.equal(eco.glop.manualOnly, false);
+});
+test("apply defaults, so_manual values, family headers and duplicates", () => {
+  const base = { terrenos: "", lugares: "", condicoes: "", grupo: "", raridade: "", revisado: "" };
+  const eco = buildEcologyFromRows([
+    { ...base, id: "", familia: "== X (1) ==" },
+    { ...base, id: "a", so_manual: "SIM" }, { ...base, id: "b", so_manual: "x" }, { ...base, id: "c", so_manual: "" },
+  ]);
+  assert.deepEqual([eco.a.manualOnly, eco.b.manualOnly, eco.c.manualOnly], [true, true, false]);
+  assert.equal(eco.a.group, null); assert.equal(eco.a.rarity, "comum"); assert.equal(eco.a.reviewed, false);
+  assert.throws(() => buildEcologyFromRows([{ ...base, id: "a" }, { ...base, id: "a" }]), /duplicado/);
+  assert.throws(() => buildEcologyFromRows([{ ...base, id: "zzz" }], new Set(["a"])), /catálogo/);
+});
+test("apply is all-or-nothing", () => {
+  const dir = mkdtempSync(join(tmpdir(), "eco-"));
+  const csv = join(dir, "s.csv"); const out = join(dir, "ecology.js");
+  const good = { terrenos: "", lugares: "", condicoes: "", grupo: "", raridade: "", so_manual: "", revisado: "" };
+  const first = creatureCatalog[0].id; const second = creatureCatalog[1].id;
+  writeFileSyncT(out, "// conteudo original\n");
+  writeCsv([{ ...good, id: first }, { ...good, id: second, terrenos: "Lava" }], csv);
+  assert.throws(() => applyEcologySheet(csv, out), /Lava/);
+  assert.equal(readFileSyncT(out, "utf8"), "// conteudo original\n");
+  writeCsv([{ ...good, id: second }, { ...good, id: first, terrenos: "Pântano" }], csv);
+  applyEcologySheet(csv, out); const first1 = readFileSyncT(out, "utf8");
+  applyEcologySheet(csv, out); assert.equal(readFileSyncT(out, "utf8"), first1);
+  assert.ok(first1.indexOf(JSON.stringify(first)) < first1.indexOf(JSON.stringify(second)) === (first < second));
 });
