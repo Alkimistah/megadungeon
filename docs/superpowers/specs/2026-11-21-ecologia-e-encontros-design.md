@@ -129,3 +129,10 @@ Cada projeto tem o seu próprio plano.
 - A fórmula exata dos pesos do gerador, no projeto 2. Ela precisa ser documentada e ter testes estatísticos.
 - O formato interno de `ecology.js`, desde que legível e validado.
 - As palavras-chave e as regras de subtipo do rascunho, desde que cada etiqueta sugerida tenha um motivo registrado.
+
+## Decisões do PO após a conferência (22/11/2026)
+
+- **A planilha CSV ficou difícil de ler.** Muito texto junto, sem dar para distinguir o que é o quê. As etiquetas seguem como estão, sem revisão linha a linha. Uma revisão futura precisa de um formato visual, com uma criatura por cartão, etiquetas destacadas e a citação recolhida, e não de CSV.
+- **Dragões** podem estar em praticamente qualquer lugar aberto, porque há tipos para vários ambientes. Os que não têm terreno citado no livro recebem todos os terrenos, menos Subterrâneo.
+- **Mortos-vivos** podem estar em diversos lugares, mas aparecem mais em catacumbas, com miasma e em pântanos. Os que não têm terreno citado no livro recebem Pântano, Catacumbas/necrópole e Miasma.
+- **Consequência para a fase 2.** Terreno, lugar e condição são **peso**, não filtro exclusivo, pelo menos para mortos-vivos. Uma criatura etiquetada só com Pântano ainda pode aparecer em outros terrenos, com menos chance. Etiqueta vazia continua sendo neutra, valendo para qualquer lugar.
