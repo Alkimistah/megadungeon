@@ -4,9 +4,9 @@ As decisões abaixo são do PO, tomadas em 21/11/2026, salvo quando indicado com
 
 ## Intenção
 
-O catálogo tem 574 fichas conferidas: Livro Básico 76, Ameaças de Arton 418, Deuses de Arton 76 e Masmorra de Práxis 4. Ainda no fim do mês chega o **Bestiário de Arton**, com cerca de 400 monstros. O PDF já está em `tmp/livros/T20 Bestiario de Arton.pdf` e tem um apêndice “Criaturas por ND” (PDF 188–189).
+O catálogo tem 574 fichas conferidas: Livro Básico 76, Ameaças de Arton 418, Deuses de Arton 76 e Masmorra de Práxis 4. Já chegou o **Bestiário de Arton**, com cerca de 200 monstros. O PDF já está em `tmp/livros/T20 Bestiario de Arton.pdf` e tem um apêndice “Criaturas por ND” (PDF 188).
 
-Hoje os encontros automáticos escolhem a criatura por ND e por tipo. A afinidade com o terreno existe só para cerca de 20 criaturas e alguns subtipos, numa lista fixa no código (`TERRAIN_AFFINITIES` em `src/encounterResolver.js`). As criaturas de apoio também estão numa lista fixa (`SUPPORT_CREATURE_IDS_BY_TYPE`). A faixa 21–30 não tem regras de criatura.
+Hoje os encontros automáticos escolhem a criatura por ND e por tipo. A afinidade com o terreno existe só para cerca de 20 criaturas e alguns subtipos, numa lista fixa no código (`TERRAIN_AFFINITIES` em `src/encounterResolver.js`). As criaturas de apoio também estão numa lista fixa (`SUPPORT_CREATURE_IDS_BY_TYPE`). A faixa 21–30 ainda não tem regras de criatura.
 
 O encontro manual mostra ND, tipo, armadilha e só os terrenos da faixa ativa.
 
@@ -18,7 +18,7 @@ O PO quer três coisas:
 **Objetivos:**
 - cada criatura diz onde aparece, como aparece e com que frequência;
 - o gerador escolhe por essas etiquetas;
-- cada faixa de andares vira configuração;
+- cada faixa de andares se torna configuração;
 - livro novo significa só fichas novas com etiquetas.
 
 **Não objetivos:**
@@ -27,7 +27,7 @@ O PO quer três coisas:
 
 **Anti-objetivos:**
 - etiquetas sem fonte, inventadas;
-- um gerador que exige editar código a cada livro;
+- um gerador que exige ou necessite editar código a cada livro;
 - uma revisão impossível de fazer, com mil fichas soltas e sem agrupamento.
 
 ## Vocabulário
@@ -120,7 +120,7 @@ Cada projeto tem o seu próprio plano.
    - Busca por nome e composição opcional (solitária, grupo, enxame).
    - Usa a paleta bronze quando aberto pela tela inicial, o que já existe.
 4. **Bestiário de Arton.**
-   - Cadastro das cerca de 400 fichas, conferido com o apêndice “Criaturas por ND”.
+   - Cadastro das cerca de 200 fichas, conferido com o apêndice “Criaturas por ND”.
    - As etiquetas entram junto com cada ficha.
    - Antes, é preciso conferir se alguma ficha já existe no catálogo, pela regra do PO “revisar antes de cadastrar”.
 
