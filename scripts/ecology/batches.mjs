@@ -87,7 +87,7 @@ const ndValue = (nd) => { const n = Number(String(nd).replace(",", ".")); return
 const OPEN_TERRAINS = "Aquático, Ártico, Colina, Deserto, Floresta, Montanha, Pântano, Planície";
 const PO_RULES = [
   {
-    applies: (creature) => /drag/i.test(creature.subtype || ""),
+    applies: (creature) => creature.subtype?.toLowerCase() === "dragão",
     terrenos: OPEN_TERRAINS,
     note: "regra do PO: dragões em qualquer lugar aberto",
   },

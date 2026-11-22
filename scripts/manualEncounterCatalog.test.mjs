@@ -38,6 +38,18 @@ test("aceita frações e fontes secundárias de uma mesma ficha", () => {
   assert.deepEqual(ids({ challenge: "0.25", book: "Deuses de Arton" }, catalog), []);
 });
 
+test("Bestiário aparece no filtro manual e respeita a seleção de livros no sorteio", () => {
+  const book = "Bestiário de Arton";
+  const creature = getCreatureById("abelha-grifo");
+  const aspect = getCreatureById("aspecto-de-azgher");
+  const candidates = [creature, aspect];
+  const profile = { creatureRules: { ecology: true } };
+  assert.deepEqual(ids({ book, terrain: "montanha", place: "colmeia" }), [creature.id]);
+  assert.deepEqual(ids({ book, query: "aspecto de azgher" }), [aspect.id]);
+  assert.deepEqual(getAutomaticCreatureCatalog(profile, candidates), [creature]);
+  assert.deepEqual(getAutomaticCreatureCatalog({ ...profile, disabledCreatureBooks: [book] }, candidates), []);
+});
+
 test("mantém fichas sem etiqueta disponíveis e exige etiqueta quando há filtro de ambiente", () => {
   const catalog = [getCreatureById("cascavel"), getCreatureById("garra-zumbi-enxame")];
   assert.deepEqual(ids({}, catalog), ["cascavel", "garra-zumbi-enxame"]);

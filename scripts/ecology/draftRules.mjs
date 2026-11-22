@@ -111,7 +111,7 @@ function findKeywordHits(text) {
     for (const m of folded.matchAll(k.regex)) {
       const start = m.index;
       const end = start + m[0].length;
-      const before = folded.slice(Math.max(0, start - NEGATION_WINDOW), start);
+      const before = folded.slice(Math.max(0, start - NEGATION_WINDOW), start).split(/[.!?;]/).at(-1);
       const negation = before.match(NEGATION);
       const wordEnd = start + folded.slice(start).match(/^[a-z]*/)[0].length;
       hits.push({ ...k, word: text.slice(start, Math.max(end, wordEnd)), start, snippet: snippet(text, start, end), negation: negation?.[0] ?? null });
@@ -144,11 +144,13 @@ export function suggestEcology(creature) {
   // Regras de tipo/subtipo.
   const rules = SUBTYPE_RULES.filter((rule) => matchesRule(rule, creature));
   const ruleTerrains = new Set();
+  const ruleTags = new Set();
   for (const rule of rules) {
     const added = [];
     for (const category of ["terrains", "places", "conditions"]) {
       for (const id of rule[category] ?? []) {
         sets[category].add(id);
+        ruleTags.add(`${category}:${id}`);
         added.push(id);
         if (category === "terrains") ruleTerrains.add(id);
       }
@@ -160,6 +162,7 @@ export function suggestEcology(creature) {
   const text = descriptionText(creature);
   const hits = text ? findKeywordHits(text) : [];
   const descTags = new Set();
+  const strongDescTags = new Set();
   const strongTerrains = new Set();
   let descGroup = null;
   let doubtful = false;
@@ -176,13 +179,14 @@ export function suggestEcology(creature) {
     }
     sets[hit.category].add(hit.id);
     descTags.add(`${hit.category}:${hit.id}`);
+    if (!hit.weak) strongDescTags.add(`${hit.category}:${hit.id}`);
     if (hit.category === "terrains" && !hit.weak) strongTerrains.add(hit.id);
     reasons.push(`palavra-chave "${hit.word}"${hit.weak ? " (indício fraco)" : ""} → ${LABEL[hit.id]}: "${hit.snippet}"`);
   }
 
   // Conflito: a regra de subtipo aponta terrenos e a descrição aponta só outros.
-  const descTerrains = [...sets.terrains].filter((id) => descTags.has(`terrains:${id}`));
-  const conflict = ruleTerrains.size > 0 && descTerrains.length > 0 && !descTerrains.some((id) => ruleTerrains.has(id));
+  const conflict = ruleTerrains.size > 0 && strongTerrains.size > 0
+    && ![...strongTerrains].some((id) => ruleTerrains.has(id));
   if (conflict) reasons.push("conflito: os terrenos da regra de subtipo não aparecem na descrição");
 
   // Grupo: nome > descrição > papel.
@@ -223,7 +227,8 @@ export function suggestEcology(creature) {
   const descTagCount = descTags.size;
   let confidence;
   if (doubtful) confidence = "baixa";
-  else if (strongTerrains.size > 0 && !conflict && (descTagCount >= 2 || rules.length > 0)) confidence = "alta";
+  else if (strongTerrains.size > 0 && !conflict
+    && (strongDescTags.size >= 2 || [...strongDescTags].some((tag) => ruleTags.has(tag)))) confidence = "alta";
   else if (descTagCount > 0) confidence = "media";
   else if (rules.length > 0) confidence = rules.map((r) => r.confidence).reduce((a, b) => (CONFIDENCE_ORDER.indexOf(b) > CONFIDENCE_ORDER.indexOf(a) ? b : a));
   else confidence = "baixa";

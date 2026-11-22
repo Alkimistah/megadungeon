@@ -287,7 +287,7 @@ O ND da criatura inicial vem de `creatureRules.challengeSource`:
 
 O app separa o ND em camadas: `challenge.encounter` é o orçamento base do encontro; `challenge.trap` consome parte desse orçamento; `challenge.creatures` é o orçamento restante para criatura ou grupo; `challenge.climate` e `challenge.terrain` são modificadores externos. Assim, o total segue a regra `total = encounter + climate + terrain`, enquanto a composição interna segue `encounter = creatures + trap` quando uma armadilha incidental existe.
 
-O diretório `creatureCatalog/` armazena fichas de criaturas específicas por tipo (`animals.js`, `constructs.js`, `humanoids.js`, `monsters.js`, `spirits.js`, `undead.js`). Cada ficha é um objeto exportado com identidade, ND, sentidos, estatísticas, ações, habilidades, perícias, equipamento e tesouro. O índice `creatureCatalog/index.js` agrega tudo e expõe buscas por id, tipo, ND e papel de ameaça.
+O diretório `creatureCatalog/` armazena fichas de criaturas específicas por tipo (`animals.js`, `constructs.js`, `humanoids.js`, `monsters.js`, `spirits.js`, `undead.js`) e as 181 fichas do Bestiário de Arton em `bestiary.js`. Cada ficha é um objeto exportado com identidade, ND, sentidos, estatísticas, ações, habilidades, perícias, equipamento e tesouro. O índice `creatureCatalog/index.js` agrega as 755 fichas e expõe buscas por id, tipo, ND e papel de ameaça.
 
 Além do tipo da criatura, o catálogo enriquece cada ficha com papel de ameaça (`role`): `solo`, `minion`/`lacaio` ou `special`/`especial`. Esse campo representa o ícone mecânico da ficha, não a espécie ou origem da criatura. Quando o papel não está explícito no cadastro, `inferThreatRole` compara PV, Defesa, ataque e quantidade de habilidades com as tabelas de criação de ameaças e marca o resultado com `roleSource: "inferred"` e `roleConfidence`; fichas cadastradas com papel explícito usam `roleSource: "explicit"`.
 
@@ -540,19 +540,18 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
 
 ### Retomada da ecologia
 
-Encerramos após a fase 3. A fase 1 etiquetou as 574 fichas do catálogo. A fase 2 integrou a ecologia aos sorteios da Floresta e adicionou a seleção de livros por sessão. O Arquipélago tem contextos configurados para ilhas, costa e mar aberto. A ligação dos objetivos das ilhas ao gerador de combates ainda está pendente.
+A fase 1 etiquetou as 574 fichas do catálogo original. A fase 2 integrou a ecologia aos sorteios da Floresta e adicionou a seleção de livros por sessão. O Arquipélago tem contextos configurados para ilhas, costa e mar aberto. A ligação dos objetivos das ilhas ao gerador de combates ainda está pendente.
 
 A fase 3 entregou a busca, os filtros de catálogo e a composição manual de encontros. Foram verificados o build, os testes de ecologia, os andares 1–30 e as missões, além da QA no Chrome na tela inicial e na Floresta. [Plano do encontro manual](docs/superpowers/plans/2026-11-22-ecologia-fase-3-encontro-manual.md)
 
-**Próximo passo da ecologia — fase 4, Bestiário de Arton.** Começar pelo inventário do apêndice «Criaturas por ND» (p. 188 do PDF em `tmp/livros/`). Cruzar o inventário com o catálogo atual para identificar fichas já cadastradas e variantes antes de cadastrar as inéditas. Conferir as referências e incluir as etiquetas de ecologia com cada ficha. Para a revisão das etiquetas, usar cartões por criatura com a citação recolhida, conforme a decisão do PO. [Design da ecologia](docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md)
+**Fase 4 — Bestiário de Arton.** As 181 entradas do apêndice «Criaturas por ND» (p. 188 do PDF) foram cruzadas com o catálogo anterior. As fichas publicadas de criaturas transformadas, como a Mantícora Zumbi e os Condenados da Legio Precita, têm estatísticas próprias e foram cadastradas com IDs próprios. Quando o apêndice e o bloco divergiam, foi usado o bloco, incluindo o ND 8 do Ancião das Rochas. Os papéis vêm dos ícones impressos e as fontes registram a página impressa e o intervalo no PDF. As etiquetas foram cadastradas com `reviewed: false` e os cartões locais para revisão estão em `tmp/ecologia/bestiario/cartoes.html`. [Design da ecologia](docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md)
 
 Continuam abertos:
 
 1. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
    - **Avisos do cadastro de ecologia para a fase 4:**
        - as etiquetas ainda não foram revisadas linha a linha (`reviewed: false` em todas). O PO preferiu "ir como está e ver depois", e uma revisão futura deve ser visual, em cartões;
-       - antes de rodar o rascunho em fichas novas (fase 4), vale corrigir pontos do `draftRules.mjs`: a janela de negação atravessa frases, a regra de subtipo conta como apoio vazio para a confiança "alta", e "água" fraca entra no conflito;
-       - a regra de dragões casa `/drag/i` no subtipo, então um subtipo novo com "drag" também cairia nela;
+       - a fase 4 limitou a janela de negação à frase, exigiu evidência forte para confiança alta e retirou o indício fraco de água da análise de conflitos. A regra de dragões usa o subtipo `dragão`;
        - a planilha conferida e as citações ficam só em `tmp/ecologia/`, que não é versionado. O `review` recusa sobrescrevê-la sem `--force`.
 2. **Origem de ícones a confirmar com o PO.** O `CREDITOS.md` lista numa seção própria os ícones sem origem confirmada: `boss`, `camp`, `elite`, `trap`, `treasure`, `normal`, `unknown`, `hidden-forest`, `archipelago-boat`, `close-modal`, `earth-arrow-left`, `info` e `expand-*`. Se vierem do game-icons.net, passam para a seção Game Icons.
 3. **Pontos menores, sem urgência:**

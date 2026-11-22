@@ -5,6 +5,7 @@ import { monsterCreatures } from "./monsters.js";
 import { spiritCreatures } from "./spirits.js";
 import { undeadCreatures } from "./undead.js";
 import { eventCreatures } from "./events.js";
+import { bestiaryCreatures } from "./bestiary.js";
 import { basicBookRoleByCreatureId, sourceByCreatureId, threatsBookRoleByCreatureId } from "./sources.js";
 import { ecologyByCreatureId } from "./ecology.js";
 import { NEUTRAL_ECOLOGY, validateEcology } from "./ecologyVocabulary.js";
@@ -104,10 +105,17 @@ function withEcology(creature) {
   return { ...creature, ecology: getCreatureEcology(creature.id) };
 }
 
+const bestiaryByType = new Map();
+for (const creature of bestiaryCreatures) {
+  if (!bestiaryByType.has(creature.type)) bestiaryByType.set(creature.type, []);
+  bestiaryByType.get(creature.type).push(creature);
+}
+
 export const creaturesByType = Object.fromEntries(
   Object.entries(creaturesByTypeRaw).map(([type, creatures]) => [
     type,
-    dedupeById(creatures).map(withCreatureSources).map(withThreatRoleMetadata).map(withEcology)
+    dedupeById([...creatures, ...(bestiaryByType.get(type) ?? [])])
+      .map(withCreatureSources).map(withThreatRoleMetadata).map(withEcology)
   ])
 );
 

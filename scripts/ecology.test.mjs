@@ -302,3 +302,32 @@ test("avatars and aspects of gods are manual-only in any book (PO, 22/11/2026)",
   assert.equal(out[0].terrenos, "Montanha");
   assert.equal(out[1].so_manual, "");
 });
+
+test("Bestiário de Arton has complete, unique sheets with ecology and PDF references", () => {
+  const book = "Bestiário de Arton";
+  const creatures = creatureCatalog.filter(creature => creature.source?.book === book);
+  assert.equal(creatures.length, 181);
+  assert.equal(new Set(creatureCatalog.map(creature => creature.id)).size, creatureCatalog.length);
+  for (const creature of creatures) {
+    assert.equal(creature.source.pdfPage, creature.source.bookPage + 4, creature.id);
+    assert.ok(creature.source.pdfPage >= 23 && creature.source.pdfPage <= 177, creature.id);
+    assert.ok(Number.isFinite(creature.stats.hitPoints) || creature.stats.hitPointsText === "—", creature.id);
+    assert.ok(Object.hasOwn(ecologyByCreatureId, creature.id), creature.id);
+    assert.equal(creature.roleSource, "pdf-review", creature.id);
+  }
+  assert.equal(getCreatureById("abelha-grifo").stats.hitPoints, 38);
+  assert.equal(getCreatureById("anciao-das-rochas").challengeRating, 8);
+  const aspects = creatures.filter(creature => creature.name.startsWith("Aspecto "));
+  assert.ok(aspects.length > 0);
+  assert.ok(aspects.every(creature => creature.ecology.manualOnly));
+  assert.equal(getCreatureById("o-profano").ecology.manualOnly, true);
+});
+
+test("draft habitat confidence uses independent evidence from the same sentence", () => {
+  const creature = { name: "Sentinela", type: "construct", challengeRating: 1, role: "solo" };
+  assert.deepEqual(suggestEcology({
+    ...creature, description: "Nunca foge. Vive em florestas."
+  }).tags.terrains, ["floresta"]);
+  assert.equal(suggestEcology({ ...creature, description: "Vive em florestas." }).confidence, "media");
+  assert.equal(suggestEcology({ ...creature, description: "Vive em florestas e bebe água." }).confidence, "media");
+});
