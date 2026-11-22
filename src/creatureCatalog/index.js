@@ -6,6 +6,8 @@ import { spiritCreatures } from "./spirits.js";
 import { undeadCreatures } from "./undead.js";
 import { eventCreatures } from "./events.js";
 import { basicBookRoleByCreatureId, sourceByCreatureId, threatsBookRoleByCreatureId } from "./sources.js";
+import { ecologyByCreatureId } from "./ecology.js";
+import { NEUTRAL_ECOLOGY, validateEcology } from "./ecologyVocabulary.js";
 import { inferThreatRole, getThreatRole } from "../threatCreationRules.js";
 export { animalCreatures } from "./animals.js";
 export { constructCreatures } from "./constructs.js";
@@ -89,10 +91,23 @@ function withThreatRoleMetadata(creature) {
   };
 }
 
+for (const [id, entry] of Object.entries(ecologyByCreatureId)) {
+  const errors = validateEcology(entry);
+  if (errors.length) throw new Error(`Ecologia inválida para ${id}: ${errors.join("; ")}`);
+}
+
+export function getCreatureEcology(id) {
+  return ecologyByCreatureId[id] || NEUTRAL_ECOLOGY;
+}
+
+function withEcology(creature) {
+  return { ...creature, ecology: getCreatureEcology(creature.id) };
+}
+
 export const creaturesByType = Object.fromEntries(
   Object.entries(creaturesByTypeRaw).map(([type, creatures]) => [
     type,
-    dedupeById(creatures).map(withCreatureSources).map(withThreatRoleMetadata)
+    dedupeById(creatures).map(withCreatureSources).map(withThreatRoleMetadata).map(withEcology)
   ])
 );
 

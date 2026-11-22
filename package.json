@@ -14,6 +14,7 @@
     "test:ranges": "node --test scripts/floorRanges.test.mjs",
     "test:archipelago": "node --test scripts/archipelagoState.test.mjs",
     "test:treasure": "node scripts/treasure.test.mjs",
+    "test:ecology": "node --test scripts/ecology.test.mjs",
     "qa:floors-11-20": "node scripts/qaForestMvp.mjs",
     "qa:floors-1-10": "node scripts/qaFloors1to10.mjs",
     "qa:layout": "node scripts/qaLayout.mjs",
