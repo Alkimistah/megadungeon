@@ -124,3 +124,15 @@ test("figurative uses found in the catalog are not habitats", () => {
   assert.equal(s.tags.group, "solitaria");
   assert.deepEqual(suggestEcology({ id: "sel", type: "monster", challengeRating: 3, role: "solo", description: "Habita selvas profundas e charcos." }).tags.terrains, ["floresta", "pantano"]);
 });
+test("description may be an array of paragraphs; an empty array counts as no description", () => {
+  const s = suggestEcology({ id: "arr", type: "animal", challengeRating: 1, role: "minion",
+    description: ["Esse roedor vive em bandos.", "Pode ser encontrado em pântanos ermos e esgotos de metrópoles."] });
+  assert.deepEqual(s.tags.terrains, ["pantano"]); assert.deepEqual(s.tags.places, ["urbano"]);
+  assert.equal(s.tags.group, "bando"); assert.equal(s.confidence, "alta"); assert.equal(s.needsBook, false);
+  const e = suggestEcology({ id: "emp", type: "animal", challengeRating: 1, role: "minion", description: [] });
+  assert.equal(e.needsBook, true); assert.equal(e.confidence, "baixa");
+});
+test("habitat words inside hyphenated names are not habitats", () => {
+  const s = suggestEcology({ id: "hy", type: "animal", challengeRating: 1, role: "minion", description: "Lobos-das-cavernas caçam como lobos comuns." });
+  assert.deepEqual(s.tags.terrains, []);
+});

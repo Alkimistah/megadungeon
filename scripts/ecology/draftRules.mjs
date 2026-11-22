@@ -45,7 +45,8 @@ export const SUBTYPE_RULES = [
   { name: "construct", type: "construct", subtype: null, places: ["masmorra", "cavernas-profundas"], confidence: "baixa" }
 ];
 
-// Palavras-chave sobre o texto dobrado (sem acento, minúsculas). Todas exigem início de palavra;
+// Palavras-chave sobre o texto dobrado (sem acento, minúsculas). Todas exigem início de palavra
+// (e não depois de hífen, para não casar com nomes compostos como "lobos-das-cavernas");
 // radicais curtos ou ambíguos também têm fim de palavra ou exclusões explícitas.
 const W = "(?![a-z])"; // fim de palavra
 export const KEYWORDS = [
@@ -81,7 +82,7 @@ export const KEYWORDS = [
   { category: "group", id: "horda", pattern: `hordas?${W}` },
   // "tropa" e "legião" nas descrições quase sempre são tropas militares comandadas; só valem no nome.
   { category: "group", id: "horda", pattern: `tropas?${W}|legiao|legioes`, nameOnly: true }
-].map((k) => ({ ...k, regex: new RegExp(`(?<![a-z])(?:${k.pattern})`, "g") }));
+].map((k) => ({ ...k, regex: new RegExp(`(?<![a-z-])(?:${k.pattern})`, "g") }));
 
 const NEGATION = /raramente|nunca|ao contrario|fora de|exceto|longe de/;
 const NEGATION_WINDOW = 30;
