@@ -2480,6 +2480,26 @@ svg {
   min-height: 0;
 }
 
+.manual-encounter-dialog:has(.manual-encounter-filters[open]) {
+  grid-template-rows: auto auto 1fr;
+  overflow-y: auto;
+}
+
+.manual-encounter-dialog:has(.manual-encounter-filters[open]) .manual-encounter-result {
+  overflow-y: visible;
+}
+
+@media (max-height: 540px) {
+  .manual-encounter-dialog {
+    grid-template-rows: auto auto 1fr;
+    overflow-y: auto;
+  }
+
+  .manual-encounter-dialog .manual-encounter-result {
+    overflow-y: visible;
+  }
+}
+
 .manual-encounter-controls {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -2498,8 +2518,43 @@ svg {
   width: 100%;
 }
 
+.manual-encounter-controls input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.manual-encounter-controls [hidden] {
+  display: none;
+}
+
+.manual-encounter-search {
+  grid-column: span 2;
+}
+
 .manual-encounter-creature {
+  grid-column: span 3;
+}
+
+.manual-encounter-filters,
+.manual-encounter-status {
   grid-column: 1 / -1;
+}
+
+.manual-encounter-status {
+  margin: 0;
+  color: #d8c8b7;
+}
+
+.manual-encounter-filters summary {
+  cursor: pointer;
+}
+
+.manual-encounter-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(145px, 100%), 1fr));
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .manual-encounter-result:empty {
@@ -3487,9 +3542,17 @@ details.mission-run-guidance p {
   .environment-columns,
   .combat-page,
   .extended-controls,
-  .extended-layout,
-  .manual-encounter-controls {
+  .extended-layout {
     grid-template-columns: 1fr;
+  }
+
+  .manual-encounter-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .manual-encounter-search,
+  .manual-encounter-creature {
+    grid-column: 1 / -1;
   }
 
   .extended-action-grid {

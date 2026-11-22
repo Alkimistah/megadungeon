@@ -386,7 +386,20 @@ const manualEncounterDialogController = createManualEncounterDialogController({
   challengeInput: elements.manualEncounterChallengeInput,
   closeButton: elements.manualEncounterClose,
   creatureInput: elements.manualEncounterCreatureInput,
-  creatureTypeInput: elements.manualEncounterCreatureTypeInput,
+  filters: {
+    query: document.getElementById("manualEncounterSearchInput"),
+    terrain: elements.manualEncounterTerrainInput,
+    place: document.getElementById("manualEncounterPlaceInput"),
+    condition: document.getElementById("manualEncounterConditionInput"),
+    type: elements.manualEncounterCreatureTypeInput,
+    challenge: document.getElementById("manualEncounterCatalogChallengeInput"),
+    role: document.getElementById("manualEncounterRoleInput"),
+    book: document.getElementById("manualEncounterBookInput")
+  },
+  catalogStatus: document.getElementById("manualEncounterCatalogStatus"),
+  compositionInput: document.getElementById("manualEncounterCompositionInput"),
+  quantityField: document.getElementById("manualEncounterQuantityField"),
+  quantityInput: document.getElementById("manualEncounterQuantityInput"),
   dialogElement: elements.manualEncounterDialog,
   formElement: elements.manualEncounterForm,
   getActiveMissions: () => missionState.getSelected(),
@@ -398,7 +411,6 @@ const manualEncounterDialogController = createManualEncounterDialogController({
   },
   openButton: elements.manualEncounterButton,
   resultElement: elements.manualEncounterResult,
-  terrainInput: elements.manualEncounterTerrainInput,
   trapModeInput: elements.manualEncounterTrapModeInput
 });
 

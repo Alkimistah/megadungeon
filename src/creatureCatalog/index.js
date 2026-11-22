@@ -138,21 +138,21 @@ function isEcologyEligible(creature, disabledBooks) {
   return sources.some(source => !disabledBooks.has(source?.book));
 }
 
-function getEcologicalFamilyRepresentative(family, variants, profile, disabledBooks) {
-  const preferred = profile.creatureRules.preferredCreatureIdsByFamily?.[family];
+function getEcologicalFamilyRepresentative(family, variants, profile, disabledBooks, candidateIds) {
+  const preferred = profile?.creatureRules?.preferredCreatureIdsByFamily?.[family];
   const ids = variants.has(preferred) ? [preferred, ...variants] : variants;
   for (const id of ids) {
     const creature = creaturesById.get(id);
-    if (isEcologyEligible(creature, disabledBooks)) return creature;
+    if ((!candidateIds || candidateIds.has(id)) && isEcologyEligible(creature, disabledBooks)) return creature;
   }
   return null;
 }
 
-function isEcologicalAutomaticCreature(creature, profile, disabledBooks) {
+function isEcologicalAutomaticCreature(creature, profile, disabledBooks, candidateIds) {
   if (!isEcologyEligible(creature, disabledBooks)) return false;
   const family = creature.variantOf || creature.id;
   const variants = variantsByFamily.get(family);
-  return !variants || getEcologicalFamilyRepresentative(family, variants, profile, disabledBooks)?.id === creature.id;
+  return !variants || getEcologicalFamilyRepresentative(family, variants, profile, disabledBooks, candidateIds)?.id === creature.id;
 }
 
 export function isAutomaticCreature(creature, profile) {
@@ -161,7 +161,13 @@ export function isAutomaticCreature(creature, profile) {
   return isEcologicalAutomaticCreature(creature, profile, new Set(profile.disabledCreatureBooks));
 }
 
-export function getAutomaticCreatureCatalog(profile) {
+export function getAutomaticCreatureCatalog(profile, candidates) {
+  if (candidates) {
+    const disabledBooks = new Set(profile?.disabledCreatureBooks);
+    const candidateIds = new Set(candidates.map(creature => creature.id));
+    return candidates.filter(creature => isEcologicalAutomaticCreature(creature, profile, disabledBooks, candidateIds));
+  }
+
   if (!profile?.creatureRules?.ecology) return creatureCatalog.filter(creature => isLegacyAutomaticCreature(creature, profile));
 
   const disabledBooks = new Set(profile.disabledCreatureBooks);

@@ -301,6 +301,8 @@ As versões homônimas cadastradas têm IDs próprios. A variante aponta para o 
 
 Em **Configurações → Livros nos sorteios de criaturas**, a seleção vale para futuros sorteios e rerrolagens dos perfis ecológicos e é salva com a sessão. Sessões anteriores começam com todos os livros habilitados. O gerador exclui as fichas só manuais e as de livros desabilitados antes de escolher a variante de cada família. Fichas com mais de uma fonte seguem elegíveis enquanto pelo menos um de seus livros estiver habilitado. Fichas escolhidas explicitamente pelo mestre e composições curadas continuam disponíveis.
 
+O diálogo **Encontro** usa `manualEncounterCatalog.js` para combinar busca por nome e filtros de terreno, lugar, condição, tipo, ND da ficha, papel e livro. A busca vale para o catálogo inteiro, incluindo variantes e fichas só manuais. O sorteio pelo orçamento seleciona dentro do resultado elegível dos filtros. Com uma ficha escolhida, o mestre pode montar uma criatura solitária, um grupo da mesma ficha ou uma ficha coletiva de enxame. O ND da composição usa o cálculo de combate existente. O atalho da tela inicial mantém a paleta bronze. [Plano da fase 3](docs/superpowers/plans/2026-11-22-ecologia-fase-3-encontro-manual.md)
+
 O fluxo de etiquetagem é: `npm run ecology:draft` (rascunho a partir das fichas) → `npm run ecology:batches -- split` (lotes) → conferência com o livro por lote (com `tools/pdf`, citação e página do PDF, e um revisor por amostragem em cada lote) → `ecology:batches -- merge` → `ecology:batches -- review` (gera `revisao.csv` e `vocabulario.csv` em `tmp/ecologia/`, já aplicando as regras do PO abaixo automaticamente, e recusa sobrescrever uma `revisao.csv` existente sem `--force`; o LEIA-ME da pasta é escrito à mão, não gerado) → `ecology:apply -- <csv>` (grava `ecology.js`). `npm run test:ecology` roda os testes dessa parte. Regras do PO (aplicadas pelo `review`): dragões sem terreno citado no livro recebem todos os terrenos abertos (todos, menos Subterrâneo); mortos-vivos sem terreno citado recebem Pântano, Catacumbas/necrópole e Miasma; avatares e aspectos de deuses, de qualquer livro, são só manuais (o Aspecto de Aharadak, de Ameaças de Arton, entrou por essa regra). A planilha CSV ficou difícil para o PO ler; a próxima revisão deve usar um formato visual, com um cartão por criatura. O cadastro de um livro novo (por exemplo o Bestiário de Arton, com cerca de 200 criaturas) deve trazer as etiquetas pelo mesmo fluxo.
 
 O perfil da floresta usa `creatureRules.bossCreatureId: "quimera"` para selecionar a Quimera de Ameaças de Arton no andar 20.
@@ -536,13 +538,18 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
   - **Dividir entre jogadores?**, de 1 a 10, mostra **Por jogador**, com o valor arredondado para baixo e o resto informado;
   - a tabela de `src/economy/crystalValues.js` vai agora até o ND 20. Isso também corrige as recompensas de missão acima do ND 10, que antes ficavam zeradas no ND 11.
 
+### Retomada da ecologia
+
+Encerramos após a fase 3. A fase 1 etiquetou as 574 fichas do catálogo. A fase 2 integrou a ecologia aos sorteios da Floresta e adicionou a seleção de livros por sessão. O Arquipélago tem contextos configurados para ilhas, costa e mar aberto. A ligação dos objetivos das ilhas ao gerador de combates ainda está pendente.
+
+A fase 3 entregou a busca, os filtros de catálogo e a composição manual de encontros. Foram verificados o build, os testes de ecologia, os andares 1–30 e as missões, além da QA no Chrome na tela inicial e na Floresta. [Plano do encontro manual](docs/superpowers/plans/2026-11-22-ecologia-fase-3-encontro-manual.md)
+
+**Próximo passo da ecologia — fase 4, Bestiário de Arton.** Começar pelo inventário do apêndice «Criaturas por ND» (p. 188 do PDF em `tmp/livros/`). Cruzar o inventário com o catálogo atual para identificar fichas já cadastradas e variantes antes de cadastrar as inéditas. Conferir as referências e incluir as etiquetas de ecologia com cada ficha. Para a revisão das etiquetas, usar cartões por criatura com a citação recolhida, conforme a decisão do PO. [Design da ecologia](docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md)
+
 Continuam abertos:
 
 1. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
-   - **Encontros e ecologia das criaturas:** é um projeto em 4 fases, com design em [docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md](docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md). A fase 1 (etiquetas das 574 fichas) está concluída. Faltam:
-     - Fase 3, encontro manual novo.
-     - Fase 4, cadastro do Bestiário de Arton, cujo PDF já está em `tmp/livros/`, com as etiquetas pelo mesmo fluxo.
-     - Fase 1 publicada em 22/11/2026. Avisos para as próximas fases:
+   - **Avisos do cadastro de ecologia para a fase 4:**
        - as etiquetas ainda não foram revisadas linha a linha (`reviewed: false` em todas). O PO preferiu "ir como está e ver depois", e uma revisão futura deve ser visual, em cartões;
        - antes de rodar o rascunho em fichas novas (fase 4), vale corrigir pontos do `draftRules.mjs`: a janela de negação atravessa frases, a regra de subtipo conta como apoio vazio para a confiança "alta", e "água" fraca entra no conflito;
        - a regra de dragões casa `/drag/i` no subtipo, então um subtipo novo com "drag" também cairia nela;

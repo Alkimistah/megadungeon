@@ -276,10 +276,28 @@
         </div>
 
         <div class="manual-encounter-controls">
+          <label class="manual-encounter-search">
+            Buscar criatura
+            <input id="manualEncounterSearchInput" type="search" autocomplete="off">
+          </label>
           <label class="manual-encounter-creature">
             Ficha da criatura
             <select id="manualEncounterCreatureInput"></select>
           </label>
+
+          <details id="manualEncounterFilters" class="manual-encounter-filters">
+            <summary>Filtros do catálogo</summary>
+            <div class="manual-encounter-filter-grid">
+              <label>Terreno <select id="manualEncounterTerrainInput"></select></label>
+              <label>Lugar <select id="manualEncounterPlaceInput"></select></label>
+              <label>Condição <select id="manualEncounterConditionInput"></select></label>
+              <label>Tipo de criatura <select id="manualEncounterCreatureTypeInput"></select></label>
+              <label>ND da ficha <select id="manualEncounterCatalogChallengeInput"></select></label>
+              <label>Papel <select id="manualEncounterRoleInput"></select></label>
+              <label>Livro <select id="manualEncounterBookInput"></select></label>
+            </div>
+          </details>
+          <p id="manualEncounterCatalogStatus" class="manual-encounter-status" role="status" hidden></p>
 
           <label>
             Orçamento de combate
@@ -287,13 +305,17 @@
           </label>
 
           <label>
-            Terreno
-            <select id="manualEncounterTerrainInput"></select>
+            Composição
+            <select id="manualEncounterCompositionInput">
+              <option value="">Padrão</option>
+              <option value="solitaria">Solitária</option>
+              <option value="grupo">Grupo</option>
+              <option value="enxame">Enxame</option>
+            </select>
           </label>
-
-          <label>
-            Tipo de criatura
-            <select id="manualEncounterCreatureTypeInput"></select>
+          <label id="manualEncounterQuantityField" hidden>
+            Quantidade
+            <input id="manualEncounterQuantityInput" type="number" min="2" max="20" step="1" value="2" required>
           </label>
 
           <label>

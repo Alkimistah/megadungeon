@@ -14,7 +14,7 @@
     "test:ranges": "node --test scripts/floorRanges.test.mjs",
     "test:archipelago": "node --test scripts/archipelagoState.test.mjs",
     "test:treasure": "node scripts/treasure.test.mjs",
-    "test:ecology": "node --test scripts/ecology.test.mjs scripts/encounterEcology.test.mjs",
+    "test:ecology": "node --test scripts/ecology.test.mjs scripts/encounterEcology.test.mjs scripts/manualEncounterCatalog.test.mjs",
     "ecology:draft": "node scripts/ecology/draft.mjs",
     "ecology:batches": "node scripts/ecology/batches.mjs",
     "ecology:apply": "node scripts/ecology/apply.mjs",

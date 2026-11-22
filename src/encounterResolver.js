@@ -741,7 +741,7 @@ export function resolveForestAmbush(node, profile, { mapSeed } = {}) {
   return creature ? createResolvedEncounter(ambushNode, [getCreatureSummary(creature, 1, rng)], seed) : null;
 }
 
-export function resolveNodeEncounter(node, { mapSeed, profile } = {}) {
+export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidates } = {}) {
   if (!node) return null;
   if (node.resolvedEncounter?.version === ENCOUNTER_RESOLUTION_VERSION) return node.resolvedEncounter;
   if (node.resolvedEncounter) node.resolvedEncounter = null;
@@ -753,7 +753,9 @@ export function resolveNodeEncounter(node, { mapSeed, profile } = {}) {
   if (node.fixedComposition) {
     items = resolveFixedComposition(node.fixedComposition, rng);
   } else {
-    const catalog = node.creature ? getAllowedCatalog(node.creature.allowedCreatureIds, profile) : [];
+    const catalog = node.creature
+      ? creatureCandidates ?? getAllowedCatalog(node.creature.allowedCreatureIds, profile)
+      : [];
     items = resolveCreatureGroup(node, rng, catalog, getNodeEcology(node, profile));
     if (node.trap) items.push(getTrapSummary(node.trap));
   }
