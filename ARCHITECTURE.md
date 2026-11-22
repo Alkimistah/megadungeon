@@ -295,6 +295,10 @@ As referências vêm do campo `source` das fichas e do mapeamento por ID em `cre
 
 As versões homônimas cadastradas têm IDs próprios. A variante aponta para o ID padrão em `variantOf`. O seletor manual e a lista de combate mostram o livro, e o sorteio usa a ficha padrão da família ou a preferência em `creatureRules.preferredCreatureIdsByFamily`. Saves e encontros fixos continuam a resolver pelo ID gravado. [Especificação e progresso da auditoria](docs/superpowers/specs/2026-11-18-auditoria-catalogo-criaturas-design.md)
 
+**Ecologia das criaturas.** `creatureCatalog/ecologyVocabulary.js` define o vocabulário das etiquetas: terrenos, lugares, condições, `group` (comportamento de grupo), `rarity` (raridade) e `manualOnly` (só aparece por escolha manual). `creatureCatalog/ecology.js` é **gerado**, não editado à mão: tem 574 entradas, uma por ficha, todas com `reviewed: false`. Uma criatura sem entrada recebe o padrão neutro. As etiquetas são **preferências (pesos)**, não filtros exclusivos: uma criatura etiquetada só com Pântano ainda pode aparecer em outros terrenos, com menos chance. Terreno vazio significa qualquer lugar. O gerador de encontros ainda não usa as etiquetas (fase 2). [Design da ecologia e dos encontros](docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md)
+
+O fluxo de etiquetagem é: `npm run ecology:draft` (rascunho a partir das fichas) → `npm run ecology:batches -- split` (lotes) → conferência com o livro por lote (com `tools/pdf`, citação e página do PDF, e um revisor por amostragem em cada lote) → `ecology:batches -- merge` → `ecology:batches -- review` (gera `revisao.csv`, `vocabulario.csv` e um LEIA-ME em `tmp/ecologia/`) → `ecology:apply -- <csv>` (grava `ecology.js`). `npm run test:ecology` roda os testes dessa parte. Regras do PO aplicadas: dragões sem terreno citado no livro recebem todos os terrenos abertos (todos, menos Subterrâneo); mortos-vivos sem terreno citado recebem Pântano, Catacumbas/necrópole e Miasma. A planilha CSV ficou difícil para o PO ler; a próxima revisão deve usar um formato visual, com um cartão por criatura. O cadastro de um livro novo (por exemplo o Bestiário de Arton, com cerca de 200 criaturas) deve trazer as etiquetas pelo mesmo fluxo.
+
 O perfil da floresta usa `creatureRules.bossCreatureId: "quimera"` para selecionar a Quimera de Ameaças de Arton no andar 20.
 
 `damageTypes.js` centraliza os tipos de dano (`acid`, `slashing`, `electricity`, `essence`, `fire`, `cold`, `bludgeoning`, `light`, `piercing`, `psychic`, `darkness`) com rótulos em português, aliases e categorias. Esse catálogo é usado como referência comum por ameaças, armadilhas, perigos ambientais e habilidades.
@@ -531,11 +535,10 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
 Continuam abertos:
 
 1. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
-   - **Encontros e ecologia das criaturas:** é um projeto em 4 fases. O design está em [docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md](docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md).
-     - Fase 1, etiquetas das 574 fichas. O plano está em [docs/superpowers/plans/2026-11-21-ecologia-fase-1-etiquetas.md](docs/superpowers/plans/2026-11-21-ecologia-fase-1-etiquetas.md), e é o **ponto de recomeço**.
-     - Fase 2, gerador por etiquetas.
+   - **Encontros e ecologia das criaturas:** é um projeto em 4 fases, com design em [docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md](docs/superpowers/specs/2026-11-21-ecologia-e-encontros-design.md). A fase 1 (etiquetas das 574 fichas) está concluída. Faltam:
+     - Fase 2, gerador por etiquetas, usando terreno, lugar e condição como peso. É o **próximo ponto de recomeço** e ainda precisa de plano próprio.
      - Fase 3, encontro manual novo.
-     - Fase 4, cadastro do Bestiário de Arton, cujo PDF já está em `tmp/livros/`.
+     - Fase 4, cadastro do Bestiário de Arton, cujo PDF já está em `tmp/livros/`, com as etiquetas pelo mesmo fluxo.
 2. **Origem de ícones a confirmar com o PO.** O `CREDITOS.md` lista numa seção própria os ícones sem origem confirmada: `boss`, `camp`, `elite`, `trap`, `treasure`, `normal`, `unknown`, `hidden-forest`, `archipelago-boat`, `close-modal`, `earth-arrow-left`, `info` e `expand-*`. Se vierem do game-icons.net, passam para a seção Game Icons.
 3. **Pontos menores, sem urgência:**
    - o `qaLayout.mjs` fixa os rótulos curtos do contador;
