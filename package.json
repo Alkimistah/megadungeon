@@ -16,6 +16,7 @@
     "test:treasure": "node scripts/treasure.test.mjs",
     "test:ecology": "node --test scripts/ecology.test.mjs",
     "ecology:draft": "node scripts/ecology/draft.mjs",
+    "ecology:batches": "node scripts/ecology/batches.mjs",
     "qa:floors-11-20": "node scripts/qaForestMvp.mjs",
     "qa:floors-1-10": "node scripts/qaFloors1to10.mjs",
     "qa:layout": "node scripts/qaLayout.mjs",

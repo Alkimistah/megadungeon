@@ -1,3 +1,4 @@
+import { splitRows, mergeRows } from "./ecology/batches.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { TERRAINS, PLACES, CONDITIONS, GROUPS, RARITIES, NEUTRAL_ECOLOGY, normalizeTag, validateEcology } from "../src/creatureCatalog/ecologyVocabulary.js";
@@ -135,4 +136,29 @@ test("description may be an array of paragraphs; an empty array counts as no des
 test("habitat words inside hyphenated names are not habitats", () => {
   const s = suggestEcology({ id: "hy", type: "animal", challengeRating: 1, role: "minion", description: "Lobos-das-cavernas caçam como lobos comuns." });
   assert.deepEqual(s.tags.terrains, []);
+});
+const row = (id, livro, familia, precisa, extra = {}) => ({ familia, id, livro, precisa_livro: precisa, citacao: "", terrenos: "", ...extra });
+test("split groups needs-book rows by book and family in batches of at most 40", () => {
+  const rows = [row("a1", "B", "x", "sim"), row("n1", "A", "x", "não"), row("a2", "A", "y", "sim"), row("a3", "A", "x", "sim"), row("a4", "A", "y", "sim")];
+  const batches = splitRows(rows);
+  assert.deepEqual(batches.map((b) => b.map((r) => r.id)), [["a3", "a2", "a4"], ["a1"]]);
+  const big = Array.from({ length: 95 }, (_, i) => row(`g${i}`, "A", "gigante", "sim"));
+  assert.deepEqual(splitRows([...big, row("z", "A", "zz", "sim")]).map((b) => b.length), [40, 40, 16]);
+  const fam = [...Array.from({ length: 25 }, (_, i) => row(`p${i}`, "A", "p", "sim")), ...Array.from({ length: 25 }, (_, i) => row(`q${i}`, "A", "q", "sim"))];
+  assert.deepEqual(splitRows(fam).map((b) => b.length), [25, 25]);
+});
+test("split then merge without changes returns the draft identical", () => {
+  const draft = Array.from({ length: 100 }, (_, i) => row(`id${i}`, i % 3 ? "A" : "B", `f${i % 7}`, i % 4 ? "sim" : "não"));
+  const lists = splitRows(draft).map((b) => b.map((r) => ({ ...r })));
+  assert.deepEqual(mergeRows(draft, lists), draft);
+  assert.deepEqual(mergeRows(draft, []), draft);
+});
+test("merge replaces rows by id keeping the draft order and rejects bad batches", () => {
+  const draft = [row("a", "A", "f", "sim"), row("b", "A", "f", "sim"), row("c", "A", "f", "não")];
+  const merged = mergeRows(draft, [[{ ...draft[1], citacao: "trecho (PDF 3)" }]]);
+  assert.deepEqual(merged.map((r) => r.id), ["a", "b", "c"]);
+  assert.equal(merged[1].citacao, "trecho (PDF 3)"); assert.equal(merged[0].citacao, "");
+  assert.throws(() => mergeRows(draft, [[row("zzz", "A", "f", "sim")]]), /fora do rascunho/);
+  assert.throws(() => mergeRows(draft, [[draft[0]], [draft[0]]]), /duplicado/);
+  assert.throws(() => mergeRows(draft, [[{ id: "a" }]]), /colunas/);
 });
