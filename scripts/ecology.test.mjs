@@ -1,4 +1,4 @@
-import { splitRows, mergeRows } from "./ecology/batches.mjs";
+import { splitRows, mergeRows, buildReviewRows, buildVocabularyRows, REVIEW_COLUMNS } from "./ecology/batches.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { TERRAINS, PLACES, CONDITIONS, GROUPS, RARITIES, NEUTRAL_ECOLOGY, normalizeTag, validateEcology } from "../src/creatureCatalog/ecologyVocabulary.js";
@@ -161,4 +161,33 @@ test("merge replaces rows by id keeping the draft order and rejects bad batches"
   assert.throws(() => mergeRows(draft, [[row("zzz", "A", "f", "sim")]]), /fora do rascunho/);
   assert.throws(() => mergeRows(draft, [[draft[0]], [draft[0]]]), /duplicado/);
   assert.throws(() => mergeRows(draft, [[{ id: "a" }]]), /colunas/);
+});
+
+test("review sheet has one row per creature plus one header per family, in order", () => {
+  const mk = (id, nome, familia, nd, extra = {}) => ({ familia, id, nome, livro: "L", pagina_pdf: "1", tipo: "monster", subtipo: "", nd, papel: "", terrenos: "Floresta", lugares: "", condicoes: "", grupo: "", raridade: "Comum", so_manual: "", confianca: "alta", precisa_livro: "nao", motivos: "", citacao: "", ...extra });
+  const rows = [
+    mk("g2", "Goblin B", "goblin", "1", { tipo: "humanoid", subtipo: "goblin" }),
+    mk("g1", "Goblin A", "goblin", "0,25", { tipo: "humanoid", subtipo: "goblin" }),
+    mk("g3", "Goblin X", "goblin", "?", { tipo: "humanoid", subtipo: "goblin" }),
+    mk("lobo", "Lobo", "animal", "1", { tipo: "animal" }),
+    mk("lobo-atroz", "Lobo Atroz", "lobo", "2", { tipo: "animal" }),
+    mk("u1", "Zumbi", "undead", "1", { tipo: "undead" }),
+    mk("r1", "Rival", "???", "?", { tipo: "???" })
+  ];
+  const sheet = buildReviewRows(rows);
+  const headers = sheet.filter((r) => r.id === "");
+  assert.equal(sheet.length, rows.length + headers.length);
+  assert.deepEqual(headers.map((r) => r.familia), ["== Animais (1) ==", "== Goblin (3) ==", "== Lobo (1) ==", "== Mortos-vivos (1) ==", "== Outros (1) =="]);
+  assert.ok(headers.every((r) => Object.entries(r).every(([k, v]) => k === "familia" || v === "")));
+  const goblins = sheet.filter((r) => r.familia === "Goblin").map((r) => r.nome);
+  assert.deepEqual(goblins, ["Goblin A", "Goblin B", "Goblin X"]);
+  assert.ok(sheet.every((r) => Object.keys(r).join("|") === REVIEW_COLUMNS.join("|")));
+  assert.deepEqual(REVIEW_COLUMNS, ["familia", "nome", "nd", "terrenos", "lugares", "condicoes", "grupo", "raridade", "so_manual", "revisado", "confianca", "citacao", "id", "livro", "pagina_pdf"]);
+  assert.ok(sheet.every((r) => r.revisado === ""));
+});
+test("vocabulary sheet has one column per category with the vocabulary labels", () => {
+  const { names, rows } = buildVocabularyRows();
+  assert.deepEqual(names, ["terrenos", "lugares", "condicoes", "grupo", "raridade", "so_manual", "revisado"]);
+  assert.equal(rows[0].terrenos, "Aquático");
+  assert.equal(rows.map((r) => r.lugares).filter(Boolean).length, 13);
 });
