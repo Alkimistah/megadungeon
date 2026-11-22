@@ -291,3 +291,14 @@ test("buildReviewRows applies the PO rules from the catalog", () => {
   const sheet = buildReviewRows([row], new Map([["z", { type: "undead" }]]));
   assert.equal(sheet.find((r) => r.id === "z").terrenos, "Pântano");
 });
+test("avatars and aspects of gods are manual-only in any book (PO, 22/11/2026)", () => {
+  assert.equal(suggestEcology({ id: "ah", name: "Aspecto de Aharadak", type: "spirit", challengeRating: 10, role: "solo", source: { book: "Ameaças de Arton" } }).tags.manualOnly, true);
+  const catalog = new Map([["ah", { type: "spirit", subtype: "lefeu", name: "Aspecto de Aharadak" }], ["dr", { type: "spirit", subtype: null, name: "Dríade" }]]);
+  const out = applyPoRules([
+    { id: "ah", terrenos: "Montanha", so_manual: "", citacao: "" },
+    { id: "dr", terrenos: "Floresta", so_manual: "", citacao: "" },
+  ], catalog);
+  assert.equal(out[0].so_manual, "sim");
+  assert.equal(out[0].terrenos, "Montanha");
+  assert.equal(out[1].so_manual, "");
+});

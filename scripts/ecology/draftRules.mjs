@@ -132,7 +132,8 @@ function isManualOnly(creature) {
   if (typeof nd !== "number") return "ND não numérico";
   if (creature.type === "event") return "tipo evento";
   if (creature.type === "???") return "tipo ???";
-  if (creature.source?.book === "Deuses de Arton" && /^(Avatar|Aspecto) /.test(creature.name ?? "")) return "avatar ou aspecto divino";
+  // Avatares e aspectos são deuses: só manual em qualquer livro (PO, 22/11/2026).
+  if (/^(Avatar|Aspecto) /.test(creature.name ?? "")) return "avatar ou aspecto divino";
   return null;
 }
 

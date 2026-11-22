@@ -134,5 +134,6 @@ Cada projeto tem o seu próprio plano.
 
 - **A planilha CSV ficou difícil de ler.** Muito texto junto, sem dar para distinguir o que é o quê. As etiquetas seguem como estão, sem revisão linha a linha. Uma revisão futura precisa de um formato visual, com uma criatura por cartão, etiquetas destacadas e a citação recolhida, e não de CSV.
 - **Dragões** podem estar em praticamente qualquer lugar aberto, porque há tipos para vários ambientes. Os que não têm terreno citado no livro recebem todos os terrenos, menos Subterrâneo.
+- **Avatares e aspectos** são deuses e só aparecem quando o PO os põe à mão, venham de qualquer livro. Entre eles está o Aspecto de Aharadak, de Ameaças de Arton.
 - **Mortos-vivos** podem estar em diversos lugares, mas aparecem mais em catacumbas, com miasma e em pântanos. Os que não têm terreno citado no livro recebem Pântano, Catacumbas/necrópole e Miasma.
 - **Consequência para a fase 2.** Terreno, lugar e condição são **peso**, não filtro exclusivo, pelo menos para mortos-vivos. Uma criatura etiquetada só com Pântano ainda pode aparecer em outros terrenos, com menos chance. Etiqueta vazia continua sendo neutra, valendo para qualquer lugar.

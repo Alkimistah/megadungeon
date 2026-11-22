@@ -102,10 +102,15 @@ const PO_RULES = [
 const addToList = (list, item) => { const parts = list ? list.split(", ") : []; if (!parts.includes(item)) parts.push(item); return parts.join(", "); };
 
 // Devolve cópias das linhas com as regras aplicadas; catalogById é um Map id -> ficha (type, subtype).
+// Avatares e aspectos são deuses: só aparecem quando o PO os põe à mão (PO, 22/11/2026).
+const isDivine = (creature) => /^(Avatar|Aspecto) /.test(creature.name ?? "");
+
 export function applyPoRules(rows, catalogById) {
-  return rows.map((row) => {
-    const creature = row.id ? catalogById.get(row.id) : null;
-    if (!creature || row.terrenos) return row;
+  return rows.map((input) => {
+    const creature = input.id ? catalogById.get(input.id) : null;
+    if (!creature) return input;
+    const row = isDivine(creature) && input.so_manual !== "sim" ? { ...input, so_manual: "sim" } : input;
+    if (row.terrenos) return row;
     const rule = PO_RULES.find((r) => r.applies(creature));
     if (!rule) return row;
     const next = { ...row, terrenos: rule.terrenos, citacao: row.citacao ? `${row.citacao} | ${rule.note}` : rule.note };

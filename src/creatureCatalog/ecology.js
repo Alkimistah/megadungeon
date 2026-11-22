@@ -31,7 +31,7 @@ export const ecologyByCreatureId = {
   "arquilich-ferren-asloth": { terrains: ["pantano"], places: ["catacumbas"], conditions: ["miasma"], group: "dupla", rarity: "comum", manualOnly: true, reviewed: false },
   "arvore-matilha": { terrains: ["floresta"], places: ["ruinas"], conditions: [], group: "solitaria", rarity: "rara", manualOnly: false, reviewed: false },
   "asa-assassina": { terrains: [], places: ["masmorra"], conditions: [], group: "bando", rarity: "comum", manualOnly: false, reviewed: false },
-  "aspecto-de-aharadak": { terrains: [], places: ["tormenta"], conditions: [], group: "solitaria", rarity: "rara", manualOnly: false, reviewed: false },
+  "aspecto-de-aharadak": { terrains: [], places: ["tormenta"], conditions: [], group: "solitaria", rarity: "rara", manualOnly: true, reviewed: false },
   "aspecto-de-allihanna": { terrains: [], places: [], conditions: [], group: "solitaria", rarity: "incomum", manualOnly: true, reviewed: false },
   "aspecto-de-kallyadranoch": { terrains: ["aquatico", "artico", "colina", "deserto", "floresta", "montanha", "pantano", "planicie"], places: ["alturas"], conditions: [], group: "solitaria", rarity: "rara", manualOnly: true, reviewed: false },
   "aspecto-de-khalmyr": { terrains: [], places: [], conditions: [], group: "solitaria", rarity: "incomum", manualOnly: true, reviewed: false },
