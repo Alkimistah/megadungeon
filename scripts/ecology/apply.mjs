@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { writeFileSync } from "node:fs";
 import { readCsv } from "./csv.mjs";
-import { creatureCatalog } from "../../src/creatureCatalog/index.js";
+import { catalogCreatureIds } from "./catalogIds.mjs";
 import { TERRAINS, PLACES, CONDITIONS, GROUPS, RARITIES, normalizeTag, validateEcology } from "../../src/creatureCatalog/ecologyVocabulary.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -46,8 +46,11 @@ export function collectEcology(rows, knownIds = null) {
       entry.rarity = normalizeTag("rarities", rarity);
       if (!entry.rarity) fail(rarity, "raridade desconhecida");
     }
-    entry.manualOnly = TRUE_VALUES.has(clean(row.so_manual).toLowerCase());
-    entry.reviewed = clean(row.revisado).toLowerCase() === "x";
+    for (const [column, key] of [["so_manual", "manualOnly"], ["revisado", "reviewed"]]) {
+      const flag = clean(row[column]).toLowerCase();
+      if (flag && !TRUE_VALUES.has(flag)) fail(clean(row[column]), `valor inválido em ${column} (use sim, s, x, true ou deixe vazio)`);
+      entry[key] = TRUE_VALUES.has(flag);
+    }
     if (!errors.some((e) => e.startsWith(`linha ${line},`))) {
       const problems = validateEcology(entry);
       problems.forEach((p) => fail(id, p));
@@ -74,7 +77,7 @@ export function renderEcologyModule(entries) {
 
 // Valida tudo antes de escrever; com qualquer erro, o arquivo de saída fica intacto.
 export function applyEcologySheet(csvFile, outFile = DEFAULT_OUT) {
-  const knownIds = new Set(creatureCatalog.map((c) => c.id));
+  const knownIds = catalogCreatureIds();
   const entries = buildEcologyFromRows(readCsv(csvFile), knownIds);
   writeFileSync(outFile, renderEcologyModule(entries), "utf8");
   return entries;

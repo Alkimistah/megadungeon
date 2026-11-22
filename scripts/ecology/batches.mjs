@@ -1,10 +1,11 @@
 // Divide as linhas do rascunho que precisam do livro em lotes e junta os lotes conferidos.
 // Uso: npm run ecology:batches -- split [--force]   |   merge   |   review
 
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, relative } from "node:path";
 import { readCsv, writeCsv } from "./csv.mjs";
+import { rawCreatures } from "./catalogIds.mjs";
 import { TERRAINS, PLACES, CONDITIONS, GROUPS, RARITIES } from "../../src/creatureCatalog/ecologyVocabulary.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -81,8 +82,42 @@ function familyName(raw, rows, namesById) {
 
 const ndValue = (nd) => { const n = Number(String(nd).replace(",", ".")); return nd !== "" && Number.isFinite(n) ? n : Infinity; };
 
+// Regras do PO, spec "Decisões do PO após a conferência (22/11/2026)". Só valem para terreno vazio
+// (sem terreno citado no livro), então reaplicar não muda nada. Usam tipo/subtipo da ficha, não a família do CSV.
+const OPEN_TERRAINS = "Aquático, Ártico, Colina, Deserto, Floresta, Montanha, Pântano, Planície";
+const PO_RULES = [
+  {
+    applies: (creature) => /drag/i.test(creature.subtype || ""),
+    terrenos: OPEN_TERRAINS,
+    note: "regra do PO: dragões em qualquer lugar aberto",
+  },
+  {
+    applies: (creature) => creature.type === "undead",
+    terrenos: "Pântano",
+    lugares: "Catacumbas/necrópole",
+    condicoes: "Miasma",
+    note: "regra do PO: mortos-vivos em qualquer lugar, mais em catacumbas, miasma e pântano",
+  },
+];
+const addToList = (list, item) => { const parts = list ? list.split(", ") : []; if (!parts.includes(item)) parts.push(item); return parts.join(", "); };
+
+// Devolve cópias das linhas com as regras aplicadas; catalogById é um Map id -> ficha (type, subtype).
+export function applyPoRules(rows, catalogById) {
+  return rows.map((row) => {
+    const creature = row.id ? catalogById.get(row.id) : null;
+    if (!creature || row.terrenos) return row;
+    const rule = PO_RULES.find((r) => r.applies(creature));
+    if (!rule) return row;
+    const next = { ...row, terrenos: rule.terrenos, citacao: row.citacao ? `${row.citacao} | ${rule.note}` : rule.note };
+    if (rule.lugares) next.lugares = addToList(row.lugares, rule.lugares);
+    if (rule.condicoes) next.condicoes = addToList(row.condicoes, rule.condicoes);
+    return next;
+  });
+}
+
 // Planilha para o PO: um cabeçalho "== Família (n) ==" e depois as fichas da família, por ND e nome.
-export function buildReviewRows(rows) {
+export function buildReviewRows(sourceRows, catalogById = new Map()) {
+  const rows = applyPoRules(sourceRows, catalogById);
   const namesById = new Map(rows.map((r) => [r.id, r.nome]));
   const byFamily = new Map();
   for (const [raw, list] of Map.groupBy(rows, (r) => r.familia)) {
@@ -109,10 +144,14 @@ export function buildVocabularyRows() {
   return { names, rows: Array.from({ length: height }, (_, i) => Object.fromEntries(names.map((k) => [k, values[k][i] ?? ""]))) };
 }
 
-function review() {
+function review(force) {
   if (!existsSync(MERGED)) { console.error(`Falta ${relative(ROOT, MERGED)}. Rode merge.`); return 1; }
+  if (existsSync(REVIEW) && !force) {
+    console.error(`${relative(ROOT, REVIEW)} já existe e pode ter edições. Use --force para sobrescrever.`);
+    return 1;
+  }
   const rows = readCsv(MERGED);
-  const sheet = buildReviewRows(rows);
+  const sheet = buildReviewRows(rows, rawCreatures());
   writeCsv(sheet, REVIEW, REVIEW_COLUMNS);
   const vocab = buildVocabularyRows();
   writeCsv(vocab.rows, VOCAB, vocab.names);
@@ -130,6 +169,7 @@ function split(force) {
   }
   const rows = readCsv(DRAFT);
   const columns = Object.keys(rows[0]);
+  if (existsSync(BATCH_DIR)) for (const f of readdirSync(BATCH_DIR)) if (/^lote-\d+\.csv$/.test(f)) rmSync(join(BATCH_DIR, f));
   const batches = splitRows(rows);
   batches.forEach((batch, i) => writeCsv(batch, join(BATCH_DIR, batchName(i + 1)), columns));
   console.log(`${batches.length} lotes em ${relative(ROOT, BATCH_DIR)}:`);
@@ -159,6 +199,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [command, ...flags] = process.argv.slice(2);
   if (command === "split") process.exitCode = split(flags.includes("--force"));
   else if (command === "merge") process.exitCode = merge();
-  else if (command === "review") process.exitCode = review();
-  else { console.error("Uso: node scripts/ecology/batches.mjs split [--force] | merge | review"); process.exitCode = 1; }
+  else if (command === "review") process.exitCode = review(flags.includes("--force"));
+  else { console.error("Uso: node scripts/ecology/batches.mjs split [--force] | merge | review [--force]"); process.exitCode = 1; }
 }

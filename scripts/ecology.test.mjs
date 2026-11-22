@@ -1,6 +1,10 @@
-import { splitRows, mergeRows, buildReviewRows, buildVocabularyRows, REVIEW_COLUMNS } from "./ecology/batches.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
+import { mkdtempSync, rmSync, writeFileSync, readFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { splitRows, mergeRows, buildReviewRows, buildVocabularyRows, applyPoRules, REVIEW_COLUMNS } from "./ecology/batches.mjs";
+import { catalogCreatureIds } from "./ecology/catalogIds.mjs";
 import { TERRAINS, PLACES, CONDITIONS, GROUPS, RARITIES, NEUTRAL_ECOLOGY, normalizeTag, validateEcology } from "../src/creatureCatalog/ecologyVocabulary.js";
 import { ecologyByCreatureId } from "../src/creatureCatalog/ecology.js";
 import { creatureCatalog, getCreatureById, getCreatureEcology } from "../src/creatureCatalog/index.js";
@@ -39,9 +43,6 @@ test("creatures without entry get the neutral ecology", () => {
 });
 
 // ---- Tarefa 2: rascunho automático ----
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { suggestEcology } from "./ecology/draftRules.mjs";
 import { readCsv, writeCsv } from "./ecology/csv.mjs";
 
@@ -195,12 +196,13 @@ test("vocabulary sheet has one column per category with the vocabulary labels", 
 
 // ---- Tarefa 5: aplicação da planilha ----
 import { buildEcologyFromRows, applyEcologySheet } from "./ecology/apply.mjs";
-import { writeFileSync as writeFileSyncT, readFileSync as readFileSyncT } from "node:fs";
 
 test("csv round trip preserves quotes, commas and accents", () => {
   const dir = mkdtempSync(join(tmpdir(), "eco-"));
-  const rows = [{ nome: 'Glop "grande"', citacao: "pântanos, rios; lagos", terrenos: "Pântano, Aquático" }];
-  writeCsv(rows, join(dir, "a.csv")); assert.deepEqual(readCsv(join(dir, "a.csv")), rows);
+  try {
+    const rows = [{ nome: 'Glop "grande"', citacao: "pântanos, rios; lagos", terrenos: "Pântano, Aquático" }];
+    writeCsv(rows, join(dir, "a.csv")); assert.deepEqual(readCsv(join(dir, "a.csv")), rows);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 test("apply rejects unknown tags with row and creature", () => {
   assert.throws(() => buildEcologyFromRows([{ id: "glop", nome: "Glop", terrenos: "Lava" }]), /linha 2.*glop.*Lava/i);
@@ -224,15 +226,68 @@ test("apply defaults, so_manual values, family headers and duplicates", () => {
 });
 test("apply is all-or-nothing", () => {
   const dir = mkdtempSync(join(tmpdir(), "eco-"));
-  const csv = join(dir, "s.csv"); const out = join(dir, "ecology.js");
-  const good = { terrenos: "", lugares: "", condicoes: "", grupo: "", raridade: "", so_manual: "", revisado: "" };
-  const first = creatureCatalog[0].id; const second = creatureCatalog[1].id;
-  writeFileSyncT(out, "// conteudo original\n");
-  writeCsv([{ ...good, id: first }, { ...good, id: second, terrenos: "Lava" }], csv);
-  assert.throws(() => applyEcologySheet(csv, out), /Lava/);
-  assert.equal(readFileSyncT(out, "utf8"), "// conteudo original\n");
-  writeCsv([{ ...good, id: second }, { ...good, id: first, terrenos: "Pântano" }], csv);
-  applyEcologySheet(csv, out); const first1 = readFileSyncT(out, "utf8");
-  applyEcologySheet(csv, out); assert.equal(readFileSyncT(out, "utf8"), first1);
-  assert.ok(first1.indexOf(JSON.stringify(first)) < first1.indexOf(JSON.stringify(second)) === (first < second));
+  try {
+    const csv = join(dir, "s.csv"); const out = join(dir, "ecology.js");
+    const good = { terrenos: "", lugares: "", condicoes: "", grupo: "", raridade: "", so_manual: "", revisado: "" };
+    const first = creatureCatalog[0].id; const second = creatureCatalog[1].id;
+    writeFileSync(out, "// conteudo original\n");
+    writeCsv([{ ...good, id: first }, { ...good, id: second, terrenos: "Lava" }], csv);
+    assert.throws(() => applyEcologySheet(csv, out), /Lava/);
+    assert.equal(readFileSync(out, "utf8"), "// conteudo original\n");
+    writeCsv([{ ...good, id: second }, { ...good, id: first, terrenos: "Pântano" }], csv);
+    applyEcologySheet(csv, out); const first1 = readFileSync(out, "utf8");
+    applyEcologySheet(csv, out); assert.equal(readFileSync(out, "utf8"), first1);
+    assert.ok(first1.indexOf(JSON.stringify(first)) < first1.indexOf(JSON.stringify(second)) === (first < second));
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("apply accepts the same truthy set for so_manual and revisado, and rejects anything else", () => {
+  const base = { terrenos: "", lugares: "", condicoes: "", grupo: "", raridade: "" };
+  for (const word of ["sim", " S ", "X", "True"]) {
+    const [e] = Object.values(buildEcologyFromRows([{ ...base, id: "a", so_manual: word, revisado: word }]));
+    assert.equal(e.manualOnly, true, word); assert.equal(e.reviewed, true, word);
+  }
+  const [e] = Object.values(buildEcologyFromRows([{ ...base, id: "a", so_manual: "", revisado: " " }]));
+  assert.equal(e.manualOnly, false); assert.equal(e.reviewed, false);
+  assert.throws(() => buildEcologyFromRows([{ ...base, id: "a", so_manual: "talvez" }]), /linha 2.*a.*talvez/);
+  assert.throws(() => buildEcologyFromRows([{ ...base, id: "a", revisado: "nao" }]), /linha 2.*a.*nao/);
+});
+
+test("catalogCreatureIds equals the creatureCatalog ids without importing ecology", () => {
+  assert.deepEqual([...catalogCreatureIds()].sort(), creatureCatalog.map((c) => c.id).sort());
+});
+
+// Regras do PO: spec "Decisões do PO após a conferência (22/11/2026)".
+test("applyPoRules gives dragons the open terrains only when terrain is empty", () => {
+  const catalog = new Map([["d1", { type: "monster", subtype: "dragão" }], ["d2", { type: "monster", subtype: "Dragão" }], ["m", { type: "monster", subtype: "goblin" }]]);
+  const rows = [
+    { id: "d1", terrenos: "", lugares: "", condicoes: "", citacao: "" },
+    { id: "d2", terrenos: "Montanha", lugares: "", condicoes: "", citacao: "p. 3" },
+    { id: "m", terrenos: "", lugares: "", condicoes: "", citacao: "" },
+    { id: "", terrenos: "", lugares: "", condicoes: "", citacao: "" },
+  ];
+  const out = applyPoRules(rows, catalog);
+  assert.equal(out[0].terrenos, "Aquático, Ártico, Colina, Deserto, Floresta, Montanha, Pântano, Planície");
+  assert.match(out[0].citacao, /^regra do PO: dragões/);
+  assert.deepEqual(out[1], rows[1]);
+  assert.deepEqual(out[2], rows[2]);
+  assert.deepEqual(out[3], rows[3]);
+  assert.equal(rows[0].terrenos, "", "não altera a entrada");
+  assert.equal(applyPoRules([{ id: "d1", terrenos: "", citacao: "livro" }], catalog)[0].citacao, "livro | regra do PO: dragões em qualquer lugar aberto");
+});
+test("applyPoRules gives undead Pântano, catacumbas and miasma without duplicating", () => {
+  const catalog = new Map([["z", { type: "undead", subtype: null }], ["z2", { type: "undead", subtype: null }]]);
+  const out = applyPoRules([
+    { id: "z", terrenos: "", lugares: "", condicoes: "", citacao: "" },
+    { id: "z2", terrenos: "", lugares: "Catacumbas/necrópole, Ruínas", condicoes: "Miasma", citacao: "x" },
+  ], catalog);
+  assert.deepEqual([out[0].terrenos, out[0].lugares, out[0].condicoes], ["Pântano", "Catacumbas/necrópole", "Miasma"]);
+  assert.deepEqual([out[1].terrenos, out[1].lugares, out[1].condicoes], ["Pântano", "Catacumbas/necrópole, Ruínas", "Miasma"]);
+  assert.match(out[1].citacao, /^x \| regra do PO: mortos-vivos/);
+  assert.equal(applyPoRules([{ id: "z", terrenos: "Deserto", lugares: "", condicoes: "" }], catalog)[0].lugares, "");
+});
+test("buildReviewRows applies the PO rules from the catalog", () => {
+  const row = { familia: "undead", id: "z", nome: "Z", nd: "1", terrenos: "", lugares: "", condicoes: "", citacao: "" };
+  const sheet = buildReviewRows([row], new Map([["z", { type: "undead" }]]));
+  assert.equal(sheet.find((r) => r.id === "z").terrenos, "Pântano");
 });
