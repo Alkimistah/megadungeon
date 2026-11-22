@@ -539,6 +539,11 @@ Continuam abertos:
      - Fase 2, gerador por etiquetas, usando terreno, lugar e condição como peso. É o **próximo ponto de recomeço** e ainda precisa de plano próprio.
      - Fase 3, encontro manual novo.
      - Fase 4, cadastro do Bestiário de Arton, cujo PDF já está em `tmp/livros/`, com as etiquetas pelo mesmo fluxo.
+     - Fase 1 publicada em 22/11/2026. Avisos para as próximas fases:
+       - as etiquetas ainda não foram revisadas linha a linha (`reviewed: false` em todas). O PO preferiu "ir como está e ver depois", e uma revisão futura deve ser visual, em cartões;
+       - antes de rodar o rascunho em fichas novas (fase 4), vale corrigir pontos do `draftRules.mjs`: a janela de negação atravessa frases, a regra de subtipo conta como apoio vazio para a confiança "alta", e "água" fraca entra no conflito;
+       - a regra de dragões casa `/drag/i` no subtipo, então um subtipo novo com "drag" também cairia nela;
+       - a planilha conferida e as citações ficam só em `tmp/ecologia/`, que não é versionado. O `review` recusa sobrescrevê-la sem `--force`.
 2. **Origem de ícones a confirmar com o PO.** O `CREDITOS.md` lista numa seção própria os ícones sem origem confirmada: `boss`, `camp`, `elite`, `trap`, `treasure`, `normal`, `unknown`, `hidden-forest`, `archipelago-boat`, `close-modal`, `earth-arrow-left`, `info` e `expand-*`. Se vierem do game-icons.net, passam para a seção Game Icons.
 3. **Pontos menores, sem urgência:**
    - o `qaLayout.mjs` fixa os rótulos curtos do contador;
