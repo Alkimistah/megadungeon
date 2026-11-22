@@ -1,4 +1,38 @@
 import { assetUrl } from "../assetUrl.js";
+
+const openSea = { terrains: ["aquatico"], places: ["mar-aberto"], conditions: [] };
+const coast = { terrains: ["aquatico"], places: ["costa-ilhas"], conditions: [] };
+const island = { terrains: [], places: ["costa-ilhas"], conditions: [] };
+const tropicalIsland = { ...island, terrains: ["floresta"] };
+const shipwreck = { ...coast, places: ["costa-ilhas", "ruinas"] };
+
+export const archipelagoEcologyContexts = {
+  openSea,
+  coast,
+  island,
+  byTheme: {
+    tropical: tropicalIsland,
+    mangrove: { ...island, terrains: ["pantano", "aquatico"] },
+    atoll: coast,
+    "coral-coast": coast,
+    "giant-kelp": coast,
+    mist: { ...island, conditions: ["neblina"] },
+    "ship-graveyard": shipwreck,
+    volcanic: { ...island, terrains: ["montanha"], places: ["costa-ilhas", "vulcanico"], conditions: ["calor"] },
+    "abandoned-ship": shipwreck,
+    "cyclopean-ruins": shipwreck,
+    "sea-caves": { ...coast, terrains: ["aquatico", "subterraneo"], places: ["costa-ilhas", "cavernas-profundas"] },
+    "impossible-tide": coast,
+    crystal: { ...island, terrains: ["subterraneo"] },
+    iceberg: { ...openSea, terrains: ["artico"], conditions: ["frio"] },
+    floating: { ...island, places: ["costa-ilhas", "alturas"] },
+    storm: { ...island, conditions: ["tempestade"] },
+    "salt-and-bones": coast,
+    elemental: { ...island, places: ["costa-ilhas", "planos-elementais"] },
+    dinosaurs: tropicalIsland
+  }
+};
+
 export const archipelago21to30Profile = {
   id: "archipelago-21-30",
   label: "Andares de 21 a 30",
@@ -29,6 +63,22 @@ export const archipelago21to30Profile = {
       28: 26,
       29: 26,
       30: 27
+    }
+  },
+  creatureRules: {
+    ecology: {
+      defaults: island,
+      terrainTagsByName: {
+        Aquático: ["aquatico"]
+      },
+      conditionTagsByName: {
+        Neblina: ["neblina"],
+        "Calor extremo": ["calor"],
+        "Frio extremo": ["frio"],
+        Tempestade: ["tempestade"]
+      },
+      typeWeights: { animal: 1.15, monster: 1.2, construct: 0.75 },
+      subtypeWeights: { "elfo-do-mar": 1.3, irukanjin: 1.3, sahuagin: 1.3 }
     }
   },
   archipelago: {

@@ -1,8 +1,13 @@
 import { calculateCombatND, formatChallengeRating, roundToQuarter } from "./challenge.js";
 import { getAutomaticCreatureCatalog, getCreatureById } from "./creatureCatalog/index.js";
 import { assignCreatureProfile } from "./creatures.js";
+import {
+  canUseEcologyQuantity, getCreatureEcologyWeight, getEcologyGroupWeight,
+  getEncounterEcologyContext, pickEcologyWeighted
+} from "./encounterEcology.js";
 import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
 import { applyWeaponVariation } from "./equipment/weaponVariation.js";
+import { getLegacyCandidateWeight, SUPPORT_CREATURE_IDS_BY_TYPE } from "./legacyEncounterPreferences.js";
 import { createRng, pickWeighted } from "./random.js";
 import { createModificationPlan, getThreatParameters, THREAT_CHALLENGE_ORDER } from "./threatCreationRules.js";
 import { getTrapById } from "./traps.js";
@@ -19,29 +24,6 @@ const CREATURE_TYPE_LABELS = {
   event: "Evento"
 };
 
-const TERRAIN_AFFINITIES = {
-  "Colinas": {
-    ids: ["centauro-combatente", "centauro-chefe", "centauro-xama"],
-    subtypes: ["centauro"]
-  },
-  "Floresta": {
-    ids: ["lobo", "espada-da-floresta", "galhada-macho", "galhada-femea"],
-    subtypes: ["orc", "goblin"]
-  },
-  "Pântano": {
-    ids: ["glop", "glooop", "mamae-glop", "basilisco", "tendriculo"],
-    subtypes: []
-  },
-  "Aquático": {
-    ids: ["aquinne", "lacedon"],
-    subtypes: ["elemental"]
-  },
-  "Planície aberta": {
-    ids: ["orc-combatente", "gnoll-saqueador", "gnoll-filibusteiro"],
-    subtypes: ["orc", "gnoll"]
-  }
-};
-
 const ELITE_ADJECTIVES_BY_TYPE = {
   animal:    ["Enfurecido",  "Raivoso",   "Feroz"],
   construct: ["Reforçado",   "Blindado",  "Avançado"],
@@ -51,26 +33,8 @@ const ELITE_ADJECTIVES_BY_TYPE = {
   undead:    ["Corrompido",  "Sombrio",   "Amaldiçoado"]
 };
 
-const SUPPORT_CREATURE_IDS_BY_TYPE = {
-  animal: ["rato-gigante", "lobo"],
-  construct: ["soldado-mecanico", "galhada-macho", "galhada-femea"],
-  spirit: ["terrier", "aquinne", "stagh"],
-  humanoid: ["orc-combatente", "bandido", "gnoll-saqueador"],
-  monster: ["glop", "glooop", "cocatriz"],
-  undead: ["zumbi", "garra-zumbi", "carnical"]
-};
-
 function getTerrainName(node) {
   return node.environment?.terrain?.name || null;
-}
-
-function hasTerrainAffinity(creature, terrainName) {
-  const affinity = TERRAIN_AFFINITIES[terrainName];
-
-  if (!affinity) return false;
-  if (affinity.ids.includes(creature.id)) return true;
-
-  return creature.subtype && affinity.subtypes.includes(creature.subtype);
 }
 
 function getChallengeWeight(creature, targetChallenge) {
@@ -81,17 +45,6 @@ function getChallengeWeight(creature, targetChallenge) {
   if (distance <= 1) return 7;
   if (distance <= 2) return 3;
   return 1;
-}
-
-function getCandidateWeight(creature, targetChallenge, terrainName, preferredIds = [], preferredSubtype = null) {
-  let weight = getChallengeWeight(creature, targetChallenge);
-
-  if (hasTerrainAffinity(creature, terrainName)) weight += 30;
-  if (preferredIds.includes(creature.id)) weight += 18;
-  if (creature.role === "minion" && targetChallenge <= 2) weight += 3;
-  if (preferredSubtype !== null && creature.subtype === preferredSubtype) weight += 25;
-
-  return weight;
 }
 
 function getAllowedCatalog(allowedIds, profile) {
@@ -143,15 +96,29 @@ function getCandidates(catalog, type, maximumChallenge, excludedIds, minimumChal
   );
 }
 
-function pickCreatureForChallenge({ catalog, type, targetChallenge, terrainName, rng, excludedIds, preferredIds = [], preferredSubtype = null }) {
-  const minimumChallenge = Math.max(0.25, targetChallenge - 2);
-  const candidates = getCandidates(catalog, type, targetChallenge, excludedIds, minimumChallenge);
-  const options = candidates.map((creature) => ({
-    creature,
-    weight: getCandidateWeight(creature, targetChallenge, terrainName, preferredIds, preferredSubtype)
-  }));
+function chooseCandidate(candidates, {
+  type, targetChallenge, terrainName, rng, preferredIds = [], preferredSubtype = null, ecology, quantity = 1
+}) {
+  if (candidates.length === 0) return null;
 
-  return options.length > 0 ? pickWeighted(rng, options).creature : null;
+  const options = candidates.map((creature) => {
+    const challengeWeight = getChallengeWeight(creature, targetChallenge);
+    const weight = ecology
+      ? challengeWeight * getCreatureEcologyWeight(creature, ecology.context, ecology.rules, type, preferredSubtype)
+        * getEcologyGroupWeight(creature, quantity)
+      : getLegacyCandidateWeight(creature, challengeWeight, targetChallenge, terrainName, preferredIds, preferredSubtype);
+
+    return { creature, weight };
+  });
+  return (ecology ? pickEcologyWeighted(rng, options) : pickWeighted(rng, options)).creature;
+}
+
+function pickCreatureForChallenge(options) {
+  const { catalog, type, targetChallenge, excludedIds, ecology } = options;
+  const minimumChallenge = Math.max(0.25, targetChallenge - 2);
+  const candidates = getCandidates(catalog, ecology ? null : type, targetChallenge, excludedIds, minimumChallenge);
+  const exact = ecology ? candidates.filter(creature => creature.challengeRating === targetChallenge) : [];
+  return chooseCandidate(exact.length ? exact : candidates, options);
 }
 
 function getExactChallengeCandidates(catalog, type, targetChallenge, excludedIds = new Set()) {
@@ -163,14 +130,11 @@ function getExactChallengeCandidates(catalog, type, targetChallenge, excludedIds
   return typed.length > 0 ? typed : candidates;
 }
 
-function pickExactCreatureForChallenge({ catalog, type, targetChallenge, terrainName, rng, excludedIds, preferredIds = [], preferredSubtype = null }) {
-  const candidates = getExactChallengeCandidates(catalog, type, targetChallenge, excludedIds);
-  const options = candidates.map((creature) => ({
-    creature,
-    weight: getCandidateWeight(creature, targetChallenge, terrainName, preferredIds, preferredSubtype)
-  }));
-
-  return options.length > 0 ? pickWeighted(rng, options).creature : null;
+function pickExactCreatureForChallenge(options) {
+  const { catalog, type, targetChallenge, excludedIds, ecology, quantity = 1 } = options;
+  const pool = ecology ? catalog.filter(creature => canUseEcologyQuantity(creature, quantity)) : catalog;
+  const candidates = getExactChallengeCandidates(pool, ecology ? null : type, targetChallenge, excludedIds);
+  return chooseCandidate(candidates, options);
 }
 
 // Returns the smallest CR in THREAT_CHALLENGE_ORDER that is >= cr.
@@ -405,7 +369,7 @@ function removeLeastCR(current) {
 // Post-generation validation: adjust the group iteratively until its actual T20 ND
 // matches targetChallenge. Adds creatures to fill a deficit; removes the lowest-CR
 // creature to fix an excess or when addition is mathematically impossible.
-function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, catalog) {
+function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, catalog, ecology) {
   if (items.length === 0) return items;
   const MAX_ITER = 10;
   const current = items.map(i => ({ ...i }));
@@ -420,7 +384,8 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, ca
       const allSubOne = allCRs.every(cr => cr < 1);
       const S = allCRs.reduce((a, b) => a + b, 0);
 
-      if (allSubOne && targetChallenge >= 1) {
+      const leadCreature = getCreatureById(current[0].creatureId) ?? current[0].creatureData ?? null;
+      if (allSubOne && targetChallenge >= 1 && (!ecology || canUseEcologyQuantity(leadCreature, 2))) {
         // T20 two-phase rule: ND = 1+2k requires total ∈ [2^k, 2^(k+1)).
         // Add enough of the lead creature to reach the floor of the required tier.
         const k = Math.floor((targetChallenge - 1) / 2);
@@ -437,7 +402,6 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, ca
       // encounter (CR ≥ targetChallenge). That produces encounters where one creature
       // dominates while companions are just filler — remove the weakest instead.
       if (neededCR !== null && neededCR < targetChallenge) {
-        const leadCreature = getCreatureById(current[0].creatureId) ?? current[0].creatureData ?? null;
         // Allow picking creatures already in the group so quantity++ is possible —
         // sometimes the right fix is more of the lead creature, not a new species.
         const added = pickCreatureForChallenge({
@@ -447,7 +411,10 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, ca
           rng,
           excludedIds: new Set(),
           preferredSubtype: leadCreature?.subtype ?? null,
-          catalog,
+          catalog: ecology
+            ? catalog.filter(creature => canUseEcologyQuantity(creature, 2) || !current.some(item => item.creatureId === creature.id))
+            : catalog,
+          ecology,
         });
 
         // Use the catalog creature only if it's reasonably close to the needed CR;
@@ -465,7 +432,8 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, ca
 
         // Catalog gap: generate a scaled elite variant of the lead creature.
         // Only for CR ≥ 1 targets where the base creature is genuinely weaker.
-        if (leadCreature && neededCR >= 1 && neededCR > leadCreature.challengeRating + 0.5) {
+        if (leadCreature && neededCR >= 1 && neededCR > leadCreature.challengeRating + 0.5
+          && (!ecology || canUseEcologyQuantity(leadCreature, 2))) {
           const elite = createEliteVariant(leadCreature, neededCR);
           if (elite) {
             current.push(getEliteCreatureSummary(elite, 1, rng));
@@ -500,19 +468,10 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, ca
   return current;
 }
 
-function resolveCreatureGroup(node, rng, catalog) {
-  if (!node.creature || !node.challenge || node.challenge.creatures <= 0) return [];
-
-  const specificCreatureItems = resolveSpecificCreature(node, rng);
-  if (specificCreatureItems.length > 0) return specificCreatureItems;
-
-  const targetChallenge = node.creature.targetChallenge ?? node.challenge.creatures;
-  const terrainName = getTerrainName(node);
-  const type = node.creature.type;
-
+function getLegacySizeOptions(targetChallenge, catalog, type) {
   // Each size option produces a group whose actual combat ND equals targetChallenge
   // (per T20 doubling rule) when all creatures have CR = requiredCR.
-  const sizeOptions = [
+  return [
     { totalCount: 1, weight: 10 },
     { totalCount: 2, weight: 8 },
     { totalCount: 3, weight: 6 },
@@ -526,6 +485,46 @@ function resolveCreatureGroup(node, rng, catalog) {
     homogeneousGroupMatchesTarget(targetChallenge, option.totalCount, option.requiredChallenge) &&
     getExactChallengeCandidates(catalog, type, option.requiredChallenge).length > 0
   );
+}
+
+function getEcologicalSizeOptions(targetChallenge, catalog, type, ecology) {
+  return [1, 2, 3, 4, 5, 6].flatMap(totalCount => {
+    const leads = catalog
+      .filter(creature => creature.challengeRating <= targetChallenge
+        && canUseEcologyQuantity(creature, totalCount)
+        && homogeneousGroupMatchesTarget(targetChallenge, totalCount, creature.challengeRating))
+      .map(creature => ({
+        creature,
+        weight: getCreatureEcologyWeight(creature, ecology.context, ecology.rules, type)
+          * getEcologyGroupWeight(creature, totalCount)
+      }));
+    if (!leads.length) return [];
+
+    // Use the mean so the number of available sheets alone does not favor a size.
+    const weight = leads.reduce((sum, lead) => sum + lead.weight, 0) / leads.length;
+    return [{ totalCount, leads, weight }];
+  });
+}
+
+function getNodeEcology(node, profile) {
+  const rules = profile?.creatureRules?.ecology;
+  return rules && node.creature?.challengeSource !== "manual"
+    ? { rules, context: getEncounterEcologyContext(node, rules) }
+    : null;
+}
+
+function resolveCreatureGroup(node, rng, catalog, ecology) {
+  if (!node.creature || !node.challenge || node.challenge.creatures <= 0) return [];
+
+  const specificCreatureItems = resolveSpecificCreature(node, rng);
+  if (specificCreatureItems.length > 0) return specificCreatureItems;
+
+  const targetChallenge = node.creature.targetChallenge ?? node.challenge.creatures;
+  const terrainName = getTerrainName(node);
+  const type = node.creature.type ?? null;
+  const sizeOptions = ecology
+    ? getEcologicalSizeOptions(targetChallenge, catalog, type, ecology)
+    : getLegacySizeOptions(targetChallenge, catalog, type);
 
   if (sizeOptions.length === 0) {
     const fallback = pickCreatureForChallenge({
@@ -534,24 +533,29 @@ function resolveCreatureGroup(node, rng, catalog) {
       terrainName,
       rng,
       excludedIds: new Set(),
-      catalog
+      catalog,
+      ecology
     });
 
     return fallback
-      ? refineEncounterGroup([getCreatureSummary(fallback, 1, rng)], targetChallenge, type, terrainName, rng, catalog)
+      ? refineEncounterGroup([getCreatureSummary(fallback, 1, rng)], targetChallenge, type, terrainName, rng, catalog, ecology)
       : [];
   }
 
-  const { totalCount, requiredChallenge } = pickWeighted(rng, sizeOptions);
+  const { totalCount, requiredChallenge, leads } = ecology
+    ? pickEcologyWeighted(rng, sizeOptions)
+    : pickWeighted(rng, sizeOptions);
 
-  const lead = pickExactCreatureForChallenge({
-    type,
-    targetChallenge: requiredChallenge,
-    terrainName,
-    rng,
-    excludedIds: new Set(),
-    catalog
-  });
+  const lead = ecology
+    ? pickEcologyWeighted(rng, leads).creature
+    : pickExactCreatureForChallenge({
+      type,
+      targetChallenge: requiredChallenge,
+      terrainName,
+      rng,
+      excludedIds: new Set(),
+      catalog
+    });
   if (!lead) return [];
 
   let rawItems;
@@ -578,13 +582,15 @@ function resolveCreatureGroup(node, rng, catalog) {
 
       const support = pickExactCreatureForChallenge({
         excludedIds: new Set([lead.id]),
-        preferredIds: SUPPORT_CREATURE_IDS_BY_TYPE[type] || [],
+        preferredIds: ecology ? [] : SUPPORT_CREATURE_IDS_BY_TYPE[type] || [],
         preferredSubtype: crossType ? null : lead.subtype,
         rng,
-        targetChallenge: requiredChallenge,
+        targetChallenge: lead.challengeRating,
         terrainName,
-        type: crossType ? null : type,
+        type: crossType ? null : ecology ? lead.type : type,
         catalog,
+        ecology,
+        quantity: supportCount,
       });
 
       rawItems = support
@@ -593,7 +599,7 @@ function resolveCreatureGroup(node, rng, catalog) {
     }
   }
 
-  return refineEncounterGroup(rawItems, targetChallenge, type, terrainName, rng, catalog);
+  return refineEncounterGroup(rawItems, targetChallenge, type, terrainName, rng, catalog, ecology);
 }
 
 function getEncounterSeed(node, mapSeed) {
@@ -629,8 +635,9 @@ export function rerollNodeCreatures(node, profile) {
   const originalComposition = getCreatureComposition(original);
   const challenge = calculateCombatND(original);
   const { type, allowedCreatureIds } = node.creature;
+  const ecology = getNodeEcology(node, profile);
   const catalog = getAllowedCatalog(allowedCreatureIds, profile)
-    .filter(creature => !type || creature.type === type);
+    .filter(creature => ecology || !type || creature.type === type);
   if (!catalog.length || challenge <= 0) return null;
 
   // A rerrolagem usa o ND do grupo efetivamente encontrado. O orçamento e a
@@ -642,7 +649,7 @@ export function rerollNodeCreatures(node, profile) {
   const reroll = (encounter.creatureRerolls || 0) + 1;
   const rng = createRng(`${encounter.seed}:creature-reroll:${reroll}`);
   for (let attempt = 0; attempt < 32; attempt++) {
-    const candidate = resolveCreatureGroup(searchNode, rng, catalog);
+    const candidate = resolveCreatureGroup(searchNode, rng, catalog, ecology);
     if (calculateCombatND(candidate) === challenge && getCreatureComposition(candidate) !== originalComposition) {
       return {
         ...encounter,
@@ -719,7 +726,8 @@ export function resolveForestAmbush(node, profile, { mapSeed } = {}) {
   };
   assignCreatureProfile(ambushNode, profile, rng);
   const catalog = getAllowedCatalog(ambushNode.creature?.allowedCreatureIds, profile);
-  const items = resolveCreatureGroup(ambushNode, rng, catalog);
+  const ecology = getNodeEcology(ambushNode, profile);
+  const items = resolveCreatureGroup(ambushNode, rng, catalog, ecology);
   if (items.length && calculateCombatND(items) === target) return createResolvedEncounter(ambushNode, items, seed);
 
   const creature = pickExactCreatureForChallenge({
@@ -727,7 +735,8 @@ export function resolveForestAmbush(node, profile, { mapSeed } = {}) {
     targetChallenge: target,
     terrainName: getTerrainName(node),
     rng,
-    catalog
+    catalog,
+    ecology
   });
   return creature ? createResolvedEncounter(ambushNode, [getCreatureSummary(creature, 1, rng)], seed) : null;
 }
@@ -740,10 +749,14 @@ export function resolveNodeEncounter(node, { mapSeed, profile } = {}) {
 
   const seed = getEncounterSeed(node, mapSeed);
   const rng = createRng(seed);
-  const items = node.fixedComposition
-    ? resolveFixedComposition(node.fixedComposition, rng)
-    : [...resolveCreatureGroup(node, rng, getAllowedCatalog(node.creature?.allowedCreatureIds, profile)),
-      ...(node.trap ? [getTrapSummary(node.trap)] : [])];
+  let items;
+  if (node.fixedComposition) {
+    items = resolveFixedComposition(node.fixedComposition, rng);
+  } else {
+    const catalog = node.creature ? getAllowedCatalog(node.creature.allowedCreatureIds, profile) : [];
+    items = resolveCreatureGroup(node, rng, catalog, getNodeEcology(node, profile));
+    if (node.trap) items.push(getTrapSummary(node.trap));
+  }
   if (items.length === 0) return null;
 
   node.resolvedEncounter = createResolvedEncounter(node, items, seed);

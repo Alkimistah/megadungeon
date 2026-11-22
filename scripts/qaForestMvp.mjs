@@ -503,7 +503,7 @@ async function creatureHealthFlow() {
     expedition = prepareForestExpedition({ seed: `qa-health-${attempt}`, profile, startFloor: 14, missions: [] });
     entry = expedition.floors[0];
     node = entry.levels[0].find(candidate => {
-      resolveNodeEncounter(candidate, { mapSeed: expedition.seed });
+      resolveNodeEncounter(candidate, { mapSeed: expedition.seed, profile });
       return canRerollNodeCreatures(candidate) && getCreatureUnits(candidate.resolvedEncounter.items[0]).length >= 2;
     });
   }

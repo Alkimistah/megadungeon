@@ -110,6 +110,19 @@ label {
   gap: 6px;
 }
 
+.encounter-books {
+  min-width: 0;
+  margin: 0;
+  padding: 4px 8px 6px;
+  border: 1px solid var(--border-soft);
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.encounter-books-status {
+  margin: 4px 0 0;
+}
+
 .checkbox-field input {
   width: 18px;
   height: 18px;

@@ -785,8 +785,8 @@ test("Avatar de Kallyadranoch variants preserve distinct sheets, encounters and 
     ...profile,
     creatureRules: { ...profile.creatureRules, preferredCreatureIdsByFamily: { [original.id]: divine.id } }
   };
-  assert.deepEqual(familyIds(profile), [original.id]);
-  assert.deepEqual(familyIds(alternate), [divine.id]);
+  assert.deepEqual(familyIds(profile), []);
+  assert.deepEqual(familyIds(alternate), []);
   for (const [creature, selectedProfile] of [[original, alternate], [divine, profile]]) {
     const encounter = resolveNodeEncounter({
       id: creature.id,
@@ -820,10 +820,10 @@ test("an exact encounter with a single special creature preserves its challenge 
 
 test("cult book variants keep the original encounter IDs and profile defaults", () => {
   const pairs = [
-    ["reishid", "reishid-livro-basico", "Livro Básico"],
-    ["avatar-de-aharadak", "avatar-de-aharadak-deuses-de-arton", "Deuses de Arton"]
+    ["reishid", "reishid-livro-basico", "Livro Básico", true],
+    ["avatar-de-aharadak", "avatar-de-aharadak-deuses-de-arton", "Deuses de Arton", false]
   ];
-  for (const [originalId, variantId, variantBook] of pairs) {
+  for (const [originalId, variantId, variantBook, automatic] of pairs) {
     const original = getCreatureById(originalId);
     const variant = getCreatureById(variantId);
     assert.deepEqual(original.sources.map(source => source.book), ["Ameaças de Arton"]);
@@ -834,12 +834,12 @@ test("cult book variants keep the original encounter IDs and profile defaults", 
     const availableIds = selectedProfile => getAutomaticCreatureCatalog(selectedProfile)
       .map(creature => creature.id)
       .filter(id => familyIds.has(id));
-    assert.deepEqual(availableIds(profile), [originalId]);
+    assert.deepEqual(availableIds(profile), automatic ? [originalId] : []);
     const alternate = {
       ...profile,
       creatureRules: { ...profile.creatureRules, preferredCreatureIdsByFamily: { [originalId]: variantId } }
     };
-    assert.deepEqual(availableIds(alternate), [variantId]);
+    assert.deepEqual(availableIds(alternate), automatic ? [variantId] : []);
 
     const nodeFor = id => ({
       id,

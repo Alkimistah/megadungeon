@@ -19,6 +19,7 @@ import { createMissionGenerationContext, generateMissionOffers } from "./mission
 import { materializeMissionsForCurrentContent } from "./missions/missionProfileAdapters.js";
 import { createMissionState } from "./missions/missionState.js";
 import { canRerollNodeCreatures, rerollNodeCreatures, resolveForestAmbush, resolveNodeEncounter } from "./encounterResolver.js";
+import { creatureCatalog } from "./creatureCatalog/index.js";
 import { withCreatureReinforcement } from "./creatureReinforcement.js";
 import { createNodeDialogController } from "./nodeDialog.js";
 import { decodeSessionCode, encodeSessionCode } from "./sessionCode.js";
@@ -68,6 +69,9 @@ const elements = {
   settingsToggle: document.getElementById("settingsToggle"),
   settingsToggleIcon: document.getElementById("settingsToggleIcon"),
   settingsPanel: document.getElementById("settingsPanel"),
+  encounterBooks: document.getElementById("encounterBooks"),
+  encounterBookOptions: document.getElementById("encounterBookOptions"),
+  encounterBooksStatus: document.getElementById("encounterBooksStatus"),
   legendToggle: document.getElementById("legendToggle"),
   legendPanel: document.getElementById("legendPanel"),
   legendClose: document.getElementById("legendClose"),
@@ -93,6 +97,11 @@ const elements = {
   nodeDialogFooter: document.getElementById("nodeDialogFooter")
 };
 
+const creatureBooks = [...new Set(creatureCatalog
+  .flatMap(creature => (creature.sources ?? [creature.source]).map(source => source?.book))
+  .filter(Boolean))]
+  .sort((first, second) => first.localeCompare(second, "pt-BR"));
+let disabledCreatureBooks = [];
 let activeFloorRange = FLOOR_RANGES[0];
 let currentMapSeed = createRandomSeed();
 let infoMessageTimeout = null;
@@ -582,6 +591,7 @@ function getCurrentSession() {
       profile: activeFloorRange.id,
       floor: snapshot.activeExploration?.floor || 21,
       mapSeed: currentMapSeed,
+      disabledCreatureBooks,
       missions: missionState.exportSessionState(),
       archipelagoState: archipelagoState.exportSessionState()
     };
@@ -596,6 +606,7 @@ function getCurrentSession() {
       profile: activeFloorRange.id,
       floor: snapshot.floor,
       mapSeed: currentMapSeed,
+      disabledCreatureBooks,
       missions: missionState.exportSessionState(),
       extendedState: extendedState.exportSessionState()
     };
@@ -608,6 +619,7 @@ function getCurrentSession() {
     ...renderedNodeMapSettings,
     unknownPaths: state.isUnknownPathsEnabled(),
     mapSeed: currentMapSeed,
+    disabledCreatureBooks,
     missions: missionState.exportSessionState(),
     state: state.exportSessionState(),
     ...(forestExpedition ? { forestExpedition: serializeForestExpedition(forestExpedition) } : {})
@@ -772,6 +784,8 @@ function openMissionSelectionForNewExploration() {
 }
 
 function restoreSession(session) {
+  const savedBooks = Array.isArray(session.disabledCreatureBooks) ? session.disabledCreatureBooks : [];
+  disabledCreatureBooks = creatureBooks.filter(book => savedBooks.includes(book));
   applyFloorRange(session.profile);
   elements.floorInput.value = String(session.floor);
   currentMapSeed = session.mapSeed;
@@ -953,7 +967,10 @@ function syncRecommendationsWithFloor() {
 
 function applyFloorRange(floorRangeId) {
   forestExpedition = null;
-  activeFloorRange = getFloorRange(floorRangeId);
+  activeFloorRange = { ...getFloorRange(floorRangeId) };
+  elements.encounterBooks.hidden = !activeFloorRange.creatureRules?.ecology;
+  if (!elements.encounterBooks.hidden) activeFloorRange.disabledCreatureBooks = disabledCreatureBooks;
+  syncEncounterBookOptions();
   elements.floorRangeTitle.textContent = activeFloorRange.label;
   populateFloorSelect(activeFloorRange);
   applyTheme(activeFloorRange.theme);
@@ -972,6 +989,33 @@ function applyFloorRange(floorRangeId) {
     : "Gerar mapa";
   syncExtendedFloorControls();
   manualEncounterDialogController.syncProfileOptions();
+}
+
+function syncEncounterBookOptions() {
+  for (const input of elements.encounterBookOptions.querySelectorAll("input")) {
+    input.checked = !disabledCreatureBooks.includes(input.value);
+  }
+  elements.encounterBooksStatus.hidden = disabledCreatureBooks.length < creatureBooks.length;
+}
+
+function bindEncounterBookOptions() {
+  for (const book of creatureBooks) {
+    const label = document.createElement("label");
+    label.className = "checkbox-field";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.value = book;
+    label.append(input, book);
+    elements.encounterBookOptions.append(label);
+
+    input.addEventListener("change", () => {
+      const options = elements.encounterBookOptions.querySelectorAll("input:not(:checked)");
+      disabledCreatureBooks = [...options].map(option => option.value);
+      activeFloorRange.disabledCreatureBooks = disabledCreatureBooks;
+      syncEncounterBookOptions();
+      if (autosaveActive) void saveCurrentExpedition();
+    });
+  }
 }
 
 function setSettingsOpen(isOpen) {
@@ -1132,6 +1176,8 @@ function registerServiceWorker() {
 }
 
 function bindEvents() {
+  bindEncounterBookOptions();
+
   elements.floorInput.addEventListener("change", () => {
     if (isExtendedExplorationMode() && !canConfigureCurrentExtendedFloor()) {
       syncExtendedFloorControls();

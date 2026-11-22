@@ -65,6 +65,34 @@ export const forest11to20Profile = {
     defaultPartySize: 4,
     challengeSource: "creatures",
     bossCreatureId: "quimera",
+    ecology: {
+      defaults: { terrains: ["floresta"], places: [], conditions: [] },
+      terrainTagsByName: {
+        Floresta: ["floresta"],
+        Pântano: ["pantano"],
+        Aquático: ["aquatico"],
+        Colinas: ["colina"],
+        "Planície aberta": ["planicie"]
+      },
+      conditionTagsByName: {
+        "Clima normal": [],
+        Calor: ["calor"],
+        "Calor extremo": ["calor"],
+        Frio: ["frio"],
+        "Frio extremo": ["frio"],
+        Neblina: ["neblina"],
+        Chuva: [],
+        Granizo: [],
+        Neve: [],
+        Tempestade: ["tempestade"],
+        "Vento forte": [],
+        Vendaval: [],
+        Furacão: [],
+        Tornado: []
+      },
+      typeWeights: { animal: 1.25, monster: 1.15, construct: 0.75 },
+      subtypeWeights: { lobo: 1.2, aranha: 1.15, "sátiro": 1.2, "sílfide": 1.2 }
+    },
     defaultTypeWeights: [
       { type: "animal", weight: 30 },
       { type: "construct", weight: 4 },
