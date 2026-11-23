@@ -50,13 +50,15 @@ function getDifficultyLabel(difficulty) {
 }
 
 function getIslandDisplayName(island, unknownPaths) {
-  if (isIslandRevealed(island, unknownPaths)) return island.name;
-  if (island.floor === 30) return "Ilha 30";
-  return `Ilha ${island.floor}`;
+  return isIslandRevealed(island, unknownPaths) ? island.name : `Ilha ${island.floor}`;
 }
 
 function isIslandRevealed(island, unknownPaths) {
   return !unknownPaths || island.visited || island.completed;
+}
+
+function getIslandDisplayStatus(island, revealed) {
+  return !revealed && island.available ? "não visitada" : island.status;
 }
 
 function getIslandModalCopy(island, unknownPaths) {
@@ -266,14 +268,14 @@ export function createArchipelagoRenderer({
     }
   }
 
-  function renderIslandButton(island) {
+  function renderIslandButton(island, boatIcon) {
     const unknownPaths = getUnknownPaths();
     const revealed = isIslandRevealed(island, unknownPaths);
     const hasMissions = revealed && getMissionsForFloor(island.floor).length > 0;
     const button = document.createElement("button");
     button.className = [
       "archipelago-island",
-      `archipelago-island-${island.difficulty}`,
+      revealed ? `archipelago-island-${island.difficulty}` : "",
       revealed && island.themeId ? `archipelago-island-theme-${island.themeId}` : "",
       revealed ? "" : "is-unexplored",
       island.completed ? "is-completed" : "",
@@ -287,9 +289,18 @@ export function createArchipelagoRenderer({
       <span class="archipelago-island-floor">${island.floor}</span>
       <img class="archipelago-island-icon" src="${assetUrl(revealed && island.icon ? island.icon : UNEXPLORED_ISLAND_ICON)}" alt="" />
       <strong>${getIslandDisplayName(island, unknownPaths)}</strong>
-      <span>${island.status}</span>
+      <span>${getIslandDisplayStatus(island, revealed)}</span>
       ${hasMissions ? `<span class="mission-island-badge">Missão</span>` : ""}
     `;
+    if (boatIcon) {
+      const marker = document.createElement("span");
+      marker.className = "archipelago-island-boat";
+      const icon = document.createElement("img");
+      icon.src = assetUrl(boatIcon);
+      icon.alt = "Barco · Última ilha explorada";
+      marker.appendChild(icon);
+      button.appendChild(marker);
+    }
     button.addEventListener("click", () => openIslandDialog(island.floor));
     return button;
   }
@@ -300,26 +311,38 @@ export function createArchipelagoRenderer({
     map.className = "archipelago-map";
     map.setAttribute("aria-label", "Mapa do arquipélago");
 
-    snapshot.islandRows.forEach((row) => {
+    const unknownPaths = getUnknownPaths();
+    for (const row of snapshot.islandRows) {
+      const visibleIslands = row.map(floor => islandsByFloor.get(floor))
+        .filter(island => !unknownPaths || island.available);
+      if (!visibleIslands.length) continue;
+
       const rowElement = document.createElement("div");
       rowElement.className = `archipelago-row archipelago-row-${row.length}`;
-      row.forEach((floor) => rowElement.appendChild(renderIslandButton(islandsByFloor.get(floor))));
+      for (const island of visibleIslands) {
+        const boatIcon = island.floor === snapshot.lastVisitedFloor ? snapshot.boatIcon : null;
+        rowElement.appendChild(renderIslandButton(island, boatIcon));
+      }
       map.appendChild(rowElement);
-    });
-
-    const boat = document.createElement("button");
-    boat.className = "archipelago-boat";
-    boat.type = "button";
-    boat.disabled = Boolean(snapshot.activeExploration?.guardianScene || snapshot.boatAmbush);
-    boat.setAttribute("aria-label", "Descansar no barco");
-    boat.innerHTML = `<img src="${assetUrl(snapshot.boatIcon)}" alt="" />`;
-    boat.addEventListener("click", () => {
-      onRestAtBoat();
-      render();
-    });
-    map.appendChild(boat);
-
+    }
     return map;
+  }
+
+  function renderBoatAction(snapshot, floating = false) {
+    const boat = createButton({
+      className: floating ? "archipelago-boat is-floating" : "archipelago-boat",
+      disabled: Boolean(snapshot.activeExploration?.guardianScene || snapshot.boatAmbush),
+      label: "Retornar ao barco",
+      onClick: () => {
+        onRestAtBoat();
+        render();
+      }
+    });
+    const icon = document.createElement("img");
+    icon.src = assetUrl(snapshot.boatIcon);
+    icon.alt = "";
+    boat.prepend(icon);
+    return boat;
   }
 
   function renderObjectiveList(island, snapshot) {
@@ -676,7 +699,7 @@ export function createArchipelagoRenderer({
       <header class="archipelago-detail-header">
         ${revealed ? `<p>${getDifficultyLabel(island.difficulty)} | ND base ${island.baseChallenge}</p>` : ""}
         <h2>${island.floor} - ${getIslandDisplayName(island, unknownPaths)}</h2>
-        <span>${island.status}</span>
+        <span>${getIslandDisplayStatus(island, revealed)}</span>
       </header>
       <div class="archipelago-island-body">
         <p class="archipelago-detail-copy">${getIslandModalCopy(island, unknownPaths)}</p>
@@ -716,17 +739,6 @@ export function createArchipelagoRenderer({
       if (rangeEnd) body.appendChild(createRangeEndActions(rangeEnd));
     }
     body.appendChild(renderObjectiveList(island, snapshot));
-    if (!island.completed && !island.defeated && snapshot.activeExploration?.floor !== island.floor) {
-      const embark = document.createElement("div");
-      embark.className = "archipelago-island-embark";
-      embark.appendChild(createButton({
-        className: "archipelago-action",
-        disabled: !canExplore,
-        label: "Explorar ilha (8h)",
-        onClick: () => exploreSelectedIsland(island)
-      }));
-      body.appendChild(embark);
-    }
     const footer = document.createElement("footer");
     footer.className = "archipelago-island-footer";
     if (island.guardian && revealed) {
@@ -737,6 +749,13 @@ export function createArchipelagoRenderer({
       footer.appendChild(progress);
     }
     if (actions.childElementCount) footer.appendChild(actions);
+    const showEmbark = !snapshot.daySpent && !snapshot.activeExploration && !island.completed && !island.defeated;
+    footer.appendChild(showEmbark ? createButton({
+      className: "archipelago-action archipelago-island-embark",
+      disabled: !canExplore,
+      label: "Explorar ilha (8h)",
+      onClick: () => exploreSelectedIsland(island)
+    }) : renderBoatAction(snapshot));
     panel.appendChild(footer);
     islandDialog.appendChild(panel);
   }
@@ -799,11 +818,9 @@ export function createArchipelagoRenderer({
       return;
     }
 
-    container.append(
-      renderSummary(snapshot),
-      renderMap(snapshot)
-    );
     const bossIsland = snapshot.islands.find((island) => island.floor === 30);
+    container.append(renderSummary(snapshot), renderMap(snapshot));
+    if (snapshot.daySpent && !bossIsland?.completed) container.appendChild(renderBoatAction(snapshot, true));
     const rangeEnd = bossIsland?.completed ? getRangeEnd() : null;
     if (rangeEnd) {
       const section = document.createElement("section");

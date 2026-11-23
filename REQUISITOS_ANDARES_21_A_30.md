@@ -60,13 +60,12 @@ Ao selecionar a faixa "Andares de 21 a 30", o app deve carregar:
 
 ### 2. Mapa do Arquipélago
 
-O mapa principal deve mostrar o barco do grupo e 10 ilhas em formato de pirâmide.
+O mapa principal apresenta as dez ilhas em formato de pirâmide. Com Caminhos desconhecidos, só as fileiras liberadas aparecem.
 
 Requisitos:
 
-- o barco fica na base da pirâmide e representa a base operacional do grupo;
-- o barco funciona como acampamento e deve ser clicável;
-- acima do barco ficam 4 ilhas de menor dificuldade;
+- o barco representa a base operacional do grupo. O ícone marca a última ilha explorada. Durante a visita, o botão Retornar ao barco fica fixo acima da barra de ferramentas e também está disponível no rodapé da ficha da ilha;
+- a base da pirâmide tem 4 ilhas de menor dificuldade;
 - acima dessas ficam 3 ilhas de dificuldade intermediária;
 - acima dessas ficam 2 ilhas avançadas;
 - no topo fica a ilha 30, a ilha do boss;
@@ -487,17 +486,16 @@ Exibe:
 
 #### 2. Mapa do Arquipélago
 
-Mostra o barco e as 10 ilhas em pirâmide:
+Mostra as dez ilhas em pirâmide à medida que são liberadas em Caminhos desconhecidos:
 
 ```text
                [30]
           [28]      [29]
       [25]    [26]      [27]
   [21]    [22]    [23]      [24]
-              [Barco]
 ```
 
-O barco é a base visual da etapa, funciona como acampamento e deve exibir os ícones dos fragmentos recuperados.
+O barco funciona como acampamento e fica acessível pelo botão Retornar ao barco durante a visita. O ícone do barco marca o último desembarque. O resumo do arquipélago mostra a contagem de fragmentos recuperados.
 
 Cada ilha deve exibir:
 
@@ -680,8 +678,8 @@ Criar ou separar:
 
 - O usuário consegue selecionar a faixa "Andares de 21 a 30".
 - O app apresenta mapa de arquipélago, não labirinto abstrato e não grafo em "taça".
-- O mapa mostra 10 ilhas.
-- O mapa mostra o barco como base da pirâmide.
+- O mapa mostra dez ilhas com Caminhos desconhecidos desligado. Com a opção ligada, aparecem só as ilhas disponíveis.
+- Durante a visita, o botão Retornar ao barco permanece visível enquanto o mestre rola o mapa. O ícone do barco permanece sobre a última ilha explorada.
 - O barco funciona como acampamento.
 - As ilhas aparecem em pirâmide: 4 ilhas iniciais, 3 intermediárias, 2 avançadas e 1 ilha de boss.
 - Ilhas 21 a 24 ficam disponíveis desde o início;
@@ -721,9 +719,9 @@ Criar ou separar:
 - Perfil `archipelago-21-30` criado e registrado na seleção de perfis.
 - Modo de exploração `archipelago` criado com estado próprio.
 - Mapa estratégico do arquipélago renderizado em pirâmide, com 4 ilhas iniciais, 3 intermediárias, 2 avançadas e ilha 30 no topo.
-- Barco exibido na base da pirâmide com ícone próprio e ação de descanso ao clicar.
+- Barco marcado no canto superior direito da última ilha explorada. O botão Retornar ao barco aparece no mapa durante a visita. Na ficha da ilha, Explorar ilha e Retornar ao barco ocupam o mesmo lugar no rodapé e se alternam conforme o estado da visita.
 - Modal de ilha implementada para exibir estado, dificuldade, ND base, descrição narrativa, objetivos e ações.
-- Com Caminhos desconhecidos ligado, a identidade e os objetivos da ilha aparecem após iniciar a exploração. Desligado, o mestre pode abrir a prévia da ilha e consultar os setores sem gastar o dia.
+- Com Caminhos desconhecidos ligado, as fileiras bloqueadas ficam ocultas e todas as ilhas ainda inéditas, incluindo a ilha 30, usam número e ícone genérico até o desembarque. Desligado, o mestre pode abrir a prévia da ilha e consultar os setores sem gastar o dia.
 - Ilha 30 fica bloqueada até a obtenção dos 9 fragmentos.
 - Conclusão de ilhas 21 a 29 concede fragmentos e atualiza o progresso global.
 - Exploração de ilha consome 8 horas e bloqueia nova exploração até o próximo descanso.
@@ -792,7 +790,7 @@ A progressão normal começa com as quatro ilhas iniciais abertas e nenhum fragm
 
 #### Por onde retomar
 
-1. **Integrar as missões do arquipélago.** Adaptar os vínculos ao tema, setor e variante, inclusive com setores reabertos e composições rerroladas. Verificar progresso e recompensas ao jogar, salvar e restaurar.
+1. **Integrar as missões do arquipélago.** Vincular objetivos ao tema, setor e variante. Conferir aceite, progresso, recompensa e restauração da sessão. Testar uma missão com setor reaberto e outra com criaturas rerroladas antes de ampliar para todas as categorias.
 2. **Validar a campanha completa em mesa.** Usar como referência o grupo chegando no nível 7 e testar os marcos de nível 8, 9 e 10 aos 4, 7 e 9 fragmentos. Conferir duração das sessões, recursos que sobram para o guardião, XP, tesouros, reaberturas e emboscadas. Testar o Rei Tirano com todos os bônus e com todos removidos, com atenção à CD 27 do Rugido Ensurdecedor e ao impacto de dois Deinonicos.
 3. **Revisar a grade tática compartilhada.** Tratar a evolução da grade como uma frente própria e conferir os efeitos nas arenas insulares e no convés da liburna.
 
@@ -836,7 +834,7 @@ A progressão normal começa com as quatro ilhas iniciais abertas e nenhum fragm
 - O descanso gera novos climas diários por ilha.
 - Antes de explorar, o grupo pode tentar identificar o clima de uma ilha com teste apropriado.
 - Fragmentos desbloqueiam a Ilha 30 e determinam a chance e o ND da emboscada no descanso.
-- O mapa visual deve ser uma pirâmide com barco na base, 4 ilhas iniciais, 3 intermediárias, 2 avançadas e 1 ilha de boss no topo.
+- O mapa visual deve ser uma pirâmide com 4 ilhas iniciais, 3 intermediárias, 2 avançadas e 1 ilha de boss no topo. O barco usa um botão fixo para retorno durante a visita.
 - O mapa principal é estratégico, não tático.
 - As ilhas 21 a 29 devem ter tema sorteado por seed a partir de pools separados por dificuldade.
 - A ilha 30 tem tema fixo: ilha dos dinossauros.
@@ -874,7 +872,7 @@ O fluxo deve priorizar escolha aberta e controle manual do mestre. A primeira ve
 ## Passo a Passo Inicial
 
 1. Criar o perfil `archipelago-21-30` e o modo `archipelago`, ainda com dados simples de ilha. Implementado.
-2. Renderizar o mapa estratégico em pirâmide com barco na base, 4 ilhas acessíveis, 5 ilhas travadas e ilha 30 bloqueada. Implementado.
+2. Renderizar o mapa estratégico em pirâmide, com quatro ilhas acessíveis no início e as outras visíveis conforme Caminhos desconhecidos. Manter o barco no botão fixo. Implementado.
 3. Implementar ficha/modal da ilha com estado, clima diário, objetivos/encontros placeholder e ações de exploração. Implementado.
 4. Usar o barco como acampamento. O descanso recupera o esforço do dia e o tempo de exploração. Nas ilhas iniciais, preserva os setores resolvidos.
 5. Implementar regra de 1 exploração por descanso, consumo de 8 horas e bloqueio de novas explorações até descansar. Implementado.

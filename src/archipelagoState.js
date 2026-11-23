@@ -200,6 +200,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
     islands = sessionState?.islands
       ? hydrateSessionIslands(nextProfile, { ...sessionState, activeExploration }, nextRng)
       : createGeneratedIslands(nextProfile, nextRng);
+    if (activeExploration) markVisited(activeExploration.floor);
     if (activeExploration?.floor === 30) prepareFinalIslandTreasure(islands[30], activeExploration.mapSeed);
     boatAmbush = sessionState?.boatAmbush ?? null;
     if (boatAmbush) applyLiburnaLayout(boatAmbush);
@@ -213,6 +214,11 @@ export function createArchipelagoState(profile, rng = Math.random) {
     } else if (sessionState?.testingFragments) {
       log = ["Expedição restaurada com os fragmentos conquistados.", ...log].slice(0, 8);
     }
+  }
+
+  function markVisited(floor) {
+    visitedFloors.delete(floor);
+    visitedFloors.add(floor);
   }
 
   function prepareFinalIslandTreasure(island, mapSeed) {
@@ -237,7 +243,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
       }
     }
 
-    visitedFloors.add(floor);
+    markVisited(floor);
     daySpent = true;
     elapsedMinutes += activeProfile.archipelago.explorationMinutes;
     activeExploration = {
@@ -474,6 +480,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
       islandRows: activeProfile.archipelago.islandRows,
       boatLabel: activeProfile.archipelago.boatLabel,
       boatIcon: activeProfile.archipelago.boatIcon,
+      lastVisitedFloor: [...visitedFloors].at(-1) ?? null,
       boatAmbush,
       daySpent,
       activeExploration,

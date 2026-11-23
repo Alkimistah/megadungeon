@@ -1006,3 +1006,18 @@ test("a Mata dos Fetos corta reforços e rerrola entre composições ND 10 com D
   assert.ok(state.resolveObjective(30, id, "success"));
   assert.equal(state.rerollSector(30, id), false);
 });
+
+test("o barco acompanha o último desembarque, inclusive após descansar e revisitar uma ilha", () => {
+  const rng = () => 0.99;
+  const state = createArchipelagoState(productionProfile, rng);
+  assert.equal(state.getSnapshot().lastVisitedFloor, null);
+  for (const floor of [21, 22, 21]) {
+    assert.ok(state.exploreIsland(floor));
+    assert.equal(state.getSnapshot().lastVisitedFloor, floor);
+    assert.ok(state.restAtBoat({ rng }));
+    assert.equal(state.getSnapshot().activeExploration, null);
+    assert.equal(state.getSnapshot().lastVisitedFloor, floor);
+  }
+  state.initialize(productionProfile, rng, JSON.parse(JSON.stringify(state.exportSessionState())));
+  assert.equal(state.getSnapshot().lastVisitedFloor, 21);
+});

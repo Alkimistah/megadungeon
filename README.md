@@ -93,7 +93,7 @@ Para adicionar uma nova faixa de andares:
 
 - Criar uma mecânica especial para a Quimera; o MVP usa o chefe sozinho em arena fixa simples.
 - Ampliar os desconhecidos e evoluir a continuidade de clima/terreno e as pistas de rota dos andares 11–20.
-- As três ilhas intermediárias têm seis setores cada. As duas avançadas têm oito setores cada. A expedição começa com quatro ilhas abertas e zero fragmentos. Concluir as iniciais libera as intermediárias. Concluir as intermediárias libera as avançadas. Nove fragmentos abrem a rota até o Rei Tirano ND 11. O próximo trabalho é integrar as missões do arquipélago e validar a campanha em mesa. [Ordem de implementação](REQUISITOS_ANDARES_21_A_30.md#por-onde-retomar)
+- As três ilhas intermediárias têm seis setores cada. As duas avançadas têm oito setores cada. A expedição começa com quatro ilhas abertas e zero fragmentos. Concluir as iniciais libera as intermediárias. Concluir as intermediárias libera as avançadas. Nove fragmentos abrem a rota até o Rei Tirano ND 11. Com Caminhos desconhecidos, cada fileira aparece ao ser liberada e as ilhas só revelam o tema no desembarque. O ícone do barco marca a última ilha explorada, e o botão Retornar ao barco fica disponível no mapa durante a visita. O próximo trabalho é integrar as missões do arquipélago e validar a campanha em mesa. [Ordem de implementação](REQUISITOS_ANDARES_21_A_30.md#por-onde-retomar)
 
 ## MVP dos andares 11–20
 

@@ -452,8 +452,7 @@ svg {
   grid-template-columns: repeat(4, minmax(120px, 1fr));
 }
 
-.archipelago-island,
-.archipelago-boat {
+.archipelago-island {
   display: grid;
   gap: 6px;
   min-height: 86px;
@@ -472,15 +471,13 @@ svg {
   cursor: pointer;
 }
 
-.archipelago-island:hover,
-.archipelago-boat:hover {
+.archipelago-island:hover {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 56%),
     color-mix(in srgb, var(--surface-alt) 84%, white 16%);
 }
 
-.archipelago-island strong,
-.archipelago-boat strong {
+.archipelago-island strong {
   font-size: 15px;
   line-height: 1.2;
 }
@@ -601,40 +598,72 @@ svg {
 }
 
 .archipelago-boat {
-  grid-template-columns: 1fr;
+  display: inline-flex;
   align-items: center;
-  justify-items: center;
-  width: min(340px, 100%);
-  min-height: 150px;
-  margin: 0 auto;
-  border-color: rgba(240, 215, 130, 0.46);
-  background:
-    radial-gradient(circle at 50% 58%, rgba(240, 215, 130, 0.18), transparent 58%),
-    rgba(10, 18, 18, 0.34);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 247, 232, 0.06),
-    0 14px 34px rgba(0, 0, 0, 0.22);
-  text-align: center;
-  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+  gap: 8px;
+  min-height: 46px;
+  margin-inline-start: auto;
+  padding: 4px 12px 4px 8px;
+  border: 1px solid #d3bd86;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-alt) 90%, #d3bd86);
+  color: #fff0c8;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.archipelago-boat:hover,
-.archipelago-boat:focus-visible {
+.archipelago-boat.is-floating {
+  position: fixed;
+  inset-inline-end: max(14px, env(safe-area-inset-right));
+  bottom: calc(var(--toolbar-height) + 8px);
+  z-index: 19;
+  min-height: 58px;
+  padding-inline: 12px 20px;
+  font-size: 16px;
+}
+
+.archipelago-boat:is(:hover, :focus-visible):not(:disabled) {
   border-color: #f0d782;
-  background:
-    radial-gradient(circle at 50% 58%, rgba(240, 215, 130, 0.28), transparent 60%),
-    rgba(24, 39, 37, 0.56);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 247, 232, 0.13),
-    0 18px 44px rgba(0, 0, 0, 0.3);
-  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--surface-alt) 78%, #d3bd86);
 }
 
-.archipelago-boat img {
-  width: 280px;
-  height: 150px;
+.archipelago-boat:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+.archipelago-boat img,
+.archipelago-island-boat img {
+  width: 48px;
+  height: 34px;
   object-fit: contain;
   filter: invert(94%) sepia(25%) saturate(380%) hue-rotate(342deg) brightness(104%);
+}
+
+.archipelago-boat.is-floating img {
+  width: 58px;
+  height: 42px;
+}
+
+.archipelago-island-boat img {
+  width: 63.89px;
+  height: 45.25px;
+}
+
+.archipelago-island-boat {
+  position: absolute;
+  inset: -1px -1px auto auto;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 73.21px;
+  height: 47.92px;
+  border: 1px solid #d3bd86;
+  border-radius: 8px;
+  background: var(--surface-alt);
+  pointer-events: none;
 }
 
 .archipelago-detail,
@@ -4220,7 +4249,7 @@ details.mission-run-guidance p {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: .5rem;
+  gap: .5rem 1rem;
 }
 
 .archipelago-island-footer .archipelago-actions {
@@ -4228,23 +4257,18 @@ details.mission-run-guidance p {
 }
 
 .archipelago-island-embark {
-  display: flex;
-  justify-content: center;
-  padding: .5rem 0 1rem;
-}
-
-.archipelago-island-embark button {
   min-height: 46px;
+  margin-inline-start: auto;
   padding: .65rem 1.4rem;
 }
 
-.archipelago-island-embark button:not(:disabled) {
+.archipelago-island-embark:not(:disabled) {
   border-color: #d3bd86;
   background: #dcc58b;
   color: #182c28;
 }
 
-.archipelago-island-embark button:not(:disabled):hover {
+.archipelago-island-embark:not(:disabled):hover {
   background: #eed9aa;
 }
 
