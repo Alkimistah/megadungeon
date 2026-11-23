@@ -1,6 +1,6 @@
 # Mega Dungeon
 
-Gerador procedural de exploração e encontros para Tormenta20. O app tem dois modos de jogo implementados: exploração estendida para os andares 1 a 10, representando um labirinto abstrato com eventos d100 e encontros finais curados; e mapa em grafo para os andares 11 a 20, representando uma região maior com nodos, rotas ramificadas e encontros por sala. Os andares 21 a 30 estão em planejamento como um arquipélago aberto.
+Gerador procedural de exploração e encontros para Tormenta20. Os andares 1 a 10 usam exploração estendida, com eventos d100 e encontros finais curados. Os andares 11 a 20 usam um mapa em grafo com rotas ramificadas. Os andares 21 a 30 usam um mapa de arquipélago, com as quatro ilhas iniciais jogáveis do desembarque à conquista do fragmento.
 
 ## O que o app faz
 
@@ -9,6 +9,7 @@ Gerador procedural de exploração e encontros para Tormenta20. O app tem dois m
 - Para os andares 11 a 20, gera um mapa de nós com múltiplos níveis e caminhos ramificados.
 - Cada nó do mapa 11 a 20 tem tipo de sala (normal, elite, armadilha, tesouro, boss, acampamento), perícia de descoberta, DC, ND calculado, ambiente (clima + terreno) e perfil de criatura quando aplicável.
 - O jogador navega pelo mapa escolhendo rotas, marcando encontros como explorados ou tentados, e descansando em acampamentos.
+- No arquipélago, oferece Manguezal, Ilha Tropical, Atol Circular e Costa do Coral. Cada ilha tem quatro setores, mapas táticos e um confronto no Centro sorteado entre três composições de ND 8.
 - O estado completo da exploração é exportado como um código de sessão que pode ser copiado e restaurado a qualquer momento, sem conta e sem backend.
 - Funciona offline e pode ser instalado como PWA.
 
@@ -57,7 +58,7 @@ src/
 ├── environment.js    # Geração de clima e terreno
 ├── tables.js         # Tabelas de perícias por tipo de sala
 ├── floorRanges.js    # Gerenciamento de perfis de andar
-├── floorProfiles/    # Perfis dungeon1to10 e forest11to20
+├── floorProfiles/    # Perfis dos andares 1–10, 11–20 e 21–30
 ├── random.js         # RNG com seed (cyrb128 + sfc32)
 └── sessionCode.js    # Codificação/decodificação do código de sessão
 ```
@@ -79,6 +80,7 @@ Os perfis atuais são:
 
 - `dungeon1to10`: exploração estendida dos andares 1 a 10, com ações por andar, tabela d100, efeitos mecânicos, mapas táticos, encontros finais e chefe do andar 10.
 - `forest11to20`: mapa em nodos dos andares 11 a 20, usado como representação de uma área maior com rotas pré-geradas.
+- `archipelago-21-30`: arquipélago com dez ilhas e progressão por fragmentos. As quatro ilhas iniciais têm exploração completa. As demais ainda usam objetivos provisórios.
 
 Para adicionar uma nova faixa de andares:
 
@@ -90,7 +92,7 @@ Para adicionar uma nova faixa de andares:
 
 - Criar uma mecânica especial para a Quimera; o MVP usa o chefe sozinho em arena fixa simples.
 - Ampliar os desconhecidos e evoluir a continuidade de clima/terreno e as pistas de rota dos andares 11–20.
-- Evoluir os andares 21 a 30 como arquipélago aberto com 10 ilhas e ilha final de boss bloqueada por progresso.
+- Completar as ilhas intermediárias e avançadas, o Rei Tirano da Ilha dos Dinossauros e a integração das missões da faixa 21–30.
 
 ## MVP dos andares 11–20
 

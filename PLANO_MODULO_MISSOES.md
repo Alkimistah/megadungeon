@@ -340,14 +340,14 @@ O texto precisa assumir floresta, pântano, regiões aquáticas, colinas e plan�
 
 ### Andares 21 a 30
 
-Esta faixa ainda não deve ser usada como critério final do módulo. A adaptação definitiva fica pendente até o modo `archipelago` amadurecer em objetivos, encontros, recompensas e mapas táticos por ilha.
+As quatro ilhas iniciais do modo `archipelago` já têm setores, encontros e mapas táticos próprios. A adaptação definitiva das missões fica para depois da implementação das ilhas intermediárias, avançadas e final.
 
 Quando essa etapa for retomada, as missões devem usar as ilhas realmente geradas na sessão, não uma lista genérica de corredores da dungeon.
 
 - Preparar os temas de ilha pela seed antes do quadro e permitir destinos nas ilhas autorizadas da faixa.
 - Usar `themeId`, narrativa, dificuldade e objetivo sorteados para montar o texto.
 - Favorecer exploração, recuperação, investigação, resgate, escolta e coleta.
-- Evitar caçadas com criatura nomeada enquanto o perfil não tiver um catálogo de criaturas por ilha.
+- Vincular caçadas com criatura nomeada somente a ilhas cujo catálogo temático inclua a criatura e permita integrar o objetivo ao encontro.
 - Adaptar objetivos e comprovações para mapas náuticos, registros, amostras, objetos recuperados e confirmação da pulseira.
 - Substituir um objetivo compatível da ilha sem alterar a quantidade total de objetivos exigidos.
 - Um objetivo materializado continua contando normalmente para a conclusão da ilha.

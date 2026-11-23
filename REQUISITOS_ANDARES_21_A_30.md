@@ -234,7 +234,7 @@ Modelo inicial recomendado:
 
 Esse modelo preserva liberdade de mesa sem exigir um subsistema pesado para cada ilha.
 
-As ilhas que ainda usam o fluxo anterior reiniciam o progresso parcial após o descanso. No fluxo de setores, já aplicado ao Manguezal, os resultados são preservados. Ao retornar, há uma chance de reabrir um setor resolvido com um novo objetivo. Veja [Retomada do Arquipélago](#retomada-do-arquipélago).
+As ilhas que ainda usam o fluxo anterior reiniciam o progresso parcial após o descanso. Nas quatro ilhas iniciais, os resultados dos setores são preservados. Ao retornar, há uma chance de reabrir um setor resolvido com um novo objetivo. Veja [Retomada do Arquipélago](#retomada-do-arquipélago).
 
 ### 8. Tempo, Descanso e Viagem Entre Ilhas
 
@@ -351,22 +351,14 @@ Cada ilha deve ter um tema próprio, com pequena variação local. O tema pode s
 
 Como o grupo pode sair da masmorra e retornar depois com progresso parcial em várias ilhas, a geração aleatória precisa ser persistente e específica. Se temas ou objetivos forem sorteados, o código de sessão deve preservar o resultado gerado para cada ilha, não apenas a seed global mínima.
 
-Modelo recomendado de geração:
+A primeira versão usa um conjunto de dez temas. A seed muda as posições dos nove temas dentro de cada dificuldade. A Ilha dos Dinossauros ocupa o andar 30. O código de sessão preserva os temas sorteados e o progresso de cada ilha. Os outros temas continuam cadastrados para restaurar expedições antigas e poderão voltar ao sorteio depois da validação completa em mesa.
 
-- a lista total de temas deve ser maior que 10;
-- a seed sorteia exatamente 9 temas não repetidos para as ilhas 21 a 29, respeitando o grau de dificuldade da pirâmide;
-- a ilha 30 não participa do sorteio e usa o tema fixo de ilha dos dinossauros;
-- o resultado gerado deve ser salvo no código de sessão para que o arquipélago não mude entre retornos à campanha;
-- temas podem ter variações internas, mas a identidade principal da ilha deve permanecer estável.
-
-Distribuição inicial sugerida de temas por dificuldade:
-
-| Dificuldade | Ilhas | Temas possíveis |
+| Dificuldade | Andares | Temas da primeira versão |
 |---|---|---|
-| Inicial | 21-24 | ilha tropical; ilha manguezal; atol circular; costa do coral; ilha dos náufragos; ilha de algas gigantes; ilha de névoa; ilha-cemitério de navios |
-| Intermediária | 25-27 | ilha vulcânica; navio abandonado; ilha das ruínas ciclópicas; ilha-labirinto de cavernas marinhas; ilha tomada por piratas; ilha sagrada ou proibida; ilha de maré impossível; ilha de cristal |
-| Avançada | 28-29 | iceberg; ilha flutuante; ilha de tempestades eternas; ilha viva; ilha de sal e ossos; ilha elemental |
-| Boss | 30 | ilha dos dinossauros |
+| Inicial | 21–24 | Ilha Manguezal, Ilha Tropical, Atol Circular e Costa do Coral |
+| Intermediária | 25–27 | Ilha Vulcânica, Ilha-Labirinto de Cavernas Marinhas e Ilha Tomada por Piratas |
+| Avançada | 28–29 | Ilha Flutuante e Ilha de Tempestades Eternas |
+| Final | 30 | Ilha dos Dinossauros |
 
 Critério de classificação:
 
@@ -751,16 +743,11 @@ As próximas ilhas usam o desenho de seis setores nas intermediárias e oito nas
 
 ### Retomada do Arquipélago
 
-A primeira versão jogável usa dez ilhas. A seed distribui os temas pelas posições de cada dificuldade. Os demais temas ficam cadastrados para restaurar expedições existentes e voltam ao desenvolvimento após a validação completa em mesa.
-
-- Iniciais — Ilha Manguezal, Ilha Tropical, Atol Circular e Costa do Coral.
-- Intermediárias — Ilha Vulcânica, Ilha-Labirinto de Cavernas Marinhas e Ilha Tomada por Piratas.
-- Avançadas — Ilha Flutuante e Ilha de Tempestades Eternas.
-- Final — Ilha dos Dinossauros.
+O fluxo completo do desembarque ao fragmento está implementado nas quatro ilhas iniciais. As intermediárias, avançadas e final ainda têm objetivos provisórios.
 
 A Ilha Tropical usa quatro setores em torno de um templo escalonado. A calçada inundada, os terraços de cultivo, a Praça do Templo e o observatório têm quatro variantes cada, três próprias das ruínas e uma reutilizável. O Centro sorteia e salva um de três guardiões ND 8. A Sentinela do Sol usa o Golem de Nor Grande, o Defensor do Templo usa o Defensor Rochoso e a Serpe do Disco Solar usa a Serpe Anciã. Os sucessos nos setores enfraquecem o guardião sorteado.
 
-O Manguezal tem 19 variantes de setor. São 12 combates de ND 6 e sete testes estendidos de ND 2 ou 3. Cada setor começa com 70% de chance de combate. Os combates concedem o XP do encontro e o tesouro indicado nas fichas das criaturas. Os testes indicam XP e tesouro conforme seu ND. A recompensa de sucesso é registrada uma vez por setor.
+O Manguezal tem 19 variantes entre o Canal das Raízes, a Comporta do Lodaçal, o Posto da Vazante e o Santuário das Oferendas. O Centro sorteia Catóblepa, Elemental do Veneno Médio ou Capitão Homem-Piranha com Tempestade de Lagartos. São 12 combates de ND 6 e sete testes estendidos de ND 2 ou 3. Cada setor começa com 70% de chance de combate. Os combates concedem o XP do encontro e o tesouro indicado nas fichas das criaturas. Os testes indicam XP e tesouro conforme seu ND. A recompensa de sucesso é registrada uma vez por setor.
 
 A arte da ilha tem quatro zonas que se encontram nas diagonais, cores suaves sorteadas sem repetição pela seed, indicadores visuais de sucesso e falha e um Centro vermelho semitransparente. O botão **Explorar ilha** fica abaixo da arte e o progresso fica no rodapé. O retorno sinaliza visualmente o setor reaberto e informa quando uma penalidade do guardião foi removida. Os encontros abrem em outra modal de tela inteira, com fichas abertas e ícone do mapa no centro do rodapé.
 
@@ -768,9 +755,13 @@ O Atol Circular tem quatro setores. O Banco da Vazante, o Canal da Enchente, o D
 
 A Costa do Coral tem quatro setores. O Jardim de Corais, a Parede do Recife, as Grutas Inundadas e o Santuário das Pérolas têm quatro variantes cada, incluindo uma compartilhada. O Centro sorteia uma de três composições ND 8. Chefe dos Elfos-do-Mar com Selako-Tigre, Lula Gigante com Pliorex ou Reishid do Recife.
 
-As quatro ilhas iniciais sorteiam quatro penalidades distintas do conjunto compartilhado de 16. O sorteio considera as proteções do guardião e fica salvo na expedição. As vulnerabilidades elementais acrescentam 50% ao dano do tipo correspondente antes da redução de dano.
+As quatro ilhas iniciais sorteiam quatro penalidades distintas do conjunto compartilhado de 16. O sorteio considera as proteções do guardião e fica salvo na expedição. As penalidades só afetam a criatura principal, e um setor reaberto mantém a penalidade sorteada.
 
-Os combates dos setores usam listas de criaturas próprias de cada ilha. Os mapas táticos incluem os elementos de terreno e os pontos de interação dos setores e do Centro. O mestre pode rerrolar os combates de setor antes de registrar dano ou ajustes, mantendo o ND e a lista de criaturas da cena.
+- A ficha aplica automaticamente as penalidades de PV máximos, Defesa, Iniciativa e testes de resistência.
+- As vulnerabilidades de ácido, eletricidade, fogo e frio acrescentam 50% ao dano do tipo correspondente antes da RD. O mestre calcula o dano final antes de lançá-lo na ficha.
+- O mestre aplica a redução de proteção indicada ou a condição de primeiro turno. As condições possíveis são abalado, atordoado, caído, desprevenido, lento, ofuscado e vulnerável.
+
+Os combates dos setores usam listas de criaturas próprias de cada ilha. Os mapas táticos incluem os elementos de terreno e os pontos de interação dos setores e do Centro. O mestre pode rerrolar os combates de setor antes de registrar dano ou ajustes, mantendo o ND e a lista de criaturas da cena. O botão fica centralizado no rodapé do painel de criaturas. A modal da ilha mostra sucesso ou falha no Centro. A vitória acrescenta um fragmento à expedição. Cristais e inventário ficam sob controle do mestre.
 
 1. **Expandir o ciclo para as demais dificuldades.** Aplicar seis setores às ilhas intermediárias e oito às avançadas. Definir a distribuição inicial de ND e recompensas, a duração esperada e a composição da Ilha 30 com o Rei Tirano ND 11.
 2. **Completar a faixa para jogo.** Adaptar vínculos de missões, revisar a arte e verificar no app o fluxo desde o desembarque até o chefe final, incluindo descanso, recompensas e restauração da sessão. A revisão da grade tática segue como uma frente própria.
@@ -853,16 +844,16 @@ Implementar os andares 21 a 30 como um terceiro modo de exploração: `archipela
 
 Esse modo deve compartilhar sistemas comuns com os modos anteriores, mas precisa de estado e renderização próprios. A estrutura mais adequada é um mapa estratégico de ilhas, com fichas de objetivo por ilha e cenas táticas abertas sob demanda.
 
-O fluxo deve priorizar escolha aberta e controle manual do mestre. A primeira versão já cobre seleção de ilha, barco como acampamento, uma exploração por descanso, reset de progresso parcial no descanso, registro de objetivo, progresso global, clima persistente do dia, novos climas após descanso, desbloqueio da ilha final e persistência explícita por ilha. Mapas táticos e cenas detalhadas ainda devem evoluir por ilha conforme os objetivos forem fechados.
+O fluxo deve priorizar escolha aberta e controle manual do mestre. A primeira versão já cobre seleção de ilha, barco como acampamento, uma exploração por descanso, registro de objetivos, progresso global, desbloqueio da ilha final e persistência por ilha. As quatro ilhas iniciais preservam os setores depois do descanso e têm cenas e mapas táticos próprios. Ilhas com objetivos provisórios reiniciam o progresso parcial.
 
 ## Passo a Passo Inicial
 
 1. Criar o perfil `archipelago-21-30` e o modo `archipelago`, ainda com dados simples de ilha. Implementado.
 2. Renderizar o mapa estratégico em pirâmide com barco na base, 4 ilhas acessíveis, 5 ilhas travadas e ilha 30 bloqueada. Implementado.
 3. Implementar ficha/modal da ilha com estado, clima diário, objetivos/encontros placeholder e ações de exploração. Implementado.
-4. Implementar barco como acampamento: descanso reseta esforço do dia, tempo de exploração e progresso parcial. Implementado.
+4. Usar o barco como acampamento. O descanso recupera o esforço do dia e o tempo de exploração. Nas ilhas iniciais, preserva os setores resolvidos.
 5. Implementar regra de 1 exploração por descanso, consumo de 8 horas e bloqueio de novas explorações até descansar. Implementado.
-6. Implementar conclusão de ilha: todos os objetivos/encontros do dia resolvidos geram check, fragmento e progresso global. Implementado.
+6. Nas ilhas iniciais, os quatro resultados abrem o Centro e a vitória sobre o guardião concede o fragmento. As ilhas com objetivos provisórios ainda concluem após o registro de todos os objetivos do dia.
 7. Implementar desbloqueio da ilha 30 quando os 9 fragmentos forem obtidos. Implementado.
 8. Implementar persistência explícita por ilha: tema, variação, objetivos/encontros, climas diários, progresso ativo e fragmentos. Implementado.
 9. Integrar ícones de barco, ilha não explorada e temas de ilha, com estado visual por visita/conclusão. Parcialmente implementado; ainda há pendência de revisão/substituição de ícones incorretos.
