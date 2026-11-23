@@ -8,13 +8,6 @@ import { createMissionTacticalMap } from "./missionTacticalMap.js";
 import { createArchipelagoHuntEncounter } from "./archipelagoMissionEncounter.js";
 import { getMissionDestinationLabel } from "./missionDestinationLabel.js";
 
-// Definido pelo controlador a cada renderização (Caminhos desconhecidos oculta o nome da ilha).
-let hideIslandNames = false;
-
-function destinationLabel(mission) {
-  return getMissionDestinationLabel(mission, { unknownPaths: hideIslandNames });
-}
-
 function createElement(tagName, className = null, text = null) {
   const element = document.createElement(tagName);
 
@@ -24,10 +17,10 @@ function createElement(tagName, className = null, text = null) {
   return element;
 }
 
-function createMissionMeta(mission) {
+function createMissionMeta(mission, unknownPaths = false) {
   return [
     mission.categoryLabel,
-    destinationLabel(mission),
+    getMissionDestinationLabel(mission, { unknownPaths }),
     mission.objective?.targetName
   ].filter(Boolean).join(" | ");
 }
@@ -124,7 +117,7 @@ function getPrimaryBinding(mission) {
   return mission.integration?.bindings?.[0] || null;
 }
 
-function getMissionAvailability(mission, context = null) {
+function getMissionAvailability(mission, context = null, unknownPaths = false) {
   if (mission.status === "completed") {
     return {
       label: "Concluída",
@@ -169,15 +162,15 @@ function getMissionAvailability(mission, context = null) {
     return {
       label: progress?.ready ? "Pronta para entregar" : "Progresso",
       text: progress
-        ? `${destinationLabel(mission)}. Progresso: ${progress.current}/${progress.required}.`
-        : `${destinationLabel(mission)}. Conte qualquer alvo compatível encontrado durante a exploração.`,
+        ? `${getMissionDestinationLabel(mission, { unknownPaths })}. Progresso: ${progress.current}/${progress.required}.`
+        : `${getMissionDestinationLabel(mission, { unknownPaths })}. Conte qualquer alvo compatível encontrado durante a exploração.`,
       canOpen: Boolean(hasCreatureTarget)
     };
   }
 
   return {
     label: "Pendente",
-    text: destinationLabel(mission) ? `Destino: ${destinationLabel(mission)}.` : "Aguardando contexto da exploração.",
+    text: getMissionDestinationLabel(mission, { unknownPaths }) ? `Destino: ${getMissionDestinationLabel(mission, { unknownPaths })}.` : "Aguardando contexto da exploração.",
     canOpen: false
   };
 }
@@ -213,8 +206,8 @@ function renderMissionProgress(mission, onAdjustProgress = null) {
   return wrapper;
 }
 
-function renderMissionAvailability(mission, context) {
-  const availability = getMissionAvailability(mission, context);
+function renderMissionAvailability(mission, context, unknownPaths = false) {
+  const availability = getMissionAvailability(mission, context, unknownPaths);
   const panel = createElement("div", `mission-availability ${availability.canOpen ? "is-available" : ""}`);
 
   panel.appendChild(createElement("strong", null, availability.label));
@@ -227,7 +220,7 @@ function formatCountLabel(count, singular, plural) {
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
-function renderMissionMapDetails(mission, tacticalMap) {
+function renderMissionMapDetails(mission, tacticalMap, unknownPaths = false) {
   const list = createElement("ul", "mission-map-details");
   const objective = mission.objective || {};
   const resolution = tacticalMap.resolutionCheck;
@@ -244,8 +237,8 @@ function renderMissionMapDetails(mission, tacticalMap) {
     ["Mapa", `${formatCountLabel(tacticalMap.objectiveCount, "ponto de interesse", "pontos de interesse")}, ${formatCountLabel(tacticalMap.enemyCount, "inimigo", "inimigos")} e ${formatCountLabel(tacticalMap.trapCount, "zona de risco", "zonas de risco")}`]
   ];
 
-  if (destinationLabel(mission)) {
-    entries.unshift(["Local", destinationLabel(mission)]);
+  if (getMissionDestinationLabel(mission, { unknownPaths })) {
+    entries.unshift(["Local", getMissionDestinationLabel(mission, { unknownPaths })]);
   }
 
   entries.forEach(([label, value]) => {
@@ -422,13 +415,14 @@ function renderMissionCard(mission, {
   onToggleReward = null,
   onToggle = null,
   rewardExpanded = false,
+  unknownPaths = false,
   selectable = false,
   onComplete = null
 } = {}) {
   const card = createElement("article", `mission-card ${mission.status === "completed" ? "is-completed" : ""} ${selectable ? "is-selectable" : ""} ${checked ? "is-selected" : ""}`);
   const header = createElement("div", "mission-card-header");
   const titleBlock = createElement("div");
-  const category = createElement("p", "node-dialog-type", createMissionMeta(mission));
+  const category = createElement("p", "node-dialog-type", createMissionMeta(mission, unknownPaths));
   const title = createElement("h3", null, mission.title);
   const status = createElement("span", "mission-status", getMissionStatusLabel(mission, missionContext));
 
@@ -475,12 +469,12 @@ function renderMissionCard(mission, {
   }));
 
   if (!selectable) {
-    card.appendChild(renderMissionAvailability(mission, missionContext));
+    card.appendChild(renderMissionAvailability(mission, missionContext, unknownPaths));
   }
 
   if (!selectable && mission.status !== "completed") {
     const actions = createElement("div", "mission-card-actions");
-    const availability = getMissionAvailability(mission, missionContext);
+    const availability = getMissionAvailability(mission, missionContext, unknownPaths);
 
     if (availability.canOpen) {
       const openButton = createElement("button", "extended-action is-compact", "Abrir encontro");
@@ -499,11 +493,11 @@ function renderMissionCard(mission, {
   return card;
 }
 
-function renderMissionRunContent(mission, onComplete, context = null, profile = null, onAdjustProgress = null, rewardExpanded = false, onToggleReward = null) {
+function renderMissionRunContent(mission, onComplete, context = null, profile = null, onAdjustProgress = null, rewardExpanded = false, onToggleReward = null, unknownPaths = false) {
   if (context?.kind === "node") return renderIntegratedMission(mission, context.node, onComplete, onAdjustProgress);
 
   const container = createElement("div", "mission-run");
-  const card = renderMissionCard(mission, { onAdjustProgress, onComplete, onToggleReward, rewardExpanded });
+  const card = renderMissionCard(mission, { onAdjustProgress, onComplete, onToggleReward, rewardExpanded, unknownPaths });
   const guidance = createElement("section", "mission-run-guidance");
   const pendingNode = context?.kind === "pending-node";
   const tacticalMap = pendingNode ? null : createMissionTacticalMap(mission, { profile });
@@ -530,7 +524,7 @@ function renderMissionRunContent(mission, onComplete, context = null, profile = 
       "Mapa opcional para conduzir a missão sem substituir o encontro normal do andar."
     );
 
-    container.append(mapNote, renderMissionMapDetails(mission, tacticalMap));
+    container.append(mapNote, renderMissionMapDetails(mission, tacticalMap, unknownPaths));
     if (tacticalMap.riskDetails?.length) {
       container.appendChild(renderMissionRiskDetails(tacticalMap));
     }
@@ -572,7 +566,6 @@ export function createMissionDialogController({
   }
 
   function renderSelection() {
-    hideIslandNames = Boolean(getUnknownPaths());
     const offers = getOffers();
     const selectedCount = selectedOfferIds.size;
 
@@ -589,6 +582,7 @@ export function createMissionDialogController({
     const list = createElement("div", "mission-list");
     offers.forEach((mission) => {
       list.appendChild(renderMissionCard(mission, {
+        unknownPaths: Boolean(getUnknownPaths()),
         checked: selectedOfferIds.has(mission.id),
         disabled: selectedCount >= 3,
         selectable: true,
@@ -630,7 +624,6 @@ export function createMissionDialogController({
   }
 
   function renderView() {
-    hideIslandNames = Boolean(getUnknownPaths());
     const missions = getSelected();
 
     closeButton.hidden = false;
@@ -646,6 +639,7 @@ export function createMissionDialogController({
       const missionContext = getMissionContext(mission);
 
       list.appendChild(renderMissionCard(mission, {
+        unknownPaths: Boolean(getUnknownPaths()),
         missionContext,
         onAdjustProgress: (missionId, delta) => {
           onAdjustProgress?.(missionId, delta);
@@ -664,7 +658,6 @@ export function createMissionDialogController({
   }
 
   function renderMissionRun(missionId) {
-    hideIslandNames = Boolean(getUnknownPaths());
     const mission = getSelected().find((candidate) => candidate.id === missionId);
 
     closeButton.hidden = false;
@@ -681,7 +674,7 @@ export function createMissionDialogController({
     }, runContext || getMissionContext(mission), getProfile(), (missionId, delta, eventKey) => {
       onAdjustProgress?.(missionId, delta, eventKey);
       renderMissionRun(missionId);
-    }, expandedRewardIds.has(mission.id), (missionId) => toggleReward(missionId, () => renderMissionRun(missionId))));
+    }, expandedRewardIds.has(mission.id), (missionId) => toggleReward(missionId, () => renderMissionRun(missionId)), Boolean(getUnknownPaths())));
   }
 
   function openSelection() {

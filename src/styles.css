@@ -4287,23 +4287,26 @@ details.mission-run-guidance p {
   white-space: nowrap;
 }
 
-.archipelago-mission-access + .archipelago-island-embark,
 .archipelago-mission-access + * {
   margin-inline-start: 0;
 }
 
 @media (max-width: 600px) {
   .archipelago-island-footer:has(.archipelago-mission-access) > span:first-child {
-    flex: 1 0 100%;
-  }
-
-  .archipelago-island-footer .archipelago-mission-access {
     flex: 1 1 0;
-    margin-inline-start: 0;
+    min-width: 0;
+    order: 1;
   }
 
   .archipelago-island-footer:has(.archipelago-mission-access) > :last-child {
     flex: 0 0 auto;
+    order: 2;
+  }
+
+  .archipelago-island-footer .archipelago-mission-access {
+    flex: 1 0 100%;
+    order: 3;
+    margin-inline-start: 0;
   }
 }
 
