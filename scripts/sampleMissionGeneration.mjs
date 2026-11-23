@@ -161,7 +161,9 @@ function assertCombatWeights(profile) {
   const weights = profile.missionRules?.categoryWeights || {};
   const allowed = new Set(profile.missionRules?.allowedCategories || []);
 
-  if (!allowed.has("extermination") && !allowed.has("specialHunt")) return;
+  // A regra de combate acima do peso base vale para as faixas com extermínio (masmorra e floresta).
+  // O arquipélago não tem extermínio e usa caçada especial no peso base (ver archipelagoMissions.test.mjs).
+  if (!allowed.has("extermination")) return;
   assert.ok(weights.extermination > 10, `${profile.id}: extermínio não está acima do peso base`);
   assert.ok(weights.specialHunt > 10, `${profile.id}: caçada especial não está acima do peso base`);
 }

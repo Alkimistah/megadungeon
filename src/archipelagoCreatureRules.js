@@ -1,4 +1,5 @@
 import { creatureCatalog } from "./creatureCatalog/index.js";
+import { dinosaurExploration } from "./archipelagoFinalBoss.js";
 
 const coastAnimals = ["canceronte", "enxame-de-aguas-vivas", "peixe-recife", "selako", "selako-tigre", "pliorex"];
 const coastalHumanoids = ["elfo-do-mar-pescador", "elfo-do-mar-chefe", "irukanjin", "homem-piranha",
@@ -43,4 +44,20 @@ export function getIslandCreatureRules(island, objective, rules) {
       (!objective.preferredType || creature.type === objective.preferredType))
     .map(creature => creature.id);
   return { ...rules, allowedCreatureIds };
+}
+
+export function getIslandCreatureIds(themeId) {
+  return [...(islandCreatures[themeId] || [])];
+}
+
+export function getOutOfPlaceCreatureIds(themeId) {
+  const own = new Set(islandCreatures[themeId] || []);
+  const dinosaurIds = Object.values(dinosaurExploration.sectorCompositions)
+    .flat(2)
+    .map(entry => entry.id);
+  const otherIds = Object.entries(islandCreatures)
+    .filter(([id]) => id !== themeId)
+    .flatMap(([, ids]) => ids);
+
+  return [...new Set([...otherIds, ...dinosaurIds])].filter(id => !own.has(id));
 }

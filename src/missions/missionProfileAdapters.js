@@ -241,6 +241,18 @@ export function materializeMissionsForCurrentContent({ floor, islands = null, le
   const nextMissions = missions.map((mission) => {
     if (mission.status === "completed") return mission;
 
+    // Missões de ilha valem para a ilha toda: não se prendem a um setor.
+    if (mission.destination?.kind === "island") {
+      return {
+        ...mission,
+        integration: {
+          ...mission.integration,
+          bindings: [],
+          state: "pending"
+        }
+      };
+    }
+
     if (islands?.length && mission.destination?.floor) {
       const island = getIslandByFloor(islands, mission.destination.floor);
       const objective = island ? pickBestObjectiveForMission(island, mission, usedObjectiveKeys) : null;

@@ -5,6 +5,11 @@ import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionTh
 import { MISSION_CATEGORIES } from "../src/missions/missionTables.js";
 import { getCreatureById } from "../src/creatureCatalog/index.js";
 import { TACTICAL_LEGEND_ORDER } from "../src/tacticalMapRenderer.js";
+import { createRng } from "../src/random.js";
+import { createArchipelagoState } from "../src/archipelagoState.js";
+import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
+import { materializeMissionsForCurrentContent } from "../src/missions/missionProfileAdapters.js";
+import { getIslandCreatureIds, getOutOfPlaceCreatureIds } from "../src/archipelagoCreatureRules.js";
 
 const POOLS = ["locations", "materials", "objects", "mementos", "clues", "challenges", "phenomena"];
 const themeIds = archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "dinosaurs");
@@ -70,6 +75,156 @@ test("missões em destaque e pontos de referência não usam a arena do guardiã
       for (const arena of arenaNames) {
         assert.ok(!text.toLowerCase().includes(arena.toLowerCase()), `${id}: "${text}" cita ${arena}`);
       }
+    }
+  }
+});
+
+// --- Gerador: uma missão por ilha (Tarefa 2) ---
+
+const profile = archipelago21to30Profile;
+const SEEDS = 300;
+const CATEGORY_POOL = {
+  collection: "materials", exploration: "locations", recovery: "objects", rescue: "mementos",
+  escort: "mementos", anomalous: "phenomena", investigation: "clues", trial: "challenges"
+};
+
+function draftFor(seed) {
+  const snapshot = createArchipelagoState(profile, createRng(seed)).getSnapshot();
+  return {
+    islands: snapshot.islands.map((island) => ({
+      baseChallenge: island.baseChallenge,
+      difficulty: island.difficulty,
+      floor: island.floor,
+      name: island.name,
+      objectives: island.objectives,
+      themeId: island.themeId,
+      themeName: island.themeName
+    }))
+  };
+}
+
+const samples = Array.from({ length: SEEDS }, (_, s) => {
+  const seed = `seed-${s}`;
+  const worldDraft = draftFor(seed);
+  const offers = generateMissionOffers(createMissionGenerationContext({ currentSeed: seed, profile, worldDraft }));
+  return { seed, worldDraft, offers };
+});
+const allOffers = samples.flatMap(sample => sample.offers);
+
+test("cada oferta ocupa uma ilha diferente", () => {
+  for (const { offers } of samples) {
+    const floors = offers.map(o => o.destination.floor);
+    assert.equal(new Set(floors).size, floors.length);
+    assert.ok(offers.length >= 1 && offers.length <= 8);
+    for (const floor of floors) assert.ok(floor >= 21 && floor <= 29);
+  }
+});
+
+test("alvos de texto vêm do tema da ilha ou da lista genérica", () => {
+  let fromTheme = 0;
+  for (const offer of allOffers) {
+    const pool = CATEGORY_POOL[offer.category];
+    if (!pool) continue;
+    const entry = getArchipelagoMissionTheme(offer.destination.targetId);
+    if (offer.featured) {
+      assert.equal(offer.objective.targetName, entry.featured.targetName);
+      continue;
+    }
+    const themed = entry?.pools[pool] || [];
+    const generic = profile.missionRules.targetPools[pool];
+    assert.ok(themed.includes(offer.objective.targetName) || generic.includes(offer.objective.targetName),
+      `${offer.category}: ${offer.objective.targetName}`);
+    if (themed.includes(offer.objective.targetName)) fromTheme += 1;
+  }
+  assert.ok(fromTheme > 0);
+});
+
+test("a missão em destaque aparece para o tema e usa o título dele", () => {
+  const seen = new Set();
+  for (const offer of allOffers) {
+    assert.equal(typeof offer.featured, "boolean");
+    if (!offer.featured) continue;
+    const entry = getArchipelagoMissionTheme(offer.themeId);
+    assert.equal(offer.destination.targetId, offer.themeId);
+    assert.equal(offer.title, entry.featured.title);
+    assert.equal(offer.category, entry.featured.category);
+    assert.equal(offer.objective.condition, entry.featured.condition);
+    assert.equal(offer.proofType, entry.featured.proofType);
+    assert.ok(offer.description.startsWith(`${entry.featured.lead} na Ilha ${offer.destination.floor}`), offer.description);
+    if (entry.featured.category === "specialHunt") {
+      assert.equal(offer.objective.targetId, entry.featured.creatureId);
+      assert.equal(offer.objective.outOfPlace, !getIslandCreatureIds(offer.themeId).includes(entry.featured.creatureId));
+    }
+    seen.add(offer.themeId);
+  }
+  for (const id of themeIds) assert.ok(seen.has(id), `${id} sem destaque`);
+  assert.equal(allOffers.find(o => o.featured && o.themeId === "floating")?.objective.outOfPlace, true);
+});
+
+test("descrição e rótulo não trazem o nome da ilha", () => {
+  for (const { worldDraft, offers } of samples) {
+    for (const offer of offers) {
+      const island = worldDraft.islands.find(item => item.floor === offer.destination.floor);
+      assert.equal(offer.destination.kind, "island");
+      assert.equal(offer.destination.label, `Ilha ${offer.destination.floor}`);
+      assert.equal(offer.destination.islandName, island.name);
+      assert.equal(offer.themeId, island.themeId);
+      assert.ok(!offer.description.includes(island.name), offer.description);
+      assert.ok(offer.description.includes(`Ilha ${offer.destination.floor}`), offer.description);
+    }
+  }
+});
+
+test("caçada usa elenco da ilha e às vezes alvo fora do lugar", () => {
+  const hunts = allOffers.filter(o => o.category === "specialHunt" && !o.featured);
+  assert.ok(hunts.length >= 40, `poucas caçadas: ${hunts.length}`);
+  let outOfPlace = 0;
+  for (const hunt of hunts) {
+    assert.equal(typeof hunt.objective.outOfPlace, "boolean");
+    const ids = hunt.objective.outOfPlace ? getOutOfPlaceCreatureIds(hunt.themeId) : getIslandCreatureIds(hunt.themeId);
+    assert.ok(ids.includes(hunt.objective.targetId), `${hunt.themeId}: ${hunt.objective.targetId}`);
+    if (hunt.objective.outOfPlace) {
+      outOfPlace += 1;
+      assert.ok(hunt.description.includes("está longe de onde deveria estar"), hunt.description);
+    }
+  }
+  const ratio = outOfPlace / hunts.length;
+  assert.ok(ratio >= 0.15 && ratio <= 0.35, `proporção ${ratio}`);
+});
+
+test("elenco fora do lugar junta os outros temas e os dinossauros, sem o tema atual", () => {
+  for (const id of themeIds) {
+    const own = getIslandCreatureIds(id);
+    const other = getOutOfPlaceCreatureIds(id);
+    assert.ok(own.length > 0);
+    assert.ok(other.length > 0);
+    for (const creatureId of other) assert.ok(!own.includes(creatureId), `${id}: ${creatureId}`);
+    assert.ok(other.includes("armento-de-burafontes") || own.includes("armento-de-burafontes"));
+    assert.equal(new Set(other).size, other.length);
+  }
+  assert.ok(getOutOfPlaceCreatureIds("floating").includes("armento-de-burafontes"));
+  assert.ok(getOutOfPlaceCreatureIds("floating").includes("pirata"));
+});
+
+test("arquipélago não oferece extermínio", () => {
+  assert.ok(!allOffers.some(o => o.category === "extermination"));
+  assert.ok(profile.missionRules.allowedCategories.includes("specialHunt"));
+  assert.ok(!profile.missionRules.allowedCategories.includes("extermination"));
+  assert.equal(profile.missionRules.categoryWeights.specialHunt, 10);
+});
+
+test("missões de ilha não se vinculam a setores", () => {
+  const { worldDraft, offers } = samples[0];
+  const islands = worldDraft.islands;
+  const withStaleBinding = offers.map(offer => ({
+    ...offer,
+    integration: { ...offer.integration, bindings: [{ kind: "objective", floor: offer.destination.floor, objectiveId: "x" }], state: "materialized" }
+  }));
+  for (const input of [offers, withStaleBinding]) {
+    const result = materializeMissionsForCurrentContent({ islands, missions: input });
+    for (const mission of result) {
+      assert.deepEqual(mission.integration.bindings, []);
+      assert.equal(mission.integration.state, "pending");
     }
   }
 });

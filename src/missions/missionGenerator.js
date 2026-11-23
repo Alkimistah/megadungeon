@@ -1,12 +1,27 @@
 import { formatChallengeRating } from "../challenge.js";
 import { getAutomaticCreatureCatalog, getCreatureById, isAutomaticCreature } from "../creatureCatalog/index.js";
+import { getIslandCreatureIds, getOutOfPlaceCreatureIds } from "../archipelagoCreatureRules.js";
 import { createRng, pick, pickWeighted, randomInt } from "../random.js";
+import { getArchipelagoMissionTheme } from "./archipelagoMissionThemes.js";
 import { DEFAULT_CATEGORY_WEIGHTS, DEFAULT_ISSUER_WEIGHTS, DIFFICULTY_MULTIPLIERS, MISSION_CATEGORIES } from "./missionTables.js";
 import { calculateMissionReward } from "./missionRewards.js";
 import { getMissionFloors, validateMission } from "./missionValidator.js";
 
 const CATEGORY_REWARD_BONUS = 1.15;
 const DIRECT_COMBAT_CATEGORIES = new Set(["extermination", "specialHunt"]);
+const FEATURED_CHANCE = 1 / 3;
+const OUT_OF_PLACE_CHANCE = 1 / 4;
+const FEATURED_TARGET_TYPES = {
+  recovery: "object",
+  investigation: "clue",
+  exploration: "location",
+  collection: "material",
+  trial: "challenge",
+  rescue: "memento",
+  escort: "memento",
+  anomalous: "phenomenon",
+  specialHunt: "creature"
+};
 
 function slugify(value) {
   return String(value)
@@ -153,31 +168,62 @@ function getCreatureTarget(profile, floor, rng, categoryId) {
   };
 }
 
-function getPoolValue(profile, poolName, rng) {
-  const values = profile.missionRules?.targetPools?.[poolName] || [];
+function toHuntTarget(creature) {
+  return {
+    id: creature.id,
+    name: creature.name,
+    challenge: creature.challengeRating,
+    type: "creature"
+  };
+}
+
+function getHuntCandidates(ids, profile, floor) {
+  const candidates = ids
+    .map((id) => getCreatureById(id))
+    .filter((creature) => creature && isAutomaticCreature(creature, profile) &&
+      typeof creature.challengeRating === "number");
+
+  return getPreferredCreatureCandidates(candidates, profile, floor, "specialHunt");
+}
+
+// Caçada numa ilha com tema: o alvo vem do elenco da ilha; às vezes, de outro lugar do arquipélago.
+function getIslandHuntTarget(profile, floor, rng, themeId) {
+  const outOfPlace = rng() < OUT_OF_PLACE_CHANCE;
+  const ids = outOfPlace ? getOutOfPlaceCreatureIds(themeId) : getIslandCreatureIds(themeId);
+  const candidates = getHuntCandidates(ids, profile, floor);
+
+  if (candidates.length) return { ...toHuntTarget(pick(rng, candidates)), outOfPlace };
+
+  const fallback = getCreatureTarget(profile, floor, rng, "specialHunt");
+  return fallback ? { ...fallback, outOfPlace: false } : null;
+}
+
+function getPoolValue(profile, poolName, rng, themePools = null) {
+  const genericValues = profile.missionRules?.targetPools?.[poolName] || [];
+  const values = themePools ? [...(themePools[poolName] || []), ...genericValues] : genericValues;
 
   if (!values.length) return null;
   return pick(rng, values);
 }
 
-function getLocation(profile, floor, rng) {
-  return getPoolValue(profile, "locations", rng) || `um ponto instável do andar ${floor}`;
+function getLocation(profile, floor, rng, themePools) {
+  return getPoolValue(profile, "locations", rng, themePools) || `um ponto instável do andar ${floor}`;
 }
 
-function getMaterial(profile, rng) {
-  return getPoolValue(profile, "materials", rng) || "amostras úteis";
+function getMaterial(profile, rng, themePools) {
+  return getPoolValue(profile, "materials", rng, themePools) || "amostras úteis";
 }
 
-function getObject(profile, rng) {
-  return getPoolValue(profile, "objects", rng) || "um objeto extraviado";
+function getObject(profile, rng, themePools) {
+  return getPoolValue(profile, "objects", rng, themePools) || "um objeto extraviado";
 }
 
-function getMemento(profile, rng) {
-  return getPoolValue(profile, "mementos", rng) || "um pertence sentimental";
+function getMemento(profile, rng, themePools) {
+  return getPoolValue(profile, "mementos", rng, themePools) || "um pertence sentimental";
 }
 
-function getPhenomenon(profile, rng) {
-  return getPoolValue(profile, "phenomena", rng) || "um fenômeno instável";
+function getPhenomenon(profile, rng, themePools) {
+  return getPoolValue(profile, "phenomena", rng, themePools) || "um fenômeno instável";
 }
 
 function getDestination(profile, floor, worldDraft = null) {
@@ -185,7 +231,6 @@ function getDestination(profile, floor, worldDraft = null) {
 
   if (mode === "archipelago") {
     const island = worldDraft?.islands?.find((item) => item.floor === floor);
-    const label = island?.name ? `Ilha ${floor} - ${island.name}` : `Ilha ${floor}`;
 
     return {
       kind: "island",
@@ -193,7 +238,8 @@ function getDestination(profile, floor, worldDraft = null) {
       floorMin: floor,
       floorMax: floor,
       targetId: island?.themeId || null,
-      label
+      label: `Ilha ${floor}`,
+      islandName: island?.name || null
     };
   }
 
@@ -224,16 +270,60 @@ function getProgressDestination(profile) {
   };
 }
 
-function createObjective({ categoryId, floor, profile, rng }) {
+function createFeaturedObjective({ featured, floor, profile, rng, themeId }) {
+  const category = MISSION_CATEGORIES[featured.category];
+  const targetType = FEATURED_TARGET_TYPES[featured.category] || "challenge";
+  const base = {
+    challenge: getRewardChallengeByFloor(profile, floor),
+    condition: featured.condition,
+    kind: category.objectiveKind,
+    progressMode: "single",
+    quantity: 1,
+    targetId: slugify(featured.targetName),
+    targetName: featured.targetName,
+    targetType,
+    turnInValue: 0
+  };
+
+  if (targetType === "creature") {
+    const creature = getCreatureById(featured.creatureId);
+
+    return {
+      ...base,
+      challenge: creature?.challengeRating ?? base.challenge,
+      outOfPlace: !getIslandCreatureIds(themeId).includes(featured.creatureId),
+      targetId: featured.creatureId,
+      targetName: featured.targetName || creature?.name,
+      turnInValue: null
+    };
+  }
+
+  if (targetType === "material") {
+    const quantity = randomInt(rng, 2, 5);
+    return { ...base, progressMode: "aggregate", quantity };
+  }
+
+  if (["clue", "challenge", "phenomenon"].includes(targetType)) {
+    return { ...base, progressMode: "manual" };
+  }
+
+  return base;
+}
+
+function createObjective({ categoryId, floor, profile, rng, themeId = null, themePools = null }) {
   const category = MISSION_CATEGORIES[categoryId];
   const challenge = getRewardChallengeByFloor(profile, floor);
 
   if (category.targetTypes.includes("creature")) {
-    const target = getCreatureTarget(profile, floor, rng, categoryId);
+    const islandHunt = categoryId === "specialHunt" && Boolean(themeId) && getIslandCreatureIds(themeId).length > 0;
+    const target = islandHunt
+      ? getIslandHuntTarget(profile, floor, rng, themeId)
+      : getCreatureTarget(profile, floor, rng, categoryId);
     const quantity = categoryId === "specialHunt" ? 1 : categoryId === "extermination" ? randomInt(rng, 4, 8) : randomInt(rng, 1, 4);
 
     if (target) {
       return {
+        ...(islandHunt ? { outOfPlace: target.outOfPlace } : {}),
         challenge: target.challenge,
         condition: categoryId === "specialHunt" ? "alvo específico" : "eliminar ameaça",
         kind: category.objectiveKind,
@@ -252,6 +342,7 @@ function createObjective({ categoryId, floor, profile, rng }) {
       kind: category.objectiveKind,
       progressMode: "manual",
       quantity,
+      ...(islandHunt ? { outOfPlace: false } : {}),
       targetId: null,
       targetName: "ameaça adequada ao ambiente",
       targetType: "creature",
@@ -261,7 +352,7 @@ function createObjective({ categoryId, floor, profile, rng }) {
 
   if (categoryId === "collection") {
     const quantity = randomInt(rng, 2, 5);
-    const material = getMaterial(profile, rng);
+    const material = getMaterial(profile, rng, themePools);
     return {
       challenge,
       condition: "coletar e entregar",
@@ -276,7 +367,7 @@ function createObjective({ categoryId, floor, profile, rng }) {
   }
 
   if (categoryId === "exploration") {
-    const location = getLocation(profile, floor, rng);
+    const location = getLocation(profile, floor, rng, themePools);
     return {
       challenge,
       condition: "confirmar rota ou local",
@@ -291,7 +382,7 @@ function createObjective({ categoryId, floor, profile, rng }) {
   }
 
   if (categoryId === "recovery") {
-    const object = getObject(profile, rng);
+    const object = getObject(profile, rng, themePools);
     return {
       challenge,
       condition: "recuperar objeto",
@@ -306,7 +397,7 @@ function createObjective({ categoryId, floor, profile, rng }) {
   }
 
   if (categoryId === "rescue" || categoryId === "escort") {
-    const memento = getMemento(profile, rng);
+    const memento = getMemento(profile, rng, themePools);
     return {
       challenge,
       condition: categoryId === "rescue" ? "recuperar lembrança" : "entregar lembrança",
@@ -321,7 +412,7 @@ function createObjective({ categoryId, floor, profile, rng }) {
   }
 
   if (categoryId === "anomalous") {
-    const phenomenon = getPhenomenon(profile, rng);
+    const phenomenon = getPhenomenon(profile, rng, themePools);
     return {
       challenge,
       condition: "estabilizar ou registrar",
@@ -336,8 +427,8 @@ function createObjective({ categoryId, floor, profile, rng }) {
   }
 
   const targetName = categoryId === "investigation"
-    ? getPoolValue(profile, "clues", rng) || "um vestígio contraditório"
-    : getPoolValue(profile, "challenges", rng) || "um desafio local";
+    ? getPoolValue(profile, "clues", rng, themePools) || "um vestígio contraditório"
+    : getPoolValue(profile, "challenges", rng, themePools) || "um desafio local";
 
   return {
     challenge,
@@ -488,11 +579,21 @@ function createCategorySentence({ categoryId, destinationText, objective, source
   return `${lead} solicita que o grupo resolva ${targetPhrase} ${destinationText}.`;
 }
 
-function createMissionText({ categoryId, destination, objective, source }) {
-  const targetPhrase = getObjectivePhrase(objective);
+function createOutOfPlaceSentence(objective) {
+  return objective.outOfPlace ? "O alvo está longe de onde deveria estar." : "";
+}
+
+function createMissionText({ categoryId, destination, featured = null, objective, source }) {
   const destinationText = getDestinationPhrase(destination);
+
+  if (featured) {
+    return capitalizeFirst(`${featured.lead} ${destinationText}. ${createReferenceSentence(objective)}`);
+  }
+
+  const targetPhrase = getObjectivePhrase(objective);
   const pieces = [
     createCategorySentence({ categoryId, destinationText, objective, source, targetPhrase }),
+    createOutOfPlaceSentence(objective),
     createReferenceSentence(objective),
     createProgressSentence(destination, objective)
   ].filter(Boolean);
@@ -500,19 +601,24 @@ function createMissionText({ categoryId, destination, objective, source }) {
   return capitalizeFirst(pieces.join(" "));
 }
 
-function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
+function createMissionOffer({ categoryId, context, featured = null, floor: presetFloor = null, index, rng, usedIds }) {
   const { missionFloors, profile } = context;
   const category = MISSION_CATEGORIES[categoryId];
-  const floor = pick(rng, missionFloors);
+  const floor = presetFloor ?? pick(rng, missionFloors);
   const destination = categoryId === "extermination"
     ? getProgressDestination(profile)
     : getDestination(profile, floor, context.worldDraft);
-  const objective = createObjective({ categoryId, floor, profile, rng });
+  const isIsland = destination.kind === "island";
+  const themeId = isIsland ? destination.targetId : null;
+  const theme = themeId ? getArchipelagoMissionTheme(themeId) : null;
+  const objective = featured
+    ? createFeaturedObjective({ featured, floor, profile, rng, themeId })
+    : createObjective({ categoryId, floor, profile, rng, themeId, themePools: theme?.pools || null });
   const source = pickWeighted(rng, getMissionSources(profile, categoryId));
   const difficulty = pickWeighted(rng, DIFFICULTY_MULTIPLIERS);
   const rewardMultiplier = getRewardMultiplier(categoryId, difficulty.value);
-  const title = pick(rng, category.titleTemplates);
-  const proofType = pick(rng, category.proofTemplates);
+  const title = featured ? featured.title : pick(rng, category.titleTemplates);
+  const proofType = featured ? featured.proofType : pick(rng, category.proofTemplates);
   const turnInValue = objective.targetType === "creature"
     ? objective.quantity * (calculateMissionReward({
       challenge: objective.challenge,
@@ -543,8 +649,9 @@ function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
     sourceId: source.id || slugify(source.label),
     sourceKind: getSourceKind(source),
     title,
-    description: createMissionText({ categoryId, destination, objective, source }),
+    description: createMissionText({ categoryId, destination, featured, objective, source }),
     destination,
+    ...(isIsland ? { themeId, featured: Boolean(featured) } : {}),
     objective: {
       kind: objective.kind,
       challenge: objective.challenge,
@@ -553,7 +660,8 @@ function createMissionOffer({ categoryId, context, index, rng, usedIds }) {
       targetName: objective.targetName,
       quantity: objective.quantity,
       condition: objective.condition,
-      progressMode: objective.progressMode
+      progressMode: objective.progressMode,
+      ...(objective.outOfPlace !== undefined ? { outOfPlace: objective.outOfPlace } : {})
     },
     difficulty: difficulty.id,
     difficultyLabel: difficulty.label,
@@ -592,10 +700,63 @@ export function createMissionGenerationContext({ currentSeed, profile, worldDraf
   };
 }
 
+function getIslandThemeId(context, floor) {
+  return context.worldDraft?.islands?.find((island) => island.floor === floor)?.themeId || null;
+}
+
+// Arquipélago: no máximo uma oferta por ilha; a ilha com tema pode trazer a sua missão em destaque.
+function generateIslandMissionOffers(context, rng, offerCount) {
+  const offers = [];
+  const usedCategories = new Set();
+  const usedFloors = new Set();
+  const usedFeaturedThemes = new Set();
+  const usedIds = new Set();
+  let attempts = 0;
+
+  while (offers.length < offerCount && attempts < offerCount * 20) {
+    attempts += 1;
+    const freeFloors = context.missionFloors.filter((floor) => !usedFloors.has(floor));
+
+    if (!freeFloors.length) break;
+
+    const floor = pick(rng, freeFloors);
+    const themeId = getIslandThemeId(context, floor);
+    const featuredEntry = themeId && !usedFeaturedThemes.has(themeId)
+      ? getArchipelagoMissionTheme(themeId)?.featured || null
+      : null;
+    const featured = featuredEntry && rng() < FEATURED_CHANCE ? featuredEntry : null;
+    const categoryId = featured
+      ? featured.category
+      : pickWeighted(rng, getWeightedCategories(context.profile, usedCategories)).categoryId;
+    const mission = createMissionOffer({
+      categoryId,
+      context,
+      featured,
+      floor,
+      index: offers.length + attempts,
+      rng,
+      usedIds
+    });
+    const validation = validateMission(mission, context);
+
+    if (!validation.valid) continue;
+
+    offers.push(mission);
+    usedCategories.add(categoryId);
+    usedFloors.add(floor);
+    if (featured) usedFeaturedThemes.add(themeId);
+  }
+
+  return offers;
+}
+
 export function generateMissionOffers(context) {
   const rules = context.profile.missionRules || {};
   const rng = createRng(`${context.currentSeed}|missions|${context.profileId}`);
   const offerCount = getOfferCount(rules, rng);
+
+  if (context.mode === "archipelago") return generateIslandMissionOffers(context, rng, offerCount);
+
   const offers = [];
   const usedCategories = new Set();
   const usedIds = new Set();

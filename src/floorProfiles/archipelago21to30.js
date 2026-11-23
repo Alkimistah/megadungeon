@@ -184,7 +184,8 @@ export const archipelago21to30Profile = {
       "rescue",
       "escort",
       "trial",
-      "anomalous"
+      "anomalous",
+      "specialHunt"
     ],
     categoryWeights: {
       collection: 13,
@@ -194,7 +195,8 @@ export const archipelago21to30Profile = {
       rescue: 10,
       escort: 8,
       trial: 11,
-      anomalous: 14
+      anomalous: 14,
+      specialHunt: 10
     },
     issuerWeights: [
       { id: "imediato-barco", label: "o imediato do barco", kind: "request", weight: 22 },
