@@ -792,9 +792,9 @@ As missões das ilhas 21 a 29 são cenas próprias de cada ilha. `src/missions/a
 
 #### Por onde retomar
 
-1. **Validar a campanha completa em mesa.** Usar como referência o grupo chegando no nível 7 e testar os marcos de nível 8, 9 e 10 aos 4, 7 e 9 fragmentos. Conferir duração das sessões, recursos que sobram para o guardião, XP, tesouros, reaberturas e emboscadas. Testar o Rei Tirano com todos os bônus e com todos removidos, com atenção à CD 27 do Rugido Ensurdecedor e ao impacto de dois Deinonicos.
-2. **Revisar a grade tática compartilhada.** Tratar a evolução da grade como uma frente própria e conferir os efeitos nas arenas insulares e no convés da liburna.
-3. **Reativar os 13 temas, cada um com seu pacote em `archipelagoMissionThemes.js`.** O teste de cobertura cobra o pacote de cada tema ao ativá-lo.
+1. **Revisar a grade tática compartilhada.** Tratar a evolução da grade como uma frente própria e conferir os efeitos nas arenas insulares e no convés da liburna.
+2. **Reativar os 13 temas, cada um com seu pacote em `archipelagoMissionThemes.js`.** O teste de cobertura cobra o pacote de cada tema ao ativá-lo.
+3. **Validar a campanha completa em mesa.** Usar como referência o grupo chegando no nível 7 e testar os marcos de nível 8, 9 e 10 aos 4, 7 e 9 fragmentos. Conferir duração das sessões, recursos que sobram para o guardião, XP, tesouros, reaberturas e emboscadas. Testar o Rei Tirano com todos os bônus e com todos removidos, com atenção à CD 27 do Rugido Ensurdecedor e ao impacto de dois Deinonicos. Fica por último, depois que o restante estiver pronto, para que a sessão em mesa só gere ajustes pequenos.
 
 ### Pendências Conhecidas
 

@@ -1,6 +1,6 @@
 # Andares 11–20 — decisões, prioridades e andamento
 
-**Escopo fechado em 18/11/2026**, com referência na versão publicada `75379a3`. Este planejamento fica como histórico da entrega. Regras atuais, arquitetura, compatibilidade e instruções de manutenção estão nos [requisitos dos andares 11–20](REQUISITOS_ANDARES_11_A_20.md). Conferências pontuais em mesa seguem como acompanhamento.
+**Escopo fechado em 18/11/2026**, com referência na versão publicada `75379a3`. Este planejamento fica como histórico da entrega. Regras atuais, arquitetura, compatibilidade e instruções de manutenção estão nos [requisitos dos andares 11–20](../../REQUISITOS_ANDARES_11_A_20.md). Conferências pontuais em mesa seguem como acompanhamento.
 
 Atualizado em 18/11/2026. A expedição da última sessão foi recuperada no **andar 14**, após o descanso no acampamento e antes do último nodo. A próxima data de jogo ainda não foi registrada.
 
@@ -34,7 +34,7 @@ A [mecânica especial da Quimera](#6-p1--encontro-fixo-da-quimera) foi publicada
 ## 2. Decisões confirmadas
 
 - 11–20 continua sendo exploração de uma região selvagem por mapa em nodos. O grafo representa a região; mapas táticos representam cenas locais.
-- O grupo entra nessa faixa no nível 4 e pode chegar ao nível 7. A referência completa está em [Progressão de níveis](PROGRESSAO_NIVEIS_GRUPO.md).
+- O grupo entra nessa faixa no nível 4 e pode chegar ao nível 7. A referência completa está em [Progressão de níveis](../../PROGRESSAO_NIVEIS_GRUPO.md).
 - Missões são essenciais por grupo de andares. Compartilhar infraestrutura não significa reutilizar o conteúdo de um labirinto na exploração externa.
 - Toda missão aceita deve ter realização concreta em um ou mais nodos. Missão criada por outro fluxo também deve passar pela mesma integração.
 - Cada nodo pode abrigar no máximo uma missão, inclusive quando os objetivos são semelhantes. Missões do mesmo andar ocupam nodos distintos numa rota possível. Extermínio pode ocupar vários nodos, sem compartilhar esses nodos com outra missão.
@@ -203,7 +203,7 @@ O MVP do andar 20 termina com a **Quimera ND 8 sozinha** numa clareira plana de 
 
 1. **Sorteio na geração do andar 20.** Ao preparar a expedição, sortear quatro cabeças distintas entre as dez da ficha. Para cada uma, sortear uma fraqueza entre os candidatos da tabela abaixo. Numerar as quatro cabeças de **1 a 4**. A composição, a ordem e as fraquezas fazem parte do encontro original salvo com o andar. Abrir a ficha ou retomar a expedição usa o mesmo resultado.
 2. **Um turno da Quimera.** O mestre rola **1d4** para escolher qual cabeça conduz a próxima ação no turno. O número corresponde à lista exibida. O chefe continua com o número de ataques da ficha como ponto de partida. Uma habilidade passiva atua enquanto a cabeça estiver ativa, independentemente do dado. Se a cabeça sorteada estiver atordoada ou com a ação indisponível, a Quimera usa os ataques normais.
-3. **Dano e RD.** O mestre informa o valor, o tipo de dano e o alvo, **Corpo** ou uma das quatro cabeças. O corpo e uma cabeça atingida com tipo diferente de sua fraqueza aplicam **RD 5**, até o dano chegar a zero. Dano da fraqueza direcionado à cabeça passa integralmente. Todo dano reduz os PV compartilhados da Quimera. O app usa os tipos do [catálogo de dano do projeto](src/damageTypes.js), conferidos na [referência oficial de Tormenta20](https://jamboeditora.com.br/wp-content/uploads/2023/06/Tormenta20-Resumo-de-Regras.pdf).
+3. **Dano e RD.** O mestre informa o valor, o tipo de dano e o alvo, **Corpo** ou uma das quatro cabeças. O corpo e uma cabeça atingida com tipo diferente de sua fraqueza aplicam **RD 5**, até o dano chegar a zero. Dano da fraqueza direcionado à cabeça passa integralmente. Todo dano reduz os PV compartilhados da Quimera. O app usa os tipos do [catálogo de dano do projeto](../../src/damageTypes.js), conferidos na [referência oficial de Tormenta20](https://jamboeditora.com.br/wp-content/uploads/2023/06/Tormenta20-Resumo-de-Regras.pdf).
 4. **Atordoamento por cabeça.** A primeira vez que uma cabeça sofre dano de sua fraqueza, sua habilidade especial fica suspensa até o fim do próximo turno da Quimera. O mestre encerra esse turno com **Fim do turno da Quimera**. A ficha registra o atordoamento e se a cabeça já foi atordoada nesse combate. A fraqueza continua ignorando a RD depois de usado o atordoamento. A Quimera continua agindo com as demais cabeças e os ataques normais.
 5. **Sopro do Dragão.** Se o Dragão for sorteado, **Usar sopro** marca o uso da ação padrão e muda o estado para **Em recarga**. **Recarregar sopro** volta a deixá-lo disponível quando o mestre registrar que a Quimera gastou uma ação de movimento. **Fim do turno** trata o atordoamento. Um Dragão atordoado fica impedido de usar o sopro mesmo que esteja carregado. O estado do sopro fica no save.
 6. **Ficha do mestre.** No topo, mostrar PV atuais e máximos, RD 5 e o último lançamento, como `Corpo · 18 de corte − 5 de RD = 13 PV perdidos`. Em seguida, mostrar apenas as cabeças sorteadas, com número, habilidade, fraqueza sorteada e estado. Os ataques do corpo e as ações aplicáveis às cabeças sorteadas ficam acessíveis na mesma ficha, com os controles pertinentes a cada habilidade.
@@ -227,7 +227,7 @@ Esta tabela é uma proposta para a luta do andar 20. A ficha do mestre mostra ap
 | Tigre | Perfuração ou eletricidade |
 | Tubarão | Eletricidade ou corte |
 
-A regra de cura acelerada da Hidra conserva fogo e ácido, conforme a ficha original. A fraqueza sorteada define qual dos dois tipos contorna a RD e pode atordoar a cabeça. O controlador recebe um tipo de dano por lançamento. Ataques com múltiplos tipos e efeitos das habilidades das cabeças são adjudicados pelo mestre. [Ficha original](src/creatureCatalog/monsters.js#L2993).
+A regra de cura acelerada da Hidra conserva fogo e ácido, conforme a ficha original. A fraqueza sorteada define qual dos dois tipos contorna a RD e pode atordoar a cabeça. O controlador recebe um tipo de dano por lançamento. Ataques com múltiplos tipos e efeitos das habilidades das cabeças são adjudicados pelo mestre. [Ficha original](../../src/creatureCatalog/monsters.js#L2993).
 
 O autosave e o TXT preservam as quatro cabeças, a ordem, as fraquezas, o atordoamento, a recarga e os reforços. Os PV atuais e o último lançamento são anotações da sessão aberta. Ao retomar, a Quimera volta aos PV máximos com os reforços salvos. Um save anterior recebe o sorteio a partir da seed do andar 20 e preserva sua arena. Nas novas expedições, a arena inclui troncos como cobertura destrutível, com destruição resolvida em mesa.
 
@@ -428,7 +428,7 @@ O usuário encontrou duas missões do andar 15 no mesmo nodo. A busca anterior a
 
 Implementados contorno tracejado para exploração registrada, marcador `…` para encontro pendente e `✓` para concluído, preservando o ícone do tipo. A legenda explica os estados e mapa/modal indicam a próxima ação. Não houve mudança de regra, permissão, encontro ou formato de sessão. Marcação extra de descanso foi excluída a pedido do usuário.
 
-Suíte ampliada para 24 testes de 11–20. Testes de missões, de 1–10, build e QA de produção dos dois modos passaram, incluindo leitura em tablet/mobile e offline após cache. O [plano de usabilidade](docs/superpowers/plans/2026-11-14-usabilidade-nodos.md) registra os detalhes; a publicação segue o workflow do commit desta entrega.
+Suíte ampliada para 24 testes de 11–20. Testes de missões, de 1–10, build e QA de produção dos dois modos passaram, incluindo leitura em tablet/mobile e offline após cache. O [plano de usabilidade](../superpowers/plans/2026-11-14-usabilidade-nodos.md) registra os detalhes; a publicação segue o workflow do commit desta entrega.
 
 ## 13. Persistência após a sessão
 

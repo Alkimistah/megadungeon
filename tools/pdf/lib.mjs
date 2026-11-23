@@ -1,9 +1,9 @@
-// Abre um livro de tmp/livros/ e lê páginas do PDF. Aceita caminho completo ou um trecho do nome do arquivo.
+// Abre um livro de recursos/livros/ e lê páginas do PDF. Aceita caminho completo ou um trecho do nome do arquivo.
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 
-export const BOOKS_DIR = resolve(import.meta.dirname, "../../tmp/livros");
+export const BOOKS_DIR = resolve(import.meta.dirname, "../../recursos/livros");
 
 export function findBook(query) {
   if (query.endsWith(".pdf") && query.includes("/")) return query;

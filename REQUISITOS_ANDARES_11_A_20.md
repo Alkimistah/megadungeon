@@ -1,6 +1,6 @@
 # Requisitos e arquitetura dos andares 11–20
 
-**Escopo fechado em 18/11/2026.** A referência publicada é o commit `75379a3`. Este documento descreve o comportamento entregue e os contratos que precisam ser preservados em manutenção. O histórico de decisões e evidências está no [planejamento](PLANEJAMENTO_ANDARES_11_A_20.md).
+**Escopo fechado em 18/11/2026.** A referência publicada é o commit `75379a3`. Este documento descreve o comportamento entregue e os contratos que precisam ser preservados em manutenção. O histórico de decisões e evidências está no [planejamento](docs/historico/PLANEJAMENTO_ANDARES_11_A_20.md).
 
 ## Perfil e preparação da expedição
 

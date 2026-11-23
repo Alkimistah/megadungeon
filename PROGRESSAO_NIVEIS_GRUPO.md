@@ -32,4 +32,4 @@ O perfil `src/floorProfiles/dungeon1to10.js` contém a orientação textual de p
 
 As faixas 31–100 continuam sendo referência documental. Uma evolução pode centralizar toda a progressão em dados compartilhados. O nível atual informado pelo mestre, quando houver esse recurso, deve prevalecer sobre uma estimativa automática.
 
-As prioridades para aplicar esta referência estão em [Planejamento dos andares 11–20](PLANEJAMENTO_ANDARES_11_A_20.md).
+As prioridades para aplicar esta referência estão em [Planejamento dos andares 11–20](docs/historico/PLANEJAMENTO_ANDARES_11_A_20.md).

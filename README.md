@@ -68,7 +68,7 @@ Toda a documentação técnica detalhada — arquitetura, sistemas, estrutura de
 
 Documentos de requisitos por etapa:
 
-- [Planejamento e prioridades dos andares 11–20](PLANEJAMENTO_ANDARES_11_A_20.md) — revisão de missões e corte de escopo para o próximo uso.
+- [Planejamento e prioridades dos andares 11–20 (histórico)](docs/historico/PLANEJAMENTO_ANDARES_11_A_20.md) — revisão de missões e corte de escopo para o próximo uso.
 - [Progressão de níveis do grupo](PROGRESSAO_NIVEIS_GRUPO.md) — referência oficial de campanha por faixa de andares.
 
 - [`REQUISITOS_ANDARES_1_A_10.md`](REQUISITOS_ANDARES_1_A_10.md)
@@ -93,7 +93,7 @@ Para adicionar uma nova faixa de andares:
 
 - Criar uma mecânica especial para a Quimera; o MVP usa o chefe sozinho em arena fixa simples.
 - Ampliar os desconhecidos e evoluir a continuidade de clima/terreno e as pistas de rota dos andares 11–20.
-- As três ilhas intermediárias têm seis setores cada. As duas avançadas têm oito setores cada. A expedição começa com quatro ilhas abertas e zero fragmentos. Concluir as iniciais libera as intermediárias. Concluir as intermediárias libera as avançadas. Nove fragmentos abrem a rota até o Rei Tirano ND 11. Com Caminhos desconhecidos, cada fileira aparece ao ser liberada e as ilhas só revelam o tema no desembarque. O ícone do barco marca a última ilha explorada, e o botão Retornar ao barco fica disponível no mapa durante a visita. As missões já seguem o tema de cada ilha, com mapa próprio, acesso no centro do rodapé da ficha e CD pela tabela de ND do Ameaças de Arton. Os 13 temas fora do sorteio ainda não têm pacote de missões. O próximo trabalho é validar a campanha em mesa. [Ordem de implementação](REQUISITOS_ANDARES_21_A_30.md#por-onde-retomar)
+- As três ilhas intermediárias têm seis setores cada. As duas avançadas têm oito setores cada. A expedição começa com quatro ilhas abertas e zero fragmentos. Concluir as iniciais libera as intermediárias. Concluir as intermediárias libera as avançadas. Nove fragmentos abrem a rota até o Rei Tirano ND 11. Com Caminhos desconhecidos, cada fileira aparece ao ser liberada e as ilhas só revelam o tema no desembarque. O ícone do barco marca a última ilha explorada, e o botão Retornar ao barco fica disponível no mapa durante a visita. As missões já seguem o tema de cada ilha, com mapa próprio, acesso no centro do rodapé da ficha e CD pela tabela de ND do Ameaças de Arton. Os 13 temas fora do sorteio ainda não têm pacote de missões. O próximo trabalho é revisar a grade tática compartilhada. A validação em mesa fica por último, depois que tudo estiver pronto. [Ordem de implementação](REQUISITOS_ANDARES_21_A_30.md#por-onde-retomar)
 
 ## MVP dos andares 11–20
 
@@ -110,7 +110,7 @@ npm run build
 
 Com o servidor local ativo, `npm run qa:floors-11-20` e `npm run qa:floors-1-10` executam os fluxos no Chrome. Defina `QA_CHROME` se o executável não estiver em `/usr/bin/google-chrome`. Para testar o build e o cache offline, execute `npm run preview -- --port 4173` e `node scripts/qaForestMvp.mjs --production`.
 
-Detalhes de entrega, evidências e pendências estão no [planejamento](PLANEJAMENTO_ANDARES_11_A_20.md).
+Detalhes de entrega, evidências e pendências estão no [planejamento](docs/historico/PLANEJAMENTO_ANDARES_11_A_20.md).
 
 ### Desempenho do bundle
 

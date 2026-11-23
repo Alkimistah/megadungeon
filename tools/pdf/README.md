@@ -1,6 +1,6 @@
 # Ferramentas de PDF
 
-Elas leem os livros em `tmp/livros/`, que não são versionados. Os livros são a fonte das fichas, das tabelas e das regras. Esta pasta fica fora do app e tem dependências próprias.
+Elas leem os livros em `recursos/livros/`, pasta ignorada pelo Git. Os livros são a fonte das fichas, das tabelas e das regras. Esta pasta fica fora do app e tem dependências próprias.
 
 ```bash
 cd tools/pdf && npm install            # só na primeira vez
