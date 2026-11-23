@@ -5,36 +5,36 @@
 export const ARCHIPELAGO_MISSION_THEMES = {
   tropical: {
     pools: {
-      locations: ["uma calçada de pedra coberta de raízes", "os terraços de cultivo abandonados", "a praça diante do templo escalonado", "um mirante entre as copas"],
+      locations: ["uma calçada de pedra coberta de raízes", "os terraços de cultivo abandonados", "uma praça de pedra tomada pelo mato", "um mirante entre as copas"],
       materials: ["resina de árvore que brilha ao sol", "frutos de casca dourada", "folhas de cipó resistentes como corda", "pigmento extraído de flores raras"],
       objects: ["um disco solar de bronze", "uma estatueta de macaco entalhada", "um cantil de cerâmica selado com cera", "um cinto de ervas trançadas", "uma lança cerimonial de madeira"],
       mementos: ["um colar de sementes deixado por um explorador", "uma bandeira rasgada fincada em um tronco", "uma gaita de osso presa a uma raiz", "um retrato desbotado dentro de uma caixinha de madeira"],
-      clues: ["degraus novos em uma escada antiga", "marcas de garra em um pilar do templo", "fumaça de fogueira entre as copas", "símbolos solares riscados nas pedras da calçada"],
-      challenges: ["abrir caminho pela mata fechada sem perder a trilha", "subir os degraus cobertos de raízes antes do anoitecer", "atravessar as ruínas sem acordar os guardiões", "decifrar o mecanismo do disco solar"],
+      clues: ["degraus novos em uma escada antiga", "marcas de garra em um pilar caído", "fumaça de fogueira entre as copas", "símbolos solares riscados nas pedras da calçada"],
+      challenges: ["abrir caminho pela mata fechada sem perder a trilha", "subir os degraus cobertos de raízes antes do anoitecer", "atravessar as ruínas sem acordar o que dorme nelas", "decifrar o mecanismo do disco solar"],
       phenomena: ["aves que silenciam todas de uma vez", "raízes que se mexem quando ninguém olha", "um rugido distante que acompanha o grupo", "luz dourada que atravessa as copas e aponta o templo"]
     },
     featured: {
       category: "recovery",
-      title: "O fragmento do templo escalonado",
-      targetName: "o fragmento guardado no templo escalonado",
-      lead: "Recupere o fragmento que o guardião esconde entre os terraços do templo",
-      condition: "Chegar ao altar do templo e trazer o fragmento sem destruir a estátua do guardião",
-      proofType: "Entregar o fragmento intacto, ainda morno do sol do altar."
+      title: "O disco solar perdido",
+      targetName: "o disco solar de bronze esquecido nos terraços de cultivo",
+      lead: "Recupere o disco solar de bronze que uma expedição deixou para trás nos terraços de cultivo",
+      condition: "Achar o disco entre as raízes dos terraços e trazê-lo sem quebrar as bordas",
+      proofType: "Entregar o disco de bronze, limpo da terra e das raízes."
     },
     map: {
       markers: ["tree", "canopy", "clearing", "slope"],
-      landmark: { name: "Altar do disco solar", effect: "No topo do templo, o ponto de referência da missão; a escada que leva até ele é terreno difícil." }
+      landmark: { name: "Terraço do disco solar", effect: "Terraço de cultivo ao lado da calçada, ponto de referência da missão; os degraus cobertos de raízes são terreno difícil." }
     }
   },
 
   mangrove: {
     pools: {
-      locations: ["um canal estreito entre as raízes", "um altar soterrado pela lama", "uma clareira de águas paradas", "uma passarela de troncos apodrecidos"],
+      locations: ["um canal estreito entre as raízes", "uma ilhota de raízes firmes", "uma clareira de águas paradas", "uma passarela de troncos apodrecidos"],
       materials: ["lama escura rica em minerais", "raízes aéreas de casca grossa", "folhas de mangue cobertas de sal", "ovos de uma ave de pântano"],
       objects: ["uma canoa virada entre as raízes", "um lampião de gordura afundado na lama", "uma rede de pesca emaranhada", "uma urna de barro coberta de limo", "um remo entalhado com símbolos"],
       mementos: ["uma bota solitária presa na lama", "uma carta lacrada guardada num pote de barro", "um pente de madrepérola preso em uma raiz", "um chapéu de palha boiando num canal"],
       clues: ["pegadas largas que desaparecem na água", "raízes cortadas de forma limpa", "bolhas que sobem em fila no canal", "um rastro de escamas no lodo"],
-      challenges: ["atravessar o lodaçal sem afundar", "seguir o canal certo entre dezenas iguais", "alcançar o altar antes que a água suba", "manter a luz acesa no escuro do mangue"],
+      challenges: ["atravessar o lodaçal sem afundar", "seguir o canal certo entre dezenas iguais", "alcançar a ilhota antes que a água suba", "manter a luz acesa no escuro do mangue"],
       phenomena: ["neblina baixa que cheira a ovo podre", "coaxar que responde à voz do grupo", "raízes que se fecham atrás de quem passa", "vaga-lumes que se afastam de uma direção"]
     },
     featured: {
@@ -42,12 +42,12 @@ export const ARCHIPELAGO_MISSION_THEMES = {
       title: "O que se esconde nos canais",
       targetName: "a origem das marcas nos canais rasos",
       lead: "Descubra o que arrastou os barcos para dentro dos canais",
-      condition: "Seguir o rastro até o altar soterrado e identificar o que vive sob a lama",
-      proofType: "Relatar a origem do rastro e entregar um desenho do altar."
+      condition: "Seguir o rastro pelos canais até a ilhota de raízes e identificar o que vive sob a lama",
+      proofType: "Relatar a origem do rastro e entregar um desenho da ilhota."
     },
     map: {
       markers: ["swamp", "wet", "tree", "water"],
-      landmark: { name: "Altar soterrado", effect: "Meio coberto de lama, é o ponto de referência da missão; o lodo ao redor é terreno difícil." }
+      landmark: { name: "Ilhota de raízes", effect: "Ponto de referência da missão no meio dos canais; o lodo ao redor é terreno difícil." }
     }
   },
 
@@ -71,7 +71,7 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     },
     map: {
       markers: ["water", "current", "wet", "clearing"],
-      landmark: { name: "Banco da lagoa", effect: "Ponto de referência da missão no centro do anel; o canal ao redor tem correnteza e é terreno difícil." }
+      landmark: { name: "Duna das palmeiras tortas", effect: "Ponto de referência da missão no anel de areia; o canal ao lado tem correnteza e é terreno difícil." }
     }
   },
 
@@ -95,37 +95,37 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     },
     map: {
       markers: ["water", "trench", "difficult", "current"],
-      landmark: { name: "Arco de coral", effect: "Ponto de referência da missão; as cristas ao redor são terreno difícil." }
+      landmark: { name: "Jardim das ostras", effect: "Ponto de referência da missão no baixio; as cristas ao redor são terreno difícil." }
     }
   },
 
   volcanic: {
     pools: {
-      locations: ["uma praia de cinzas negras", "uma encosta cortada por rios de lava", "a borda da caldeira", "um túnel de lava endurecida"],
+      locations: ["uma praia de cinzas negras", "uma encosta cortada por rios de lava", "o topo de uma encosta de cinzas", "um túnel de lava endurecida"],
       materials: ["vidro vulcânico cortante", "enxofre amarelo das fumarolas", "pedra-pomes leve e quente", "cristais formados pela lava"],
       objects: ["uma picareta derretida pela metade", "um forno de campanha abandonado", "um escudo de bronze rachado pelo calor", "uma urna de obsidiana lacrada", "uma corrente de ferro enterrada em cinzas"],
       mementos: ["um capacete de mineiro chamuscado", "uma carta meio queimada de uma expedição", "uma pulseira de ferro marcada com um nome", "uma bandeira de tecido endurecido pelas cinzas"],
       clues: ["pegadas que terminam em rocha derretida", "símbolos riscados em pedra ainda quente", "ossos limpos pelo calor", "uma trilha de cinzas varrida de propósito"],
-      challenges: ["cruzar o rio de lava pelas pedras firmes", "respirar sem se sufocar nas fumarolas", "chegar à borda antes do próximo tremor", "estabilizar a rota entre as fendas"],
+      challenges: ["cruzar o rio de lava pelas pedras firmes", "respirar sem se sufocar nas fumarolas", "chegar ao topo antes do próximo tremor", "estabilizar a rota entre as fendas"],
       phenomena: ["tremores curtos a cada poucos minutos", "chuva de cinzas finas", "ar que treme e distorce o horizonte", "um estrondo grave vindo do fundo da montanha"]
     },
     featured: {
       category: "trial",
-      title: "A prova da caldeira",
-      targetName: "a travessia da caldeira instável",
-      lead: "Prove que a rota da caldeira é segura percorrendo-a até a borda",
-      condition: "Atravessar a caldeira e firmar três marcos de pedra antes do próximo tremor grande",
+      title: "A prova da encosta",
+      targetName: "a travessia da encosta instável",
+      lead: "Prove que a rota da encosta é segura percorrendo-a de ponta a ponta",
+      condition: "Atravessar a encosta e firmar três marcos de pedra antes do próximo tremor grande",
       proofType: "Mostrar os marcos firmados e relatar os trechos que cederam."
     },
     map: {
       markers: ["lava", "slope", "difficult", "obstacle"],
-      landmark: { name: "Caldeira de basalto", effect: "Ponto de referência da missão; os rios de lava ao redor são intransitáveis." }
+      landmark: { name: "Encosta dos marcos", effect: "Ponto de referência da missão na encosta; os rios de lava ao redor são intransitáveis." }
     }
   },
 
   "sea-caves": {
     pools: {
-      locations: ["a boca da maré, voltada para o mar", "um túnel inundado", "uma plataforma de pedra entre dois canais", "um bolsão de ar escondido"],
+      locations: ["a entrada voltada para o mar", "um túnel inundado", "uma plataforma de pedra entre dois canais", "um bolsão de ar escondido"],
       materials: ["cristais de sal das paredes", "musgo luminoso das cavernas", "lascas de rocha polida pela água", "bolsas de ar presas em algas secas"],
       objects: ["um bote preso entre duas pedras", "um baú encravado no teto da caverna", "uma corda de resgate cortada", "um lampião ainda aceso no escuro", "uma bússola de latão cheia de água"],
       mementos: ["uma bota de borracha cheia de água do mar", "um diário de bordo ensopado e ilegível", "um chapéu de pescador preso em uma estalactite", "um colar de dentes de peixe-lanterna"],
@@ -141,35 +141,35 @@ export const ARCHIPELAGO_MISSION_THEMES = {
       condition: "Atrair a criatura para a plataforma de pedra e derrotá-la antes que a maré encha o túnel",
       proofType: "Trazer um tentáculo como prova da caçada.",
       creatureId: "lula-gigante",
-      landmark: { name: "Câmara da maré", effect: "Plataforma de pedra firme no meio dos canais; é onde a lula costuma emergir." }
+      landmark: { name: "Plataforma da lula", effect: "Plataforma de pedra firme no meio dos canais; é onde a lula costuma emergir." }
     },
     map: {
       markers: ["water", "current", "wet", "concealment"],
-      landmark: { name: "Câmara da maré", effect: "Plataforma de pedra no cruzamento dos canais, ponto de referência da missão." }
+      landmark: { name: "Plataforma dos três canais", effect: "Plataforma de pedra no cruzamento dos canais, ponto de referência da missão." }
     }
   },
 
   "pirate-held": {
     pools: {
-      locations: ["um cais de contrabandistas", "a paliçada voltada para o mar", "uma passarela entre o fortim e o galeão", "uma gruta usada como paiol"],
+      locations: ["um cais de contrabandistas", "a paliçada voltada para o mar", "uma passarela entre o fortim e o cais", "uma gruta usada como paiol"],
       materials: ["barris de pólvora úmida", "rolos de lona de vela", "garrafas de rum do próprio fortim", "pregos e ferragens de navio"],
       objects: ["um cofre de capitão trancado", "um mapa de rotas roubadas", "uma bandeira negra enrolada", "um diário de contas dos piratas", "um sino de alarme do fortim"],
       mementos: ["um medalhão de uma tripulação desaparecida", "uma fita de cabelo presa a uma grade", "uma pistola antiga com iniciais gravadas", "uma caixa de música tirada de um navio mercante"],
       clues: ["uma fogueira com pouca lenha, mas ainda quente", "marcações de carga em engradados", "bandeiras trocadas durante a noite", "dois horários diferentes no quadro de turnos"],
-      challenges: ["passar pelos vigias sem soar o alarme", "infiltrar-se no galeão atracado", "convencer um pirata a trair o capitão", "escapar do fortim com o prisioneiro"],
+      challenges: ["passar pelos vigias sem soar o alarme", "infiltrar-se no depósito do fortim", "convencer um pirata a trair o capitão", "escapar do fortim com o que veio buscar"],
       phenomena: ["tambores batendo ao longe em ritmo regular", "um canhão que dispara sem aviso", "gaivotas que seguem os piratas", "bandeiras que mudam de cor com o vento"]
     },
     featured: {
       category: "rescue",
-      title: "Prisioneiros do fortim",
-      targetName: "os prisioneiros mantidos no fortim",
-      lead: "Resgate os marinheiros que os piratas mantêm presos no fortim",
-      condition: "Libertar os prisioneiros e levá-los ao barco antes do galeão zarpar",
-      proofType: "Entregar os sobreviventes ao barco e registrar seus nomes."
+      title: "A lembrança do marinheiro",
+      targetName: "o medalhão de um marinheiro que não voltou, guardado pelos piratas",
+      lead: "Resgate o medalhão de um marinheiro que não voltou, tomado pelos piratas e guardado no paiol",
+      condition: "Chegar ao paiol da gruta, recuperar o medalhão sem acionar o alarme e sair pelo cais",
+      proofType: "Entregar o medalhão à família ou ao imediato do barco."
     },
     map: {
       markers: ["deck", "obstacle", "door", "advantage"],
-      landmark: { name: "Galeão da Caveira", effect: "Galeão atracado ao lado do fortim, ponto de referência da missão; barris e engradados dão cobertura." }
+      landmark: { name: "Paiol da gruta", effect: "Gruta usada como depósito, ponto de referência da missão; barris e engradados dão cobertura." }
     }
   },
 
@@ -195,7 +195,7 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     },
     map: {
       markers: ["wind", "pit", "slope", "difficult"],
-      landmark: { name: "Cume das nuvens", effect: "Ponto mais alto da ilha e referência da missão; áreas de vento forte ao redor." }
+      landmark: { name: "Ponte dos ninhos", effect: "Ponte entre plataformas e referência da missão; áreas de vento forte ao redor." }
     }
   },
 
@@ -215,11 +215,11 @@ export const ARCHIPELAGO_MISSION_THEMES = {
       targetName: "o ponto onde o mesmo raio cai sem parar",
       lead: "Investigue o ponto onde o mesmo raio cai a cada minuto, sem que ninguém explique por quê",
       condition: "Chegar ao ponto, observar o fenômeno por uma tempestade completa e descobrir o que o atrai",
-      proofType: "Registrar o fenômeno e trazer um fragmento da pedra atingida."
+      proofType: "Registrar o fenômeno e trazer uma lasca da pedra atingida."
     },
     map: {
       markers: ["wind", "wet", "water", "slope"],
-      landmark: { name: "Olho da tormenta", effect: "Ponto de referência da missão; o vento forte varre as áreas expostas ao redor." }
+      landmark: { name: "Pedra do raio", effect: "Pedra atingida pelo raio, ponto de referência da missão; o vento forte varre as áreas expostas ao redor." }
     }
   }
 };

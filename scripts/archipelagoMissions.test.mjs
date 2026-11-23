@@ -27,7 +27,11 @@ test("todo tema ativo do arquipélago tem pacote de missões completo", () => {
       assert.ok(entry.pools[pool].length >= 4 && entry.pools[pool].length <= 6, `${id}.${pool}`);
     assert.ok(MISSION_CATEGORIES[entry.featured.category], `${id} categoria`);
     assert.notEqual(entry.featured.category, "extermination");
-    if (entry.featured.category === "specialHunt") assert.ok(getCreatureById(entry.featured.creatureId), `${id} criatura`);
+    if (entry.featured.category === "specialHunt") {
+      const creature = getCreatureById(entry.featured.creatureId);
+      assert.ok(creature, `${id} criatura`);
+      assert.ok(creature.challengeRating >= 7 && creature.challengeRating <= 11, `${id} ND ${creature.challengeRating}`);
+    }
     assert.ok(entry.map.markers.length >= 2);
     for (const marker of entry.map.markers) assert.ok(TACTICAL_LEGEND_ORDER.includes(marker), `${id} marcador ${marker}`);
     assert.ok(entry.map.landmark.name && entry.map.landmark.effect, `${id} ponto de referência`);
@@ -55,5 +59,17 @@ test("alvos genéricos do perfil não carregam itens de um tema específico", ()
   for (const [name, list] of Object.entries(pools)) {
     assert.ok(list.length >= 3, `targetPools.${name}`);
     for (const item of list) assert.ok(!/coral|recife|alga|areia/i.test(item), `${name}: ${item}`);
+  }
+});
+
+test("missões em destaque e pontos de referência não usam a arena do guardião", () => {
+  const arenaNames = allThemes.map(theme => theme.arenaName).filter(Boolean);
+  for (const id of themeIds) {
+    const entry = getArchipelagoMissionTheme(id);
+    for (const text of collectTexts(entry)) {
+      for (const arena of arenaNames) {
+        assert.ok(!text.toLowerCase().includes(arena.toLowerCase()), `${id}: "${text}" cita ${arena}`);
+      }
+    }
   }
 });
