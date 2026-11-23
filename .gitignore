@@ -7,3 +7,4 @@ Thumbs.db
 *.log
 recursos/
 .playwright-mcp/
+.idea/

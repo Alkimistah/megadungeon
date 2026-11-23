@@ -391,7 +391,6 @@ svg {
 
 .archipelago-summary > div,
 .archipelago-detail,
-.archipelago-log,
 .archipelago-map {
   border: 1px solid var(--border-soft);
   border-radius: 8px;
@@ -667,10 +666,6 @@ svg {
 }
 
 .archipelago-detail,
-.archipelago-log {
-  padding: 14px;
-}
-
 .archipelago-dialog {
   inset: 0;
   margin: 0;
@@ -720,8 +715,7 @@ svg {
   justify-self: end;
 }
 
-.archipelago-detail-header h2,
-.archipelago-log h2 {
+.archipelago-detail-header h2 {
   margin: 0;
   color: #fff7e8;
   font-size: 20px;
@@ -747,10 +741,6 @@ svg {
   background: var(--action);
   color: #fff7e8;
   font-weight: bold;
-}
-
-.archipelago-action-secondary {
-  background: var(--surface-alt);
 }
 
 .archipelago-action:disabled,
@@ -2028,7 +2018,6 @@ svg {
   color: #fff7e8;
 }
 
-.creature-section,
 .trap-section {
   display: grid;
   gap: 8px;
@@ -2039,7 +2028,6 @@ svg {
   background: rgba(16, 24, 16, 0.42);
 }
 
-.creature-section h3,
 .trap-section h3 {
   margin: 0;
   color: #f1d6a8;
@@ -2047,19 +2035,8 @@ svg {
   letter-spacing: 0;
 }
 
-.creature-section .detail-line,
 .trap-section .detail-line {
   margin: 0;
-}
-
-.creature-guidance {
-  display: grid;
-  gap: 5px;
-  margin: 2px 0 0;
-  padding-left: 18px;
-  color: #d8c8b7;
-  font-size: 13px;
-  line-height: 1.35;
 }
 
 .modal-actions {
@@ -2460,15 +2437,6 @@ svg {
   font-style: italic;
 }
 
-.encounter-detail-list {
-  display: grid;
-  gap: 7px;
-  margin: 2px 0 0;
-  padding-left: 18px;
-  color: #d8c8b7;
-  font-size: 13px;
-  line-height: 1.35;
-}
 
 .environment-columns {
   display: grid;
@@ -3477,6 +3445,9 @@ details.mission-run-guidance p {
 }
 
 #rangeDialog .footer-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 9px 14px;
   border: 1px solid var(--home-accent);
   border-radius: 8px;
@@ -3484,6 +3455,12 @@ details.mission-run-guidance p {
   color: var(--home-text);
   font-size: 14px;
   font-weight: 600;
+}
+
+#rangeDialog .footer-button img {
+  width: 18px;
+  height: 18px;
+  filter: invert(88%) sepia(18%);
 }
 
 /* Modal "Sobre o app": tela cheia, mesma paleta da tela inicial, conteúdo alinhado ao topo. */
