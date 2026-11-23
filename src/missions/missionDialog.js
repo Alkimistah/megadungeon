@@ -6,6 +6,14 @@ import { createCreatureDetail, createEncounterMissionPanel } from "../nodeDialog
 import { getEncounterMissionMatches } from "./missionEncounterIntegration.js";
 import { createMissionTacticalMap } from "./missionTacticalMap.js";
 import { createArchipelagoHuntEncounter } from "./archipelagoMissionEncounter.js";
+import { getMissionDestinationLabel } from "./missionDestinationLabel.js";
+
+// Definido pelo controlador a cada renderização (Caminhos desconhecidos oculta o nome da ilha).
+let hideIslandNames = false;
+
+function destinationLabel(mission) {
+  return getMissionDestinationLabel(mission, { unknownPaths: hideIslandNames });
+}
 
 function createElement(tagName, className = null, text = null) {
   const element = document.createElement(tagName);
@@ -19,7 +27,7 @@ function createElement(tagName, className = null, text = null) {
 function createMissionMeta(mission) {
   return [
     mission.categoryLabel,
-    mission.destination?.label,
+    destinationLabel(mission),
     mission.objective?.targetName
   ].filter(Boolean).join(" | ");
 }
@@ -110,6 +118,9 @@ function getMissionStatusLabel(mission, context = null) {
 }
 
 function getPrimaryBinding(mission) {
+  // Missões de ilha não se prendem a setores (sessões antigas podem trazer vínculos).
+  if (mission.destination?.kind === "island") return null;
+
   return mission.integration?.bindings?.[0] || null;
 }
 
@@ -158,15 +169,15 @@ function getMissionAvailability(mission, context = null) {
     return {
       label: progress?.ready ? "Pronta para entregar" : "Progresso",
       text: progress
-        ? `${mission.destination.label}. Progresso: ${progress.current}/${progress.required}.`
-        : `${mission.destination.label}. Conte qualquer alvo compatível encontrado durante a exploração.`,
+        ? `${destinationLabel(mission)}. Progresso: ${progress.current}/${progress.required}.`
+        : `${destinationLabel(mission)}. Conte qualquer alvo compatível encontrado durante a exploração.`,
       canOpen: Boolean(hasCreatureTarget)
     };
   }
 
   return {
     label: "Pendente",
-    text: mission.destination?.label ? `Destino: ${mission.destination.label}.` : "Aguardando contexto da exploração.",
+    text: destinationLabel(mission) ? `Destino: ${destinationLabel(mission)}.` : "Aguardando contexto da exploração.",
     canOpen: false
   };
 }
@@ -233,8 +244,8 @@ function renderMissionMapDetails(mission, tacticalMap) {
     ["Mapa", `${formatCountLabel(tacticalMap.objectiveCount, "ponto de interesse", "pontos de interesse")}, ${formatCountLabel(tacticalMap.enemyCount, "inimigo", "inimigos")} e ${formatCountLabel(tacticalMap.trapCount, "zona de risco", "zonas de risco")}`]
   ];
 
-  if (mission.destination?.label) {
-    entries.unshift(["Local", mission.destination.label]);
+  if (destinationLabel(mission)) {
+    entries.unshift(["Local", destinationLabel(mission)]);
   }
 
   entries.forEach(([label, value]) => {
@@ -538,6 +549,7 @@ export function createMissionDialogController({
   getMissionContext = () => null,
   getOffers,
   getProfile,
+  getUnknownPaths = () => false,
   getSelected,
   onConfirmSelection,
   onAdjustProgress,
@@ -560,6 +572,7 @@ export function createMissionDialogController({
   }
 
   function renderSelection() {
+    hideIslandNames = Boolean(getUnknownPaths());
     const offers = getOffers();
     const selectedCount = selectedOfferIds.size;
 
@@ -617,6 +630,7 @@ export function createMissionDialogController({
   }
 
   function renderView() {
+    hideIslandNames = Boolean(getUnknownPaths());
     const missions = getSelected();
 
     closeButton.hidden = false;
@@ -650,6 +664,7 @@ export function createMissionDialogController({
   }
 
   function renderMissionRun(missionId) {
+    hideIslandNames = Boolean(getUnknownPaths());
     const mission = getSelected().find((candidate) => candidate.id === missionId);
 
     closeButton.hidden = false;

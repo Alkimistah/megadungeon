@@ -14,6 +14,7 @@ import { createArchipelagoHuntEncounter } from "../src/missions/archipelagoMissi
 import { calculateCombatND } from "../src/challenge.js";
 import { getIslandThemeTerrain } from "../src/archipelagoPilot.js";
 import { createMissionTacticalMap } from "../src/missions/missionTacticalMap.js";
+import { getMissionDestinationLabel } from "../src/missions/missionDestinationLabel.js";
 
 const POOLS = ["locations", "materials", "objects", "mementos", "clues", "challenges", "phenomena"];
 const themeIds = archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "dinosaurs");
@@ -464,4 +465,22 @@ test("mapa da caçada posiciona um inimigo por criatura do encontro", () => {
     assert.equal(map.enemyCount, total, mission.id);
     assert.equal(map.cells.filter(c => c === "enemy").length, total, mission.id);
   }
+});
+
+test("rótulo do destino segue Caminhos desconhecidos", () => {
+  const m = { destination: { kind: "island", floor: 23, label: "Ilha 23", islandName: "Ilha Vulcânica" } };
+  assert.equal(getMissionDestinationLabel(m, { unknownPaths: true }), "Ilha 23");
+  assert.equal(getMissionDestinationLabel(m, { unknownPaths: false }), "Ilha 23 - Ilha Vulcânica");
+});
+
+test("missão salva antes da mudança mostra só o número com caminhos desconhecidos", () => {
+  const legado = { destination: { kind: "island", floor: 21, floorMin: 21, floorMax: 21, label: "Ilha 21 - Atol Circular" } };
+  assert.equal(getMissionDestinationLabel(legado, { unknownPaths: true }), "Ilha 21");
+  assert.equal(getMissionDestinationLabel(legado, { unknownPaths: false }), "Ilha 21 - Atol Circular");
+});
+
+test("andares da floresta não mudam", () => {
+  const m = { destination: { kind: "floor", floor: 3, label: "Andar 3" } };
+  assert.equal(getMissionDestinationLabel(m, { unknownPaths: true }), "Andar 3");
+  assert.equal(getMissionDestinationLabel({}, { unknownPaths: true }), "");
 });

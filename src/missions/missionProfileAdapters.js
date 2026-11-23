@@ -166,75 +166,9 @@ function materializeMissionOnNode(mission, node, floor) {
   };
 }
 
-const OBJECTIVE_TYPE_SCORES_BY_CATEGORY = {
-  anomalous: { "objetivo principal": 7, "cena da ilha": 5, boss: 1 },
-  collection: { "cena da ilha": 6, "objetivo principal": 4, boss: 0 },
-  escort: { "cena da ilha": 6, "objetivo principal": 4, boss: 0 },
-  exploration: { "objetivo principal": 7, "cena da ilha": 5, boss: 1 },
-  investigation: { "cena da ilha": 7, "objetivo principal": 4, boss: 0 },
-  recovery: { "cena da ilha": 6, "objetivo principal": 5, boss: 0 },
-  rescue: { "cena da ilha": 6, "objetivo principal": 5, boss: 0 },
-  trial: { "cena da ilha": 6, "objetivo principal": 5, boss: 1 }
-};
-
-function scoreObjectiveForMission(objective, mission, usedObjectiveKeys, islandFloor) {
-  const key = `${islandFloor}:${objective.id}`;
-  const typeScore = OBJECTIVE_TYPE_SCORES_BY_CATEGORY[mission.category]?.[objective.type] || 2;
-  const missionChallenge = Number(mission.reward?.challenge || mission.objective?.challenge || 0);
-  const objectiveChallenge = Number(objective.challenge || 0);
-  const challengeScore = missionChallenge && objectiveChallenge
-    ? Math.max(0, 5 - Math.abs(objectiveChallenge - missionChallenge))
-    : 0;
-  const mainTargetScore = objective.type === "objetivo principal" && mission.objective?.targetType === "location" ? 3 : 0;
-  const usagePenalty = usedObjectiveKeys.has(key) ? 20 : 0;
-
-  return typeScore + challengeScore + mainTargetScore - usagePenalty;
-}
-
-function pickBestObjectiveForMission(island, mission, usedObjectiveKeys) {
-  return (island.objectives || [])
-    .map((objective) => ({
-      objective,
-      score: scoreObjectiveForMission(objective, mission, usedObjectiveKeys, island.floor)
-    }))
-    .sort((left, right) => {
-      if (right.score !== left.score) return right.score - left.score;
-      return String(left.objective.id).localeCompare(String(right.objective.id));
-    })[0]?.objective || null;
-}
-
-function getObjectiveBindingContext(island, objective) {
-  return `${island.name || `Ilha ${island.floor}`} | ${objective.title} | ${objective.type} | ND ${objective.challenge}`;
-}
-
-function materializeMissionOnObjective(mission, island, objective) {
-  const binding = {
-    kind: "objective",
-    floor: island.floor,
-    objectiveId: objective.id,
-    label: objective.title,
-    context: getObjectiveBindingContext(island, objective)
-  };
-
-  return {
-    ...mission,
-    status: "materialized",
-    integration: {
-      ...mission.integration,
-      bindings: [binding],
-      state: "materialized"
-    }
-  };
-}
-
-function getIslandByFloor(islands, floor) {
-  return (islands || []).find((island) => island.floor === floor) || null;
-}
-
-export function materializeMissionsForCurrentContent({ floor, islands = null, levels = null, missions }) {
+export function materializeMissionsForCurrentContent({ floor, levels = null, missions }) {
   const missionIds = new Set(missions.map((mission) => mission.id));
   const usedNodeIds = new Set();
-  const usedObjectiveKeys = new Set();
 
   clearMissionBindings(levels, missionIds);
 
@@ -251,16 +185,6 @@ export function materializeMissionsForCurrentContent({ floor, islands = null, le
           state: "pending"
         }
       };
-    }
-
-    if (islands?.length && mission.destination?.floor) {
-      const island = getIslandByFloor(islands, mission.destination.floor);
-      const objective = island ? pickBestObjectiveForMission(island, mission, usedObjectiveKeys) : null;
-
-      if (island && objective) {
-        usedObjectiveKeys.add(`${island.floor}:${objective.id}`);
-        return materializeMissionOnObjective(mission, island, objective);
-      }
     }
 
     if (levels && mission.destination?.floor === floor) {

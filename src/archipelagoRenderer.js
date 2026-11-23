@@ -71,15 +71,20 @@ function getIslandModalCopy(island, unknownPaths) {
   return "A identidade desta ilha será revelada quando o grupo iniciar a exploração.";
 }
 
-function getMissionsForObjective(missions, objective) {
-  return missions.filter((mission) => {
-    const objectiveBindings = (mission.integration?.bindings || [])
-      .filter((binding) => binding.kind === "objective");
-
-    if (!objectiveBindings.length) return true;
-
-    return objectiveBindings.some((binding) => binding.objectiveId === objective.id);
-  });
+function createMissionAccess(mission, onOpenMission) {
+  const button = document.createElement("button");
+  const icon = document.createElement("img");
+  const title = document.createElement("span");
+  button.type = "button";
+  button.className = "archipelago-mission-access";
+  button.title = `Missão: ${mission.title}`;
+  icon.src = "/assets/icons/game-icons--tied-scroll.svg";
+  icon.alt = "";
+  icon.setAttribute("aria-hidden", "true");
+  title.textContent = `Missão: ${mission.title}`;
+  button.append(icon, title);
+  button.addEventListener("click", () => onOpenMission(mission.id));
+  return button;
 }
 
 function createButton({ className, disabled = false, label, onClick }) {
@@ -348,23 +353,6 @@ export function createArchipelagoRenderer({
   function renderObjectiveList(island, snapshot) {
     const list = document.createElement("div");
     list.className = "archipelago-objectives";
-    const missions = getMissionsForFloor(island.floor);
-    const canRunMissions = missions.length && (island.visited || snapshot.activeExploration?.floor === island.floor);
-
-    if (canRunMissions) {
-      const missionActions = document.createElement("div");
-      missionActions.className = "mission-context-panel";
-      missionActions.innerHTML = `<strong>Missão disponível</strong><span>${missions.map((mission) => mission.title).join(", ")}</span>`;
-      missions.forEach((mission) => {
-        missionActions.appendChild(createButton({
-          className: "archipelago-small-action mission-context-action",
-          label: "Realizar missão",
-          onClick: () => onOpenMission(mission.id)
-        }));
-      });
-      list.appendChild(missionActions);
-    }
-
     if (island.floor === 30 && !island.available) {
       const locked = document.createElement("p");
       locked.className = "archipelago-objective";
@@ -411,7 +399,6 @@ export function createArchipelagoRenderer({
     }
 
     island.objectives.forEach((objective) => {
-      const objectiveMissions = getMissionsForObjective(missions, objective);
       const item = document.createElement("div");
       item.className = `archipelago-objective ${objective.resolved ? "is-resolved" : ""}`;
       const canResolve = snapshot.activeExploration?.floor === island.floor && objective.available !== false && !objective.resolved;
@@ -424,12 +411,6 @@ export function createArchipelagoRenderer({
         </div>
         <p>${objective.description}</p>
       `;
-      if (objectiveMissions.length) {
-        const indicator = document.createElement("div");
-        indicator.className = "mission-inline-indicator";
-        indicator.innerHTML = `<strong>Missão</strong><span>${objectiveMissions.map((mission) => mission.title).join(", ")}</span>`;
-        item.appendChild(indicator);
-      }
       if (canResolve && objective.scene) {
         if (objective.scene.resolvedEncounter) item.appendChild(createIslandMapButton(objective.scene));
         item.appendChild(createIslandEncounter(objective.scene));
@@ -749,6 +730,11 @@ export function createArchipelagoRenderer({
       footer.appendChild(progress);
     }
     if (actions.childElementCount) footer.appendChild(actions);
+    const accessibleMissions = getMissionsForFloor(island.floor);
+    const canRunMissions = island.visited || snapshot.activeExploration?.floor === island.floor;
+    if (canRunMissions) {
+      accessibleMissions.forEach((mission) => footer.appendChild(createMissionAccess(mission, onOpenMission)));
+    }
     const showEmbark = !snapshot.daySpent && !snapshot.activeExploration && !island.completed && !island.defeated;
     footer.appendChild(showEmbark ? createButton({
       className: "archipelago-action archipelago-island-embark",

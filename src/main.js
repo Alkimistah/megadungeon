@@ -420,6 +420,7 @@ missionDialogController = createMissionDialogController({
   dialogElement: elements.missionDialog,
   getMissionContext,
   getOffers: () => missionState.getOffers(),
+  getUnknownPaths: () => state.isUnknownPathsEnabled(),
   getProfile: () => activeFloorRange,
   getSelected: () => missionState.getSelected(),
   onConfirmSelection: (selectedMissionIds) => {
@@ -786,11 +787,8 @@ function materializeActiveMissions({ floor = Number(elements.floorInput.value), 
 
   if (!selectedMissions.length) return;
 
-  const islands = isArchipelagoMode() ? archipelagoState.getSnapshot().islands : null;
-
   missionState.replaceSelected(materializeMissionsForCurrentContent({
     floor,
-    islands,
     levels,
     missions: selectedMissions
   }));
