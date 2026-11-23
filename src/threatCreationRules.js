@@ -286,6 +286,14 @@ export function getThreatTier(challengeRating) {
     THREAT_TIERS[THREAT_TIERS.length - 1];
 }
 
+export function getAbilityDcForChallenge(challengeRating) {
+  const table = THREAT_PARAMETERS.solo;
+  const target = Number(challengeRating);
+  const match = table.filter((entry) => entry.challengeRating <= target).at(-1) || table[0];
+
+  return match.abilityDc;
+}
+
 export function getThreatParameters(role, challengeRating) {
   const normalizedRole = normalizeRole(role);
   const table = THREAT_PARAMETERS[normalizedRole];

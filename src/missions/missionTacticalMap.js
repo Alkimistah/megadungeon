@@ -1,4 +1,5 @@
 import { createRng, randomInt } from "../random.js";
+import { getAbilityDcForChallenge } from "../threatCreationRules.js";
 import { trapCatalog } from "../traps.js";
 import { getIslandThemeTerrain } from "../archipelagoPilot.js";
 import { getArchipelagoMissionTheme } from "./archipelagoMissionThemes.js";
@@ -209,17 +210,11 @@ function placeTerrain(cells, mission, rng, size, themedMarkers = null) {
   });
 }
 
-function getMissionDc(mission) {
-  const challenge = Number(mission.reward?.challenge || 1);
-  const difficultyBonus = {
-    simple: 0,
-    standard: 2,
-    risky: 4,
-    hard: 6,
-    severe: 8
-  }[mission.difficulty] || 2;
+function getMissionDc(mission, profile) {
+  const floorChallenge = profile?.missionRules?.rewardChallengeByFloor?.[mission.destination?.floor];
+  const baseChallenge = Number(floorChallenge ?? mission.reward?.challenge ?? mission.objective?.challenge ?? 1);
 
-  return Math.max(12, Math.min(35, 10 + Math.round(challenge * 2) + difficultyBonus));
+  return getAbilityDcForChallenge(baseChallenge + 1);
 }
 
 function formatCheck(label, check) {
@@ -330,7 +325,7 @@ export function createMissionTacticalMap(mission, { profile = null } = {}) {
   const objectiveCount = placeObjective(cells, mission, rng, size);
   const enemyCount = placeEnemies(cells, mission, rng, size, enemyTotal);
   const risk = placeRisk(cells, mission, rng, size);
-  const missionDc = getMissionDc(mission);
+  const missionDc = getMissionDc(mission, profile);
   const resolutionCheck = getMissionResolutionCheck(mission, detailRng, missionDc);
   const riskDetails = getRiskDetails(mission, risk, detailRng, missionDc);
   const objectiveLabel = OBJECTIVE_HEAVY_KINDS.has(mission.objective?.kind)

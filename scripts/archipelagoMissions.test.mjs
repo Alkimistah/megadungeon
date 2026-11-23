@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { forest11to20Profile } from "../src/floorProfiles/forest11to20.js";
+import { getAbilityDcForChallenge } from "../src/threatCreationRules.js";
 import { archipelago21to30Profile } from "../src/floorProfiles/archipelago21to30.js";
 import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionThemes.js";
 import { MISSION_CATEGORIES } from "../src/missions/missionTables.js";
@@ -517,4 +519,40 @@ test("memo do encontro respeita livros desativados no mesmo perfil", () => {
   assert.equal(off.items.length, 1, "livros desativados não geram acompanhantes");
   mutable.disabledCreatureBooks = [];
   assert.ok(createArchipelagoHuntEncounter(mission, mutable).items.length > 1);
+});
+
+function dcMission(floor, challenge, extra = {}) {
+  return {
+    id: `dc-${floor}-${challenge}`, category: "collection", categoryLabel: "Coleta", difficulty: "hard",
+    reward: { challenge },
+    destination: { kind: "island", floor, label: "Ilha" },
+    objective: { kind: "collect", quantity: 1, progressMode: "aggregate", targetName: "cristais", condition: "Colete" },
+    proofType: "Amostra", ...extra
+  };
+}
+
+test("CD da missão vem da tabela do livro para ND do andar + 1", () => {
+  assert.equal(createMissionTacticalMap(dcMission(21, 8), { profile }).missionDc, 28);
+  assert.equal(createMissionTacticalMap(dcMission(28, 10), { profile }).missionDc, 31);
+  const map = createMissionTacticalMap(dcMission(21, 8), { profile });
+  assert.equal(map.resolutionCheck.dc, 28);
+});
+
+test("CD da missão usa a linha inferior mais próxima para ND sem linha", () => {
+  const noFloor = { missionRules: {} };
+  assert.equal(getAbilityDcForChallenge(2.5), 16);
+  assert.equal(getAbilityDcForChallenge(21), 49);
+  assert.equal(getAbilityDcForChallenge(24), 51);
+  assert.equal(getAbilityDcForChallenge(40), 55);
+  assert.equal(getAbilityDcForChallenge(0.25), 12);
+  assert.equal(createMissionTacticalMap(dcMission(15, 1.5), { profile: noFloor }).missionDc, 16);
+});
+
+test("missão sem perfil usa o ND da recompensa + 1", () => {
+  assert.equal(createMissionTacticalMap(dcMission(24, 6)).missionDc, 24);
+  assert.equal(createMissionTacticalMap(dcMission(24, 6, { reward: undefined, objective: { kind: "collect", challenge: 3, quantity: 1, targetName: "a", condition: "c" } })).missionDc, 18);
+});
+
+test("CD da floresta segue a mesma tabela", () => {
+  assert.equal(createMissionTacticalMap(dcMission(15, 3), { profile: forest11to20Profile }).missionDc, 18);
 });
