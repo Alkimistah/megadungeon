@@ -1,5 +1,5 @@
 // Valida a planilha de ecologia (tudo ou nada) e gera src/creatureCatalog/ecology.js.
-// Uso: npm run ecology:apply -- tmp/ecologia/revisao.csv [--out caminho]
+// Uso: npm run ecology:apply -- recursos/ecologia/revisao.csv [--out caminho]
 
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";

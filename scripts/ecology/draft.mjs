@@ -1,4 +1,4 @@
-// Gera tmp/ecologia/rascunho.csv com as etiquetas sugeridas para todas as fichas do catálogo.
+// Gera recursos/ecologia/rascunho.csv com as etiquetas sugeridas para todas as fichas do catálogo.
 // Uso: npm run ecology:draft
 
 import { fileURLToPath } from "node:url";
@@ -9,7 +9,7 @@ import { suggestEcology } from "./draftRules.mjs";
 import { writeCsv } from "./csv.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const OUTPUT = join(ROOT, "tmp", "ecologia", "rascunho.csv");
+const OUTPUT = join(ROOT, "recursos", "ecologia", "rascunho.csv");
 
 const DRAFT_COLUMNS = ["familia", "id", "nome", "livro", "pagina_pdf", "tipo", "subtipo", "nd", "papel", "terrenos", "lugares", "condicoes", "grupo", "raridade", "so_manual", "confianca", "precisa_livro", "motivos", "citacao"];
 

@@ -9,7 +9,7 @@ import { rawCreatures } from "./catalogIds.mjs";
 import { TERRAINS, PLACES, CONDITIONS, GROUPS, RARITIES } from "../../src/creatureCatalog/ecologyVocabulary.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const DIR = join(ROOT, "tmp", "ecologia");
+const DIR = join(ROOT, "recursos", "ecologia");
 const DRAFT = join(DIR, "rascunho.csv");
 const BATCH_DIR = join(DIR, "lotes");
 const DONE_DIR = join(DIR, "conferido");
