@@ -4242,15 +4242,23 @@ details.mission-run-guidance p {
 }
 
 .archipelago-island-footer {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(min-content, 1fr) minmax(0, auto) minmax(min-content, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: .5rem 1rem;
 }
 
-.archipelago-island-footer .archipelago-actions {
-  margin: 0 0 0 auto;
+.archipelago-island-footer > .archipelago-island-progress,
+.archipelago-island-footer > .archipelago-actions {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+}
+
+.archipelago-island-footer > :last-child {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
 }
 
 .archipelago-mission-access {
@@ -4259,7 +4267,9 @@ details.mission-run-guidance p {
   gap: 8px;
   min-width: 0;
   max-width: 100%;
-  margin-inline-start: auto;
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
   padding: 6px 14px 6px 8px;
   border: 1px solid rgba(120, 200, 190, .55);
   border-radius: 999px;
@@ -4287,11 +4297,12 @@ details.mission-run-guidance p {
   white-space: nowrap;
 }
 
-.archipelago-mission-access + * {
-  margin-inline-start: 0;
-}
-
 @media (max-width: 600px) {
+  .archipelago-island-footer:has(.archipelago-mission-access) {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
   .archipelago-island-footer:has(.archipelago-mission-access) > span:first-child {
     flex: 1 1 0;
     min-width: 0;
@@ -4301,6 +4312,7 @@ details.mission-run-guidance p {
   .archipelago-island-footer:has(.archipelago-mission-access) > :last-child {
     flex: 0 0 auto;
     order: 2;
+    margin-inline-start: auto;
   }
 
   .archipelago-island-footer .archipelago-mission-access {

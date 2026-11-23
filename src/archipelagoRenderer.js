@@ -724,6 +724,7 @@ export function createArchipelagoRenderer({
     footer.className = "archipelago-island-footer";
     if (island.guardian && revealed) {
       const progress = document.createElement("span");
+      progress.className = "archipelago-island-progress";
       progress.textContent = island.floor === 30 && island.objectives[0]?.type === "combate"
         ? `${activeObjectiveCount} de ${island.objectives.length} setores opcionais resolvidos`
         : `${activeObjectiveCount} de ${island.objectives.length} setores resolvidos`;
