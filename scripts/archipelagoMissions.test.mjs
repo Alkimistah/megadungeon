@@ -364,3 +364,33 @@ test("caçada sem criatura viável ainda abre", () => {
   const strong = { ...hunt, objective: { ...hunt.objective, targetId: "serpe-ancia" } };
   assert.doesNotThrow(() => createArchipelagoHuntEncounter(strong, profile));
 });
+
+test("alvo fora do lugar não recebe escolta da fauna local mesmo com elencos sobrepostos", () => {
+  const base = sampleHunts(1)[0];
+  const local = new Set(getIslandCreatureIds("tropical"));
+  const origin = getCreatureOriginIds("centopeia-dragao");
+  assert.ok(origin.some(id => local.has(id)), "caso de teste precisa de sobreposição");
+  for (let i = 0; i < 20; i++) {
+    const mission = {
+      ...base,
+      id: `fora-do-lugar-${i}`,
+      themeId: "tropical",
+      destination: { ...base.destination, floor: 25, targetId: "tropical" },
+      objective: { ...base.objective, targetId: "centopeia-dragao", outOfPlace: true }
+    };
+    const enc = createArchipelagoHuntEncounter(mission, profile);
+    assert.equal(enc.items[0].creatureId, "centopeia-dragao");
+    for (const item of enc.items.filter(it => !it.isTarget)) {
+      assert.ok(!local.has(item.creatureId), `escolta local ${item.creatureId}`);
+      assert.ok(origin.includes(item.creatureId), item.creatureId);
+    }
+  }
+});
+
+test("sem ND do andar no perfil, o limite é o ND do alvo + 1", () => {
+  const base = sampleHunts(300).find(o => !o.objective.outOfPlace && o.themeId === "coral-coast");
+  const mission = { ...base, destination: { ...base.destination, floor: 99 }, objective: { ...base.objective, targetId: "selako" } };
+  const enc = createArchipelagoHuntEncounter(mission, profile);
+  assert.ok(enc.challenge <= 3, `ND ${enc.challenge}`);
+  assert.equal(enc.items[0].creatureId, "selako");
+});

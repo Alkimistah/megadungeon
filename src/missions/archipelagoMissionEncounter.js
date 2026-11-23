@@ -71,7 +71,11 @@ export function createArchipelagoHuntEncounter(mission, profile) {
   const floorChallenge = profile?.missionRules?.rewardChallengeByFloor?.[mission.destination.floor];
   const limit = roundToQuarter((Number(floorChallenge) || targetChallenge) + 1);
 
-  const roster = objective.outOfPlace ? getCreatureOriginIds(target.id) : getIslandCreatureIds(mission.themeId);
+  const localIds = new Set(getIslandCreatureIds(mission.themeId));
+  // Alvo fora do lugar nunca vem escoltado pela fauna local.
+  const roster = objective.outOfPlace
+    ? getCreatureOriginIds(target.id).filter(id => !localIds.has(id))
+    : [...localIds];
   const ecologyThemeId = objective.outOfPlace ? getCreatureOriginThemeId(target.id) : mission.themeId;
   const companions = targetChallenge >= limit
     ? []
