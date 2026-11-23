@@ -32,7 +32,7 @@
 
 ---
 
-## Tarefa 1: Conteúdo por tema e prévia em cartões
+### Task 1: Conteúdo por tema e prévia em cartões
 
 **Files:**
 - Create: `src/missions/archipelagoMissionThemes.js`
@@ -91,7 +91,7 @@ git add src/missions/archipelagoMissionThemes.js scripts/archipelagoMissions.tes
 git commit -m "feat: adiciona o conteúdo de missões por tema do arquipélago"
 ```
 
-## Tarefa 2: Gerador, uma missão por ilha e fim do vínculo com setores
+### Task 2: Gerador, uma missão por ilha e fim do vínculo com setores
 
 **Files:**
 - Modify: `src/missions/missionGenerator.js` (`getDestination` ~183, `createObjective`, `createMissionOffer` ~503, `generateMissionOffers` ~596, `getCreatureTarget` ~106)
@@ -145,7 +145,7 @@ Para `draftFor(s)`, monte o `worldDraft` com `createArchipelagoState(profile, cr
 - [ ] **Passo 4:** `npm run test:archipelago-missions && npm run test:missions && npm run test:floors-11-20`. Esperado: PASS (a floresta continua igual).
 - [ ] **Passo 5: Commit** `feat: gera missões temáticas com uma por ilha no arquipélago`
 
-## Tarefa 3: Encontro da caçada
+### Task 3: Encontro da caçada
 
 **Files:**
 - Create: `src/missions/archipelagoMissionEncounter.js`
@@ -183,7 +183,7 @@ test("caçada sem criatura viável ainda abre", () => { /* missão com targetId 
 - [ ] **Passo 4:** `npm run test:archipelago-missions && npm run test:ecology`. Esperado: PASS.
 - [ ] **Passo 5: Commit** `feat: monta o encontro das caçadas do arquipélago pela ecologia da ilha`
 
-## Tarefa 4: Mapa tático com o terreno da ilha
+### Task 4: Mapa tático com o terreno da ilha
 
 **Files:**
 - Modify: `src/missions/missionTacticalMap.js` (`placeTerrain` ~185, `createMissionTacticalMap` ~304)
@@ -219,7 +219,7 @@ test("mapa da caçada posiciona um inimigo por criatura do encontro", () => { /*
 - [ ] **Passo 4:** `npm run test:archipelago-missions && npm run test:archipelago`. Esperado: PASS.
 - [ ] **Passo 5: Commit** `feat: adapta o mapa tático da missão ao terreno da ilha`
 
-## Tarefa 5: Rodapé da ficha e rótulo "Ilha N"
+### Task 5: Rodapé da ficha e rótulo "Ilha N"
 
 **Files:**
 - Modify: `src/archipelagoRenderer.js:351-365` (remover painel), `:414-430` (remover indicador), `~743` (rodapé)
@@ -264,7 +264,7 @@ test("andares da floresta não mudam", () => { /* kind "floor" → destination.l
   Salve as capturas em `.playwright-mcp/missoes-arquipelago/` e mostre-as ao PO.
 - [ ] **Passo 6: Commit** `feat: move o acesso à missão para o rodapé da ficha da ilha`
 
-## Tarefa 6: Verificação final e documentação
+### Task 6: Verificação final e documentação
 
 **Files:**
 - Modify: `REQUISITOS_ANDARES_21_A_30.md` ("Por onde retomar", "Pendências", "Pontos de Revisão Futura")
