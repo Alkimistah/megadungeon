@@ -36,6 +36,7 @@ O plano indica o nível de cada tarefa na seção “Execução”.
 - **Ledger:** `.superpowers/sdd/<nome-do-plano>/progress.md`, ignorado pelo Git. A primeira linha nomeia o plano. Cada tarefa concluída grava uma linha com a faixa de commits, e cada decisão do gerente vira uma linha `Ruling:` com o motivo e o custo se estiver errada.
 - **Retomada:** leia o ledger e o `git log`, e retome na primeira tarefa sem linha de conclusão. Não refaça o que o ledger marca como concluído.
 - **Ferramentas de PDF:** ficam em `tools/pdf/` (veja o README da pasta). Rode `npm install` nela na primeira vez. Ela tem `find.mjs`, que busca um termo, `text.mjs`, que extrai o texto por coluna, e `render.mjs`, que gera PNG das páginas. Os PDFs ficam em `recursos/livros/` e os CSVs das auditorias em `recursos/auditorias/`, pasta ignorada pelo Git.
+- **Pastas fora do Git:** `tmp/` guarda o que é temporário (prévias em `tmp/previas/<assunto>/`, saídas de QA, rascunhos) e pode ser esvaziada a qualquer momento. `recursos/` guarda o que precisa durar (livros, auditorias, planilhas conferidas). Antes de apagar algo fora de `tmp/`, listar para o PO o que cada pasta contém.
 
 ## Commits e publicação
 
