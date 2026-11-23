@@ -9,7 +9,7 @@ Gerador procedural de exploração e encontros para Tormenta20. Os andares 1 a 1
 - Para os andares 11 a 20, gera um mapa de nós com múltiplos níveis e caminhos ramificados.
 - Cada nó do mapa 11 a 20 tem tipo de sala (normal, elite, armadilha, tesouro, boss, acampamento), perícia de descoberta, DC, ND calculado, ambiente (clima + terreno) e perfil de criatura quando aplicável.
 - O jogador navega pelo mapa escolhendo rotas, marcando encontros como explorados ou tentados, e descansando em acampamentos.
-- No arquipélago, oferece Manguezal, Ilha Tropical, Atol Circular e Costa do Coral. Cada ilha tem quatro setores, mapas táticos e um confronto no Centro sorteado entre três composições de ND 8.
+- No arquipélago, distribui nove ilhas em três fileiras, quatro iniciais, três intermediárias e duas avançadas, e a ilha final do Rei Tirano. As iniciais têm quatro setores, as intermediárias seis e as avançadas oito, com mapas táticos e um guardião no Centro. Cada uma das nove pode ter uma missão própria, ligada ao seu tema.
 - No descanso na liburna, pode abrir uma emboscada com chance e ND definidos pela quantidade de fragmentos. O descanso termina depois que o mestre encerra o encontro.
 - O estado completo da exploração é exportado como um código de sessão que pode ser copiado e restaurado a qualquer momento, sem conta e sem backend.
 - Funciona offline e pode ser instalado como PWA.
@@ -81,7 +81,7 @@ Os perfis atuais são:
 
 - `dungeon1to10`: exploração estendida dos andares 1 a 10, com ações por andar, tabela d100, efeitos mecânicos, mapas táticos, encontros finais e chefe do andar 10.
 - `forest11to20`: mapa em nodos dos andares 11 a 20, usado como representação de uma área maior com rotas pré-geradas.
-- `archipelago-21-30`: arquipélago com dez ilhas e progressão por fragmentos. As quatro ilhas iniciais têm exploração completa. As demais ainda usam objetivos provisórios.
+- `archipelago-21-30`: arquipélago com dez ilhas e progressão por fragmentos. As nove ilhas e a ilha final têm exploração completa, e as nove têm missões por tema. Outros 13 temas estão desligados até receberem setores e pacote de missões.
 
 Para adicionar uma nova faixa de andares:
 
@@ -93,7 +93,7 @@ Para adicionar uma nova faixa de andares:
 
 - Criar uma mecânica especial para a Quimera; o MVP usa o chefe sozinho em arena fixa simples.
 - Ampliar os desconhecidos e evoluir a continuidade de clima/terreno e as pistas de rota dos andares 11–20.
-- As três ilhas intermediárias têm seis setores cada. As duas avançadas têm oito setores cada. A expedição começa com quatro ilhas abertas e zero fragmentos. Concluir as iniciais libera as intermediárias. Concluir as intermediárias libera as avançadas. Nove fragmentos abrem a rota até o Rei Tirano ND 11. Com Caminhos desconhecidos, cada fileira aparece ao ser liberada e as ilhas só revelam o tema no desembarque. O ícone do barco marca a última ilha explorada, e o botão Retornar ao barco fica disponível no mapa durante a visita. As missões já seguem o tema de cada ilha, com mapa próprio e acesso compacto na ficha. Os 13 temas fora do sorteio ainda não têm pacote de missões. O próximo trabalho é validar a campanha em mesa. [Ordem de implementação](REQUISITOS_ANDARES_21_A_30.md#por-onde-retomar)
+- As três ilhas intermediárias têm seis setores cada. As duas avançadas têm oito setores cada. A expedição começa com quatro ilhas abertas e zero fragmentos. Concluir as iniciais libera as intermediárias. Concluir as intermediárias libera as avançadas. Nove fragmentos abrem a rota até o Rei Tirano ND 11. Com Caminhos desconhecidos, cada fileira aparece ao ser liberada e as ilhas só revelam o tema no desembarque. O ícone do barco marca a última ilha explorada, e o botão Retornar ao barco fica disponível no mapa durante a visita. As missões já seguem o tema de cada ilha, com mapa próprio, acesso no centro do rodapé da ficha e CD pela tabela de ND do Ameaças de Arton. Os 13 temas fora do sorteio ainda não têm pacote de missões. O próximo trabalho é validar a campanha em mesa. [Ordem de implementação](REQUISITOS_ANDARES_21_A_30.md#por-onde-retomar)
 
 ## MVP dos andares 11–20
 
