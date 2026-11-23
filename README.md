@@ -10,6 +10,7 @@ Gerador procedural de exploração e encontros para Tormenta20. Os andares 1 a 1
 - Cada nó do mapa 11 a 20 tem tipo de sala (normal, elite, armadilha, tesouro, boss, acampamento), perícia de descoberta, DC, ND calculado, ambiente (clima + terreno) e perfil de criatura quando aplicável.
 - O jogador navega pelo mapa escolhendo rotas, marcando encontros como explorados ou tentados, e descansando em acampamentos.
 - No arquipélago, oferece Manguezal, Ilha Tropical, Atol Circular e Costa do Coral. Cada ilha tem quatro setores, mapas táticos e um confronto no Centro sorteado entre três composições de ND 8.
+- No descanso na liburna, pode abrir uma emboscada com chance e ND definidos pela quantidade de fragmentos. O descanso termina depois que o mestre encerra o encontro.
 - O estado completo da exploração é exportado como um código de sessão que pode ser copiado e restaurado a qualquer momento, sem conta e sem backend.
 - Funciona offline e pode ser instalado como PWA.
 
@@ -92,7 +93,7 @@ Para adicionar uma nova faixa de andares:
 
 - Criar uma mecânica especial para a Quimera; o MVP usa o chefe sozinho em arena fixa simples.
 - Ampliar os desconhecidos e evoluir a continuidade de clima/terreno e as pistas de rota dos andares 11–20.
-- Completar as ilhas intermediárias e avançadas, o Rei Tirano da Ilha dos Dinossauros e a integração das missões da faixa 21–30.
+- Retomar o arquipélago pela Ilha Vulcânica, a primeira intermediária com seis setores. Depois, completar as demais intermediárias, as avançadas, o Rei Tirano da Ilha dos Dinossauros e a integração das missões. [Ordem de implementação](REQUISITOS_ANDARES_21_A_30.md#por-onde-retomar)
 
 ## MVP dos andares 11–20
 

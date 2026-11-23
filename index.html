@@ -11,6 +11,19 @@
     <link rel="manifest" href="/manifest.webmanifest" />
   </head>
   <body>
+    <svg width="0" height="0" aria-hidden="true" class="svg-filter-definitions">
+      <defs>
+        <filter id="archipelago-art-lines" color-interpolation-filters="sRGB">
+          <feColorMatrix in="SourceGraphic" type="luminanceToAlpha" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="1.12" intercept="-0.12" />
+          </feComponentTransfer>
+          <feComposite in2="SourceAlpha" operator="in" result="lines" />
+          <feFlood flood-color="white" />
+          <feComposite in2="lines" operator="in" />
+        </filter>
+      </defs>
+    </svg>
     <header>
       <div class="header-main">
         <h1>Mapa Aleatório de Encontros - <span id="floorRangeTitle">Andares de 11 a 20</span></h1>

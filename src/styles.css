@@ -529,6 +529,7 @@ svg {
 }
 
 .archipelago-island.has-island-art {
+  --island-completed-tint: brightness(0) saturate(100%) invert(76%) sepia(18%) saturate(798%) hue-rotate(71deg) brightness(93%) contrast(91%);
   position: relative;
   align-content: start;
   justify-items: center;
@@ -553,19 +554,40 @@ svg {
 }
 
 .archipelago-island.has-island-art:not(.is-completed) .archipelago-island-icon {
-  filter: brightness(0) invert(1);
+  filter: var(--island-art-filter, brightness(0) invert(1));
 }
 
 .archipelago-island.is-unexplored.has-island-art:not(.is-completed) .archipelago-island-icon {
-  filter: none;
+  filter: url("#archipelago-art-lines");
 }
 
 .archipelago-island.is-unexplored.is-locked.has-island-art:not(.is-completed) .archipelago-island-icon {
-  filter: grayscale(1) saturate(0) brightness(0.72);
+  filter: url("#archipelago-art-lines") brightness(0.72);
 }
 
 .archipelago-island.has-island-art.is-completed .archipelago-island-icon {
-  filter: brightness(0) saturate(100%) invert(76%) sepia(18%) saturate(798%) hue-rotate(71deg) brightness(93%) contrast(91%);
+  filter: var(--island-completed-art-filter, var(--island-completed-tint));
+}
+
+.svg-filter-definitions {
+  position: absolute;
+}
+
+:is(.archipelago-island-theme-crystal,
+    .archipelago-island-theme-cyclopean-ruins,
+    .archipelago-island-theme-dinosaurs,
+    .archipelago-island-theme-elemental,
+    .archipelago-island-theme-floating,
+    .archipelago-island-theme-iceberg,
+    .archipelago-island-theme-impossible-tide,
+    .archipelago-island-theme-living,
+    .archipelago-island-theme-pirate-held,
+    .archipelago-island-theme-sacred,
+    .archipelago-island-theme-salt-and-bones,
+    .archipelago-island-theme-sea-caves,
+    .archipelago-island-theme-storm) {
+  --island-art-filter: url("#archipelago-art-lines");
+  --island-completed-art-filter: url("#archipelago-art-lines") var(--island-completed-tint);
 }
 
 .archipelago-island.has-island-art strong {
@@ -1105,6 +1127,16 @@ svg {
 .tactical-cell.is-floor,
 .tactical-swatch.is-floor {
   background: var(--tactical-floor, #b9b0a1);
+}
+
+.tactical-cell.is-deck,
+.tactical-swatch.is-deck {
+  background: repeating-linear-gradient(0deg, #a47b51 0 20%, #855e3d 20% 25%);
+}
+
+.tactical-cell.is-canopy,
+.tactical-swatch.is-canopy {
+  background: repeating-linear-gradient(135deg, #d7c398 0 6px, #c2aa7e 6px 8px);
 }
 
 .tactical-cell.is-party,

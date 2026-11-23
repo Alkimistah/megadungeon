@@ -10,6 +10,84 @@ import { calculateCombatND } from "../src/challenge.js";
 import { creatureCatalog, getCreatureById } from "../src/creatureCatalog/index.js";
 import { withCreatureHealthChange } from "../src/encounterCreatureHealth.js";
 import { createIslandGuardian, createIslandSector, createIslandSectorCombat } from "../src/archipelagoPilot.js";
+import { canRerollBoatAmbush, createBoatAmbush, getBoatAmbushRules } from "../src/archipelagoBoatAmbush.js";
+
+test("a chance da emboscada sobe 5 pontos por fragmento e o ND acompanha a expedição", () => {
+  const expectedChallenges = [6, 6, 6, 6, 7, 7, 7, 8, 8, 9];
+  for (const [fragments, challenge] of expectedChallenges.entries()) {
+    const chance = 15 + 5 * fragments;
+    assert.deepEqual(getBoatAmbushRules(fragments), { chance, challenge });
+    const profile = archipelago21to30Profile;
+    const atThreshold = createBoatAmbush(fragments, 1, profile, "limiar", () => chance / 100);
+    assert.equal(atThreshold, null);
+    for (const compositionRoll of [0, 0.5, 0.99]) {
+      const rolls = [(chance - 1) / 100, compositionRoll];
+      const scene = createBoatAmbush(fragments, 1, profile, "convés", () => rolls.shift());
+      assert.equal(scene.resolvedEncounter.budget.creatures, challenge);
+      const map = createNodeTacticalMap(scene);
+      assert.equal(map.terrain.name, "Convés da liburna");
+      assert.equal(map.cells[0], "water");
+      assert.equal(map.cells.at(-1), "water");
+      assert.equal(map.cells[map.landmark.index], "mechanism");
+      assert.equal(map.landmark.label, "Mastro da vela quadrada");
+      assert.equal(map.cells.filter(tile => tile === "party").length, 4);
+      assert.equal(map.cells[6 * map.width + 15], "canopy");
+      assert.equal(map.cells[7 * map.width + 13], "party");
+      if (compositionRoll !== 0) assert.equal(map.cells[8 * map.width + 1], "water");
+      assert.equal(map.cells[6 * map.width + 18], "deck");
+      const enemyPositions = map.cells.flatMap((tile, index) => tile === "enemy" ? [index] : []);
+      assert.equal(enemyPositions.length, map.enemyCount);
+      for (const index of enemyPositions) {
+        const x = index % map.width;
+        const y = Math.floor(index / map.width);
+        const onDeck = y >= 6 && y <= 7 && x >= 1 && x <= 18 ||
+          y >= 5 && y <= 8 && x >= 3 && x <= 18 || y >= 4 && y <= 9 && x >= 6 && x <= 16;
+        assert.equal(onDeck, compositionRoll !== 0);
+      }
+    }
+  }
+});
+
+test("a emboscada só rola depois da exploração e o descanso aguarda sua conclusão, inclusive ao restaurar", () => {
+  const profile = archipelago21to30Profile;
+  const state = createArchipelagoState(profile, createRng("noite"));
+  const noRoll = () => assert.fail("descanso redundante rolou emboscada");
+  assert.ok(state.restAtBoat({ rng: noRoll }));
+  assert.equal(state.exportSessionState().nightsAtBoat, 0);
+  const island = state.getSnapshot().islands[0];
+  assert.ok(state.exploreIsland(island.floor, { mapSeed: "noite" }));
+  assert.ok(state.resolveObjective(island.floor, island.objectives[0].id, "success"));
+  assert.ok(state.restAtBoat({ rng: () => 0 }));
+  assert.equal(state.getSnapshot().daySpent, true);
+  assert.equal(state.getElapsedMinutes(), 480);
+  assert.equal(state.restAtBoat({ rng: noRoll }), false);
+  assert.equal(state.resolveObjective(island.floor, island.objectives[1].id, "success"), false);
+  const ambush = state.getSnapshot().boatAmbush;
+  const initialCreature = ambush.resolvedEncounter.items[0].creatureId;
+  assert.ok(canRerollBoatAmbush(ambush));
+  assert.ok(state.rerollBoatAmbush("noite"));
+  assert.equal(state.getSnapshot().boatAmbush, ambush);
+  assert.notEqual(ambush.resolvedEncounter.items[0].creatureId, initialCreature);
+  assert.equal(ambush.resolvedEncounter.budget.creatures, 6);
+  assert.deepEqual(ambush.tacticalLayout.enemyTiles, ["deck"]);
+  assert.equal(ambush.rerolls, 1);
+  assert.equal(state.getElapsedMinutes(), 480);
+  ambush.resolvedEncounter = withCreatureHealthChange(ambush.resolvedEncounter, ambush.resolvedEncounter.items[0], 0, 5);
+  const saved = JSON.parse(JSON.stringify(state.exportSessionState()));
+  saved.boatAmbush.tacticalLayout = { enemyTiles: ["floor"] };
+  state.initialize(profile, createRng("outra"), saved);
+  assert.deepEqual(state.getSnapshot().boatAmbush.resolvedEncounter, saved.boatAmbush.resolvedEncounter);
+  assert.equal(state.getSnapshot().boatAmbush.tacticalLayout.landmark.name, "Mastro da vela quadrada");
+  assert.equal(state.rerollBoatAmbush("noite"), false);
+  assert.equal(state.exploreIsland(22), false);
+  assert.ok(state.finishBoatAmbush());
+  assert.equal(state.getSnapshot().boatAmbush, null);
+  assert.equal(state.getSnapshot().daySpent, false);
+  assert.equal(state.getElapsedMinutes(), 0);
+  assert.equal(state.getSnapshot().islands[0].objectives[0].outcome, "success");
+  assert.equal(state.exportSessionState().nightsAtBoat, 1);
+  assert.equal(state.finishBoatAmbush(), false);
+});
 
 test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com pontos de interação", () => {
   const profile = archipelago21to30Profile;

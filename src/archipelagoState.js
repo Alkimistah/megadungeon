@@ -7,6 +7,7 @@ import {
   hasIslandSectors, pickIslandGuardian, reopenIslandSector
 } from "./archipelagoPilot.js";
 import { getEncounterForSave } from "./encounterCreatureHealth.js";
+import { applyLiburnaLayout, createBoatAmbush, rerollBoatAmbush } from "./archipelagoBoatAmbush.js";
 
 function shuffle(rng, items) {
   const copy = [...items];
@@ -123,6 +124,8 @@ export function createArchipelagoState(profile, rng = Math.random) {
   let visitedFloors = new Set();
   let completedFloors = new Set();
   let activeExploration = null;
+  let boatAmbush = null;
+  let nightsAtBoat = 0;
   let daySpent = false;
   let elapsedMinutes = 0;
   let log = ["Arquipélago gerado. As ilhas iniciais estão acessíveis."];
@@ -163,6 +166,9 @@ export function createArchipelagoState(profile, rng = Math.random) {
     visitedFloors = toNumberSet(sessionState?.visitedFloors);
     completedFloors = toNumberSet(sessionState?.completedFloors);
     activeExploration = sessionState?.activeExploration || null;
+    boatAmbush = sessionState?.boatAmbush ?? null;
+    if (boatAmbush) applyLiburnaLayout(boatAmbush);
+    nightsAtBoat = sessionState?.nightsAtBoat ?? 0;
     updateSavedGuardianVulnerabilities(activeExploration?.guardianScene?.resolvedEncounter?.items?.[0]?.creatureData?.stats);
     daySpent = Boolean(sessionState?.daySpent);
     elapsedMinutes = sessionState?.elapsedMinutes || 0;
@@ -171,7 +177,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
 
   function exploreIsland(floor, { mapSeed, rng } = {}) {
     const island = islands[floor];
-    if (!island || !isIslandAvailable(floor) || daySpent || completedFloors.has(floor) || island.defeated) return false;
+    if (!island || !isIslandAvailable(floor) || daySpent || boatAmbush || completedFloors.has(floor) || island.defeated) return false;
 
     let reopened = null;
     if (hasIslandSectors(island)) {
@@ -202,7 +208,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
 
   function openSector(floor, objectiveId) {
     const island = islands[floor];
-    if (!hasIslandSectors(island) || activeExploration?.floor !== floor || activeExploration.guardianScene ||
+    if (boatAmbush || !hasIslandSectors(island) || activeExploration?.floor !== floor || activeExploration.guardianScene ||
       island.outcomes?.[objectiveId]) return false;
     const objective = island.objectives.find(item => item.id === objectiveId);
     if (!objective) return false;
@@ -217,7 +223,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
 
   function rerollSector(floor, objectiveId) {
     const island = islands[floor];
-    if (activeExploration?.floor !== floor || activeExploration.guardianScene || island?.outcomes?.[objectiveId]) return false;
+    if (boatAmbush || activeExploration?.floor !== floor || activeExploration.guardianScene || island?.outcomes?.[objectiveId]) return false;
     const scene = island?.scenes?.[objectiveId];
     if (!canRerollNodeCreatures(scene)) return false;
     const objective = island.objectives.find(item => item.id === objectiveId);
@@ -231,7 +237,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
   }
 
   function resolveObjective(floor, objectiveId, outcome) {
-    if (activeExploration?.floor !== floor) return false;
+    if (boatAmbush || activeExploration?.floor !== floor) return false;
     const island = islands[floor];
     if (hasIslandSectors(island)) {
       if (!["success", "failure"].includes(outcome) || !openSector(floor, objectiveId)) return false;
@@ -268,7 +274,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
 
   function startGuardian(floor) {
     const island = islands[floor];
-    if (!hasIslandSectors(island) || activeExploration?.floor !== floor || activeExploration.guardianScene ||
+    if (boatAmbush || !hasIslandSectors(island) || activeExploration?.floor !== floor || activeExploration.guardianScene ||
       !island.objectives.every(item => island.outcomes?.[item.id])) return false;
     activeExploration.guardianScene = previewGuardian(island);
     log = [`Combate do Centro iniciado na ilha ${floor}.`, ...log].slice(0, 8);
@@ -284,6 +290,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
   }
 
   function completeIsland(floor) {
+    if (boatAmbush) return false;
     const island = islands[floor];
     const resolved = new Set(activeExploration?.floor === floor ? activeExploration.resolvedObjectiveIds : []);
     const allResolved = hasIslandSectors(island)
@@ -298,8 +305,30 @@ export function createArchipelagoState(profile, rng = Math.random) {
     return true;
   }
 
-  function restAtBoat() {
-    if (activeExploration?.guardianScene) return false;
+  function restAtBoat({ mapSeed = activeExploration?.mapSeed, rng } = {}) {
+    if (boatAmbush || activeExploration?.guardianScene) return false;
+    if (daySpent && !completedFloors.has(30)) {
+      nightsAtBoat += 1;
+      const roll = rng ?? createRng(`${mapSeed}:barco:noite-${nightsAtBoat}`);
+      boatAmbush = createBoatAmbush(getFragments(), nightsAtBoat, activeProfile, mapSeed, roll);
+      if (boatAmbush) {
+        log = ["Emboscada no barco. O descanso foi interrompido.", ...log].slice(0, 8);
+        return true;
+      }
+    }
+    finishBoatRest();
+    return true;
+  }
+
+  function finishBoatAmbush() {
+    if (!boatAmbush) return false;
+    boatAmbush = null;
+    log = ["Emboscada no barco concluída.", ...log].slice(0, 8);
+    finishBoatRest();
+    return true;
+  }
+
+  function finishBoatRest() {
     daySpent = false;
     elapsedMinutes = 0;
     if (hasIslandSectors(islands[activeExploration?.floor])) {
@@ -314,7 +343,6 @@ export function createArchipelagoState(profile, rng = Math.random) {
       log = ["Descanso no barco. O grupo pode explorar outra ilha.", ...log].slice(0, 8);
     }
     activeExploration = null;
-    return true;
   }
 
   function getSnapshot() {
@@ -374,6 +402,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
       islandRows: activeProfile.archipelago.islandRows,
       boatLabel: activeProfile.archipelago.boatLabel,
       boatIcon: activeProfile.archipelago.boatIcon,
+      boatAmbush,
       daySpent,
       activeExploration,
       fragments: getFragments(),
@@ -398,8 +427,12 @@ export function createArchipelagoState(profile, rng = Math.random) {
         : activeExploration,
       daySpent,
       elapsedMinutes,
+      boatAmbush,
+      nightsAtBoat,
       log
     }),
+    finishBoatAmbush,
+    rerollBoatAmbush: mapSeed => rerollBoatAmbush(boatAmbush, activeProfile, mapSeed),
     getElapsedMinutes: () => elapsedMinutes,
     getSnapshot,
     initialize,

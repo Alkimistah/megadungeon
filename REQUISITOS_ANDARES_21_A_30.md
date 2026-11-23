@@ -260,21 +260,23 @@ Ao clicar no barco ou em um botão de descanso, o app deve:
 - recuperar o estado de esforço do grupo para o próximo dia;
 - zerar o contador do dia atual usado para bloquear nova exploração;
 - resetar o contador de tempo de exploração exibido, seguindo o comportamento de descanso dos outros perfis;
-- limpar progresso parcial de ilhas não concluídas;
+- preservar os setores resolvidos nas ilhas iniciais e limpar o progresso parcial nas ilhas que ainda têm objetivos provisórios;
 - permitir que o grupo escolha outra ilha para explorar.
 
 ### 8.1 Ataques ao Barco
 
-O barco é o acampamento, mas pode se tornar mais vulnerável conforme o grupo avança.
+O grupo pode sofrer uma emboscada noturna no barco. A rolagem ocorre uma vez ao tentar descansar depois de gastar o esforço do dia. A chance começa em 15% e sobe 5 pontos percentuais por fragmento, até 60%.
 
-Ideia a considerar:
+| Fragmentos | Chance | ND |
+|---|---|---|
+| 0–3 | 15%–30% | 6 |
+| 4–6 | 35%–45% | 7 |
+| 7–8 | 50%–55% | 8 |
+| 9 | 60% | 9 |
 
-- a cada ilha concluída, aumenta a chance de ataque ao barco durante uma noite de descanso;
-- esses ataques representam que o arquipélago reage ao avanço do grupo;
-- a chance, ND e composição desses ataques ainda precisam ser definidos;
-- essa regra não deve transformar todo descanso em punição constante.
+Cada ND tem composições curadas de criaturas aquáticas, voadoras e piratas. O mapa mostra a liburna de cima, cercada de água. O convés estreito tem proa afilada, mastro da vela quadrada e toldo na popa. A liburna também é o ícone dourado do botão de descanso. Criaturas aquáticas começam na água, e piratas e voadores entram pelo convés. O mestre registra quando o encontro termina. Só então o descanso zera o tempo, libera a próxima exploração e aplica as regras normais de progresso dos setores. O código de sessão guarda a noite e a emboscada em andamento, inclusive a composição e os ajustes de combate.
 
-Na primeira versão, ataques ao barco podem ser opcionais ou apenas uma regra preparada no perfil.
+Antes de registrar dano ou ajustar o combate, o mestre pode rerrolar as criaturas no rodapé da lista. A rerrolagem sorteia outra composição de mesmo ND, atualiza o mapa e mantém a mesma noite.
 
 A viagem entre ilhas pode ser simples ou mecânica.
 
@@ -726,6 +728,7 @@ Criar ou separar:
 - Conclusão de ilhas 21 a 29 concede fragmentos e atualiza o progresso global.
 - Exploração de ilha consome 8 horas e bloqueia nova exploração até o próximo descanso.
 - Descanso no barco reseta o esforço do dia e o contador de tempo de exploração. Nas ilhas com setores, o progresso persiste e o retorno pode reabrir um setor. Ilhas com objetivos provisórios reiniciam o progresso parcial.
+- Após um dia de exploração, o descanso testa a chance de emboscada no convés. Quando há um encontro, o descanso só termina depois que o mestre conclui a cena.
 - O estado do arquipélago preserva ilhas, temas, objetivos, visitas, conclusões, fragmentos, exploração ativa e log. Nas quatro ilhas iniciais, também guarda os encontros sorteados e o combate iniciado no Centro.
 - Temas das ilhas 21 a 29 são sorteados por seed a partir de pools separados por dificuldade.
 - Ilha 30 usa tema fixo de ilha dos dinossauros.
@@ -763,15 +766,18 @@ As quatro ilhas iniciais sorteiam quatro penalidades distintas do conjunto compa
 
 Os combates dos setores usam listas de criaturas próprias de cada ilha. Os mapas táticos incluem os elementos de terreno e os pontos de interação dos setores e do Centro. O mestre pode rerrolar os combates de setor antes de registrar dano ou ajustes, mantendo o ND e a lista de criaturas da cena. O botão fica centralizado no rodapé do painel de criaturas. A modal da ilha mostra sucesso ou falha no Centro. A vitória acrescenta um fragmento à expedição. Cristais e inventário ficam sob controle do mestre.
 
-1. **Expandir o ciclo para as demais dificuldades.** Aplicar seis setores às ilhas intermediárias e oito às avançadas. Definir a distribuição inicial de ND e recompensas, a duração esperada e a composição da Ilha 30 com o Rei Tirano ND 11.
-2. **Completar a faixa para jogo.** Adaptar vínculos de missões, revisar a arte e verificar no app o fluxo desde o desembarque até o chefe final, incluindo descanso, recompensas e restauração da sessão. A revisão da grade tática segue como uma frente própria.
-3. **Validar a campanha completa em mesa.** Iniciar esta etapa quando os andares 21 a 30 estiverem prontos para jogo. Conferir ritmo, pressão dos combates e testes, XP, tesouro, reabertura de setores e guardiões nos extremos de enfraquecimento. Corrigir problemas e rebalancear a partir do que aparecer em jogo.
+A liburna é o ícone dourado do botão de descanso. [A emboscada no convés](#81-ataques-ao-barco) já usa os fragmentos para determinar a chance e o ND. O restante da expedição aguarda a conclusão do combate para encerrar o descanso. A pirâmide usa traços claros sobre transparência nos 23 temas cadastrados, incluindo os que estão fora do sorteio, e aplica o mesmo tratamento ao ícone de ilha desconhecida. A seleção da primeira versão continua com dez temas.
+
+#### Por onde retomar
+
+1. **Começar pela Ilha Vulcânica.** Usá-la como primeira intermediária para estender o ciclo de quatro para seis setores. Definir objetivos e variantes, encontros, recompensas, mapa tático e guardião de ND base 9. Verificar desbloqueio do Centro após os seis resultados, enfraquecimento do guardião, registro de fragmento, descanso e restauração da sessão.
+2. **Fechar as intermediárias.** Aplicar o fluxo de seis setores à Ilha-Labirinto de Cavernas Marinhas e à Ilha Tomada por Piratas, com objetivos, criaturas e mapas próprios de cada tema.
+3. **Completar a faixa para jogo.** Implementar os oito setores da Ilha Flutuante e da Ilha de Tempestades Eternas, fechar a Ilha dos Dinossauros com o Rei Tirano ND 11, adaptar os vínculos de missões e verificar o percurso completo no app. A revisão da grade tática compartilhada segue como uma frente própria.
+4. **Validar a campanha completa em mesa.** Iniciar quando os andares 21 a 30 estiverem prontos para jogo. Conferir ritmo, pressão dos combates e testes, XP, tesouro, reabertura de setores, emboscadas e guardiões nos extremos de enfraquecimento. Rebalancear a partir do que aparecer em jogo.
 
 ### Pendências Conhecidas
 
-- Ainda existem ícones de ilhas com arte incorreta ou com transparência imperfeita que devem ser revisados/substituídos.
-- Alguns SVGs vieram com camadas de fundo embutidas; quando recoloridos pelo CSS, essas camadas podem aparecer como retângulos ou massas verdes/brancas. Esses arquivos devem ser corrigidos na origem ou substituídos por versões realmente transparentes.
-- A validação visual dos ícones precisa ser repetida após qualquer troca de SVG, especialmente nos estados visitada, em andamento, concluída e bloqueada.
+- Repetir a validação visual quando houver troca de arte, conferindo as ilhas reveladas, concluídas e bloqueadas.
 - Os fragmentos obtidos ainda são representados principalmente por contador/progresso; a exibição visual individual no barco pode evoluir.
 - Mapas táticos, encontros e recompensas das ilhas intermediárias, avançadas e final ainda precisam de implementação.
 - A adaptação definitiva do módulo de missões para os andares 21 a 30 fica pendente até o modo `archipelago` estar mais maduro. Por enquanto, não avaliar balanceamento, categorias, textos, vínculos ou recompensas de missões dessa faixa como critério final.
@@ -810,7 +816,7 @@ Os combates dos setores usam listas de criaturas próprias de cada ilha. Os mapa
 - O clima gerado para a ilha persiste pelo dia inteiro de exploração.
 - O descanso gera novos climas diários por ilha.
 - Antes de explorar, o grupo pode tentar identificar o clima de uma ilha com teste apropriado.
-- Fragmentos são apenas contador/chave para desbloquear a ilha 30; não possuem mecânica própria além disso.
+- Fragmentos desbloqueiam a Ilha 30 e determinam a chance e o ND da emboscada no descanso.
 - O mapa visual deve ser uma pirâmide com barco na base, 4 ilhas iniciais, 3 intermediárias, 2 avançadas e 1 ilha de boss no topo.
 - O mapa principal é estratégico, não tático.
 - As ilhas 21 a 29 devem ter tema sorteado por seed a partir de pools separados por dificuldade.
@@ -826,7 +832,7 @@ Os combates dos setores usam listas de criaturas próprias de cada ilha. Os mapa
 - Recompensas e vantagens opcionais devem ser úteis sem tornar a ilha final trivial.
 - Se cada ilha tiver muitas cenas internas, o modo pode ficar pesado demais; começar com ficha de ilha compacta parece mais seguro.
 - Se os temas ou encontros forem aleatórios, o save precisa guardar o resultado gerado por ilha para evitar que retorno à masmorra mude a campanha.
-- Ataques ao barco durante descanso podem escalar conforme ilhas concluídas, mas precisam ser opcionais ou bem sinalizados para não transformar o acampamento em punição constante.
+- A chance de emboscadas no barco aumenta com os fragmentos. Ritmo e dificuldade serão avaliados no teste em mesa da faixa completa.
 
 ### Pontos de Revisão Futura
 
@@ -835,7 +841,7 @@ Os combates dos setores usam listas de criaturas próprias de cada ilha. Os mapa
 - Fechar a lista final de temas e objetivos das 10 ilhas.
 - Definir o boss da ilha 30.
 - Decidir se a ilha 30 terá objetivos preliminares ou se abre diretamente a luta contra o boss.
-- Definir ataques ao barco durante descanso: chance, ND, composição e quando usar.
+- Calibrar as emboscadas no barco depois da validação completa em mesa.
 - Revisar missões nos andares 21 a 30 depois que objetivos, encontros, recompensas e mapas táticos por ilha estiverem definidos.
 
 ## Decisão Arquitetural Recomendada

@@ -550,7 +550,11 @@ A fase 3 entregou a busca, os filtros de catálogo e a composição manual de en
 
 Manguezal, Ilha Tropical, Atol Circular e Costa do Coral cobrem o fluxo do desembarque ao fragmento. `archipelagoPilot.js` monta as cenas e os guardiões, `archipelagoCreatureRules.js` define os grupos disponíveis por ilha e `archipelagoTacticalMap.js` fornece o terreno e os marcos de cada setor e Centro. `archipelagoGuardianPenalties.js` define as vantagens de setor e as restrições por ficha do guardião. `archipelagoState.js` registra os resultados, a reabertura, as rerrolagens e o confronto do Centro. `archipelagoRenderer.js` apresenta as zonas e as fichas em modais de tela inteira. [Estado, decisões e próximos passos](REQUISITOS_ANDARES_21_A_30.md#retomada-do-arquipélago)
 
-O próximo bloco é o das três ilhas intermediárias, com seis setores cada. O teste em mesa está previsto depois de a faixa inteira estar jogável.
+O próximo bloco começa na Ilha Vulcânica, com o primeiro fluxo de seis setores e guardião de ND base 9. Depois vêm as Cavernas Marinhas e a Ilha Tomada por Piratas. O teste em mesa está previsto depois de a faixa inteira estar jogável.
+
+O descanso após uma exploração pode abrir uma emboscada no convés. `archipelagoBoatAmbush.js` define a chance de 15% mais 5 pontos percentuais por fragmento, o ND por faixa, as composições e o mapa da liburna. `archipelagoState.js` salva o número da noite e o combate em andamento e só libera o próximo dia quando o mestre conclui a emboscada. O mapa tático coloca os atacantes aquáticos na água e os outros no convés.
+
+O botão de descanso usa `public/assets/icons/archipelago-boat.svg`. Na pirâmide, `index.html` define o filtro que transforma o brilho das artes com preenchimento em transparência. `src/styles.css` aplica o filtro aos temas que precisam dele e ao ícone de ilha desconhecida. O estado de conclusão usa a mesma cor verde para todos os temas.
 
 ### Melhorias futuras dos mapas táticos
 

@@ -1,9 +1,11 @@
 const TACTICAL_CELL_LABELS = {
   advantage: "Vantagem/elevação",
   boss: "Chefe Grande",
+  canopy: "Toldo da popa",
   clearing: "Clareira",
   concealment: "Visibilidade reduzida",
   current: "Água corrente",
+  deck: "Convés de madeira",
   difficult: "Terreno difícil",
   door: "Porta (entrada/saída)",
   enemy: "Inimigo",
@@ -55,7 +57,7 @@ const TACTICAL_CELL_GLYPHS = {
 
 const TACTICAL_LEGEND_ORDER = [
   "wall", "party", "boss", "enemy", "hidden", "trap", "pit", "web",
-  "water", "current", "tree", "foliage", "swamp", "wet", "clearing",
+  "water", "current", "deck", "canopy", "tree", "foliage", "swamp", "wet", "clearing",
   "slope", "trench", "wind", "concealment", "difficult", "mechanism",
   "objective", "door", "advantage", "obstacle", "reinforcement"
 ];

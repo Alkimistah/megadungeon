@@ -1,5 +1,6 @@
 import { withIslandTacticalLayout } from "./archipelagoTacticalMap.js";
 import { canRerollNodeCreatures } from "./encounterResolver.js";
+import { canRerollBoatAmbush } from "./archipelagoBoatAmbush.js";
 import { assetUrl } from "./assetUrl.js";
 import { createEncounterCombatPage } from "./nodeDialog.js";
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
@@ -74,7 +75,9 @@ function createIconButton({ className, icon, label, onClick, type = "button" }) 
   return button;
 }
 
-function createIslandEncounter(scene, onEncounterAdjusted = () => {}, { readOnly = false, onReroll } = {}) {
+function createIslandEncounter(scene, onEncounterAdjusted = () => {}, {
+  readOnly = false, onReroll, canReroll = canRerollNodeCreatures
+} = {}) {
   const sheet = document.createElement("section");
   if (!scene.resolvedEncounter) {
     sheet.textContent = "Nenhuma composição elegível para o ND da cena com os livros selecionados. Conduza o encontro manualmente.";
@@ -90,7 +93,7 @@ function createIslandEncounter(scene, onEncounterAdjusted = () => {}, { readOnly
       }
     });
     sheet.replaceChildren(page);
-    if (onReroll && canRerollNodeCreatures(scene)) {
+    if (onReroll && canReroll(scene)) {
       const rerollControls = document.createElement("div");
       rerollControls.className = "archipelago-reroll-footer";
       const status = document.createElement("p");
@@ -149,6 +152,8 @@ export function createArchipelagoRenderer({
   onCompleteIsland,
   onEncounterAdjusted,
   onExploreIsland,
+  onFinishBoatAmbush,
+  onRerollBoatAmbush,
   onLoseGuardian,
   onOpenSector,
   onRerollSector,
@@ -161,6 +166,7 @@ export function createArchipelagoRenderer({
   let selectedSector = null;
   let islandDialog = null;
   let sectorDialog = null;
+  let sectorDialogLocked = false;
 
   function ensureDialog() {
     if (islandDialog) return islandDialog;
@@ -190,14 +196,15 @@ export function createArchipelagoRenderer({
     render();
   }
 
-  function showSectorDialog(title, detail, actions, scene, themeId, objective) {
+  function showSectorDialog(title, detail, actions, scene, { themeId, objective, lockOpen = false } = {}) {
+    sectorDialogLocked = lockOpen;
     if (!sectorDialog) {
       sectorDialog = document.createElement("dialog");
       sectorDialog.className = "archipelago-dialog archipelago-encounter-dialog";
       sectorDialog.setAttribute("aria-labelledby", "archipelagoEncounterTitle");
       sectorDialog.addEventListener("cancel", event => {
         event.preventDefault();
-        closeSectorDialog();
+        if (!sectorDialogLocked) closeSectorDialog();
       });
       document.body.appendChild(sectorDialog);
     }
@@ -208,10 +215,13 @@ export function createArchipelagoRenderer({
     const heading = document.createElement("h2");
     heading.id = "archipelagoEncounterTitle";
     heading.textContent = title;
-    header.append(heading, createIconButton({
-      className: "icon-button archipelago-dialog-close", icon: "/assets/icons/close-modal.svg",
-      label: "Voltar para a ilha", onClick: closeSectorDialog
-    }));
+    header.appendChild(heading);
+    if (!lockOpen) {
+      header.appendChild(createIconButton({
+        className: "icon-button archipelago-dialog-close", icon: "/assets/icons/close-modal.svg",
+        label: "Voltar para a ilha", onClick: closeSectorDialog
+      }));
+    }
     const footer = document.createElement("footer");
     footer.className = "archipelago-encounter-footer";
     if (scene?.resolvedEncounter) {
@@ -275,7 +285,7 @@ export function createArchipelagoRenderer({
     const boat = document.createElement("button");
     boat.className = "archipelago-boat";
     boat.type = "button";
-    boat.disabled = Boolean(snapshot.activeExploration?.guardianScene);
+    boat.disabled = Boolean(snapshot.activeExploration?.guardianScene || snapshot.boatAmbush);
     boat.setAttribute("aria-label", "Descansar no barco");
     boat.innerHTML = `<img src="${assetUrl(snapshot.boatIcon)}" alt="" />`;
     boat.addEventListener("click", () => {
@@ -441,7 +451,7 @@ export function createArchipelagoRenderer({
     const actions = createEncounterActions();
     if (selectedSector === "center" && active && guardian.ready) {
       renderGuardian(detail, actions, island);
-      showSectorDialog("Centro da ilha", detail, actions, guardian.scene ?? guardian.preview, island.themeId);
+      showSectorDialog("Centro da ilha", detail, actions, guardian.scene ?? guardian.preview, { themeId: island.themeId });
     } else {
       const objective = island.objectives.find(item => item.id === selectedSector);
       if (!objective) return section;
@@ -487,7 +497,7 @@ export function createArchipelagoRenderer({
           }, tone);
         }
       }
-      showSectorDialog(`${objective.name} · ${objective.title}`, detail, actions, objective.scene, island.themeId, objective);
+      showSectorDialog(`${objective.name} · ${objective.title}`, detail, actions, objective.scene, { themeId: island.themeId, objective });
     }
     return section;
   }
@@ -623,7 +633,7 @@ export function createArchipelagoRenderer({
       </div>
       <div>
         <span>Dia</span>
-        <strong>${snapshot.daySpent ? "Gasto" : "Livre"}</strong>
+        <strong>${snapshot.boatAmbush ? "Descanso interrompido" : snapshot.daySpent ? "Gasto" : "Livre"}</strong>
       </div>
       <div class="archipelago-summary-log">
         <span>Registro</span>
@@ -631,6 +641,26 @@ export function createArchipelagoRenderer({
       </div>
     `;
     return summary;
+  }
+
+  function renderBoatAmbush(scene) {
+    if (islandDialog?.open) islandDialog.close();
+    selectedSector = null;
+    const detail = document.createElement("div");
+    const briefing = document.createElement("p");
+    briefing.className = "archipelago-encounter-briefing";
+    briefing.textContent = scene.briefing;
+    detail.append(briefing, createIslandEncounter(scene, onEncounterAdjusted, {
+      canReroll: canRerollBoatAmbush,
+      onReroll: () => {
+        if (!onRerollBoatAmbush()) return false;
+        briefing.textContent = scene.briefing;
+        return true;
+      }
+    }));
+    const actions = createEncounterActions();
+    addResultAction(actions, "Concluir emboscada e descansar", onFinishBoatAmbush);
+    showSectorDialog("Emboscada no barco", detail, actions, scene, { lockOpen: true });
   }
 
   function render() {
@@ -662,6 +692,14 @@ export function createArchipelagoRenderer({
       section.innerHTML = "<h2>Arquipélago concluído</h2>";
       section.appendChild(createRangeEndActions(rangeEnd));
       container.appendChild(section);
+    }
+    if (snapshot.boatAmbush) {
+      renderBoatAmbush(snapshot.boatAmbush);
+      return;
+    }
+    if (sectorDialogLocked) {
+      sectorDialogLocked = false;
+      sectorDialog.close();
     }
     renderDialog(snapshot);
   }

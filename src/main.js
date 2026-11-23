@@ -551,9 +551,19 @@ const archipelagoRenderer = createArchipelagoRenderer({
     updateInfo();
   },
   onRestAtBoat: () => {
-    archipelagoState.restAtBoat();
+    archipelagoState.restAtBoat({ mapSeed: currentMapSeed });
     refreshExplorationDisplay();
     updateInfo();
+  },
+  onFinishBoatAmbush: () => {
+    archipelagoState.finishBoatAmbush();
+    refreshExplorationDisplay();
+    updateInfo();
+  },
+  onRerollBoatAmbush: () => {
+    const updated = archipelagoState.rerollBoatAmbush(currentMapSeed);
+    if (updated && autosaveActive) void saveCurrentExpedition();
+    return updated;
   }
 });
 

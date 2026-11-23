@@ -3,13 +3,16 @@ import { createRng, randomInt } from "./random.js";
 const WIDTH = 20;
 const HEIGHT = 14;
 const PARTY_COUNT = 4;
+const DEFAULT_PARTY_POSITIONS = [[2, 10], [3, 10], [2, 11], [3, 11]];
 const MAX_VISIBLE_ENEMIES = 12;
 
 const WALKABLE_CELLS = new Set([
   "advantage",
+  "canopy",
   "clearing",
   "concealment",
   "current",
+  "deck",
   "difficult",
   "floor",
   "foliage",
@@ -96,9 +99,11 @@ function getPositions(cells, predicate) {
 function getFreePositions(cells) {
   return getPositions(cells, (cell) => [
     "advantage",
+    "canopy",
     "clearing",
     "concealment",
     "current",
+    "deck",
     "difficult",
     "floor",
     "foliage",
@@ -261,17 +266,20 @@ function placeFormation(cells, positions, marker, count) {
   });
 }
 
-function placeParty(cells) {
-  placeFormation(cells, [[2, 10], [3, 10], [2, 11], [3, 11]], "party", PARTY_COUNT);
+function placeParty(cells, positions) {
+  placeFormation(cells, positions, "party", PARTY_COUNT);
 }
 
 function placeEnemies(cells, node, rng) {
   const count = Math.min(getEnemyCount(node), MAX_VISIBLE_ENEMIES);
   if (!count) return [];
 
-  const partyCenter = [2, 10];
+  const [partyStart] = node.tacticalLayout?.partyPositions ?? DEFAULT_PARTY_POSITIONS;
+  const { enemyTiles, enemyArea = { minX: 10, maxX: WIDTH - 1, minY: 0, maxY: 9 } } = node.tacticalLayout ?? {};
   const candidates = shuffle(getFreePositions(cells), rng)
-    .filter((position) => position[0] >= 10 && position[1] <= 9 && distance(position, partyCenter) >= 8);
+    .filter(([x, y]) => !enemyTiles || enemyTiles.includes(cells[y][x]))
+    .filter(([x, y]) => x >= enemyArea.minX && x <= enemyArea.maxX && y >= enemyArea.minY && y <= enemyArea.maxY)
+    .filter(position => distance(position, partyStart) >= 8);
   const marker = node.type === "boss" ? "boss" : "enemy";
 
   const positions = candidates.slice(0, count);
@@ -362,7 +370,7 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
     applyTerrain(cells, node, rng);
   }
   applyClimate(cells, node, rng);
-  placeParty(cells);
+  placeParty(cells, layout?.partyPositions ?? DEFAULT_PARTY_POSITIONS);
   const enemies = placeEnemies(cells, node, rng);
   placeTrapFeature(cells, node, rng);
   protectMarkers(cells);
