@@ -788,17 +788,19 @@ A primeira visita tem 1% de chance de esconder um tesouro ND 11 em um dos quatro
 
 A progressão normal começa com as quatro ilhas iniciais abertas e nenhum fragmento. As quatro vitórias iniciais liberam as três intermediárias, e as três vitórias intermediárias liberam as duas avançadas. O Vale da Ossada exige os nove fragmentos conquistados. Ao restaurar um save criado com os atalhos, o app preserva as vitórias e conta apenas os fragmentos das ilhas concluídas. Uma exploração ativa que volte a ficar bloqueada é encerrada.
 
+As missões das ilhas 21 a 29 são cenas próprias de cada ilha. `src/missions/archipelagoMissionThemes.js` guarda, para cada tema ativo, as listas de alvos, uma missão em destaque escrita à mão e os marcadores e o ponto de referência do mapa tático. Um teste de cobertura falha se algum tema ativo ficar sem pacote. O gerador oferece de 1 a 8 missões, no máximo uma por ilha, e a missão em destaque aparece em cerca de um terço das ofertas. A missão não depende dos setores. O texto usa apenas "Ilha N", e o acesso fica no rodapé da ficha. A caçada especial tem um alvo marcado e acompanhantes do elenco da ilha. Em cerca de um quarto das caçadas, o alvo vem do ecossistema de outro tema, e os acompanhantes vêm da origem dele, nunca da fauna local. O encontro tem exatamente um alvo e ND até o ND do andar mais 1. O mapa tático usa o terreno da ilha. O extermínio não entra no arquipélago.
+
 #### Por onde retomar
 
-1. **Revisar as missões do arquipélago.** Manter cada missão como uma cena independente dos setores. Adaptar o objetivo, o texto e o mapa tático ao tema e ao terreno da ilha específica. Na ficha da ilha, substituir o botão grande por um acesso compacto que combine com a modal e preserve o destaque dos setores e das ações de exploração.
-2. **Validar a campanha completa em mesa.** Usar como referência o grupo chegando no nível 7 e testar os marcos de nível 8, 9 e 10 aos 4, 7 e 9 fragmentos. Conferir duração das sessões, recursos que sobram para o guardião, XP, tesouros, reaberturas e emboscadas. Testar o Rei Tirano com todos os bônus e com todos removidos, com atenção à CD 27 do Rugido Ensurdecedor e ao impacto de dois Deinonicos.
-3. **Revisar a grade tática compartilhada.** Tratar a evolução da grade como uma frente própria e conferir os efeitos nas arenas insulares e no convés da liburna.
+1. **Validar a campanha completa em mesa.** Usar como referência o grupo chegando no nível 7 e testar os marcos de nível 8, 9 e 10 aos 4, 7 e 9 fragmentos. Conferir duração das sessões, recursos que sobram para o guardião, XP, tesouros, reaberturas e emboscadas. Testar o Rei Tirano com todos os bônus e com todos removidos, com atenção à CD 27 do Rugido Ensurdecedor e ao impacto de dois Deinonicos.
+2. **Revisar a grade tática compartilhada.** Tratar a evolução da grade como uma frente própria e conferir os efeitos nas arenas insulares e no convés da liburna.
+3. **Reativar os 13 temas, cada um com seu pacote em `archipelagoMissionThemes.js`.** O teste de cobertura cobra o pacote de cada tema ao ativá-lo.
 
 ### Pendências Conhecidas
 
 - Repetir a validação visual quando houver troca de arte, conferindo as ilhas reveladas, concluídas e bloqueadas.
 - Os fragmentos obtidos ainda são representados principalmente por contador/progresso; a exibição visual individual no barco pode evoluir.
-- A revisão temática e visual das missões dos andares 21 a 30 é o próximo trabalho. A missão pertence à ilha, com objetivo e mapa próprios, e seu progresso é independente do resultado dos setores.
+- Os 13 temas fora do sorteio ainda não têm pacote de missões. Ao ativar cada um, o teste de cobertura exige o pacote completo.
 
 ### A Definir
 
@@ -859,7 +861,6 @@ A progressão normal começa com as quatro ilhas iniciais abertas e nenhum fragm
 - Definir o boss da ilha 30.
 - Decidir se a ilha 30 terá objetivos preliminares ou se abre diretamente a luta contra o boss.
 - Calibrar as emboscadas no barco depois da validação completa em mesa.
-- Revisar missões nos andares 21 a 30 depois que objetivos, encontros, recompensas e mapas táticos por ilha estiverem definidos.
 
 ## Decisão Arquitetural Recomendada
 
