@@ -9,7 +9,9 @@ import { createRng } from "../src/random.js";
 import { createArchipelagoState } from "../src/archipelagoState.js";
 import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
 import { materializeMissionsForCurrentContent } from "../src/missions/missionProfileAdapters.js";
-import { getIslandCreatureIds, getOutOfPlaceCreatureIds } from "../src/archipelagoCreatureRules.js";
+import { getCreatureOriginIds, getIslandCreatureIds, getOutOfPlaceCreatureIds } from "../src/archipelagoCreatureRules.js";
+import { createArchipelagoHuntEncounter } from "../src/missions/archipelagoMissionEncounter.js";
+import { calculateCombatND } from "../src/challenge.js";
 
 const POOLS = ["locations", "materials", "objects", "mementos", "clues", "challenges", "phenomena"];
 const themeIds = archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "dinosaurs");
@@ -275,4 +277,90 @@ test("lead da destaque lê bem seguido de \"na Ilha N\"", () => {
     const lead = getArchipelagoMissionTheme(id).featured.lead;
     assert.ok(!/(por quê|ponta a ponta|vazante)$/i.test(lead), `${id}: ${lead}`);
   }
+});
+
+// --- Encontro da caçada (Tarefa 3) ---
+
+function sampleHunts(count) {
+  return allOffers.filter(o => o.category === "specialHunt" && o.destination?.kind === "island").slice(0, count);
+}
+
+function getHuntRoster(mission) {
+  return mission.objective.outOfPlace
+    ? getCreatureOriginIds(mission.objective.targetId)
+    : getIslandCreatureIds(mission.themeId);
+}
+
+test("caçada gera encontro com exatamente um alvo e ND dentro do limite", () => {
+  const hunts = sampleHunts(300);
+  assert.ok(hunts.length >= 100, `poucas caçadas: ${hunts.length}`);
+  let withCompanions = 0;
+  for (const mission of hunts) {
+    const enc = createArchipelagoHuntEncounter(mission, profile);
+    assert.ok(enc, mission.id);
+    const targets = enc.items.filter(i => i.isTarget);
+    assert.equal(targets.length, 1);
+    assert.equal(targets[0].quantity, 1);
+    assert.equal(targets[0].creatureId, mission.objective.targetId);
+    assert.equal(enc.items[0].isTarget, true);
+    const limit = profile.missionRules.rewardChallengeByFloor[mission.destination.floor] + 1;
+    const total = calculateCombatND(enc.items.map(i => ({ challengeRating: i.challenge, quantity: i.quantity })));
+    assert.ok(total <= limit, `${mission.themeId}: ND ${total} > ${limit}`);
+    assert.equal(enc.challenge, total);
+    if (enc.items.length > 1) withCompanions += 1;
+  }
+  assert.ok(withCompanions > hunts.length / 2, `poucos encontros com acompanhantes: ${withCompanions}`);
+});
+
+test("acompanhantes vêm do elenco da ilha, ou da origem quando o alvo está fora do lugar", () => {
+  let outOfPlace = 0;
+  for (const mission of sampleHunts(300)) {
+    const roster = getHuntRoster(mission);
+    const enc = createArchipelagoHuntEncounter(mission, profile);
+    for (const item of enc.items.filter(i => !i.isTarget)) {
+      assert.ok(roster.includes(item.creatureId), `${mission.themeId}: ${item.creatureId} fora do elenco`);
+      assert.notEqual(item.creatureId, mission.objective.targetId);
+      assert.ok(getCreatureById(item.creatureId), item.creatureId);
+    }
+    if (mission.objective.outOfPlace) {
+      outOfPlace += 1;
+      const local = new Set(getIslandCreatureIds(mission.themeId));
+      for (const item of enc.items.filter(i => !i.isTarget)) assert.ok(!local.has(item.creatureId), `escolta local ${item.creatureId}`);
+    }
+  }
+  assert.ok(outOfPlace > 0);
+});
+
+test("origem de uma criatura fora do lugar é o primeiro tema que a contém, ou os dinossauros", () => {
+  assert.ok(getCreatureOriginIds("pirata").includes("capitao-pirata"));
+  assert.ok(getCreatureOriginIds("armento-de-burafontes").includes("burafonte"));
+  assert.ok(!getCreatureOriginIds("armento-de-burafontes").includes("pirata"));
+  assert.deepEqual(getCreatureOriginIds("criatura-inexistente"), []);
+});
+
+test("encontro é determinístico pela missão", () => {
+  for (const mission of sampleHunts(40)) {
+    assert.deepEqual(createArchipelagoHuntEncounter(mission, profile), createArchipelagoHuntEncounter(mission, profile));
+  }
+});
+
+test("encontro só existe para caçadas de ilha", () => {
+  const other = allOffers.find(o => o.category !== "specialHunt");
+  assert.equal(createArchipelagoHuntEncounter(other, profile), null);
+  const hunt = sampleHunts(1)[0];
+  assert.equal(createArchipelagoHuntEncounter({ ...hunt, destination: { kind: "floor", floor: 22 } }, profile), null);
+});
+
+test("caçada sem criatura viável ainda abre", () => {
+  const hunt = sampleHunts(300).find(o => !o.objective.outOfPlace && o.themeId === "coral-coast");
+  assert.ok(hunt);
+  const low = { ...hunt, objective: { ...hunt.objective, targetId: "selako", challenge: getCreatureById("selako").challengeRating } };
+  const enc = createArchipelagoHuntEncounter(low, profile);
+  assert.equal(enc.items[0].creatureId, "selako");
+  assert.equal(enc.items.filter(i => i.isTarget).length, 1);
+  const lonely = { ...hunt, themeId: "tema-sem-elenco", objective: { ...hunt.objective, outOfPlace: false } };
+  const alone = createArchipelagoHuntEncounter(lonely, profile);
+  assert.deepEqual(alone.items.map(i => i.isTarget), [true]);
+  const strong = { ...hunt, objective: { ...hunt.objective, targetId: "serpe-ancia" } };
+  assert.doesNotThrow(() => createArchipelagoHuntEncounter(strong, profile));
 });

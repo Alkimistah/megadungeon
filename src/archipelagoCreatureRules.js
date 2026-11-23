@@ -61,3 +61,20 @@ export function getOutOfPlaceCreatureIds(themeId) {
 
   return [...new Set([...otherIds, ...dinosaurIds])].filter(id => !own.has(id));
 }
+
+// Elenco de origem de uma criatura: o primeiro tema que a contém ou, sem tema,
+// as composições dos dinossauros. Serve à caçada de um alvo fora do lugar.
+export function getCreatureOriginIds(creatureId) {
+  const themeIds = Object.values(islandCreatures).find(ids => ids.includes(creatureId));
+  if (themeIds) return [...themeIds];
+  const dinosaurIds = [...new Set(Object.values(dinosaurExploration.sectorCompositions)
+    .flat(2)
+    .map(entry => entry.id))];
+  return dinosaurIds.includes(creatureId) ? dinosaurIds : [];
+}
+
+export function getCreatureOriginThemeId(creatureId) {
+  const entry = Object.entries(islandCreatures).find(([, ids]) => ids.includes(creatureId));
+  if (entry) return entry[0];
+  return getCreatureOriginIds(creatureId).length ? "dinosaurs" : null;
+}

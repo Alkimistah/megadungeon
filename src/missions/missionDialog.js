@@ -5,6 +5,7 @@ import { CREATURE_TYPES } from "../creatures.js";
 import { createCreatureDetail, createEncounterMissionPanel } from "../nodeDialog.js";
 import { getEncounterMissionMatches } from "./missionEncounterIntegration.js";
 import { createMissionTacticalMap } from "./missionTacticalMap.js";
+import { createArchipelagoHuntEncounter } from "./archipelagoMissionEncounter.js";
 
 function createElement(tagName, className = null, text = null) {
   const element = document.createElement(tagName);
@@ -294,7 +295,42 @@ function createMissionCreatureItem(mission, tacticalMap = null) {
   };
 }
 
-function renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress = null) {
+function createHuntEncounterItem(entry) {
+  const creature = getCreatureById(entry.creatureId);
+
+  return {
+    kind: "creature",
+    creatureId: entry.creatureId,
+    creatureData: creature || null,
+    name: entry.name || creature?.name || "Criatura da missão",
+    quantity: entry.quantity,
+    challengeLabel: formatChallengeRating(entry.challenge),
+    typeLabel: CREATURE_TYPES[creature?.type]?.label || creature?.type || "Criatura",
+    roleLabel: creature?.roleMetadata?.label || creature?.role || (entry.isTarget ? "alvo de missão" : "acompanhante")
+  };
+}
+
+function renderHuntEncounterDetails(mission, encounter, onAdjustProgress = null) {
+  const wrapper = createElement("section", "mission-creature-details");
+  const target = encounter.items.find(entry => entry.isTarget);
+  const companions = encounter.items.filter(entry => !entry.isTarget);
+
+  wrapper.append(
+    createElement("h3", null, "Alvo marcado"),
+    createCreatureDetail(createHuntEncounterItem(target), [mission], onAdjustProgress)
+  );
+  if (companions.length) wrapper.appendChild(createElement("h3", null, "Acompanhantes"));
+  companions.forEach((entry) => {
+    wrapper.appendChild(createCreatureDetail(createHuntEncounterItem(entry), [], onAdjustProgress));
+  });
+
+  return wrapper;
+}
+
+function renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress = null, profile = null) {
+  const huntEncounter = createArchipelagoHuntEncounter(mission, profile);
+  if (huntEncounter) return renderHuntEncounterDetails(mission, huntEncounter, onAdjustProgress);
+
   const item = createMissionCreatureItem(mission, tacticalMap);
   if (!item) return null;
 
@@ -487,7 +523,7 @@ function renderMissionRunContent(mission, onComplete, context = null, profile = 
     if (tacticalMap.riskDetails?.length) {
       container.appendChild(renderMissionRiskDetails(tacticalMap));
     }
-    const creatureDetails = renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress);
+    const creatureDetails = renderMissionCreatureDetails(mission, tacticalMap, onAdjustProgress, profile);
     if (creatureDetails) container.appendChild(creatureDetails);
     container.appendChild(tacticalPanel);
   }
