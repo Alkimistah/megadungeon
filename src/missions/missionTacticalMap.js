@@ -2,6 +2,7 @@ import { createRng, randomInt } from "../random.js";
 import { trapCatalog } from "../traps.js";
 import { getIslandThemeTerrain } from "../archipelagoPilot.js";
 import { getArchipelagoMissionTheme } from "./archipelagoMissionThemes.js";
+import { getMissionDestinationLabel } from "./missionDestinationLabel.js";
 import { createArchipelagoHuntEncounter } from "./archipelagoMissionEncounter.js";
 
 const DEFAULT_WIDTH = 16;
@@ -368,7 +369,9 @@ export function createMissionTacticalMap(mission, { profile = null } = {}) {
       ]
     }
     : {
-      name: mission.destination?.label || "Área da missão",
+      name: (mission.destination?.kind === "island"
+        ? getMissionDestinationLabel(mission, { unknownPaths: true })
+        : mission.destination?.label) || "Área da missão",
       effect,
       features: missionFeatures
     };

@@ -205,6 +205,18 @@ const SECTOR_ISLANDS = {
   }
 };
 
+// Ids das criaturas que o próprio lugar usa (guardiões e composições de setor).
+export function getIslandOwnCreatureIds(themeId) {
+  const config = SECTOR_ISLANDS[themeId];
+  if (!config) return [];
+  // Guardiões legados (só para saves antigos) ficam de fora.
+  const guardians = config.guardians || [];
+  const sectors = Object.values(config.sectorCompositions || {}).flat();
+  const ids = [...guardians, ...sectors].flatMap(entry =>
+    (Array.isArray(entry) ? entry : entry.creatures || []).map(creature => creature.id));
+  return [...new Set(ids.filter(Boolean))];
+}
+
 export function getIslandThemeTerrain(themeId) {
   const config = SECTOR_ISLANDS[themeId];
   if (!config) return null;

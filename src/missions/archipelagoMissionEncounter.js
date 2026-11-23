@@ -70,7 +70,8 @@ export function createArchipelagoHuntEncounter(mission, profile) {
   // não ser recalculada a cada renderização do diálogo e do mapa.
   const objective = mission.objective;
   const key = [mission.id, mission.themeId, mission.destination.floor, objective.targetId,
-    objective.targetName, objective.challenge, objective.outOfPlace].join("|");
+    objective.targetName, objective.challenge, objective.outOfPlace,
+    (profile?.disabledCreatureBooks || []).join(",")].join("|");
   const holder = profile && typeof profile === "object" ? profile : ENCOUNTER_CACHE_NO_PROFILE;
   let perProfile = encounterCache.get(holder);
   if (!perProfile) encounterCache.set(holder, perProfile = new Map());

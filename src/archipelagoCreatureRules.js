@@ -1,5 +1,7 @@
 import { creatureCatalog } from "./creatureCatalog/index.js";
 import { dinosaurExploration } from "./archipelagoFinalBoss.js";
+// Ciclo de módulos inofensivo: ambos só usam o outro dentro de funções.
+import { getIslandOwnCreatureIds } from "./archipelagoPilot.js";
 
 const coastAnimals = ["canceronte", "enxame-de-aguas-vivas", "peixe-recife", "selako", "selako-tigre", "pliorex"];
 const coastalHumanoids = ["elfo-do-mar-pescador", "elfo-do-mar-chefe", "irukanjin", "homem-piranha",
@@ -51,7 +53,7 @@ export function getIslandCreatureIds(themeId) {
 }
 
 export function getOutOfPlaceCreatureIds(themeId) {
-  const own = new Set(islandCreatures[themeId] || []);
+  const own = new Set([...(islandCreatures[themeId] || []), ...getIslandOwnCreatureIds(themeId)]);
   const dinosaurIds = Object.values(dinosaurExploration.sectorCompositions)
     .flat(2)
     .map(entry => entry.id);

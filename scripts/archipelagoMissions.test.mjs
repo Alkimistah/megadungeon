@@ -3,7 +3,7 @@ import test from "node:test";
 import { archipelago21to30Profile } from "../src/floorProfiles/archipelago21to30.js";
 import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionThemes.js";
 import { MISSION_CATEGORIES } from "../src/missions/missionTables.js";
-import { getCreatureById, isAutomaticCreature } from "../src/creatureCatalog/index.js";
+import { creatureCatalog, getCreatureById, isAutomaticCreature } from "../src/creatureCatalog/index.js";
 import { TACTICAL_LEGEND_ORDER } from "../src/tacticalMapRenderer.js";
 import { createRng } from "../src/random.js";
 import { createArchipelagoState } from "../src/archipelagoState.js";
@@ -12,7 +12,7 @@ import { materializeMissionsForCurrentContent } from "../src/missions/missionPro
 import { getCreatureOriginIds, getIslandCreatureIds, getOutOfPlaceCreatureIds } from "../src/archipelagoCreatureRules.js";
 import { createArchipelagoHuntEncounter } from "../src/missions/archipelagoMissionEncounter.js";
 import { calculateCombatND } from "../src/challenge.js";
-import { getIslandThemeTerrain } from "../src/archipelagoPilot.js";
+import { getIslandOwnCreatureIds, getIslandThemeTerrain } from "../src/archipelagoPilot.js";
 import { createMissionTacticalMap } from "../src/missions/missionTacticalMap.js";
 import { getMissionDestinationLabel } from "../src/missions/missionDestinationLabel.js";
 
@@ -430,7 +430,7 @@ test("mapa da missão de ilha usa terreno e marcadores do tema", () => {
   }
 });
 
-const GENERIC_MAP_FIXTURE = {"cells":["floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","obstacle","floor","objective","floor","floor","floor","floor","floor","floor","floor","difficult","floor","floor","floor","floor","floor","floor","objective","floor","floor","floor","difficult","floor","floor","floor","foliage","floor","floor","floor","floor","floor","floor","floor","floor","trap","floor","trap","floor","floor","floor","floor","floor","floor","floor","foliage","floor","floor","floor","floor","floor","floor","objective","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","obstacle","floor","floor","floor","floor","floor","difficult","floor","floor","floor","floor","difficult","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","foliage","floor","floor","floor","floor","floor","floor","trap","floor","floor","floor","floor","trap","floor","floor","floor","floor","floor","floor","party","party","floor","foliage","floor","floor","foliage","floor","floor","floor","floor","floor","floor","floor","floor","floor","party","party","floor","floor","floor","difficult","floor","obstacle","obstacle","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor"],"climate":[],"enemyCount":0,"height":12,"missionDc":28,"objectiveCount":3,"resolutionCheck":{"skill":"Sobrevivência","action":"coletar a amostra sem contaminar a prova","dc":28},"riskDetails":[{"area":"alcance curto","challengeLabel":"6","checks":["Detectar: Investigação CD 30","Desarmar: Ladinagem CD 30","Resistência: Vontade CD 25 (evita)"],"effect":"Criaturas em alcance curto ficam confusas permanentemente.","kind":"Armadilha","name":"Símbolo da Insanidade"},{"area":"todas as criaturas num quadrado de 6m de lado","challengeLabel":"6","checks":["Detectar: Investigação CD 25","Desarmar: Ladinagem CD 25","Resistência: Reflexos CD 30 (reduz à metade)"],"effect":"Causa 15d6 pontos de dano de impacto em todas as criaturas num quadrado de 6m de lado.","kind":"Armadilha","name":"Desabamento do Teto"},{"area":"alcance curto","challengeLabel":"5","checks":["Detectar: Investigação CD 30","Desarmar: Ladinagem CD 30","Resistência: Fortitude CD 25 (evita)"],"effect":"Criaturas em alcance curto ficam atordoadas por 1d6 rodadas.","kind":"Armadilha","name":"Símbolo do Atordoamento"},{"area":"esfera de 3m","challengeLabel":"5","checks":["Detectar: Investigação CD 25","Desarmar: Ladinagem CD 25","Resistência: Reflexos CD 25 (evita)"],"effect":"Causa 12d6 pontos de dano de impacto em todas as criaturas em uma esfera de 3m.","kind":"Armadilha","name":"Mina Terrestre"}],"terrain":{"name":"Ilha 4","effect":"Objetivo: cristais. Teste central: Sobrevivência CD 28 (coletar a amostra sem contaminar a prova).","features":[{"name":"Coleta","effect":"Colete cristais."},{"name":"Riscos","effect":"Símbolo da Insanidade; Desabamento do Teto; Símbolo do Atordoamento; Mina Terrestre"},{"name":"Objetivo","effect":"Amostra"}]},"template":"collection","trapCount":4,"width":16};
+const GENERIC_MAP_FIXTURE = {"cells":["floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","obstacle","floor","objective","floor","floor","floor","floor","floor","floor","floor","difficult","floor","floor","floor","floor","floor","floor","objective","floor","floor","floor","difficult","floor","floor","floor","foliage","floor","floor","floor","floor","floor","floor","floor","floor","trap","floor","trap","floor","floor","floor","floor","floor","floor","floor","foliage","floor","floor","floor","floor","floor","floor","objective","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","obstacle","floor","floor","floor","floor","floor","difficult","floor","floor","floor","floor","difficult","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","foliage","floor","floor","floor","floor","floor","floor","trap","floor","floor","floor","floor","trap","floor","floor","floor","floor","floor","floor","party","party","floor","foliage","floor","floor","foliage","floor","floor","floor","floor","floor","floor","floor","floor","floor","party","party","floor","floor","floor","difficult","floor","obstacle","obstacle","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor"],"climate":[],"enemyCount":0,"height":12,"missionDc":28,"objectiveCount":3,"resolutionCheck":{"skill":"Sobrevivência","action":"coletar a amostra sem contaminar a prova","dc":28},"riskDetails":[{"area":"alcance curto","challengeLabel":"6","checks":["Detectar: Investigação CD 30","Desarmar: Ladinagem CD 30","Resistência: Vontade CD 25 (evita)"],"effect":"Criaturas em alcance curto ficam confusas permanentemente.","kind":"Armadilha","name":"Símbolo da Insanidade"},{"area":"todas as criaturas num quadrado de 6m de lado","challengeLabel":"6","checks":["Detectar: Investigação CD 25","Desarmar: Ladinagem CD 25","Resistência: Reflexos CD 30 (reduz à metade)"],"effect":"Causa 15d6 pontos de dano de impacto em todas as criaturas num quadrado de 6m de lado.","kind":"Armadilha","name":"Desabamento do Teto"},{"area":"alcance curto","challengeLabel":"5","checks":["Detectar: Investigação CD 30","Desarmar: Ladinagem CD 30","Resistência: Fortitude CD 25 (evita)"],"effect":"Criaturas em alcance curto ficam atordoadas por 1d6 rodadas.","kind":"Armadilha","name":"Símbolo do Atordoamento"},{"area":"esfera de 3m","challengeLabel":"5","checks":["Detectar: Investigação CD 25","Desarmar: Ladinagem CD 25","Resistência: Reflexos CD 25 (evita)"],"effect":"Causa 12d6 pontos de dano de impacto em todas as criaturas em uma esfera de 3m.","kind":"Armadilha","name":"Mina Terrestre"}],"terrain":{"name":"Ilha 24","effect":"Objetivo: cristais. Teste central: Sobrevivência CD 28 (coletar a amostra sem contaminar a prova).","features":[{"name":"Coleta","effect":"Colete cristais."},{"name":"Riscos","effect":"Símbolo da Insanidade; Desabamento do Teto; Símbolo do Atordoamento; Mina Terrestre"},{"name":"Objetivo","effect":"Amostra"}]},"template":"collection","trapCount":4,"width":16};
 
 test("missão sem targetId usa o mapa genérico de antes", () => {
   const mission = {
@@ -483,4 +483,38 @@ test("andares da floresta não mudam", () => {
   const m = { destination: { kind: "floor", floor: 3, label: "Andar 3" } };
   assert.equal(getMissionDestinationLabel(m, { unknownPaths: true }), "Andar 3");
   assert.equal(getMissionDestinationLabel({}, { unknownPaths: true }), "");
+});
+
+test("fora do lugar nunca inclui guardiões e composições do próprio tema", () => {
+  for (const id of archipelago21to30Profile.archipelago.enabledThemeIds) {
+    const own = getIslandOwnCreatureIds(id);
+    const out = new Set(getOutOfPlaceCreatureIds(id));
+    for (const creatureId of own) assert.ok(!out.has(creatureId), `${id}: ${creatureId}`);
+  }
+  assert.ok(getIslandOwnCreatureIds("tropical").includes("defensor-rochoso"));
+  assert.ok(!getOutOfPlaceCreatureIds("tropical").includes("defensor-rochoso"));
+});
+
+test("mapa genérico de ilha usa o nome neutro, sem vazar o nome da ilha", () => {
+  const mission = {
+    id: "legacy-island-1", category: "collection", categoryLabel: "Coleta", difficulty: "hard", reward: { challenge: 6 },
+    destination: { kind: "island", label: "Ilha 21 - Atol Circular" },
+    objective: { kind: "collect", quantity: 3, progressMode: "aggregate", targetName: "cristais", condition: "Colete" },
+    proofType: "Amostra"
+  };
+  assert.equal(createMissionTacticalMap(mission, { profile }).terrain.name, "Ilha 21");
+  const forest = { ...mission, destination: { kind: "forest", label: "Floresta Sombria" } };
+  assert.equal(createMissionTacticalMap(forest, { profile }).terrain.name, "Floresta Sombria");
+});
+
+test("memo do encontro respeita livros desativados no mesmo perfil", () => {
+  const mutable = { ...profile, disabledCreatureBooks: [] };
+  const books = [...new Set(creatureCatalog.flatMap(c => (c.sources ?? [c.source]).map(x => x?.book)).filter(Boolean))];
+  const mission = sampleHunts(300).find(m => createArchipelagoHuntEncounter(m, mutable).items.length > 1);
+  assert.ok(mission);
+  mutable.disabledCreatureBooks = books;
+  const off = createArchipelagoHuntEncounter(mission, mutable);
+  assert.equal(off.items.length, 1, "livros desativados não geram acompanhantes");
+  mutable.disabledCreatureBooks = [];
+  assert.ok(createArchipelagoHuntEncounter(mission, mutable).items.length > 1);
 });
