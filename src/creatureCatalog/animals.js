@@ -2682,6 +2682,44 @@ export const reiTirano = {
     "skillsText": null
 };
 
+const reiTiranoArquipelago = {
+    ...reiTirano,
+    id: "rei-tirano-nd-11",
+    name: "Rei Tirano",
+    variantOf: reiTirano.id,
+    challengeRating: 11,
+    role: "solo",
+    description: "Adaptação de campanha do Rei-Tirano para o confronto final do Arquipélago.",
+    stats: {
+        ...reiTirano.stats,
+        initiative: 10,
+        perception: 10,
+        defense: 40,
+        fortitude: 24,
+        reflex: 18,
+        will: 11,
+        hitPoints: 550
+    },
+    actions: [
+        { name: "Corpo a Corpo", text: "Mordida +34 (4d10+24, x3) e cauda +31 (4d6+20)." }
+    ],
+    abilities: [
+        { name: "Agarrar Aprimorado", timing: "livre", text: "Mordida (teste +36)." },
+        {
+            name: "Cauda Avassaladora",
+            timing: "livre",
+            text: "Ao acertar com a cauda, pode arremessar o alvo 1d6 × 1,5m na direção que escolher (Fort CD 32 evita). O alvo fica caído e sofre 1d6 de impacto por 1,5m percorrido se atingir um obstáculo."
+        },
+        {
+            name: "Engolir",
+            timing: "padrão",
+            text: "Pode engolir uma criatura que esteja agarrando com a mordida. No início de cada turno do Rei Tirano, ela sofre 3d10+12 de impacto e 2d10+8 de ácido. Ela pode escapar causando 45 pontos de dano pelo lado de dentro (Defesa 20, RD 0)."
+        },
+        reiTirano.abilities[3]
+    ],
+    treasure: "Dentes do Rei Tirano (CD 26 para extrair, valem T$ 1.000 para fabricar armas superiores)."
+};
+
 export const tuntram = {
     "id": "tuntram",
     "name": "Tuntram",
@@ -3847,6 +3885,6 @@ export const animalCreatures = [
     rinoceronteLanoso, tigre, trobo, tumarkhan,
     ursoDasCavernas, ursoPanda, ursoPardo, armentoDeBurafontes,
     bandoDeDeinonicos, burafonte, deinonico, enxameDeGaliGali,
-    galiGali, grandeBattham, raagoran, reiTirano,
+    galiGali, grandeBattham, raagoran, reiTirano, reiTiranoArquipelago,
     tuntram
 ];

@@ -1,10 +1,17 @@
+import { createArchipelagoFinalBoss, dinosaurExploration } from "./archipelagoFinalBoss.js";
+import { stormExploration } from "./archipelagoStorm.js";
+import { floatingExploration } from "./archipelagoFloating.js";
+import { pirateFortExploration } from "./archipelagoPirateFort.js";
+import { seaCavesExploration } from "./archipelagoSeaCaves.js";
+import { volcanicExploration } from "./archipelagoVolcanic.js";
 import { atollExploration } from "./archipelagoAtoll.js";
 import { coralCoastExploration } from "./archipelagoCoralCoast.js";
 import { getEligibleGuardianPenalties, getGuardianPenalty } from "./archipelagoGuardianPenalties.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getIslandCreatureRules } from "./archipelagoCreatureRules.js";
 import { calculateCombatND } from "./challenge.js";
-import { pick } from "./random.js";
+import { createRng, pick } from "./random.js";
+import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
 import { resolveNodeEncounter } from "./encounterResolver.js";
 import { archipelagoEcologyContexts } from "./floorProfiles/archipelago21to30.js";
 
@@ -32,11 +39,22 @@ export function createIslandPilot(floor, themeId, dc, rng) {
   const composition = config.guardians[guardianComposition];
   const guardian = getCreatureById(composition.creatures[0].id);
   const penalties = getEligibleGuardianPenalties(guardian);
+  const sectorPenalties = config.sectors.map(sector => {
+    if (sector.defaultGuardianBuff) return undefined;
+    const [penalty] = penalties.splice(Math.floor(rng() * penalties.length), 1);
+    return penalty.id;
+  });
+  const defenses = guardian.stats.defensesText?.toLowerCase() ?? "";
+  const buffs = !config.fixedGuardianBuffs && config.guardianBuffs?.filter(buff =>
+    !sectorPenalties.includes(buff.incompatiblePenalty ?? null) && (!buff.eligible || buff.eligible(defenses))
+  );
   return {
     pilot: config.pilot,
     objectives: variants.map((variant, index) => {
-      const [penalty] = penalties.splice(Math.floor(rng() * penalties.length), 1);
-      return createIslandSector(island, index, variant, dc, penalty.id);
+      const buff = buffs && config.sectors[index].defaultGuardianBuff
+        ? buffs.splice(Math.floor(rng() * buffs.length), 1)[0]
+        : undefined;
+      return createIslandSector(island, index, variant, dc, sectorPenalties[index], buff?.id);
     }),
     guardianComposition: composition.id ?? guardianComposition
   };
@@ -165,6 +183,12 @@ const MANGROVE_TERRAIN = { name: "Pântano", effect: "Canais rasos e lama entre 
 
 const SECTOR_ISLANDS = {
   atoll: atollExploration,
+  volcanic: volcanicExploration,
+  "sea-caves": seaCavesExploration,
+  "pirate-held": pirateFortExploration,
+  floating: floatingExploration,
+  storm: stormExploration,
+  dinosaurs: dinosaurExploration,
   "coral-coast": coralCoastExploration,
   mangrove: { pilot: "mangrove-sectors", sectors: MANGROVE_SECTORS, guardians: GUARDIAN_COMPOSITIONS },
   tropical: {
@@ -199,16 +223,19 @@ function getSectorTasks(config, index) {
   return config.extraTasks ? [...tasks, sharedTask, config.extraTasks[index]] : [...tasks, sharedTask];
 }
 
-export function createIslandSector({ floor, themeId }, index, variant, dc, penaltyId) {
+export function createIslandSector({ floor, themeId }, index, variant, dc, penaltyId, guardianBuffId) {
   const config = SECTOR_ISLANDS[themeId];
-  const { direction, name, effect } = config.sectors[index];
+  const { direction, name, effect, defaultGuardianBuff } = config.sectors[index];
+  const buffId = config.fixedGuardianBuffs ? defaultGuardianBuff : guardianBuffId ?? defaultGuardianBuff;
+  const guardianBuff = defaultGuardianBuff && config.guardianBuffs.find(buff => buff.id === buffId);
   const [title, type, description, preferredType] = getSectorTasks(config, index)[variant];
-  const challenge = type === "combate" ? 6 : ["exploração", "ritual"].includes(type) ? 3 : 2;
+  const challenge = type === "combate" ? config.combatChallenge ?? 6 : ["exploração", "ritual"].includes(type) ? 3 : 2;
   const testDc = challenge === 2 && type !== "recuperação" ? dc + 2 : dc;
   return {
     id: `${floor}-${index + 1}`, direction, name, variant, title, type,
-    effect: penaltyId ? getGuardianPenalty(penaltyId, index).label : effect,
-    ...(penaltyId ? { penaltyId } : {}),
+    ...(guardianBuff
+      ? { guardianBuffId: guardianBuff.id, guardianBuff: guardianBuff.label, effect: `Remove o bônus do guardião (${guardianBuff.label})` }
+      : { effect: penaltyId ? getGuardianPenalty(penaltyId, index).label : effect, ...(penaltyId ? { penaltyId } : {}) }),
     challenge,
     ...(preferredType ? { preferredType } : {}),
     description: type === "combate" ? description : `${description} Em caso de falha num teste, repita a etapa. CD ${testDc}.`
@@ -221,15 +248,47 @@ export function reopenIslandSector(island, rng, dc) {
   const previous = pick(rng, resolved);
   const index = island.objectives.indexOf(previous);
   const variant = pickIslandVariant(getSectorTasks(SECTOR_ISLANDS[island.themeId], index), rng, previous.variant);
-  const lostSuccess = island.outcomes[previous.id] === "success";
-  island.objectives[index] = createIslandSector(island, index, variant, dc, previous.penaltyId);
+  const lostSuccess = previous.type !== "tesouro" && island.outcomes[previous.id] === "success";
+  island.objectives[index] = createIslandSector(island, index, variant, dc, previous.penaltyId, previous.guardianBuffId);
   delete island.outcomes[previous.id];
   delete island.scenes?.[previous.id];
   return { id: previous.id, name: previous.name, lostSuccess };
 }
 
 export function createIslandSectorCombat(island, objective, profile, mapSeed) {
-  return createIslandPilotScene({ ...island, objectives: [objective] }, profile, mapSeed);
+  const compositions = SECTOR_ISLANDS[island.themeId]?.sectorCompositions?.[objective.direction];
+  if (!compositions) return createIslandPilotScene({ ...island, objectives: [objective] }, profile, mapSeed);
+
+  const visit = island.visits ?? 1;
+  const index = island.objectives.indexOf(objective);
+  const offset = island.objectives[0].variant;
+  const creatures = compositions[(index + offset + visit - 1) % compositions.length];
+  return createIslandPilotScene(
+    { ...island, objectives: [objective] }, profile, `${mapSeed}:visita-${visit}`, { creatures }
+  );
+}
+
+export function canRerollDinosaurSector(scene) {
+  return Boolean(scene?.fixedComposition?.creatures?.length && scene.resolvedEncounter?.items.length &&
+    !hasEncounterAdjustments(scene.resolvedEncounter));
+}
+
+export function rerollDinosaurSector(island, objective, scene, profile) {
+  if (!canRerollDinosaurSector(scene)) return false;
+
+  const current = scene.fixedComposition.creatures;
+  const alternatives = dinosaurExploration.sectorCompositions[objective.direction].filter(creatures =>
+    creatures.length !== current.length || creatures.some(({ id, quantity }) =>
+      !current.some(item => item.id === id && item.quantity === quantity)
+    )
+  );
+  const rng = createRng(`${scene.resolvedEncounter.seed}:rerrolagem`);
+  const creatures = pick(rng, alternatives);
+  const updated = createIslandPilotScene(
+    { ...island, objectives: [objective] }, profile, `dinossauros:rerrolagem:${rng()}`, { creatures }
+  );
+  Object.assign(scene, updated);
+  return true;
 }
 
 export function createIslandGuardian(island, selection, profile, mapSeed) {
@@ -237,24 +296,39 @@ export function createIslandGuardian(island, selection, profile, mapSeed) {
   const composition = typeof selection === "string"
     ? config.guardians.find(guardian => guardian.id === selection)
     : config.legacyGuardians?.[selection] ?? config.guardians[selection];
-  const scene = createIslandPilotScene({
-    ...island,
-    objectives: [{ id: `${island.floor}-centro`, type: "combate", challenge: island.baseChallenge }]
-  }, profile, mapSeed, composition);
-  scene.briefing = composition.briefing;
+  const buffs = island.objectives.flatMap((objective, index) => {
+    if (!objective.guardianBuff || (objective.type !== "tesouro" && island.outcomes?.[objective.id] === "success")) return [];
+    const buffId = objective.guardianBuffId ?? config.sectors[index].defaultGuardianBuff;
+    return [config.guardianBuffs.find(buff => buff.id === buffId)];
+  });
+  const scene = island.themeId === "dinosaurs"
+    ? createArchipelagoFinalBoss(island, profile, mapSeed, buffs.flatMap(buff => buff.companions ?? []))
+    : createIslandPilotScene({
+      ...island,
+      objectives: [{ id: `${island.floor}-centro`, type: "combate", challenge: island.baseChallenge }]
+    }, profile, mapSeed, composition);
+  if (composition.briefing) scene.briefing = composition.briefing;
   const leader = scene.resolvedEncounter.items[0];
   const creature = leader.creatureData ?? getCreatureById(leader.creatureId);
   const stats = { ...creature.stats };
+  let actions = creature.actions;
+  let abilities = creature.abilities;
   const notes = [];
   island.objectives.forEach((objective, index) => {
-    if (island.outcomes[objective.id] !== "success") return;
+    if (objective.type === "tesouro" || objective.guardianBuff || island.outcomes?.[objective.id] !== "success") return;
     const penalty = getGuardianPenalty(objective.penaltyId, index);
     if (penalty.apply) penalty.apply(stats);
     else notes.push(penalty.label);
   });
+  for (const buff of buffs) {
+    if (buff.apply) buff.apply(stats, creature.stats);
+    else if (buff.applyToActions) actions = buff.applyToActions(actions);
+    else if (buff.ability) abilities = [...(abilities ?? []), buff.ability];
+    else if (!buff.companions) notes.push(buff.label);
+  }
   if (notes.length) stats.defensesText = [stats.defensesText, ...notes].filter(Boolean).join("; ");
   const name = composition.name ?? creature.name;
   if (composition.name) leader.name = name;
-  leader.creatureData = { ...creature, name, stats };
+  leader.creatureData = { ...creature, name, stats, actions, abilities };
   return scene;
 }

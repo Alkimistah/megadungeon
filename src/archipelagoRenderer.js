@@ -1,3 +1,4 @@
+import { canRerollDinosaurSector } from "./archipelagoPilot.js";
 import { withIslandTacticalLayout } from "./archipelagoTacticalMap.js";
 import { canRerollNodeCreatures } from "./encounterResolver.js";
 import { canRerollBoatAmbush } from "./archipelagoBoatAmbush.js";
@@ -7,9 +8,33 @@ import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { createRng, randomInt } from "./random.js";
 import { createRangeEndActions } from "./rangeEndActions.js";
 import { openTacticalMapFullscreen } from "./tacticalMapRenderer.js";
+import { formatComponents, formatItemLine } from "./treasure/treasureFormat.js";
+import { summarizeGains } from "./treasure/treasureSummary.js";
 
 const UNEXPLORED_ISLAND_ICON = "/assets/icons/islands/ilha-nao-explorada.webp";
 const SECTOR_COLORS = ["#a7bb91", "#d2af82", "#8fb4cc", "#c5a0bd", "#a5a1cf", "#c6bf83", "#d79f92", "#86b7aa"];
+
+function renderSectorTreasure({ challenge, gains }) {
+  const section = document.createElement("section");
+  section.className = "archipelago-encounter-briefing";
+  const heading = document.createElement("h3");
+  heading.textContent = `Tesouro recuperado · ND ${challenge}`;
+  const list = document.createElement("ul");
+  const { coins, wealth, items } = summarizeGains(gains);
+  const lines = [
+    ...Object.entries(coins).filter(([, amount]) => amount > 0)
+      .map(([currency, amount]) => `${amount.toLocaleString("pt-BR")} ${currency}`),
+    ...wealth.map(({ value, examples }) => `T$ ${value.toLocaleString("pt-BR")} em riquezas (${examples})`),
+    ...items.map(item => [formatItemLine(item), ...formatComponents(item.components)].join(" · "))
+  ];
+  for (const line of lines) {
+    const entry = document.createElement("li");
+    entry.textContent = line;
+    list.appendChild(entry);
+  }
+  section.append(heading, list);
+  return section;
+}
 
 function byFloor(islands) {
   return new Map(islands.map((island) => [island.floor, island]));
@@ -230,7 +255,7 @@ export function createArchipelagoRenderer({
       center.appendChild(createIslandMapButton(scene, themeId, objective));
       footer.appendChild(center);
     }
-    if (actions.childElementCount) detail.appendChild(actions);
+    if (actions.childElementCount && !detail.contains(actions)) detail.appendChild(actions);
     detail.className = "archipelago-encounter-body";
     detail.classList.toggle("is-text-encounter", !scene?.resolvedEncounter);
     panel.append(header, detail, footer);
@@ -317,6 +342,14 @@ export function createArchipelagoRenderer({
       list.appendChild(missionActions);
     }
 
+    if (island.floor === 30 && !island.available) {
+      const locked = document.createElement("p");
+      locked.className = "archipelago-objective";
+      locked.textContent = `Reúna os nove fragmentos para abrir a rota final (${snapshot.fragments}/9).`;
+      list.appendChild(locked);
+      return list;
+    }
+
     if (!isIslandRevealed(island, getUnknownPaths())) {
       const hidden = document.createElement("div");
       hidden.className = "archipelago-objective";
@@ -328,6 +361,24 @@ export function createArchipelagoRenderer({
         <p>Os objetivos e o tema da ilha aparecem após iniciar a exploração.</p>
       `;
       list.appendChild(hidden);
+      return list;
+    }
+
+    if (island.floor === 30 && island.objectives[0]?.type === "boss") {
+      const { preview, scene } = island.guardian;
+      if (preview || scene) {
+        list.appendChild(createButton({
+          className: "archipelago-small-action",
+          label: scene ? "Retomar confronto com o Rei Tirano" : "Ver confronto com o Rei Tirano",
+          onClick: () => { selectedSector = "center"; render(); }
+        }));
+        if (selectedSector === "center") {
+          const detail = document.createElement("div");
+          const actions = createEncounterActions();
+          renderGuardian(detail, actions, island);
+          showSectorDialog(`${island.arenaName} · Rei Tirano ND ${island.baseChallenge}`, detail, actions, scene ?? preview, { themeId: island.themeId });
+        }
+      }
       return list;
     }
 
@@ -378,24 +429,36 @@ export function createArchipelagoRenderer({
   function renderSectors(island, snapshot) {
     const active = snapshot.activeExploration?.floor === island.floor;
     const guardian = island.guardian;
+    const canLandAtCenter = island.floor === 30 && !active && guardian.ready &&
+      !snapshot.daySpent && !snapshot.boatAmbush && !island.completed && !island.defeated;
     const section = document.createElement("section");
+    if (island.floor === 30 && !island.completed && !island.defeated) {
+      const hint = document.createElement("p");
+      hint.className = "archipelago-objective";
+      hint.textContent = `Você pode desembarcar direto no ${island.arenaName} ou vencer os setores opcionais para remover as proteções do Rei Tirano nesta visita.`;
+      section.appendChild(hint);
+    }
     const reopened = active ? snapshot.activeExploration.reopenedSector : null;
-    const reopenedPending = reopened && island.objectives.some(item => item.id === reopened.id && !item.resolved);
-    if (reopenedPending) {
+    const reopenedObjective = reopened && island.objectives.find(item => item.id === reopened.id && !item.resolved);
+    if (reopenedObjective) {
       const notice = document.createElement("div");
       notice.className = "archipelago-reopened-notice";
       notice.setAttribute("role", "status");
       const title = document.createElement("strong");
       title.textContent = `Setor ${reopened.name} reaberto`;
       const message = document.createElement("p");
-      message.textContent = reopened.lostSuccess
-        ? "O setor recebeu um novo objetivo. A penalidade que ele aplicava ao guardião foi removida. Resolva o setor para reabrir o Centro."
-        : "O setor recebeu um novo objetivo. Resolva-o para reabrir o Centro.";
+      message.textContent = reopened.lostSuccess && reopenedObjective.guardianBuff
+        ? "O setor recebeu um novo objetivo e o bônus do guardião voltou. Resolva o setor para liberar novamente a arena."
+        : reopened.lostSuccess
+        ? "O setor recebeu um novo objetivo. A penalidade que ele aplicava ao guardião foi removida. Resolva o setor para liberar novamente a arena."
+        : "O setor recebeu um novo objetivo. Resolva-o para liberar novamente a arena.";
       notice.append(title, message);
       section.appendChild(notice);
     }
     const map = document.createElement("div");
     map.className = "archipelago-sector-map";
+    if (island.objectives.length === 6) map.classList.add("has-six-sectors");
+    if (island.objectives.length === 8) map.classList.add("has-eight-sectors");
     map.setAttribute("aria-label", "Setores da ilha");
     if (island.icon) {
       const art = document.createElement("img");
@@ -405,17 +468,22 @@ export function createArchipelagoRenderer({
       map.appendChild(art);
     }
 
-    function addSectorButton(direction, id, label, disabled, color, outcome) {
+    function addSectorButton(direction, id, label, disabled, color, outcome, status) {
       const button = createButton({
         className: "archipelago-small-action",
         disabled, label,
         onClick: () => {
           selectedSector = id;
+          if (id === "center" && canLandAtCenter) {
+            exploreSelectedIsland(island);
+            return;
+          }
           if (active && id !== "center") onOpenSector(island.floor, id);
           render();
         }
       });
       button.dataset.direction = direction;
+      if (id === "center" && canLandAtCenter) button.setAttribute("aria-label", `Desembarcar no ${island.arenaName} (8h)`);
       button.style.setProperty("--sector-color", color);
       const caption = document.createElement("span");
       caption.className = "archipelago-sector-caption";
@@ -428,6 +496,11 @@ export function createArchipelagoRenderer({
         mark.textContent = outcome === "success" ? "✓" : "×";
         caption.prepend(mark);
       }
+      if (status) {
+        const statusText = document.createElement("span");
+        statusText.textContent = status;
+        caption.appendChild(statusText);
+      }
       button.replaceChildren(caption);
       button.setAttribute("aria-pressed", String(selectedSector === id));
       button.setAttribute("aria-haspopup", "dialog");
@@ -437,21 +510,24 @@ export function createArchipelagoRenderer({
     const rng = createRng(`${getMapSeed()}:${island.floor}:${island.themeId}:cores-dos-setores`);
     const colors = [...SECTOR_COLORS];
     for (const objective of island.objectives) {
-      const isReopened = reopenedPending && objective.id === reopened.id;
+      const isReopened = reopenedObjective?.id === objective.id;
       const status = objective.outcome === "success" ? " · Sucesso" : objective.outcome === "failure" ? " · Falha" : isReopened ? " · Reaberto" : "";
       const [color] = colors.splice(randomInt(rng, 0, colors.length - 1), 1);
       addSectorButton(objective.direction, objective.id, objective.name + status, Boolean(guardian.scene), color, objective.outcome);
       if (isReopened) map.lastElementChild.classList.add("is-reopened");
     }
     const centerOutcome = island.completed ? "success" : island.defeated ? "failure" : null;
-    const centerLabel = island.completed ? "Centro · Sucesso" : island.defeated ? "Centro · Falha" : guardian.ready ? "Centro" : "Centro · Bloqueado";
-    addSectorButton("center", "center", centerLabel, !active || !guardian.ready, "#782a32", centerOutcome);
+    const centerStatus = island.completed ? "Sucesso" : island.defeated ? "Falha"
+      : canLandAtCenter ? "8h" : guardian.ready ? "" : "Bloqueado";
+    addSectorButton("center", "center", island.arenaName, !(canLandAtCenter || active && guardian.ready),
+      "#782a32", centerOutcome, centerStatus);
     section.appendChild(map);
     const detail = document.createElement("div");
     const actions = createEncounterActions();
     if (selectedSector === "center" && active && guardian.ready) {
       renderGuardian(detail, actions, island);
-      showSectorDialog("Centro da ilha", detail, actions, guardian.scene ?? guardian.preview, { themeId: island.themeId });
+      const title = island.floor === 30 ? `${island.arenaName} · Rei Tirano ND ${island.baseChallenge}` : island.arenaName;
+      showSectorDialog(title, detail, actions, guardian.scene ?? guardian.preview, { themeId: island.themeId });
     } else {
       const objective = island.objectives.find(item => item.id === selectedSector);
       if (!objective) return section;
@@ -459,20 +535,36 @@ export function createArchipelagoRenderer({
       briefing.className = "archipelago-encounter-briefing";
       const description = document.createElement("p");
       description.textContent = objective.description;
+      const treasureEvent = objective.type === "tesouro";
       const kind = document.createElement("span");
       kind.textContent = objective.type === "combate"
         ? `Combate de ND ${objective.challenge}`
-        : "Teste estendido";
+        : treasureEvent ? "Evento raro" : "Teste estendido";
       const reward = document.createElement("p");
       const xp = `${(objective.challenge * 1000).toLocaleString("pt-BR")} XP`;
       const rewardSummary = objective.type === "combate"
         ? `${xp}. Tesouro indicado nas fichas das criaturas.`
         : `${xp} e tesouro padrão de ND ${objective.challenge}.`;
-      reward.textContent = `Vantagem em caso de sucesso: ${objective.effect}. ${objective.rewardEarned
-        ? "XP e tesouro deste setor já concedidos."
-        : `Recompensa: ${rewardSummary}`}`;
+      if (objective.guardianBuff && !treasureEvent) {
+        const buff = document.createElement("p");
+        buff.textContent = objective.outcome === "success"
+          ? `Bônus do guardião removido: ${objective.guardianBuff}.`
+          : `Bônus ativo do guardião: ${objective.guardianBuff}.`;
+        briefing.appendChild(buff);
+      }
+      reward.textContent = treasureEvent
+        ? `Tesouro de ND ${objective.challenge}. Efeito sobre o guardião: nenhum.`
+        : `Vantagem em caso de sucesso: ${objective.effect}. ${objective.rewardEarned
+          ? "Recompensa deste setor já concedida."
+          : `Recompensa: ${rewardSummary}`}`;
       briefing.append(kind, description, reward);
+      if (objective.guardsTreasure) {
+        const guarded = document.createElement("p");
+        guarded.textContent = `Os dinossauros guardam um tesouro de ND ${island.baseChallenge}. Vença o combate para recuperá-lo.`;
+        briefing.appendChild(guarded);
+      }
       detail.appendChild(briefing);
+      if (objective.treasureReward) detail.appendChild(renderSectorTreasure(objective.treasureReward));
       if (!active && !objective.resolved) {
         const preview = document.createElement("p");
         preview.textContent = snapshot.daySpent
@@ -487,13 +579,19 @@ export function createArchipelagoRenderer({
         const onReroll = active && !objective.resolved && !guardian.scene
           ? () => onRerollSector(island.floor, objective.id)
           : undefined;
-        detail.appendChild(createIslandEncounter(objective.scene, onEncounterAdjusted, { readOnly: objective.resolved, onReroll }));
+        const canReroll = island.floor === 30 ? canRerollDinosaurSector : canRerollNodeCreatures;
+        detail.appendChild(createIslandEncounter(objective.scene, onEncounterAdjusted, {
+          readOnly: objective.resolved, onReroll, canReroll
+        }));
       }
       if (active && !objective.resolved) {
-        for (const [outcome, label, tone] of [["failure", "Desistir do encontro", "is-danger"], ["success", "Conquistar encontro", "is-primary"]]) {
+        const resultActions = treasureEvent
+          ? [["failure", "Deixar o tesouro", "is-danger"], ["success", "Recuperar tesouro", "is-primary"]]
+          : [["failure", "Desistir do encontro", "is-danger"], ["success", "Conquistar encontro", "is-primary"]];
+        for (const [outcome, label, tone] of resultActions) {
           addResultAction(actions, label, () => {
             onResolveObjective(island.floor, objective.id, outcome);
-            closeSectorDialog();
+            if (!(treasureEvent || objective.guardsTreasure) || outcome !== "success") closeSectorDialog();
           }, tone);
         }
       }
@@ -518,13 +616,9 @@ export function createArchipelagoRenderer({
       introduction.textContent = scene.briefing;
       detail.appendChild(introduction);
     }
-    const effects = document.createElement("p");
-    const leader = scene?.resolvedEncounter.items[0]?.name;
-    effects.textContent = guardian.effects.length
-      ? `Penalidades ${leader ? `na ficha de ${leader}` : "na ficha do guardião principal"}: ${guardian.effects.join(" · ")}. Aliados mantêm seus valores.`
-      : "Guardião em força plena.";
-    effects.className = "archipelago-encounter-briefing";
-    detail.appendChild(effects);
+    if (island.floor !== 30 || guardian.effects.length || guardian.buffs.length) {
+      renderGuardianEffects(detail, island, scene);
+    }
     if (guardian.scene) {
       detail.appendChild(createIslandEncounter(guardian.scene, onEncounterAdjusted));
       for (const [label, action, tone] of [["Registrar derrota", onLoseGuardian, "is-danger"], ["Registrar vitória", onCompleteIsland, "is-primary"]]) {
@@ -532,11 +626,34 @@ export function createArchipelagoRenderer({
       }
       return;
     }
+    const finalBoss = island.floor === 30;
     const warning = document.createElement("p");
-    warning.textContent = "Depois de iniciar o combate, a expedição só pode registrar vitória ou derrota.";
+    warning.textContent = finalBoss
+      ? "Para lançar dano ou cura, inicie o confronto final. Depois de começar, a expedição só pode registrar vitória ou derrota."
+      : "Depois de iniciar o combate, a expedição só pode registrar vitória ou derrota.";
     detail.appendChild(warning);
+    const startLabel = finalBoss ? "Iniciar confronto final" : "Iniciar combate";
+    addResultAction(actions, startLabel, () => { onStartGuardian(island.floor); render(); });
+    if (finalBoss) detail.appendChild(actions);
     if (guardian.preview) detail.appendChild(createIslandEncounter(guardian.preview, undefined, { readOnly: true }));
-    addResultAction(actions, "Iniciar combate do Centro", () => { onStartGuardian(island.floor); render(); });
+  }
+
+  function renderGuardianEffects(detail, island, scene) {
+    const { guardian } = island;
+    const effects = document.createElement("p");
+    const leader = scene?.resolvedEncounter.items[0]?.name;
+    const effectLabel = island.objectives.some(item => item.guardianBuff) ? "Efeitos dos sucessos" : "Penalidades";
+    effects.textContent = guardian.effects.length
+      ? `${effectLabel} ${leader ? `na ficha de ${leader}` : "na ficha do guardião principal"}: ${guardian.effects.join(" · ")}. Aliados mantêm seus valores.`
+      : "Guardião em força plena.";
+    effects.className = "archipelago-encounter-briefing";
+    detail.appendChild(effects);
+    if (guardian.buffs.length) {
+      const buffs = document.createElement("p");
+      buffs.className = "archipelago-encounter-briefing";
+      buffs.textContent = `Bônus ativos do guardião: ${guardian.buffs.join(" · ")}.`;
+      detail.appendChild(buffs);
+    }
   }
 
   function renderDialog(snapshot) {
@@ -580,7 +697,7 @@ export function createArchipelagoRenderer({
       actions.appendChild(createButton({
         className: "archipelago-action",
         disabled: !canComplete,
-        label: island.floor === 30 ? "Concluir boss" : "Concluir ilha",
+        label: "Concluir ilha",
         onClick: (event) => {
           event.preventDefault();
           onCompleteIsland(island.floor);
@@ -614,7 +731,9 @@ export function createArchipelagoRenderer({
     footer.className = "archipelago-island-footer";
     if (island.guardian && revealed) {
       const progress = document.createElement("span");
-      progress.textContent = `${activeObjectiveCount} de ${island.objectives.length} setores resolvidos`;
+      progress.textContent = island.floor === 30 && island.objectives[0]?.type === "combate"
+        ? `${activeObjectiveCount} de ${island.objectives.length} setores opcionais resolvidos`
+        : `${activeObjectiveCount} de ${island.objectives.length} setores resolvidos`;
       footer.appendChild(progress);
     }
     if (actions.childElementCount) footer.appendChild(actions);

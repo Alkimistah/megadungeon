@@ -83,6 +83,7 @@ export const archipelago21to30Profile = {
   },
   archipelago: {
     explorationMinutes: 480,
+    sectorTreasureChance: 0.01,
     boatLabel: "Barco do grupo",
     boatIcon: "/assets/icons/archipelago-boat.svg",
     unlockRules: {
@@ -134,41 +135,40 @@ export const archipelago21to30Profile = {
     ],
     themePools: {
       initial: [
-        { id: "tropical", name: "Ilha Tropical", icon: "/assets/icons/islands/ilha-tropical.webp", narrative: "Uma faixa de areia clara contorna a ilha, mas a mata logo toma conta da costa. Entre as copas, dá para ver o topo de um templo escalonado. Da praia, uma antiga calçada de pedra desaparece sob a vegetação na direção das ruínas.", objective: "Recuperar o fragmento protegido pelo guardião do templo escalonado." },
-        { id: "mangrove", name: "Ilha Manguezal", icon: "/assets/icons/islands/ilha-manguezal.webp", narrative: "Parece mais um emaranhado de raízes saindo da água do que terra firme, com lama escura, canais tortos e silêncio pesado.", objective: "Atravessar canais rasos e raízes para alcançar um altar soterrado pela lama." },
-        { id: "atoll", name: "Atol Circular", icon: "/assets/icons/islands/atol-circular.webp", narrative: "É um anel de areia branca cercando uma lagoa azul demais, bonito de longe, mas traiçoeiro quando a maré começa a mudar.", objective: "Explorar o anel de areia e a lagoa central antes que a maré feche a rota." },
-        { id: "coral-coast", name: "Costa do Coral", icon: "/assets/icons/islands/costa-do-coral.webp", narrative: "Quase não há praia ali, só recifes coloridos, água rasa brilhando ao sol e sombras se movendo por baixo do casco.", objective: "Recuperar o fragmento em recifes vivos, trechos submersos e pouca terra firme." },
+        { id: "tropical", name: "Ilha Tropical", arenaName: "Templo Escalonado", icon: "/assets/icons/islands/ilha-tropical.webp", narrative: "Uma faixa de areia clara contorna a ilha, mas a mata logo toma conta da costa. Entre as copas, dá para ver o topo de um templo escalonado. Da praia, uma antiga calçada de pedra desaparece sob a vegetação na direção das ruínas.", objective: "Recuperar o fragmento protegido pelo guardião do templo escalonado." },
+        { id: "mangrove", name: "Ilha Manguezal", arenaName: "Altar do Covil", icon: "/assets/icons/islands/ilha-manguezal.webp", narrative: "Parece mais um emaranhado de raízes saindo da água do que terra firme, com lama escura, canais tortos e silêncio pesado.", objective: "Atravessar canais rasos e raízes para alcançar um altar soterrado pela lama." },
+        { id: "atoll", name: "Atol Circular", arenaName: "Banco da Lagoa", icon: "/assets/icons/islands/atol-circular.webp", narrative: "É um anel de areia branca cercando uma lagoa azul demais, bonito de longe, mas traiçoeiro quando a maré começa a mudar.", objective: "Explorar o anel de areia e a lagoa central antes que a maré feche a rota." },
+        { id: "coral-coast", name: "Costa do Coral", arenaName: "Arco de Coral", icon: "/assets/icons/islands/costa-do-coral.webp", narrative: "Quase não há praia ali, só recifes coloridos, água rasa brilhando ao sol e sombras se movendo por baixo do casco.", objective: "Recuperar o fragmento em recifes vivos, trechos submersos e pouca terra firme." },
         { id: "shipwrecked", name: "Ilha dos Náufragos", icon: "/assets/icons/islands/ilha-dos-naufragos.webp", narrative: "Dá para ver mastros quebrados, fumaça de fogueira e barracas remendadas, como se o mar cuspisse gente ali há anos.", objective: "Resgatar sobreviventes ou recuperar mapas entre acampamentos improvisados." },
         { id: "giant-kelp", name: "Ilha de Algas Gigantes", icon: "/assets/icons/islands/ilha-de-algas-gigantes.webp", narrative: "O mar ao redor parece uma floresta submersa, com algas grossas agarrando as ondas como dedos verdes.", objective: "Abrir caminho por vegetação marinha e criaturas escondidas na arrebentação." },
         { id: "mist", name: "Ilha de Névoa", icon: "/assets/icons/islands/ilha-de-nevoa.webp", narrative: "Ela surge e some dentro de uma bruma fria, e as vozes que vêm de lá não acompanham o vento.", objective: "Localizar uma verdade escondida antes que ecos falsos confundam a expedição." },
         { id: "ship-graveyard", name: "Ilha-Cemitério de Navios", icon: "/assets/icons/islands/ilha-cemiterio-de-navios.webp", narrative: "Não é bem uma ilha, é um monte de cascos mortos encalhados uns nos outros, rangendo como se ainda navegassem.", objective: "Investigar cascos encalhados que formam uma dungeon sobre o mar." }
       ],
       intermediate: [
-        { id: "volcanic", name: "Ilha Vulcânica", icon: "/assets/icons/islands/ilha-vulcanica.webp", narrative: "É uma montanha negra soltando fumaça, com rios vermelhos descendo pelas encostas e o ar tremendo de calor.", objective: "Sobreviver à instabilidade do vulcão e estabilizar a rota até o fragmento." },
+        { id: "volcanic", name: "Ilha Vulcânica", arenaName: "Caldeira de Basalto", icon: "/assets/icons/islands/ilha-vulcanica.webp", narrative: "É uma montanha negra soltando fumaça, com rios vermelhos descendo pelas encostas e o ar tremendo de calor.", objective: "Sobreviver à instabilidade do vulcão e estabilizar a rota até o fragmento." },
         { id: "abandoned-ship", name: "Navio Abandonado", icon: "/assets/icons/islands/navio-abandonado.webp", narrative: "Há um navio enorme parado onde não deveria existir navio algum, velho, torto e silencioso demais para estar vazio.", objective: "Explorar um navio encalhado ou fantasma que substitui o terreno da ilha." },
         { id: "cyclopean-ruins", name: "Ilha das Ruínas Ciclópicas", icon: "/assets/icons/islands/ilha-das-ruinas-ciclopicas.webp", narrative: "Pedras gigantes se erguem da água como ossos de deuses afogados, todas cobertas de musgo e sal.", objective: "Ativar ou atravessar estruturas gigantescas semi-afundadas." },
-        { id: "sea-caves", name: "Ilha-Labirinto de Cavernas Marinhas", icon: "/assets/icons/islands/ilha-labirinto-de-cavernas-marinhas.webp", narrative: "A costa é furada como queijo, cheia de bocas escuras onde a maré entra cantando baixo.", objective: "Navegar túneis inundados, bolsões de ar e passagens que somem com a maré." },
-        { id: "pirate-held", name: "Ilha Tomada por Piratas", icon: "/assets/icons/islands/ilha-tomada-por-piratas.webp", narrative: "Dá para ver paliçadas, bandeiras rasgadas e gente armada nas pedras antes mesmo de ancorar.", objective: "Romper um fortim costeiro e recuperar o fragmento antes que ele seja vendido." },
+        { id: "sea-caves", name: "Ilha-Labirinto de Cavernas Marinhas", arenaName: "Câmara da Maré", icon: "/assets/icons/islands/ilha-labirinto-de-cavernas-marinhas.webp", narrative: "A costa é furada como queijo, cheia de bocas escuras onde a maré entra cantando baixo.", objective: "Navegar túneis inundados, bolsões de ar e passagens que somem com a maré." },
+        { id: "pirate-held", name: "Ilha Tomada por Piratas", arenaName: "Galeão da Caveira", icon: "/assets/icons/islands/ilha-tomada-por-piratas.webp", narrative: "Dá para ver paliçadas, bandeiras rasgadas e gente armada nas pedras antes mesmo de ancorar.", objective: "Romper um fortim costeiro e recuperar o fragmento antes que ele seja vendido." },
         { id: "sacred", name: "Ilha Sagrada", icon: "/assets/icons/islands/ilha-sagrada.webp", narrative: "Ela parece calma demais, com pilares antigos, aves em círculo e uma sensação clara de que não fomos convidados.", objective: "Cumprir tabus, provações ou negociações com guardiões espirituais." },
         { id: "impossible-tide", name: "Ilha de Maré Impossível", icon: "/assets/icons/islands/ilha-de-mare-impossivel.webp", narrative: "A água sobe, desce e corre contra si mesma, revelando caminhos que somem antes da gente terminar de apontar.", objective: "Resolver o objetivo enquanto caminhos, armadilhas e salas mudam com o ciclo da maré." },
         { id: "crystal", name: "Ilha de Cristal", icon: "/assets/icons/islands/ilha-de-cristal.webp", narrative: "Brilha como uma joia quebrada no sol, cheia de torres translúcidas e reflexos que mostram coisas que não estão lá.", objective: "Atravessar cavernas brilhantes, ilusões naturais e formações cortantes." }
       ],
       advanced: [
         { id: "iceberg", name: "Iceberg", icon: "/assets/icons/islands/iceberg.webp", narrative: "É uma fortaleza de gelo à deriva, branca e azul, estalando alto como madeira prestes a partir.", objective: "Explorar uma ilha de gelo móvel com risco de fratura e frio extremo." },
-        { id: "floating", name: "Ilha Flutuante", icon: "/assets/icons/islands/ilha-flutuante.webp", narrative: "Fica suspensa acima do mar, com cachoeiras caindo no vazio e pedras menores girando ao redor dela.", objective: "Alcançar plataformas suspensas e lidar com quedas, ventos e rotas quebradas." },
-        { id: "storm", name: "Ilha de Tempestades Eternas", icon: "/assets/icons/islands/ilha-de-tempestades-eternas.webp", narrative: "Mesmo com céu limpo ao redor, aquela ilha vive debaixo de nuvens negras, raios e vento de arrancar vela.", objective: "Avançar sob chuva, raios e ventos que alteram cada cena." },
+        { id: "floating", name: "Ilha Flutuante", arenaName: "Cume das Nuvens", icon: "/assets/icons/islands/ilha-flutuante.webp", narrative: "Fica suspensa acima do mar, com cachoeiras caindo no vazio e pedras menores girando ao redor dela.", objective: "Alcançar plataformas suspensas e lidar com quedas, ventos e rotas quebradas." },
+        { id: "storm", name: "Ilha de Tempestades Eternas", arenaName: "Olho da Tormenta", icon: "/assets/icons/islands/ilha-de-tempestades-eternas.webp", narrative: "Mesmo com céu limpo ao redor, aquela ilha vive debaixo de nuvens negras, raios e vento de arrancar vela.", objective: "Avançar sob chuva, raios e ventos que alteram cada cena." },
         { id: "living", name: "Ilha Viva", icon: "/assets/icons/islands/ilha-viva.webp", narrative: "A costa se mexe devagar, como se a própria terra respirasse antes de decidir se deixa alguém desembarcar.", objective: "Negociar ou resistir a um terreno semiconsciente que reage ao grupo." },
         { id: "salt-and-bones", name: "Ilha de Sal e Ossos", icon: "/assets/icons/islands/ilha-de-sal-e-ossos.webp", narrative: "É branca como osso velho, cercada de recifes afiados e carcaças grandes demais para serem de baleia.", objective: "Sobreviver a recifes cortantes, carcaças gigantes e necrófagos." },
         { id: "elemental", name: "Ilha Elemental", icon: "/assets/icons/islands/ilha-elemental.webp", narrative: "Cada pedaço dela parece pertencer a um mundo diferente, com fogo, gelo, pedra e vento brigando pela mesma praia.", objective: "Estabilizar regiões dominadas por forças elementais incompatíveis." }
       ],
       boss: [
-        { id: "dinosaurs", name: "Ilha dos Dinossauros", icon: "/assets/icons/islands/ilha-dos-dinossauros.webp", narrative: "A selva ruge antes da âncora cair, e as árvores se abrem para pegadas maiores que um bote.", objective: "Enfrentar a versão ND 11 do Rei Tirano para concluir a etapa." }
+        { id: "dinosaurs", name: "Ilha dos Dinossauros", arenaName: "Vale da Ossada", icon: "/assets/icons/islands/ilha-dos-dinossauros.webp", narrative: "A selva ruge antes da âncora cair, e as árvores se abrem para pegadas maiores que um bote.", objective: "Enfrentar a versão ND 11 do Rei Tirano para concluir a etapa." }
       ]
     },
     boss: {
       creatureId: "rei-tirano-nd-11",
-      plannedCreatureName: "Rei Tirano ND 11",
-      status: "pending-catalog"
+      treasureChance: 0.01
     }
   },
   missionRules: {

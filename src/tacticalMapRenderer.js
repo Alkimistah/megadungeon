@@ -12,6 +12,7 @@ const TACTICAL_CELL_LABELS = {
   floor: "Chão",
   foliage: "Folhagem/vegetação",
   hidden: "Inimigo oculto/em potencial",
+  lava: "Lava intransitável",
   mechanism: "Mecanismo",
   objective: "Objetivo/achado",
   obstacle: "Obstáculo/cobertura",
@@ -39,6 +40,7 @@ const TACTICAL_CELL_GLYPHS = {
   enemy: "E",
   foliage: "F",
   hidden: "?",
+  lava: "≈",
   mechanism: "M",
   objective: "!",
   party: "G",
@@ -57,7 +59,7 @@ const TACTICAL_CELL_GLYPHS = {
 
 const TACTICAL_LEGEND_ORDER = [
   "wall", "party", "boss", "enemy", "hidden", "trap", "pit", "web",
-  "water", "current", "deck", "canopy", "tree", "foliage", "swamp", "wet", "clearing",
+  "water", "current", "lava", "deck", "canopy", "tree", "foliage", "swamp", "wet", "clearing",
   "slope", "trench", "wind", "concealment", "difficult", "mechanism",
   "objective", "door", "advantage", "obstacle", "reinforcement"
 ];

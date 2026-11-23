@@ -208,7 +208,7 @@ Possíveis efeitos de progresso sobre o boss:
 
 O boss ainda não está definido neste documento.
 
-Também fica em aberto se a ilha 30 terá objetivos preliminares antes do boss ou se, ao entrar nela, o grupo já inicia diretamente a luta final.
+A Ilha 30 oferece o confronto final após o desembarque. O mestre pode conferir a ficha e a arena antes de iniciar o combate. Os quatro setores opcionais têm encontros de dinossauros de ND 10. O Rei Tirano começa com quatro bônus fixos e cada vitória de setor remove um deles durante a visita.
 
 ### 7. Cenas Dentro de Cada Ilha
 
@@ -369,7 +369,7 @@ Critério de classificação:
 - ilhas avançadas devem concentrar alterações fortes de terreno, clima extremo, efeitos mágicos ou risco de cena mais complexo;
 - a ilha do boss deve ser reconhecível desde o início no mapa, mas permanecer bloqueada até os 9 fragmentos serem obtidos.
 
-Tema definido para a ilha do boss: ilha dos dinossauros. O boss planejado é uma versão ND 11 do Rei Tirano, ainda a ser criada e cadastrada no catálogo.
+Tema definido para a ilha do boss: ilha dos dinossauros. O boss é uma adaptação de campanha ND 11 do Rei Tirano cadastrada no catálogo.
 
 Exemplos iniciais:
 
@@ -729,7 +729,7 @@ Criar ou separar:
 - Exploração de ilha consome 8 horas e bloqueia nova exploração até o próximo descanso.
 - Descanso no barco reseta o esforço do dia e o contador de tempo de exploração. Nas ilhas com setores, o progresso persiste e o retorno pode reabrir um setor. Ilhas com objetivos provisórios reiniciam o progresso parcial.
 - Após um dia de exploração, o descanso testa a chance de emboscada no convés. Quando há um encontro, o descanso só termina depois que o mestre conclui a cena.
-- O estado do arquipélago preserva ilhas, temas, objetivos, visitas, conclusões, fragmentos, exploração ativa e log. Nas quatro ilhas iniciais, também guarda os encontros sorteados e o combate iniciado no Centro.
+- O estado do arquipélago preserva ilhas, temas, objetivos, visitas, conclusões, fragmentos, exploração ativa e log. Nas nove ilhas de exploração, também guarda os encontros sorteados e o combate iniciado no Centro.
 - Temas das ilhas 21 a 29 são sorteados por seed a partir de pools separados por dificuldade.
 - Ilha 30 usa tema fixo de ilha dos dinossauros.
 - Ícones SVG de barco, ilha não explorada e temas de ilha foram integrados ao mapa.
@@ -742,11 +742,11 @@ O Centro só abre depois dos quatro resultados. O app sorteia uma das composiç�
 
 No retorno, a chance inicial de reabertura é de 10% por setor resolvido. Se a rolagem for bem-sucedida, um setor sorteado perde o resultado e recebe uma variante diferente. As recompensas anteriores continuam registradas. Enquanto o setor estiver pendente, o Centro fica bloqueado. O resultado novo substitui o enfraquecimento anterior. O estado, os encontros e o combate do Centro são guardados no código de sessão.
 
-As próximas ilhas usam o desenho de seis setores nas intermediárias e oito nas avançadas. Cada sucesso representa, respectivamente, um sexto ou um oitavo do enfraquecimento disponível. O piloto inicial usa quatro partes. Cada guardião precisa de um limite próprio de enfraquecimento e de validação dos dois extremos.
+As intermediárias usam seis setores, com quatro penalidades e dois bônus removíveis. As avançadas usam oito setores, com quatro penalidades e quatro bônus removíveis. Cada sucesso aplica a penalidade ou remove o bônus vinculado ao setor. Cada guardião precisa de um limite próprio de enfraquecimento e de validação dos dois extremos.
 
 ### Retomada do Arquipélago
 
-O fluxo completo do desembarque ao fragmento está implementado nas quatro ilhas iniciais. As intermediárias, avançadas e final ainda têm objetivos provisórios.
+O fluxo completo do desembarque ao fragmento está implementado nas nove ilhas de exploração. A Ilha dos Dinossauros encerra a faixa com o combate final.
 
 A Ilha Tropical usa quatro setores em torno de um templo escalonado. A calçada inundada, os terraços de cultivo, a Praça do Templo e o observatório têm quatro variantes cada, três próprias das ruínas e uma reutilizável. O Centro sorteia e salva um de três guardiões ND 8. A Sentinela do Sol usa o Golem de Nor Grande, o Defensor do Templo usa o Defensor Rochoso e a Serpe do Disco Solar usa a Serpe Anciã. Os sucessos nos setores enfraquecem o guardião sorteado.
 
@@ -768,25 +768,44 @@ Os combates dos setores usam listas de criaturas próprias de cada ilha. Os mapa
 
 A liburna é o ícone dourado do botão de descanso. [A emboscada no convés](#81-ataques-ao-barco) já usa os fragmentos para determinar a chance e o ND. O restante da expedição aguarda a conclusão do combate para encerrar o descanso. A pirâmide usa traços claros sobre transparência nos 23 temas cadastrados, incluindo os que estão fora do sorteio, e aplica o mesmo tratamento ao ícone de ilha desconhecida. A seleção da primeira versão continua com dez temas.
 
+A Ilha Vulcânica tem seis setores. A Praia de Cinzas, a Ponte de Basalto, o Campo de Fumarolas, a Galeria de Obsidiana, o Terraço da Forja e a Borda da Caldeira têm três variantes cada, com combates de ND 7 e testes de ND 2 ou 3. A recompensa segue a mesma regra das ilhas iniciais. Os mapas incluem cinzas, lava intransitável, fumarolas e obstáculos de obsidiana conforme a cena.
+
+O Centro abre após seis resultados e usa uma de três composições de ND 9. A Fornalha de Bronze usa um Golem de Bronze, a Sentinela da Caldeira usa um Gigante das Rochas, e a Regente das Brasas usa uma Salamandra Nobre acompanhada por uma Salamandra Guerreira. Quatro setores aplicam penalidades sorteadas à criatura principal em caso de sucesso. O Terraço da Forja e a Borda da Caldeira sorteiam dois bônus distintos para a criatura principal, ambos ativos de início. A tabela inclui +2 na Defesa, +15% dos PV máximos base, RD 5 contra um elemento, +5 à maior RD da ficha e imunidade a uma condição até o fim do segundo turno do guardião. O mestre aplica RD e imunidades conforme indicado na ficha. A expedição guarda o sorteio; sessões anteriores conservam seus bônus de Defesa e PV. O sucesso no setor correspondente remove o bônus, e a eventual reabertura do setor o restaura. A vitória concede um fragmento. Ao importar uma sessão anterior, a ilha Vulcânica adota os seis setores se a expedição ainda não a visitou. Visitas já registradas preservam seu fluxo original.
+
+A Ilha-Labirinto de Cavernas Marinhas tem seis setores com três variantes cada. A Boca da Maré, a Galeria dos Ecos, o Bolsão de Ar, o Túnel da Corrente, a Comporta Submersa e o Poço dos Contrapesos usam mapas com canais, água corrente, passagens estreitas e plataformas. Os combates de setor são ND 7. A Comporta e o Poço removem dois bônus sorteados do guardião, e os outros quatro setores podem aplicar penalidades. O Centro tem três composições ND 9: Cardume de Selakos, Gigante dos Mares ou Capitão Homem-Piranha com Lula Gigante.
+
+A Ilha Tomada por Piratas tem seis setores em torno de um fortim costeiro. Cais dos Contrabandistas, Passarela da Paliçada, Armazém de Saque, Torre de Vigia, Capela da Quilha e Casa do Contramestre têm três variantes cada, com combates de setor ND 7. Os mapas incluem passarelas elevadas, água no entorno do cais e cobertura de barricas e engradados. A Capela e a Casa do Contramestre removem os bônus sorteados do guardião. No Galeão da Caveira, o combate acontece no convés e sorteia uma de três composições ND 9: Capitão do Conclave Pirata com Bando Pirata, Capitão Pirata com Ogro Caçador ou Ogro das Sanguinárias com Galokk Capanga.
+
+A Ilha Flutuante tem oito setores e três variantes por setor. A Ilhota de Chegada, a Ponte Quebrada, o Mirante dos Ninhos e a Queda-d’Água aplicam penalidades ao guardião em caso de sucesso. O Moinho dos Ventos, as Pedras em Órbita, o Jardim das Raízes e o Farol Suspenso removem quatro bônus iniciais distintos, sorteados entre as proteções elegíveis. Os combates de setor são ND 8. O Cume das Nuvens abre com oito resultados e sorteia um encontro ND 10: Dragão Celestial Jovem, Dragão Feral ou Serpe Anciã com Grifo Celestial. Os mapas usam vãos, pontes, vento e plataformas elevadas.
+
+A Ilha de Tempestades Eternas tem oito setores e três variantes por setor. A Praia dos Destroços, a Garganta das Rajadas, a Várzea da Enxurrada e o Mirante da Chuva podem aplicar penalidades. As Agulhas de Cobre, a Comporta do Dilúvio, o Santuário do Trovão e o Farol da Tormenta podem remover quatro bônus iniciais distintos. Os combates de setor são ND 8. Ventos, correntes, chuva e abrigo aparecem nos mapas. O Centro abre com oito resultados e sorteia um guardião ND 10: Capitão Afogado, Coruja Druida ou Golem de Ferro.
+
+Em novas expedições, cada setor das nove ilhas de exploração tem 1% de chance de começar como **Tesouro escondido**. O achado ocupa um setor, conta como resultado para abrir o Centro e preserva as proteções e penalidades do guardião. Recuperá-lo rola uma recompensa padrão no ND base da ilha (8, 9 ou 10). A recompensa fica salva e é concedida uma vez por setor. Se o setor reabrir, recebe uma variante normal. O sorteio é independente por setor.
+
+A Ilha dos Dinossauros abre com nove fragmentos. O Centro fica disponível assim que o grupo desembarca. O confronto acontece no Vale da Ossada, com um riacho raso, terreno difícil e cobertura de costelas e rochedos. O Rei Tirano ND 11 é uma adaptação de campanha com 550 PV, Defesa 40, RD 5 e versões recalibradas da mordida, cauda, agarrão e Engolir. A expedição preserva o confronto iniciado e bloqueia o descanso até o mestre registrar vitória ou derrota. A vitória conclui a faixa. Os dentes da criatura constam na ficha como tesouro.
+
+A Trilha da Manada, os Ninhos da Escarpa, a Baixada do Riacho e a Mata dos Fetos têm combates ND 10. Cada vitória remove a proteção associada ao setor. A Trilha da Manada remove Pisão +31 (4d8+15 de impacto), e os Ninhos da Escarpa removem +5 em Fortitude, Reflexos e Vontade. A Baixada do Riacho remove o Rugido Ensurdecedor. Uma vez por cena, como ação padrão, o rugido deixa todas as outras criaturas em alcance médio confusas até o fim da cena (Vontade CD 27 anula), seguindo as regras normais da condição. A Mata dos Fetos remove dois Deinonicos individuais do combate final. Quando o grupo volta ao barco, os quatro resultados se perdem e os bônus retornam. A visita seguinte troca as quatro composições. Cada setor tem quatro composições curadas de ND 10, rerroláveis até ajustar o encontro ou registrar um resultado. As composições da Mata dos Fetos sempre incluem Deinonicos. A recompensa de cada setor é registrada uma única vez por expedição.
+
+A primeira visita tem 1% de chance de esconder um tesouro ND 11 em um dos quatro setores. O grupo precisa vencer o combate daquele setor para receber o tesouro. A ilha guarda o sorteio e a recompensa, inclusive quando os encontros voltam a ficar pendentes.
+
+A progressão normal começa com as quatro ilhas iniciais abertas e nenhum fragmento. As quatro vitórias iniciais liberam as três intermediárias, e as três vitórias intermediárias liberam as duas avançadas. O Vale da Ossada exige os nove fragmentos conquistados. Ao restaurar um save criado com os atalhos, o app preserva as vitórias e conta apenas os fragmentos das ilhas concluídas. Uma exploração ativa que volte a ficar bloqueada é encerrada.
+
 #### Por onde retomar
 
-1. **Começar pela Ilha Vulcânica.** Usá-la como primeira intermediária para estender o ciclo de quatro para seis setores. Definir objetivos e variantes, encontros, recompensas, mapa tático e guardião de ND base 9. Verificar desbloqueio do Centro após os seis resultados, enfraquecimento do guardião, registro de fragmento, descanso e restauração da sessão.
-2. **Fechar as intermediárias.** Aplicar o fluxo de seis setores à Ilha-Labirinto de Cavernas Marinhas e à Ilha Tomada por Piratas, com objetivos, criaturas e mapas próprios de cada tema.
-3. **Completar a faixa para jogo.** Implementar os oito setores da Ilha Flutuante e da Ilha de Tempestades Eternas, fechar a Ilha dos Dinossauros com o Rei Tirano ND 11, adaptar os vínculos de missões e verificar o percurso completo no app. A revisão da grade tática compartilhada segue como uma frente própria.
-4. **Validar a campanha completa em mesa.** Iniciar quando os andares 21 a 30 estiverem prontos para jogo. Conferir ritmo, pressão dos combates e testes, XP, tesouro, reabertura de setores, emboscadas e guardiões nos extremos de enfraquecimento. Rebalancear a partir do que aparecer em jogo.
+1. **Integrar as missões do arquipélago.** Adaptar os vínculos ao tema, setor e variante, inclusive com setores reabertos e composições rerroladas. Verificar progresso e recompensas ao jogar, salvar e restaurar.
+2. **Validar a campanha completa em mesa.** Usar como referência o grupo chegando no nível 7 e testar os marcos de nível 8, 9 e 10 aos 4, 7 e 9 fragmentos. Conferir duração das sessões, recursos que sobram para o guardião, XP, tesouros, reaberturas e emboscadas. Testar o Rei Tirano com todos os bônus e com todos removidos, com atenção à CD 27 do Rugido Ensurdecedor e ao impacto de dois Deinonicos.
+3. **Revisar a grade tática compartilhada.** Tratar a evolução da grade como uma frente própria e conferir os efeitos nas arenas insulares e no convés da liburna.
 
 ### Pendências Conhecidas
 
 - Repetir a validação visual quando houver troca de arte, conferindo as ilhas reveladas, concluídas e bloqueadas.
 - Os fragmentos obtidos ainda são representados principalmente por contador/progresso; a exibição visual individual no barco pode evoluir.
-- Mapas táticos, encontros e recompensas das ilhas intermediárias, avançadas e final ainda precisam de implementação.
 - A adaptação definitiva do módulo de missões para os andares 21 a 30 fica pendente até o modo `archipelago` estar mais maduro. Por enquanto, não avaliar balanceamento, categorias, textos, vínculos ou recompensas de missões dessa faixa como critério final.
 
 ### A Definir
 
 - Nome final da etapa.
 - Fórmula ou tabela exata de ND por ilha, baseada no grupo nível 7 a 10.
-- Ficha definitiva do boss da ilha 30: versão ND 11 do Rei Tirano.
 - Lista final dos temas disponíveis em cada grau de dificuldade.
 - Objetivo definitivo de cada ilha.
 - Quantidade definitiva de objetivos/encontros de cada ilha.
@@ -821,7 +840,7 @@ A liburna é o ícone dourado do botão de descanso. [A emboscada no convés](#8
 - O mapa principal é estratégico, não tático.
 - As ilhas 21 a 29 devem ter tema sorteado por seed a partir de pools separados por dificuldade.
 - A ilha 30 tem tema fixo: ilha dos dinossauros.
-- O boss planejado da ilha 30 é uma versão ND 11 do Rei Tirano, ainda pendente de criação.
+- O boss da ilha 30 é o Rei Tirano ND 11.
 
 ### Pontos de Atenção
 

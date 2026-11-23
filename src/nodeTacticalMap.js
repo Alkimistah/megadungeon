@@ -280,14 +280,13 @@ function placeEnemies(cells, node, rng) {
     .filter(([x, y]) => !enemyTiles || enemyTiles.includes(cells[y][x]))
     .filter(([x, y]) => x >= enemyArea.minX && x <= enemyArea.maxX && y >= enemyArea.minY && y <= enemyArea.maxY)
     .filter(position => distance(position, partyStart) >= 8);
-  const marker = node.type === "boss" ? "boss" : "enemy";
-
   const positions = candidates.slice(0, count);
-  placeFormation(cells, positions, marker, count);
   let firstPosition = 0;
   return node.resolvedEncounter.items.filter(item => item.kind === "creature").flatMap(item => {
     const nextPosition = firstPosition + (item.quantity || 1);
     const placements = positions.slice(firstPosition, nextPosition);
+    const isBoss = node.type === "boss" && (!node.bossCreatureId || item.creatureId === node.bossCreatureId);
+    placeFormation(cells, placements, isBoss ? "boss" : "enemy", placements.length);
     firstPosition = nextPosition;
     return placements.map(([x, y]) => ({ index: y * WIDTH + x, creatureId: item.creatureId }));
   });
