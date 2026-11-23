@@ -221,29 +221,25 @@ export const archipelago21to30Profile = {
         "uma rota de desembarque instável",
         "um marco visível apenas na maré certa",
         "um ponto alto da ilha",
-        "uma passagem entre recifes",
         "uma ruína costeira"
       ],
       materials: [
-        "amostras de coral vivo",
         "fragmentos de mapa náutico",
         "sal cristalizado incomum",
-        "algas resistentes à magia",
-        "areia marcada por energia planar"
+        "cordame resistente de um navio perdido"
       ],
       objects: [
         "um sextante quebrado",
         "um diário de bordo",
         "uma caixa lacrada",
-        "um amuleto preso aos recifes",
+        "um amuleto preso a um destroço",
         "uma vela com inscrições antigas"
       ],
       mementos: [
         "um diário de bordo de alguém que não voltou",
         "um medalhão preso a um destroço",
         "um mapa dobrado dentro de uma garrafa",
-        "uma fita de família amarrada ao mastro",
-        "um anel perdido entre recifes"
+        "uma fita de família amarrada ao mastro"
       ],
       clues: [
         "marcas no casco de um navio",
@@ -260,7 +256,6 @@ export const archipelago21to30Profile = {
       phenomena: [
         "maré correndo contra o vento",
         "bruma que duplica vozes",
-        "recifes que mudam de posição",
         "um brilho sob a água que acompanha o grupo"
       ]
     }

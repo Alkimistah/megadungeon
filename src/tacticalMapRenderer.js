@@ -57,7 +57,7 @@ const TACTICAL_CELL_GLYPHS = {
   web: "W"
 };
 
-const TACTICAL_LEGEND_ORDER = [
+export const TACTICAL_LEGEND_ORDER = [
   "wall", "party", "boss", "enemy", "hidden", "trap", "pit", "web",
   "water", "current", "lava", "deck", "canopy", "tree", "foliage", "swamp", "wet", "clearing",
   "slope", "trench", "wind", "concealment", "difficult", "mechanism",
