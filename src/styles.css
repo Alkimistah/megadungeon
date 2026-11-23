@@ -4293,8 +4293,13 @@ details.mission-run-guidance p {
 }
 
 @media (max-width: 600px) {
-  .archipelago-island-footer:has(.archipelago-mission-access) {
-    flex-wrap: nowrap;
+  .archipelago-island-footer:has(.archipelago-mission-access) > span:first-child {
+    flex: 1 0 100%;
+  }
+
+  .archipelago-island-footer .archipelago-mission-access {
+    flex: 1 1 0;
+    margin-inline-start: 0;
   }
 
   .archipelago-island-footer:has(.archipelago-mission-access) > :last-child {

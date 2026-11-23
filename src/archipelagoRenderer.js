@@ -78,7 +78,7 @@ function createMissionAccess(mission, onOpenMission) {
   button.type = "button";
   button.className = "archipelago-mission-access";
   button.title = `Missão: ${mission.title}`;
-  icon.src = "/assets/icons/game-icons--tied-scroll.svg";
+  icon.src = assetUrl("/assets/icons/game-icons--tied-scroll.svg");
   icon.alt = "";
   icon.setAttribute("aria-hidden", "true");
   title.textContent = `Missão: ${mission.title}`;
