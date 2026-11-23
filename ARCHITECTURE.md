@@ -540,7 +540,7 @@ Design: [docs/superpowers/specs/2026-11-21-tela-inicial-e-modais-design.md](docs
 
 ### Retomada da ecologia
 
-A fase 1 etiquetou as 574 fichas do catálogo original. A fase 2 integrou a ecologia aos sorteios da Floresta e adicionou a seleção de livros por sessão. O Arquipélago tem contextos configurados para ilhas, costa e mar aberto. A Ilha Manguezal já usa o contexto ecológico e os livros habilitados nos combates de setor.
+A fase 1 etiquetou as 574 fichas do catálogo original. A fase 2 integrou a ecologia aos sorteios da Floresta e adicionou a seleção de livros por sessão. O Arquipélago tem contextos configurados para ilhas, costa e mar aberto. Os setores das quatro ilhas iniciais usam listas temáticas, os contextos ecológicos e os livros habilitados para sortear criaturas.
 
 A fase 3 entregou a busca, os filtros de catálogo e a composição manual de encontros. Foram verificados o build, os testes de ecologia, os andares 1–30 e as missões, além da QA no Chrome na tela inicial e na Floresta. [Plano do encontro manual](docs/superpowers/plans/2026-11-22-ecologia-fase-3-encontro-manual.md)
 
@@ -548,13 +548,13 @@ A fase 3 entregou a busca, os filtros de catálogo e a composição manual de en
 
 ### Retomada do Arquipélago
 
-O piloto da Ilha Manguezal cobre o fluxo do desembarque ao fragmento. `archipelagoPilot.js` concentra as variantes de setor e as composições do guardião. `archipelagoState.js` registra os resultados, a reabertura e o confronto do Centro. `archipelagoRenderer.js` apresenta as zonas da ilha e as fichas em modais de tela inteira. O piloto reutiliza o mapa tático atual. [Estado, decisões e próximos passos](REQUISITOS_ANDARES_21_A_30.md#retomada-do-arquipélago)
+Manguezal, Ilha Tropical, Atol Circular e Costa do Coral cobrem o fluxo do desembarque ao fragmento. `archipelagoPilot.js` monta as cenas e os guardiões, `archipelagoCreatureRules.js` define os grupos disponíveis por ilha e `archipelagoTacticalMap.js` fornece o terreno e os marcos de cada setor e Centro. `archipelagoState.js` registra os resultados, a reabertura, as rerrolagens e o confronto do Centro. `archipelagoRenderer.js` apresenta as zonas e as fichas em modais de tela inteira. [Estado, decisões e próximos passos](REQUISITOS_ANDARES_21_A_30.md#retomada-do-arquipélago)
 
-Retomar pelo teste completo do Manguezal em mesa, antes de cadastrar outra ilha. As sessões locais `tmp/floors-21-30/piloto-manguezal.txt` e `tmp/floors-21-30/piloto-manguezal-combates.txt` abrem, respectivamente, o Manguezal nas ilhas 23 e 24. A segunda tem quatro combates de setor. A geração normal pode sortear o tema em qualquer uma das quatro ilhas iniciais.
+O próximo bloco é o das três ilhas intermediárias, com seis setores cada. O teste em mesa está previsto depois de a faixa inteira estar jogável.
 
 ### Melhorias futuras dos mapas táticos
 
-A revisão dos mapas táticos fica pausada enquanto o ciclo do Arquipélago é validado em mesa. A comparação abaixo serve de referência para uma retomada própria.
+A revisão da grade tática compartilhada segue como uma frente própria. A comparação abaixo serve de referência para a retomada.
 
 Na retomada, avaliar também se vale reestruturar a grade compartilhada. Comparar o aproveitamento do gerador e do renderizador atuais com outra abordagem de código para montar cenas. Um caminho a testar é representar o mapa-base, os efeitos de terreno e clima e as posições das peças como partes independentes da cena. Usar a mesma cena que hoje exige adaptação na mesa para comparar a coerência entre descrição e grade, a facilidade de criar variações e a atualização das posições durante o combate. A escolha de ferramenta fica para depois dessa comparação.
 

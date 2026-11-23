@@ -4230,6 +4230,28 @@ details.mission-run-guidance p {
   margin-block: 1rem;
 }
 
+.encounter-list-panel:has(> .archipelago-reroll-footer) {
+  display: flex;
+  flex-direction: column;
+}
+
+.archipelago-reroll-footer {
+  display: grid;
+  justify-items: center;
+  gap: .5rem;
+  margin-block-start: auto;
+  padding-top: .25rem;
+}
+
+.archipelago-reroll-footer [role="status"] {
+  text-align: center;
+  margin: 0;
+}
+
+.archipelago-reroll-footer [role="status"]:empty {
+  display: none;
+}
+
 .archipelago-encounter-footer button,
 .archipelago-result-actions button {
   min-height: 42px;

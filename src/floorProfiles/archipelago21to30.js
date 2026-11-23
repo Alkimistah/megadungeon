@@ -127,9 +127,14 @@ export const archipelago21to30Profile = {
       29: 11,
       30: 1
     },
+    enabledThemeIds: [
+      "tropical", "mangrove", "atoll", "coral-coast",
+      "volcanic", "sea-caves", "pirate-held",
+      "floating", "storm", "dinosaurs"
+    ],
     themePools: {
       initial: [
-        { id: "tropical", name: "Ilha Tropical", icon: "/assets/icons/islands/ilha-tropical.webp", narrative: "É uma mancha verdejante no horizonte, cheia de palmeiras altas, praias claras e uma mata tão viva que parece observar o navio chegando.", objective: "Encontrar o fragmento entre trilhas, frutas venenosas e predadores menores." },
+        { id: "tropical", name: "Ilha Tropical", icon: "/assets/icons/islands/ilha-tropical.webp", narrative: "Uma faixa de areia clara contorna a ilha, mas a mata logo toma conta da costa. Entre as copas, dá para ver o topo de um templo escalonado. Da praia, uma antiga calçada de pedra desaparece sob a vegetação na direção das ruínas.", objective: "Recuperar o fragmento protegido pelo guardião do templo escalonado." },
         { id: "mangrove", name: "Ilha Manguezal", icon: "/assets/icons/islands/ilha-manguezal.webp", narrative: "Parece mais um emaranhado de raízes saindo da água do que terra firme, com lama escura, canais tortos e silêncio pesado.", objective: "Atravessar canais rasos e raízes para alcançar um altar soterrado pela lama." },
         { id: "atoll", name: "Atol Circular", icon: "/assets/icons/islands/atol-circular.webp", narrative: "É um anel de areia branca cercando uma lagoa azul demais, bonito de longe, mas traiçoeiro quando a maré começa a mudar.", objective: "Explorar o anel de areia e a lagoa central antes que a maré feche a rota." },
         { id: "coral-coast", name: "Costa do Coral", icon: "/assets/icons/islands/costa-do-coral.webp", narrative: "Quase não há praia ali, só recifes coloridos, água rasa brilhando ao sol e sombras se movendo por baixo do casco.", objective: "Recuperar o fragmento em recifes vivos, trechos submersos e pouca terra firme." },

@@ -733,17 +733,17 @@ Criar ou separar:
 - Ilha 30 fica bloqueada até a obtenção dos 9 fragmentos.
 - Conclusão de ilhas 21 a 29 concede fragmentos e atualiza o progresso global.
 - Exploração de ilha consome 8 horas e bloqueia nova exploração até o próximo descanso.
-- Descanso no barco reseta o esforço do dia e o contador de tempo de exploração. No Manguezal, o progresso persiste e o retorno pode reabrir um setor. As demais ilhas usam a regra anterior de reinício do progresso parcial.
-- Estado do arquipélago preserva ilhas, temas, objetivos, visitas, conclusões, fragmentos, exploração ativa e log. O piloto também preserva os encontros sorteados e o combate iniciado no Centro.
+- Descanso no barco reseta o esforço do dia e o contador de tempo de exploração. Nas ilhas com setores, o progresso persiste e o retorno pode reabrir um setor. Ilhas com objetivos provisórios reiniciam o progresso parcial.
+- O estado do arquipélago preserva ilhas, temas, objetivos, visitas, conclusões, fragmentos, exploração ativa e log. Nas quatro ilhas iniciais, também guarda os encontros sorteados e o combate iniciado no Centro.
 - Temas das ilhas 21 a 29 são sorteados por seed a partir de pools separados por dificuldade.
 - Ilha 30 usa tema fixo de ilha dos dinossauros.
 - Ícones SVG de barco, ilha não explorada e temas de ilha foram integrados ao mapa.
 - Ícones de ilhas visitadas/em andamento usam coloração branca; ilhas concluídas usam coloração esverdeada.
 - Alguns SVGs de ilha tiveram fundos opacos e linhas removidos para evitar blocos coloridos no mapa.
 
-O piloto atual da Ilha Manguezal aparece em novas expedições quando o tema é sorteado. Os setores Norte, Sul, Leste e Oeste podem ser explorados em ordem livre. Cada setor recebe um objetivo por seed. Uma ilha pode ter de zero a quatro combates antes do guardião. O mestre registra sucesso ou falha, e ambos liberam progresso rumo ao Centro. O sucesso concede uma indicação de XP e tesouro uma vez por setor e enfraquece a ficha do guardião.
+As quatro ilhas iniciais têm setores temáticos que podem ser explorados em ordem livre. Cada setor recebe um objetivo por seed. Uma ilha pode ter de zero a quatro combates antes do guardião. O mestre registra sucesso ou falha, e ambos liberam progresso rumo ao Centro. O sucesso concede uma indicação de XP e tesouro uma vez por setor e enfraquece a ficha do guardião.
 
-O Centro só abre depois dos quatro resultados. O app sorteia uma das composições curadas de ND 8 e mantém a escolha na sessão. O mestre pode conferir as fichas ajustadas antes de confirmar o combate. Antes de confirmar o combate, pode retornar ao barco. Depois de começar, só vitória ou derrota encerram o combate. A vitória concede o fragmento e um cristal verde 2× de ND 8. A derrota não concede recompensa.
+O Centro só abre depois dos quatro resultados. O app sorteia uma das composições curadas de ND 8 e mantém a escolha na sessão. O mestre pode conferir as fichas ajustadas antes de confirmar o combate. Antes de confirmar o combate, pode retornar ao barco. Depois de começar, só vitória ou derrota encerram o combate. A vitória registra a conclusão da ilha. A expedição conta um fragmento por ilha concluída.
 
 No retorno, a chance inicial de reabertura é de 10% por setor resolvido. Se a rolagem for bem-sucedida, um setor sorteado perde o resultado e recebe uma variante diferente. As recompensas anteriores continuam registradas. Enquanto o setor estiver pendente, o Centro fica bloqueado. O resultado novo substitui o enfraquecimento anterior. O estado, os encontros e o combate do Centro são guardados no código de sessão.
 
@@ -751,14 +751,30 @@ As próximas ilhas usam o desenho de seis setores nas intermediárias e oito nas
 
 ### Retomada do Arquipélago
 
+A primeira versão jogável usa dez ilhas. A seed distribui os temas pelas posições de cada dificuldade. Os demais temas ficam cadastrados para restaurar expedições existentes e voltam ao desenvolvimento após a validação completa em mesa.
+
+- Iniciais — Ilha Manguezal, Ilha Tropical, Atol Circular e Costa do Coral.
+- Intermediárias — Ilha Vulcânica, Ilha-Labirinto de Cavernas Marinhas e Ilha Tomada por Piratas.
+- Avançadas — Ilha Flutuante e Ilha de Tempestades Eternas.
+- Final — Ilha dos Dinossauros.
+
+A Ilha Tropical usa quatro setores em torno de um templo escalonado. A calçada inundada, os terraços de cultivo, a Praça do Templo e o observatório têm quatro variantes cada, três próprias das ruínas e uma reutilizável. O Centro sorteia e salva um de três guardiões ND 8. A Sentinela do Sol usa o Golem de Nor Grande, o Defensor do Templo usa o Defensor Rochoso e a Serpe do Disco Solar usa a Serpe Anciã. Os sucessos nos setores enfraquecem o guardião sorteado.
+
 O Manguezal tem 19 variantes de setor. São 12 combates de ND 6 e sete testes estendidos de ND 2 ou 3. Cada setor começa com 70% de chance de combate. Os combates concedem o XP do encontro e o tesouro indicado nas fichas das criaturas. Os testes indicam XP e tesouro conforme seu ND. A recompensa de sucesso é registrada uma vez por setor.
 
 A arte da ilha tem quatro zonas que se encontram nas diagonais, cores suaves sorteadas sem repetição pela seed, indicadores visuais de sucesso e falha e um Centro vermelho semitransparente. O botão **Explorar ilha** fica abaixo da arte e o progresso fica no rodapé. O retorno sinaliza visualmente o setor reaberto e informa quando uma penalidade do guardião foi removida. Os encontros abrem em outra modal de tela inteira, com fichas abertas e ícone do mapa no centro do rodapé.
 
-1. **Testar o Manguezal em mesa.** Comparar o tempo de jogo e a pressão de uma ilha com muitos combates com uma ilha de testes estendidos. Conferir XP, tesouro, retorno depois de descanso, recuperação de saves e o guardião com zero e quatro sucessos. A chance de reabertura e os ajustes de ficha são valores iniciais de calibragem.
-2. **Adicionar um segundo tema inicial.** Reaproveitar o ciclo de quatro setores. Criar variantes em que o tema mude as decisões, testes e consequências. Curar composições do guardião e definir o limite de enfraquecimento antes de expandir os demais temas.
-3. **Expandir o ciclo para as demais dificuldades.** Aplicar seis setores às ilhas intermediárias e oito às avançadas. Definir a distribuição de ND e recompensas, a duração esperada e a composição da Ilha 30 com o Rei Tirano ND 11.
-4. **Retomar as missões e a apresentação final.** Depois de fechar os objetivos e encontros das ilhas, adaptar vínculos de missões, revisar arte e validar a campanha completa no tablet. A revisão da grade tática segue como uma frente própria.
+O Atol Circular tem quatro setores. O Banco da Vazante, o Canal da Enchente, o Destroço na Areia e o Poço da Lagoa têm quatro variantes cada, incluindo uma compartilhada. Em expedições novas, o Centro sorteia Água-viva Gigante, Capitão do Conclave Pirata ou Selako-Tigre com Peixe-Recife, em composições de ND 8. Expedições que já tinham sorteado o Armento de Burafontes mantêm o confronto original.
+
+A Costa do Coral tem quatro setores. O Jardim de Corais, a Parede do Recife, as Grutas Inundadas e o Santuário das Pérolas têm quatro variantes cada, incluindo uma compartilhada. O Centro sorteia uma de três composições ND 8. Chefe dos Elfos-do-Mar com Selako-Tigre, Lula Gigante com Pliorex ou Reishid do Recife.
+
+As quatro ilhas iniciais sorteiam quatro penalidades distintas do conjunto compartilhado de 16. O sorteio considera as proteções do guardião e fica salvo na expedição. As vulnerabilidades elementais acrescentam 50% ao dano do tipo correspondente antes da redução de dano.
+
+Os combates dos setores usam listas de criaturas próprias de cada ilha. Os mapas táticos incluem os elementos de terreno e os pontos de interação dos setores e do Centro. O mestre pode rerrolar os combates de setor antes de registrar dano ou ajustes, mantendo o ND e a lista de criaturas da cena.
+
+1. **Expandir o ciclo para as demais dificuldades.** Aplicar seis setores às ilhas intermediárias e oito às avançadas. Definir a distribuição inicial de ND e recompensas, a duração esperada e a composição da Ilha 30 com o Rei Tirano ND 11.
+2. **Completar a faixa para jogo.** Adaptar vínculos de missões, revisar a arte e verificar no app o fluxo desde o desembarque até o chefe final, incluindo descanso, recompensas e restauração da sessão. A revisão da grade tática segue como uma frente própria.
+3. **Validar a campanha completa em mesa.** Iniciar esta etapa quando os andares 21 a 30 estiverem prontos para jogo. Conferir ritmo, pressão dos combates e testes, XP, tesouro, reabertura de setores e guardiões nos extremos de enfraquecimento. Corrigir problemas e rebalancear a partir do que aparecer em jogo.
 
 ### Pendências Conhecidas
 
@@ -766,8 +782,7 @@ A arte da ilha tem quatro zonas que se encontram nas diagonais, cores suaves sor
 - Alguns SVGs vieram com camadas de fundo embutidas; quando recoloridos pelo CSS, essas camadas podem aparecer como retângulos ou massas verdes/brancas. Esses arquivos devem ser corrigidos na origem ou substituídos por versões realmente transparentes.
 - A validação visual dos ícones precisa ser repetida após qualquer troca de SVG, especialmente nos estados visitada, em andamento, concluída e bloqueada.
 - Os fragmentos obtidos ainda são representados principalmente por contador/progresso; a exibição visual individual no barco pode evoluir.
-- Mapas táticos específicos por tema de ilha ainda não foram implementados.
-- Encontros, criaturas, armadilhas e recompensas definitivas por ilha ainda não foram fechados.
+- Mapas táticos, encontros e recompensas das ilhas intermediárias, avançadas e final ainda precisam de implementação.
 - A adaptação definitiva do módulo de missões para os andares 21 a 30 fica pendente até o modo `archipelago` estar mais maduro. Por enquanto, não avaliar balanceamento, categorias, textos, vínculos ou recompensas de missões dessa faixa como critério final.
 
 ### A Definir
@@ -800,7 +815,7 @@ A arte da ilha tem quatro zonas que se encontram nas diagonais, cores suaves sor
 - O grupo pode explorar apenas 1 ilha por descanso.
 - O barco é o acampamento e reseta o esforço do dia ao descansar.
 - O descanso no barco reseta o contador de tempo de exploração.
-- O Manguezal preserva o progresso depois do descanso, com possibilidade de reabertura no retorno. Ilhas com objetivos provisórios ainda reiniciam o progresso parcial.
+- As quatro ilhas iniciais preservam o progresso depois do descanso, com possibilidade de reabertura no retorno. Ilhas com objetivos provisórios reiniciam o progresso parcial.
 - O clima gerado para a ilha persiste pelo dia inteiro de exploração.
 - O descanso gera novos climas diários por ilha.
 - Antes de explorar, o grupo pode tentar identificar o clima de uma ilha com teste apropriado.

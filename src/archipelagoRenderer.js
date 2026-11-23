@@ -1,3 +1,5 @@
+import { withIslandTacticalLayout } from "./archipelagoTacticalMap.js";
+import { canRerollNodeCreatures } from "./encounterResolver.js";
 import { assetUrl } from "./assetUrl.js";
 import { createEncounterCombatPage } from "./nodeDialog.js";
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
@@ -72,32 +74,54 @@ function createIconButton({ className, icon, label, onClick, type = "button" }) 
   return button;
 }
 
-function createIslandEncounter(scene, onEncounterAdjusted = () => {}, { readOnly = false } = {}) {
+function createIslandEncounter(scene, onEncounterAdjusted = () => {}, { readOnly = false, onReroll } = {}) {
   const sheet = document.createElement("section");
   if (!scene.resolvedEncounter) {
-    sheet.textContent = "Nenhuma criatura elegível para sorteio. O mestre pode conduzir a cena manualmente.";
+    sheet.textContent = "Nenhuma composição elegível para o ND da cena com os livros selecionados. Conduza o encontro manualmente.";
     return sheet;
   }
 
-  function showSheet(selectedKey) {
-    sheet.replaceChildren(createEncounterCombatPage(scene, selectedKey, showSheet, [], null, {
+  function showSheet(selectedKey, rerolled = false) {
+    const page = createEncounterCombatPage(scene, selectedKey, showSheet, [], null, {
       readOnly,
       onEncounterAdjusted: () => {
         onEncounterAdjusted();
         showSheet(selectedKey);
       }
-    }));
+    });
+    sheet.replaceChildren(page);
+    if (onReroll && canRerollNodeCreatures(scene)) {
+      const rerollControls = document.createElement("div");
+      rerollControls.className = "archipelago-reroll-footer";
+      const status = document.createElement("p");
+      status.className = "node-dialog-meta";
+      status.setAttribute("role", "status");
+      const button = createButton({
+        className: "extended-action is-compact",
+        label: "Rerrolar criaturas",
+        onClick: () => {
+          if (onReroll()) showSheet(undefined, true);
+          else status.textContent = "Nenhuma outra composição compatível foi encontrada.";
+        }
+      });
+      rerollControls.append(button, status);
+      page.querySelector(".encounter-list-panel").appendChild(rerollControls);
+      if (rerolled) {
+        status.textContent = "Criaturas atualizadas com o mesmo ND.";
+        button.focus();
+      }
+    }
   }
   showSheet();
   return sheet;
 }
 
-function createIslandMapButton(scene) {
+function createIslandMapButton(scene, themeId, objective) {
   return createIconButton({
     className: "icon-button modal-tactical-map-toggle",
     icon: "/assets/icons/game-icons--treasure-map.svg",
     label: "Abrir mapa tático",
-    onClick: () => openTacticalMapFullscreen(createNodeTacticalMap(scene))
+    onClick: () => openTacticalMapFullscreen(createNodeTacticalMap(withIslandTacticalLayout(scene, themeId, objective)))
   });
 }
 
@@ -127,6 +151,7 @@ export function createArchipelagoRenderer({
   onExploreIsland,
   onLoseGuardian,
   onOpenSector,
+  onRerollSector,
   onOpenMission = () => {},
   onResolveObjective,
   onRestAtBoat,
@@ -165,7 +190,7 @@ export function createArchipelagoRenderer({
     render();
   }
 
-  function showSectorDialog(title, detail, actions, scene) {
+  function showSectorDialog(title, detail, actions, scene, themeId, objective) {
     if (!sectorDialog) {
       sectorDialog = document.createElement("dialog");
       sectorDialog.className = "archipelago-dialog archipelago-encounter-dialog";
@@ -192,7 +217,7 @@ export function createArchipelagoRenderer({
     if (scene?.resolvedEncounter) {
       const center = document.createElement("div");
       center.className = "archipelago-map-control";
-      center.appendChild(createIslandMapButton(scene));
+      center.appendChild(createIslandMapButton(scene, themeId, objective));
       footer.appendChild(center);
     }
     if (actions.childElementCount) detail.appendChild(actions);
@@ -408,20 +433,15 @@ export function createArchipelagoRenderer({
       addSectorButton(objective.direction, objective.id, objective.name + status, Boolean(guardian.scene), color, objective.outcome);
       if (isReopened) map.lastElementChild.classList.add("is-reopened");
     }
-    addSectorButton("center", "center", guardian.ready ? "Centro" : "Centro · Bloqueado", !active || !guardian.ready, "#782a32");
+    const centerOutcome = island.completed ? "success" : island.defeated ? "failure" : null;
+    const centerLabel = island.completed ? "Centro · Sucesso" : island.defeated ? "Centro · Falha" : guardian.ready ? "Centro" : "Centro · Bloqueado";
+    addSectorButton("center", "center", centerLabel, !active || !guardian.ready, "#782a32", centerOutcome);
     section.appendChild(map);
-
-    if (guardian.crystal) {
-      const reward = document.createElement("p");
-      reward.textContent = `Fragmento recuperado. Cristal verde 2× de ND ${guardian.crystal.challenge} — T$ ${guardian.crystal.total.toLocaleString("pt-BR")}.`;
-      section.appendChild(reward);
-      return section;
-    }
     const detail = document.createElement("div");
     const actions = createEncounterActions();
     if (selectedSector === "center" && active && guardian.ready) {
       renderGuardian(detail, actions, island);
-      showSectorDialog("Centro da ilha", detail, actions, guardian.scene ?? guardian.preview);
+      showSectorDialog("Centro da ilha", detail, actions, guardian.scene ?? guardian.preview, island.themeId);
     } else {
       const objective = island.objectives.find(item => item.id === selectedSector);
       if (!objective) return section;
@@ -453,7 +473,12 @@ export function createArchipelagoRenderer({
           addResultAction(actions, "Desembarcar para jogar este setor", () => exploreSelectedIsland(island));
         }
       }
-      if (objective.scene) detail.appendChild(createIslandEncounter(objective.scene, onEncounterAdjusted));
+      if (objective.scene) {
+        const onReroll = active && !objective.resolved && !guardian.scene
+          ? () => onRerollSector(island.floor, objective.id)
+          : undefined;
+        detail.appendChild(createIslandEncounter(objective.scene, onEncounterAdjusted, { readOnly: objective.resolved, onReroll }));
+      }
       if (active && !objective.resolved) {
         for (const [outcome, label, tone] of [["failure", "Desistir do encontro", "is-danger"], ["success", "Conquistar encontro", "is-primary"]]) {
           addResultAction(actions, label, () => {
@@ -462,7 +487,7 @@ export function createArchipelagoRenderer({
           }, tone);
         }
       }
-      showSectorDialog(`${objective.name} · ${objective.title}`, detail, actions, objective.scene);
+      showSectorDialog(`${objective.name} · ${objective.title}`, detail, actions, objective.scene, island.themeId, objective);
     }
     return section;
   }
@@ -476,8 +501,15 @@ export function createArchipelagoRenderer({
 
   function renderGuardian(detail, actions, island) {
     const { guardian } = island;
+    const scene = guardian.scene ?? guardian.preview;
+    if (scene?.briefing) {
+      const introduction = document.createElement("p");
+      introduction.className = "archipelago-encounter-briefing";
+      introduction.textContent = scene.briefing;
+      detail.appendChild(introduction);
+    }
     const effects = document.createElement("p");
-    const leader = (guardian.scene ?? guardian.preview)?.resolvedEncounter.items[0]?.name;
+    const leader = scene?.resolvedEncounter.items[0]?.name;
     effects.textContent = guardian.effects.length
       ? `Penalidades ${leader ? `na ficha de ${leader}` : "na ficha do guardião principal"}: ${guardian.effects.join(" · ")}. Aliados mantêm seus valores.`
       : "Guardião em força plena.";

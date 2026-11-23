@@ -96,7 +96,7 @@ export function createTacticalGrid(tacticalMap) {
     const tile = createElement("span", `tactical-cell is-${cell}`);
     const glyph = TACTICAL_CELL_GLYPHS[cell];
 
-    tile.title = getTacticalCellLabel(cell);
+    tile.title = tacticalMap.landmark?.index === index ? tacticalMap.landmark.label : getTacticalCellLabel(cell);
     if (glyph) tile.textContent = glyph;
     if (objectives.has(index)) {
       tile.classList.add("has-objective");

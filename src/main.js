@@ -530,6 +530,11 @@ const archipelagoRenderer = createArchipelagoRenderer({
   onOpenSector: (floor, objectiveId) => {
     if (archipelagoState.openSector(floor, objectiveId) && autosaveActive) void saveCurrentExpedition();
   },
+  onRerollSector: (floor, objectiveId) => {
+    const updated = archipelagoState.rerollSector(floor, objectiveId);
+    if (updated && autosaveActive) void saveCurrentExpedition();
+    return updated;
+  },
   onStartGuardian: (floor) => {
     archipelagoState.startGuardian(floor);
     refreshExplorationDisplay();

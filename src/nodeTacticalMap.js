@@ -350,7 +350,17 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
   const rng = createRng(sceneSeed);
   const cells = createEmptyMap();
 
-  applyTerrain(cells, node, rng);
+  const layout = node.tacticalLayout;
+  if (layout) {
+    for (const { x, y, width, height, tile } of layout.zones) {
+      for (let row = y; row < y + height; row += 1) {
+        for (let column = x; column < x + width; column += 1) cells[row][column] = tile;
+      }
+    }
+    cells[layout.landmark.y][layout.landmark.x] = "mechanism";
+  } else {
+    applyTerrain(cells, node, rng);
+  }
   applyClimate(cells, node, rng);
   placeParty(cells);
   const enemies = placeEnemies(cells, node, rng);
@@ -375,6 +385,7 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
     height: HEIGHT,
     objectiveCount: objectiveMarkers.length,
     objectiveMarkers,
+    ...(layout ? { landmark: { index: layout.landmark.y * WIDTH + layout.landmark.x, label: layout.landmark.name } } : {}),
     terrain: node.environment?.terrain || null,
     template: normalizeText(node.environment?.terrain?.name || "aberto"),
     trapCount: getTrapCount(node),
