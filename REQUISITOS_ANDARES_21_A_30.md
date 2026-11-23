@@ -790,7 +790,7 @@ A progressão normal começa com as quatro ilhas iniciais abertas e nenhum fragm
 
 #### Por onde retomar
 
-1. **Integrar as missões do arquipélago.** Vincular objetivos ao tema, setor e variante. Conferir aceite, progresso, recompensa e restauração da sessão. Testar uma missão com setor reaberto e outra com criaturas rerroladas antes de ampliar para todas as categorias.
+1. **Revisar as missões do arquipélago.** Manter cada missão como uma cena independente dos setores. Adaptar o objetivo, o texto e o mapa tático ao tema e ao terreno da ilha específica. Na ficha da ilha, substituir o botão grande por um acesso compacto que combine com a modal e preserve o destaque dos setores e das ações de exploração.
 2. **Validar a campanha completa em mesa.** Usar como referência o grupo chegando no nível 7 e testar os marcos de nível 8, 9 e 10 aos 4, 7 e 9 fragmentos. Conferir duração das sessões, recursos que sobram para o guardião, XP, tesouros, reaberturas e emboscadas. Testar o Rei Tirano com todos os bônus e com todos removidos, com atenção à CD 27 do Rugido Ensurdecedor e ao impacto de dois Deinonicos.
 3. **Revisar a grade tática compartilhada.** Tratar a evolução da grade como uma frente própria e conferir os efeitos nas arenas insulares e no convés da liburna.
 
@@ -798,7 +798,7 @@ A progressão normal começa com as quatro ilhas iniciais abertas e nenhum fragm
 
 - Repetir a validação visual quando houver troca de arte, conferindo as ilhas reveladas, concluídas e bloqueadas.
 - Os fragmentos obtidos ainda são representados principalmente por contador/progresso; a exibição visual individual no barco pode evoluir.
-- A adaptação definitiva do módulo de missões para os andares 21 a 30 fica pendente até o modo `archipelago` estar mais maduro. Por enquanto, não avaliar balanceamento, categorias, textos, vínculos ou recompensas de missões dessa faixa como critério final.
+- A revisão temática e visual das missões dos andares 21 a 30 é o próximo trabalho. A missão pertence à ilha, com objetivo e mapa próprios, e seu progresso é independente do resultado dos setores.
 
 ### A Definir
 
