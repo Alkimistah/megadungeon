@@ -3,7 +3,7 @@ import test from "node:test";
 import { archipelago21to30Profile } from "../src/floorProfiles/archipelago21to30.js";
 import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionThemes.js";
 import { MISSION_CATEGORIES } from "../src/missions/missionTables.js";
-import { getCreatureById } from "../src/creatureCatalog/index.js";
+import { getCreatureById, isAutomaticCreature } from "../src/creatureCatalog/index.js";
 import { TACTICAL_LEGEND_ORDER } from "../src/tacticalMapRenderer.js";
 import { createRng } from "../src/random.js";
 import { createArchipelagoState } from "../src/archipelagoState.js";
@@ -226,5 +226,53 @@ test("missões de ilha não se vinculam a setores", () => {
       assert.deepEqual(mission.integration.bindings, []);
       assert.equal(mission.integration.state, "pending");
     }
+  }
+});
+
+function getAutomaticPool(ids) {
+  return ids.map(id => getCreatureById(id))
+    .filter(creature => creature && isAutomaticCreature(creature, profile) && typeof creature.challengeRating === "number");
+}
+
+test("alvo da caçada é o mais forte disponível quando ninguém cabe na janela de ND", () => {
+  let strongestPicks = 0;
+  for (const hunt of allOffers.filter(o => o.category === "specialHunt" && !o.featured)) {
+    const target = profile.missionRules.rewardChallengeByFloor[hunt.destination.floor];
+    const limit = target + 1;
+    const ids = hunt.objective.outOfPlace ? getOutOfPlaceCreatureIds(hunt.themeId) : getIslandCreatureIds(hunt.themeId);
+    const pool = getAutomaticPool(ids);
+    const windowed = pool.filter(c => c.challengeRating >= Math.max(0.25, target - 0.5) && c.challengeRating <= limit);
+    const challenge = getCreatureById(hunt.objective.targetId).challengeRating;
+    if (windowed.length) {
+      assert.ok(windowed.some(c => c.id === hunt.objective.targetId), `${hunt.themeId}: ${hunt.objective.targetId} fora da janela`);
+    } else {
+      const strongest = Math.max(...pool.filter(c => c.challengeRating <= limit).map(c => c.challengeRating));
+      assert.equal(challenge, strongest, `${hunt.themeId}: ${hunt.objective.targetId} ND ${challenge}, esperado ${strongest}`);
+      strongestPicks += 1;
+    }
+  }
+  assert.ok(strongestPicks > 0);
+});
+
+test("toda caçada de ilha traz outOfPlace booleano, mesmo sem elenco", () => {
+  const hunts = allOffers.filter(o => o.category === "specialHunt");
+  assert.ok(hunts.length > 0);
+  for (const hunt of hunts) assert.equal(typeof hunt.objective.outOfPlace, "boolean");
+  let checked = 0;
+  for (let s = 0; s < 60; s++) {
+    const worldDraft = { islands: profile.missionRules.missionFloors.map(floor => ({ floor, name: `Ilha de teste ${floor}`, themeId: `tema-${floor}`, objectives: [] })) };
+    for (const offer of generateMissionOffers(createMissionGenerationContext({ currentSeed: `sem-elenco-${s}`, profile, worldDraft }))) {
+      if (offer.category !== "specialHunt") continue;
+      assert.equal(offer.objective.outOfPlace, false);
+      checked += 1;
+    }
+  }
+  assert.ok(checked > 0);
+});
+
+test("lead da destaque lê bem seguido de \"na Ilha N\"", () => {
+  for (const id of themeIds) {
+    const lead = getArchipelagoMissionTheme(id).featured.lead;
+    assert.ok(!/(por quê|ponta a ponta|vazante)$/i.test(lead), `${id}: ${lead}`);
   }
 });

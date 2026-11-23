@@ -177,13 +177,25 @@ function toHuntTarget(creature) {
   };
 }
 
+// Janela de ND da caçada; sem ninguém na janela, o alvo é a criatura mais forte até ND do andar + 1.
 function getHuntCandidates(ids, profile, floor) {
   const candidates = ids
     .map((id) => getCreatureById(id))
     .filter((creature) => creature && isAutomaticCreature(creature, profile) &&
       typeof creature.challengeRating === "number");
+  const targetChallenge = getRewardChallengeByFloor(profile, floor);
+  const minimumChallenge = Math.max(0.25, targetChallenge - 0.5);
+  const maximumChallenge = targetChallenge + 1;
+  const preferred = candidates.filter((creature) =>
+    creature.challengeRating >= minimumChallenge && creature.challengeRating <= maximumChallenge);
 
-  return getPreferredCreatureCandidates(candidates, profile, floor, "specialHunt");
+  if (preferred.length) return preferred;
+
+  const belowLimit = candidates.filter((creature) => creature.challengeRating <= maximumChallenge);
+  if (!belowLimit.length) return [];
+
+  const strongest = Math.max(...belowLimit.map((creature) => creature.challengeRating));
+  return belowLimit.filter((creature) => creature.challengeRating === strongest);
 }
 
 // Caçada numa ilha com tema: o alvo vem do elenco da ilha; às vezes, de outro lugar do arquipélago.
@@ -310,20 +322,20 @@ function createFeaturedObjective({ featured, floor, profile, rng, themeId }) {
   return base;
 }
 
-function createObjective({ categoryId, floor, profile, rng, themeId = null, themePools = null }) {
+function createObjective({ categoryId, floor, isIsland = false, profile, rng, themeId = null, themePools = null }) {
   const category = MISSION_CATEGORIES[categoryId];
   const challenge = getRewardChallengeByFloor(profile, floor);
 
   if (category.targetTypes.includes("creature")) {
-    const islandHunt = categoryId === "specialHunt" && Boolean(themeId) && getIslandCreatureIds(themeId).length > 0;
-    const target = islandHunt
+    const islandHunt = categoryId === "specialHunt" && isIsland;
+    const target = islandHunt && themeId && getIslandCreatureIds(themeId).length > 0
       ? getIslandHuntTarget(profile, floor, rng, themeId)
       : getCreatureTarget(profile, floor, rng, categoryId);
     const quantity = categoryId === "specialHunt" ? 1 : categoryId === "extermination" ? randomInt(rng, 4, 8) : randomInt(rng, 1, 4);
 
     if (target) {
       return {
-        ...(islandHunt ? { outOfPlace: target.outOfPlace } : {}),
+        ...(islandHunt ? { outOfPlace: Boolean(target.outOfPlace) } : {}),
         challenge: target.challenge,
         condition: categoryId === "specialHunt" ? "alvo específico" : "eliminar ameaça",
         kind: category.objectiveKind,
@@ -613,7 +625,7 @@ function createMissionOffer({ categoryId, context, featured = null, floor: prese
   const theme = themeId ? getArchipelagoMissionTheme(themeId) : null;
   const objective = featured
     ? createFeaturedObjective({ featured, floor, profile, rng, themeId })
-    : createObjective({ categoryId, floor, profile, rng, themeId, themePools: theme?.pools || null });
+    : createObjective({ categoryId, floor, isIsland, profile, rng, themeId, themePools: theme?.pools || null });
   const source = pickWeighted(rng, getMissionSources(profile, categoryId));
   const difficulty = pickWeighted(rng, DIFFICULTY_MULTIPLIERS);
   const rewardMultiplier = getRewardMultiplier(categoryId, difficulty.value);

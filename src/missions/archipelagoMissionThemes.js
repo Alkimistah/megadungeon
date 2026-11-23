@@ -65,7 +65,7 @@ export const ARCHIPELAGO_MISSION_THEMES = {
       category: "exploration",
       title: "A rota da vazante",
       targetName: "a rota segura pelos bancos de areia",
-      lead: "Mapeie a rota que se abre no anel de areia durante a vazante",
+      lead: "Durante a vazante, mapeie a rota que se abre no anel de areia",
       condition: "Marcar os bancos transitáveis até a lagoa central antes da maré fechar o caminho",
       proofType: "Trazer a rota marcada na pulseira e descrever os canais perigosos."
     },
@@ -113,7 +113,7 @@ export const ARCHIPELAGO_MISSION_THEMES = {
       category: "trial",
       title: "A prova da encosta",
       targetName: "a travessia da encosta instável",
-      lead: "Prove que a rota da encosta é segura percorrendo-a de ponta a ponta",
+      lead: "Para provar que a rota é segura, percorra de ponta a ponta a encosta instável",
       condition: "Atravessar a encosta e firmar três marcos de pedra antes do próximo tremor grande",
       proofType: "Mostrar os marcos firmados e relatar os trechos que cederam."
     },
@@ -213,7 +213,7 @@ export const ARCHIPELAGO_MISSION_THEMES = {
       category: "anomalous",
       title: "O raio que repete",
       targetName: "o ponto onde o mesmo raio cai sem parar",
-      lead: "Investigue o ponto onde o mesmo raio cai a cada minuto, sem que ninguém explique por quê",
+      lead: "Investigue por que o mesmo raio cai a cada minuto sobre o mesmo ponto",
       condition: "Chegar ao ponto, observar o fenômeno por uma tempestade completa e descobrir o que o atrai",
       proofType: "Registrar o fenômeno e trazer uma lasca da pedra atingida."
     },
