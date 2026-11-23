@@ -53,6 +53,7 @@ O PO escolheu a 1: tudo num lugar só, a revisão fica fácil e o teste guia a r
 - **Conteúdo misto (C):** listas temáticas para cada tema ativo, mais uma missão escrita à mão por tema. As genéricas continuam, mas só com alvos que servem para qualquer ilha.
 - **Uma missão por ilha, no máximo.** De 1 a 8 ofertas por carregamento da faixa, todas em ilhas diferentes.
 - **Missão independente dos setores.** Sai o vínculo de setor e sai o selo "Missão" dos setores.
+- **Missões de combate:** a Caçada especial entra, com o alvo normalmente da ecologia da ilha e às vezes um alvo fora do lugar. O Extermínio fica fora. Detalhes em "Esclarecimentos da revisão".
 - **Acesso no rodapé (opção C da prévia).** Um botão com ícone de pergaminho e o texto "Missão: <título>", entre o contador de setores e "Retornar ao barco". O painel largo "Missão disponível" sai. Captura de referência: `.playwright-mcp/missoes-arquipelago/c-rodape.png`.
 
 ## Desenho
@@ -105,7 +106,12 @@ Os textos das 9 entradas (listas e missões em destaque) são apresentados em um
 
 ## Esclarecimentos da revisão (decisões do gerente)
 
-- **Alvos de criatura:** o arquipélago não tem categorias com criatura como alvo. `allowedCategories` traz só coleta, exploração, recuperação, investigação, resgate, entrega, desafio e anomalia; caça especial e extermínio ficam fora. Não há lista de criaturas por tema neste trabalho.
+- **Missões de combate (decisão do PO):** a **Caçada especial** (`specialHunt`) entra em `allowedCategories` do arquipélago. O **Extermínio** continua fora, porque "mate X criaturas" não cabe numa cena só. Uma Caçada especial gera um combate específico na ilha:
+  - **Alvo da ilha (caso comum):** a criatura marcada e os acompanhantes saem do contexto de ecologia do tema (`archipelagoEcologyContexts.byTheme[themeId]`). O encontro é montado com o ND da ilha pelo mesmo gerador dos setores.
+  - **Alvo fora do lugar (caso raro, decisão do PO):** a criatura marcada não pertence à ecologia da ilha. É um predador incomum ou um inimigo deslocado, como um dinossauro na Ilha Flutuante ou um espírito de fogo num lugar gelado. Proposta do gerente: cerca de 1 em cada 4 caçadas sorteadas, com o alvo tirado da ecologia de **outro tema** (ativo ou não). Ele vem sozinho ou com criaturas da própria origem, nunca escoltado pela fauna local. O texto da oferta diz que ele está fora do seu lugar.
+  - A recompensa e a prova seguem a regra que a Caçada especial já tem (ND do andar + 1; troféu ou prova inequívoca).
+  - A missão escrita à mão de um tema pode ser de combate, inclusive com um alvo fora do lugar escolhido de propósito.
+- **Inimigos guardando o objetivo:** nas missões sem foco em combate, os inimigos que o mapa da missão já posiciona passam a vir da ecologia da ilha, e não de uma lista genérica.
 - **Vínculo de setor:** desliga-se só no modo `archipelago`. O campo `integration.bindings` continua no modelo, porque a floresta usa vínculos de nodo; nas missões do arquipélago, qualquer vínculo `kind: "objective"` salvo antes é ignorado. Não há conclusão automática da missão por setor.
 - **Botão do rodapé:** encontra a missão por `destination.kind = "island"` e `destination.floor` da ilha aberta, como `getMissionsForFloor` faz hoje.
 - **Rótulo "Ilha N":** é calculado na exibição a partir de `destination.floor` e do estado de Caminhos desconhecidos, e não fica gravado no rótulo. Assim valida também as missões já salvas. O título da missão, inclusive o da missão em destaque, aparece normalmente, porque o PO aceitou o spoiler pelo conteúdo.
