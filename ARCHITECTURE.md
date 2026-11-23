@@ -566,6 +566,23 @@ Na retomada, avaliar também se vale reestruturar a grade compartilhada. Compara
 
 A primeira comparação ficava em `tmp/mapas-taticos/comparacao.html`. Ela e a comparação com a cena real foram perdidas na limpeza de 23/11/2026 e serão refeitas no início da revisão da grade tática. O protótipo local usa o terreno do gerador atual e mantém as mesmas posições de duas cenas sintéticas. No pântano com neblina, a grade atual encobre três quadrados de terreno. Na floresta com tempestade, encobre um e desenha dois símbolos de armadilha em um encontro com zero armadilhas. O protótipo mostra o clima no cabeçalho da cena e sobrepõe peças e objetivos ao terreno. A comparação com a missão da bússola do andar 14 ficava em `tmp/mapas-taticos/comparacao-cena-real.html`. O encontro foi reconstruído a partir da sessão recuperada. Seis quadrados de terreno ficam encobertos na grade atual. A sobreposição preserva a posição da bússola e permite consultar terreno e armadilha juntos. A decisão sobre mapas-base fixos segue aberta.
 
+**Roteiro da retomada (23/11/2026).**
+
+1. Refazer em `tmp/previas/grade-tatica/` as duas comparações perdidas: duas cenas sintéticas (pântano com neblina, floresta com tempestade) e uma cena real que exigiu adaptação na mesa, com a grade atual ao lado da sobreposição de peças sobre o terreno.
+2. Acrescentar uma cena de cada contexto novo: arena de ilha, convés da liburna e mapa de missão por ilha.
+3. Levar ao PO as perguntas abaixo, uma por vez, com prévias renderizadas no app.
+4. Escrever o design e o plano em `docs/superpowers/` e executar pelo processo de subagentes.
+
+Perguntas para o PO:
+
+- **Sobreposição:** peças, objetivos e armadilhas passam a ficar por cima do terreno, sem esconder o quadrado?
+- **Mapas-base fixos:** um conjunto pequeno de mapas por ambiente, com poucas adições por cena, ou a geração livre atual?
+- **Coerência entre ficha e grade:** cada obstáculo ou efeito na grade precisa ter regra na descrição e na legenda, e o que não tiver efeito tático sai?
+- **Clima:** fica no cabeçalho da cena, e não como células na grade?
+- **Alcance:** a mudança vale para as três faixas, incluindo setores, arenas, convés e mapas de missão?
+- **Movimentação de peças durante o combate:** entra agora ou fica para depois (hoje está com prioridade menor)?
+- **Ferramenta:** manter o renderizador atual ajustado ou testar outra forma de montar cenas (mapa-base, terreno, clima e peças como partes independentes)?
+
 - **Repaginar a geração.** Explorar um conjunto pequeno de mapas fixos com variações por ambiente e poucas adições de terreno ou clima por cena. A dor na mesa é conciliar o que a ficha do encontro descreve com o que a grade mostra, especialmente quando o mapa repete um efeito ou coloca um obstáculo sem função clara. Na retomada, partir de cenas reais que exigiram adaptação manual e verificar se cada adição tem efeito tático claro, combina com o mapa escolhido e aparece de forma coerente na descrição e na legenda.
 - **Movimentar jogadores e inimigos durante a sessão.** Ideia de prioridade menor que a revisão da geração. Na grade atual, as posições iniciais são marcadores da cena. Ao retomar, conferir se há algum protótipo anterior e estudar a movimentação de peças sobre a grade, mantendo o terreno e os objetivos em suas posições.
 
