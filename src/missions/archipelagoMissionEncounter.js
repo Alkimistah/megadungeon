@@ -59,9 +59,30 @@ function resolveCompanions(mission, target, roster, ecologyThemeId, limit, profi
   return [];
 }
 
+const ENCOUNTER_CACHE_LIMIT = 64;
+const ENCOUNTER_CACHE_NO_PROFILE = {};
+const encounterCache = new WeakMap();
+
 export function createArchipelagoHuntEncounter(mission, profile) {
   if (!isIslandHunt(mission)) return null;
 
+  // Memo por perfil (objeto) e pelas entradas que o encontro lê, para a caçada
+  // não ser recalculada a cada renderização do diálogo e do mapa.
+  const objective = mission.objective;
+  const key = [mission.id, mission.themeId, mission.destination.floor, objective.targetId,
+    objective.targetName, objective.challenge, objective.outOfPlace].join("|");
+  const holder = profile && typeof profile === "object" ? profile : ENCOUNTER_CACHE_NO_PROFILE;
+  let perProfile = encounterCache.get(holder);
+  if (!perProfile) encounterCache.set(holder, perProfile = new Map());
+  if (perProfile.has(key)) return perProfile.get(key);
+
+  const encounter = buildHuntEncounter(mission, profile);
+  if (perProfile.size >= ENCOUNTER_CACHE_LIMIT) perProfile.delete(perProfile.keys().next().value);
+  perProfile.set(key, encounter);
+  return encounter;
+}
+
+function buildHuntEncounter(mission, profile) {
   const objective = mission.objective;
   const creature = getCreatureById(objective.targetId);
   const targetChallenge = typeof creature?.challengeRating === "number"

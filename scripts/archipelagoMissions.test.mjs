@@ -12,6 +12,8 @@ import { materializeMissionsForCurrentContent } from "../src/missions/missionPro
 import { getCreatureOriginIds, getIslandCreatureIds, getOutOfPlaceCreatureIds } from "../src/archipelagoCreatureRules.js";
 import { createArchipelagoHuntEncounter } from "../src/missions/archipelagoMissionEncounter.js";
 import { calculateCombatND } from "../src/challenge.js";
+import { getIslandThemeTerrain } from "../src/archipelagoPilot.js";
+import { createMissionTacticalMap } from "../src/missions/missionTacticalMap.js";
 
 const POOLS = ["locations", "materials", "objects", "mementos", "clues", "challenges", "phenomena"];
 const themeIds = archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "dinosaurs");
@@ -393,4 +395,73 @@ test("sem ND do andar no perfil, o limite é o ND do alvo + 1", () => {
   const enc = createArchipelagoHuntEncounter(mission, profile);
   assert.ok(enc.challenge <= 3, `ND ${enc.challenge}`);
   assert.equal(enc.items[0].creatureId, "selako");
+});
+
+// --- Mapa tático com o terreno da ilha (Tarefa 4) ---
+
+const activeThemes = themeIds;
+
+function sampleMission(themeId, predicate = () => true) {
+  const mission = allOffers.find(o => o.destination?.kind === "island" && o.themeId === themeId && predicate(o));
+  assert.ok(mission, `sem missão para ${themeId}`);
+  return mission;
+}
+
+test("todo tema ativo tem terreno de ilha", () => {
+  for (const id of activeThemes) assert.ok(getIslandThemeTerrain(id)?.name, id);
+  assert.equal(getIslandThemeTerrain("inexistente"), null);
+});
+
+test("mapa da missão de ilha usa terreno e marcadores do tema", () => {
+  for (const theme of activeThemes) {
+    const entry = getArchipelagoMissionTheme(theme);
+    const mission = sampleMission(theme, o => !(o.featured && entry.featured.landmark));
+    const map = createMissionTacticalMap(mission, { profile });
+    const terrain = getIslandThemeTerrain(theme);
+    assert.equal(map.terrain.name, terrain.name);
+    assert.equal(map.terrain.features[0].name, terrain.features[0].name);
+    const themed = new Set(entry.map.markers);
+    assert.ok(map.cells.some(c => themed.has(c)), theme);
+    assert.ok(map.terrain.features.some(f => f.name === entry.map.landmark.name), theme);
+    assert.ok(map.terrain.features.some(f => f.name === mission.categoryLabel), theme);
+    assert.ok(map.terrain.features.some(f => f.name === "Riscos"), theme);
+    for (const c of map.cells) assert.ok(c === "floor" || TACTICAL_LEGEND_ORDER.includes(c), c);
+  }
+});
+
+const GENERIC_MAP_FIXTURE = {"cells":["floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","obstacle","floor","objective","floor","floor","floor","floor","floor","floor","floor","difficult","floor","floor","floor","floor","floor","floor","objective","floor","floor","floor","difficult","floor","floor","floor","foliage","floor","floor","floor","floor","floor","floor","floor","floor","trap","floor","trap","floor","floor","floor","floor","floor","floor","floor","foliage","floor","floor","floor","floor","floor","floor","objective","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","obstacle","floor","floor","floor","floor","floor","difficult","floor","floor","floor","floor","difficult","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","foliage","floor","floor","floor","floor","floor","floor","trap","floor","floor","floor","floor","trap","floor","floor","floor","floor","floor","floor","party","party","floor","foliage","floor","floor","foliage","floor","floor","floor","floor","floor","floor","floor","floor","floor","party","party","floor","floor","floor","difficult","floor","obstacle","obstacle","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor","floor"],"climate":[],"enemyCount":0,"height":12,"missionDc":28,"objectiveCount":3,"resolutionCheck":{"skill":"Sobrevivência","action":"coletar a amostra sem contaminar a prova","dc":28},"riskDetails":[{"area":"alcance curto","challengeLabel":"6","checks":["Detectar: Investigação CD 30","Desarmar: Ladinagem CD 30","Resistência: Vontade CD 25 (evita)"],"effect":"Criaturas em alcance curto ficam confusas permanentemente.","kind":"Armadilha","name":"Símbolo da Insanidade"},{"area":"todas as criaturas num quadrado de 6m de lado","challengeLabel":"6","checks":["Detectar: Investigação CD 25","Desarmar: Ladinagem CD 25","Resistência: Reflexos CD 30 (reduz à metade)"],"effect":"Causa 15d6 pontos de dano de impacto em todas as criaturas num quadrado de 6m de lado.","kind":"Armadilha","name":"Desabamento do Teto"},{"area":"alcance curto","challengeLabel":"5","checks":["Detectar: Investigação CD 30","Desarmar: Ladinagem CD 30","Resistência: Fortitude CD 25 (evita)"],"effect":"Criaturas em alcance curto ficam atordoadas por 1d6 rodadas.","kind":"Armadilha","name":"Símbolo do Atordoamento"},{"area":"esfera de 3m","challengeLabel":"5","checks":["Detectar: Investigação CD 25","Desarmar: Ladinagem CD 25","Resistência: Reflexos CD 25 (evita)"],"effect":"Causa 12d6 pontos de dano de impacto em todas as criaturas em uma esfera de 3m.","kind":"Armadilha","name":"Mina Terrestre"}],"terrain":{"name":"Ilha 4","effect":"Objetivo: cristais. Teste central: Sobrevivência CD 28 (coletar a amostra sem contaminar a prova).","features":[{"name":"Coleta","effect":"Colete cristais."},{"name":"Riscos","effect":"Símbolo da Insanidade; Desabamento do Teto; Símbolo do Atordoamento; Mina Terrestre"},{"name":"Objetivo","effect":"Amostra"}]},"template":"collection","trapCount":4,"width":16};
+
+test("missão sem targetId usa o mapa genérico de antes", () => {
+  const mission = {
+    id: "fixture-generic-1", category: "collection", categoryLabel: "Coleta", difficulty: "hard", reward: { challenge: 6 },
+    destination: { kind: "island", floor: 24, label: "Ilha 4" },
+    objective: { kind: "collect", quantity: 3, progressMode: "aggregate", targetName: "cristais", condition: "Colete" },
+    proofType: "Amostra"
+  };
+  assert.deepEqual(createMissionTacticalMap(mission, { profile }), GENERIC_MAP_FIXTURE);
+});
+
+test("destaque com landmark substitui o ponto de referência", () => {
+  let checked = 0;
+  for (const theme of activeThemes) {
+    const entry = getArchipelagoMissionTheme(theme);
+    if (!entry.featured.landmark) continue;
+    const mission = sampleMission(theme, o => o.featured);
+    const names = createMissionTacticalMap(mission, { profile }).terrain.features.map(f => f.name);
+    assert.ok(names.includes(entry.featured.landmark.name), theme);
+    assert.ok(!names.includes(entry.map.landmark.name), theme);
+    checked += 1;
+  }
+  assert.ok(checked >= 2);
+});
+
+test("mapa da caçada posiciona um inimigo por criatura do encontro", () => {
+  const hunts = sampleHunts(60);
+  for (const mission of hunts) {
+    const enc = createArchipelagoHuntEncounter(mission, profile);
+    const total = enc.items.reduce((sum, item) => sum + item.quantity, 0);
+    const map = createMissionTacticalMap(mission, { profile });
+    assert.equal(map.enemyCount, total, mission.id);
+    assert.equal(map.cells.filter(c => c === "enemy").length, total, mission.id);
+  }
 });

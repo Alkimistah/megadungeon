@@ -205,6 +205,12 @@ const SECTOR_ISLANDS = {
   }
 };
 
+export function getIslandThemeTerrain(themeId) {
+  const config = SECTOR_ISLANDS[themeId];
+  if (!config) return null;
+  return config.terrain ?? (themeId === "mangrove" ? MANGROVE_TERRAIN : null);
+}
+
 export function hasIslandSectors(island) {
   const config = SECTOR_ISLANDS[island?.themeId];
   return Boolean(config && island.pilot === config.pilot);

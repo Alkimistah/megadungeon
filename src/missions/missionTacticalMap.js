@@ -1,5 +1,8 @@
 import { createRng, randomInt } from "../random.js";
 import { trapCatalog } from "../traps.js";
+import { getIslandThemeTerrain } from "../archipelagoPilot.js";
+import { getArchipelagoMissionTheme } from "./archipelagoMissionThemes.js";
+import { createArchipelagoHuntEncounter } from "./archipelagoMissionEncounter.js";
 
 const DEFAULT_WIDTH = 16;
 const DEFAULT_HEIGHT = 12;
@@ -137,10 +140,18 @@ function placeObjective(cells, mission, rng, size) {
   return objectiveCount;
 }
 
-function placeEnemies(cells, mission, rng, size) {
+function getIslandMapTheme(mission) {
+  const themeId = mission.destination?.kind === "island" ? mission.destination.targetId : null;
+  const theme = themeId ? getArchipelagoMissionTheme(themeId) : null;
+  const terrain = theme ? getIslandThemeTerrain(themeId) : null;
+
+  return theme && terrain ? { theme, terrain } : null;
+}
+
+function placeEnemies(cells, mission, rng, size, enemyTotal = null) {
   if (!COMBAT_KINDS.has(mission.objective?.kind)) return 0;
 
-  const count = Math.min(Math.max(mission.objective?.quantity || 1, 1), 8);
+  const count = enemyTotal ?? Math.min(Math.max(mission.objective?.quantity || 1, 1), 8);
   const enemyXMin = Math.max(3, Math.floor(size.width * 0.52));
   const enemyYMax = Math.max(2, size.height - 3);
   const candidates = shuffle(
@@ -180,9 +191,9 @@ function placeRisk(cells, mission, rng, size) {
   };
 }
 
-function placeTerrain(cells, mission, rng, size) {
+function placeTerrain(cells, mission, rng, size, themedMarkers = null) {
   const kind = mission.objective?.kind;
-  const terrainMarkers = kind === "explore"
+  const terrainMarkers = themedMarkers?.length ? themedMarkers : kind === "explore"
     ? ["difficult", "obstacle", "concealment"]
     : kind === "collect"
       ? ["foliage", "difficult", "obstacle"]
@@ -307,10 +318,16 @@ export function createMissionTacticalMap(mission, { profile = null } = {}) {
   const size = getMissionMapSize(mission, profile);
   const cells = createEmptyCells(size);
 
-  placeTerrain(cells, mission, rng, size);
+  const islandTheme = getIslandMapTheme(mission);
+  const huntEncounter = islandTheme ? createArchipelagoHuntEncounter(mission, profile) : null;
+  const enemyTotal = huntEncounter
+    ? huntEncounter.items.reduce((sum, item) => sum + item.quantity, 0)
+    : null;
+
+  placeTerrain(cells, mission, rng, size, islandTheme?.theme.map.markers);
   placeParty(cells, size);
   const objectiveCount = placeObjective(cells, mission, rng, size);
-  const enemyCount = placeEnemies(cells, mission, rng, size);
+  const enemyCount = placeEnemies(cells, mission, rng, size, enemyTotal);
   const risk = placeRisk(cells, mission, rng, size);
   const missionDc = getMissionDc(mission);
   const resolutionCheck = getMissionResolutionCheck(mission, detailRng, missionDc);
@@ -318,6 +335,43 @@ export function createMissionTacticalMap(mission, { profile = null } = {}) {
   const objectiveLabel = OBJECTIVE_HEAVY_KINDS.has(mission.objective?.kind)
     ? mission.objective?.targetName
     : "ponto de pressão da missão";
+
+  const missionFeatures = [
+    {
+      name: mission.categoryLabel,
+      effect: mission.objective?.condition
+        ? `${mission.objective.condition} ${mission.objective.targetName || "o objetivo"}.`
+        : "Objetivo definido pela missão."
+    },
+    {
+      name: "Riscos",
+      effect: riskDetails.length
+        ? riskDetails.map((riskDetail) => riskDetail.name).join("; ")
+        : "Sem risco adicional no mapa."
+    },
+    {
+      name: "Objetivo",
+      effect: mission.proofType || "Confirmação do mestre."
+    }
+  ];
+  const effect = `Objetivo: ${objectiveLabel}. Teste central: ${formatResolutionCheck(resolutionCheck)}.`;
+  const terrain = islandTheme
+    ? {
+      name: islandTheme.terrain.name,
+      effect: `${islandTheme.terrain.effect} ${effect}`,
+      features: [
+        ...islandTheme.terrain.features,
+        ...missionFeatures,
+        mission.featured && islandTheme.theme.featured.landmark
+          ? islandTheme.theme.featured.landmark
+          : islandTheme.theme.map.landmark
+      ]
+    }
+    : {
+      name: mission.destination?.label || "Área da missão",
+      effect,
+      features: missionFeatures
+    };
 
   return {
     cells: cells.flat(),
@@ -328,28 +382,7 @@ export function createMissionTacticalMap(mission, { profile = null } = {}) {
     objectiveCount,
     resolutionCheck,
     riskDetails,
-    terrain: {
-      name: mission.destination?.label || "Área da missão",
-      effect: `Objetivo: ${objectiveLabel}. Teste central: ${formatResolutionCheck(resolutionCheck)}.`,
-      features: [
-        {
-          name: mission.categoryLabel,
-          effect: mission.objective?.condition
-            ? `${mission.objective.condition} ${mission.objective.targetName || "o objetivo"}.`
-            : "Objetivo definido pela missão."
-        },
-        {
-          name: "Riscos",
-          effect: riskDetails.length
-            ? riskDetails.map((riskDetail) => riskDetail.name).join("; ")
-            : "Sem risco adicional no mapa."
-        },
-        {
-          name: "Objetivo",
-          effect: mission.proofType || "Confirmação do mestre."
-        }
-      ]
-    },
+    terrain,
     template: mission.category,
     trapCount: risk.count,
     width: size.width
