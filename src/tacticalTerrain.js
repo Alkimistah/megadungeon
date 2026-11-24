@@ -73,6 +73,22 @@ export const TERRAIN_AUTOTILE_JOINS = {
   canopy: ["canopy"]
 };
 
+// Lados sem vizinho do mesmo grupo, para uma lista de índices de feature (toldo), pela mesma regra do autotile.
+export function getFeatureAutotileClasses(type, indices, width, index) {
+  const joins = TERRAIN_AUTOTILE_JOINS[type] ?? [type];
+  const set = new Set(indices);
+  const x = index % width;
+  const neighbors = {
+    top: set.has(index - width),
+    right: x < width - 1 && set.has(index + 1),
+    bottom: set.has(index + width),
+    left: x > 0 && set.has(index - 1)
+  };
+  const classes = ["is-auto"];
+  for (const [side, joined] of Object.entries(neighbors)) if (!joined) classes.push(`edge-${side}`);
+  return joins.includes(type) ? classes : [];
+}
+
 export function getTerrainTileClasses(terrain, width, index) {
   const type = terrain[index];
   const isAuto = type in TERRAIN_AUTOTILE_JOINS;

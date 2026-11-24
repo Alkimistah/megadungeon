@@ -39,6 +39,18 @@ test("a chance da emboscada sobe 5 pontos por fragmento e o ND acompanha a exped
       assert.equal(map.scene.terrain[6 * map.width + 15], "deck");
       assert.ok(map.scene.features.some(feature => feature.id === "stern-canopy"));
       assert.ok(map.scene.markers.some(marker => marker.id === "square-mast"));
+      const sternMast = map.scene.features.find(feature => feature.id === "stern-canopy-mast");
+      assert.equal(sternMast.type, "obstacle");
+      assert.equal(sternMast.label, "Mastro do toldo");
+      assert.deepEqual([...sternMast.indices].sort((a, b) => a - b), [6 * map.width + 16, 7 * map.width + 16]);
+      assert.ok(scene.environment.terrain.features.some(feature => feature.id === "stern-canopy-mast"));
+      for (const piece of map.scene.pieces) {
+        for (let y = piece.y; y < piece.y + piece.height; y++) {
+          for (let x = piece.x; x < piece.x + piece.width; x++) {
+            assert.ok(!sternMast.indices.includes(y * map.width + x), `peça ${piece.id} sobre o mastro do toldo`);
+          }
+        }
+      }
       assert.equal(map.cells.at(-1), "water");
       assert.equal(map.cells[map.landmark.index], "mechanism");
       assert.equal(map.landmark.label, "Mastro da vela quadrada");

@@ -4,6 +4,7 @@ import {
   TACTICAL_MARKER_GLYPHS,
   TACTICAL_MARKER_LABELS,
   TACTICAL_TERRAIN_LABELS,
+  getFeatureAutotileClasses,
   getTerrainTileClasses
 } from "./tacticalTerrain.js";
 
@@ -173,7 +174,7 @@ function renderTacticalGrid(scene, state, updateLegend, updateControls) {
       tile.appendChild(overlay);
     }
   };
-  scene.features.forEach((entry) => addOverlay(entry, "feature"));
+  scene.features.filter((entry) => entry.type !== "canopy").forEach((entry) => addOverlay(entry, "feature"));
   scene.markers.forEach((entry) => {
     if (!entry.pieceId) {
       addOverlay(entry, "marker");
@@ -186,6 +187,22 @@ function renderTacticalGrid(scene, state, updateLegend, updateControls) {
   const layer = createElement("div", "tactical-piece-layer");
   const tokens = new Map();
   grid.appendChild(layer);
+
+  // Toldo: desenhado por cima das peças (sem capturar cliques), com contorno único por feature.
+  const canopyCells = scene.features.filter((entry) => entry.type === "canopy").flatMap((entry) =>
+    (entry.indices || []).map((index) => {
+      const cell = createElement("span", "tactical-canopy-cell is-canopy");
+      cell.classList.add(...getFeatureAutotileClasses("canopy", entry.indices, scene.width, index));
+      cell.style.gridColumn = String(index % scene.width + 1);
+      cell.style.gridRow = String(Math.floor(index / scene.width) + 1);
+      cell.title = entry.label || TACTICAL_FEATURE_LABELS.canopy || "canopy";
+      return cell;
+    }));
+  if (canopyCells.length) {
+    const canopyLayer = createElement("div", "tactical-canopy-layer");
+    canopyLayer.append(...canopyCells);
+    grid.appendChild(canopyLayer);
+  }
 
   function update() {
     const pieces = state?.pieces ?? scene.pieces;

@@ -34,11 +34,12 @@ const briefings = {
 const mast = { id: "square-mast", name: "Mastro da vela quadrada", effect: "O mastro fica no centro do convés." };
 const cargo = { id: "cargo", name: "Carga", effect: "Caixas e barris junto à amurada servem de cobertura." };
 const canopy = { id: "stern-canopy", name: "Toldo da popa", effect: "A lona cobre os quadrados claros da popa, por onde se pode passar." };
+const canopyMast = { id: "stern-canopy-mast", name: "Mastro do toldo", effect: "O mastro de apoio sustenta a lona no meio da popa." };
 
 const deck = {
   name: "Convés da liburna",
   effect: "O casco estreito corre da proa, à esquerda, até a popa coberta, à direita. O grupo começa junto ao toldo.",
-  features: [mast, cargo, canopy]
+  features: [mast, cargo, canopy, canopyMast]
 };
 
 const tacticalLayout = {
@@ -48,6 +49,7 @@ const tacticalLayout = {
     { x: 3, y: 5, width: 16, height: 4, tile: "deck" },
     { x: 6, y: 4, width: 11, height: 6, tile: "deck" },
     { x: 15, y: 5, width: 3, height: 4, tile: "canopy", id: canopy.id, label: canopy.name },
+    { x: 16, y: 6, width: 1, height: 2, tile: "obstacle", featureType: "obstacle", id: canopyMast.id, label: canopyMast.name },
     { x: 7, y: 4, width: 2, height: 1, tile: "obstacle", featureType: "obstacle", id: cargo.id, label: cargo.name },
     { x: 12, y: 9, width: 2, height: 1, tile: "obstacle", featureType: "obstacle", id: cargo.id, label: cargo.name }
   ],

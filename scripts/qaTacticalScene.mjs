@@ -159,6 +159,48 @@ try {
   await remove.click();
   assert.equal(await king.count(), 0);
   assert.equal(await remove.count(), 0);
+  // Liburna: o toldo fica numa camada por cima das peças, sem capturar cliques.
+  await page.evaluate(async () => {
+    document.body.replaceChildren();
+    const { createTacticalMapPanel } = await import("./src/tacticalMapRenderer.js");
+    const { createTacticalEncounterSession } = await import("./src/tacticalEncounterSession.js");
+    const { createBoatAmbush } = await import("./src/archipelagoBoatAmbush.js");
+    const { createNodeTacticalMap } = await import("./src/nodeTacticalMap.js");
+    const { archipelago21to30Profile } = await import("./src/floorProfiles/archipelago21to30.js");
+    const ambush = createBoatAmbush(9, 1, archipelago21to30Profile, "toldo-qa", () => 0);
+    const map = createNodeTacticalMap(ambush);
+    const state = createTacticalEncounterSession().openMap("liburna", map);
+    document.body.append(createTacticalMapPanel(map, { state }));
+  });
+  const boat = page.locator(".tactical-map-panel");
+  const canopyLayer = boat.locator(".tactical-piece-layer + .tactical-canopy-layer");
+  assert.equal(await canopyLayer.count(), 1);
+  assert.equal(await canopyLayer.evaluate((layer) => getComputedStyle(layer).pointerEvents), "none");
+  assert.ok(await canopyLayer.locator(".tactical-canopy-cell.is-auto.is-canopy").count());
+  assert.equal(await boat.locator(".tactical-cell .tactical-feature.is-canopy").count(), 0);
+  const rightmost = (await boat.locator('.tactical-piece[data-side="ally"]').evaluateAll((pieces) =>
+    pieces.map((piece) => [piece.getAttribute("aria-label"), Number(piece.style.getPropertyValue("--piece-x")), Number(piece.style.getPropertyValue("--piece-y"))])))
+    .sort((first, second) => second[1] - first[1] || first[2] - second[2])[0];
+  const walker = boat.getByRole("button", { name: rightmost[0], exact: true });
+  await walker.focus();
+  await walker.press("ArrowRight");
+  assert.equal(await walker.evaluate((piece) => piece.style.getPropertyValue("--piece-x")), "15");
+  const insideCanopy = await walker.evaluate((piece, layerSelector) => {
+    const area = piece.getBoundingClientRect();
+    const canopy = document.querySelector(layerSelector).getBoundingClientRect();
+    return area.right <= canopy.right && area.left >= canopy.left;
+  }, ".tactical-canopy-layer");
+  assert.ok(insideCanopy);
+  const another = boat.locator('.tactical-piece[data-side="enemy"]').first();
+  await another.click();
+  assert.equal(await walker.getAttribute("aria-pressed"), "false");
+  const bounds = await walker.boundingBox();
+  const point = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
+  assert.equal(await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest(".tactical-piece")?.getAttribute("aria-label"), point), rightmost[0]);
+  await page.mouse.click(point.x, point.y);
+  assert.equal(await walker.getAttribute("aria-pressed"), "true");
+  await page.screenshot({ path: process.env.QA_CANOPY_SHOT || "/tmp/liburna-toldo.png" });
+
   console.log("Grade tática: camadas, teclado, mouse, toque e painel compartilhado.");
 } finally {
   await browser.close();

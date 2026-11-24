@@ -65,7 +65,8 @@
 
 /* Terrenos agrupados: miolo liso e contorno único (autotile). O atlas fica por baixo só na porta. */
 .tactical-cell.tactical-sprite.is-auto { background-image: none; background-size: auto; box-shadow: none; }
-.tactical-cell.tactical-sprite.is-auto::after {
+.tactical-cell.tactical-sprite.is-auto::after,
+.tactical-canopy-cell.is-auto::after {
   position: absolute;
   inset: 0;
   content: "";
@@ -127,10 +128,15 @@
 .tactical-cell.tactical-sprite.is-auto.is-escarpment.edge-left { --e-left: linear-gradient(to right, #75604d 0 10%, transparent 10%); }
 .tactical-cell.tactical-sprite.is-auto.is-escarpment.edge-right { --e-right: linear-gradient(to left, #4a3a2e 0 10%, transparent 10%); }
   /* Toldo/tenda: lona listrada contínua, moldura escura só no contorno */
+.tactical-canopy-cell.is-auto.is-canopy,
 .tactical-cell.tactical-sprite.is-auto.is-canopy { background-color: #c1947a; background-image: repeating-linear-gradient(to right, #d7a98a 0 25%, #8f5f4c 25% 50%); }
+.tactical-canopy-cell.is-auto.is-canopy.edge-top,
 .tactical-cell.tactical-sprite.is-auto.is-canopy.edge-top { --e-top: linear-gradient(to bottom, #5c4548 0 12%, #e0b59a 12% 18%, transparent 18%); }
+.tactical-canopy-cell.is-auto.is-canopy.edge-bottom,
 .tactical-cell.tactical-sprite.is-auto.is-canopy.edge-bottom { --e-bottom: linear-gradient(to top, #3f2f31 0 10%, #5c4548 10% 22%, transparent 22%); }
+.tactical-canopy-cell.is-auto.is-canopy.edge-left,
 .tactical-cell.tactical-sprite.is-auto.is-canopy.edge-left { --e-left: linear-gradient(to right, #5c4548 0 12%, transparent 12%); }
+.tactical-canopy-cell.is-auto.is-canopy.edge-right,
 .tactical-cell.tactical-sprite.is-auto.is-canopy.edge-right { --e-right: linear-gradient(to left, #5c4548 0 12%, transparent 12%); }
 
 
@@ -151,3 +157,15 @@
 }
 .tactical-cell.tactical-sprite.is-door.is-auto.door-h::before { inset: 24% 4%; --door-dir: to right; }
 .tactical-cell.tactical-sprite.is-door.is-auto.door-v::before { inset: 4% 24%; --door-dir: to bottom; }
+
+/* Toldo por cima das peças: camada própria, transparente a cliques */
+.tactical-canopy-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(var(--tactical-width), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--tactical-height), minmax(0, 1fr));
+  pointer-events: none;
+}
+.tactical-canopy-cell { position: relative; opacity: 0.7; pointer-events: none; }
