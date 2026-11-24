@@ -41,19 +41,41 @@ O PO pediu que o trabalho ande **de pouco em pouco**, com qualidade máxima em c
 
 ## Ordem das etapas
 
-| Etapa | Fileira | Tema (`id`) |
-|---|---|---|
-| 1 | Inicial | Ilha dos Náufragos (`shipwrecked`) |
-| 2 | Inicial | Ilha de Algas Gigantes (`giant-kelp`) |
-| 3 | Inicial | Ilha de Névoa (`mist`) |
-| 4 | Inicial | Ilha-Cemitério de Navios (`ship-graveyard`) |
-| — | Ponto de controle das iniciais | |
-| 5–9 | Intermediária | Navio Abandonado, Ruínas Ciclópicas, Ilha Sagrada, Maré Impossível, Ilha de Cristal (ordem definida no ponto de controle) |
-| — | Ponto de controle das intermediárias | |
-| 10–13 | Avançada | Iceberg, Ilha Viva, Sal e Ossos, Ilha Elemental (ordem definida no ponto de controle) |
-| — | Ponto de controle final | |
+| Etapa | Fileira | Tema (`id`) | Situação |
+|---|---|---|---|
+| 1 | Inicial | Ilha dos Náufragos (`shipwrecked`) | Concluída e publicada (24/11/2026) |
+| 2 | Inicial | Ilha de Algas Gigantes (`giant-kelp`) | Concluída e publicada (24/11/2026) |
+| 3 | Inicial | Ilha de Névoa (`mist`) | **Próxima.** Começa pela prévia de conteúdo |
+| 4 | Inicial | Ilha-Cemitério de Navios (`ship-graveyard`) | Pendente |
+| — | Ponto de controle das iniciais | | Pendente |
+| 5–9 | Intermediária | Navio Abandonado, Ruínas Ciclópicas, Ilha Sagrada, Maré Impossível, Ilha de Cristal (ordem definida no ponto de controle) | Pendente |
+| — | Ponto de controle das intermediárias | | Pendente |
+| 10–13 | Avançada | Iceberg, Ilha Viva, Sal e Ossos, Ilha Elemental (ordem definida no ponto de controle) | Pendente |
+| — | Ponto de controle final | | Pendente |
 
 O PO definiu a ordem das iniciais. A ordem das demais fileiras fica para o ponto de controle anterior a cada uma.
+
+### Onde paramos
+
+As etapas 1 e 2 foram concluídas e publicadas em 24/11/2026. Junto com elas, entraram melhorias que passam a valer para as próximas ilhas:
+
+- **Uma planta por combate.** A planta é escolhida pela tarefa, em `byTask`, e cada setor tem pelo menos dois combates sorteáveis.
+- **Mecânica própria de guardião (`rule`).** Por exemplo, a lente do farol contra a Aparição.
+- **Área inicial dos inimigos (`enemyArea`).** Ela impede que a tarefa comece perdida.
+- **Visual dos terrenos agrupados.** Elevação, inclinação, buraco, abismo, fosso, penhasco e toldo aparecem com contorno único. A porta é desenhada sobre o chão, o toldo fica por cima das peças, e os elementos sobre o platô ficam no mesmo nível dele.
+
+O modelo de dados de uma ilha nova está em `src/archipelagoShipwrecked.js` e `src/archipelagoGiantKelp.js`. Os testes de modelo estão em `scripts/archipelagoShipwrecked.test.mjs` e `scripts/archipelagoGiantKelp.test.mjs`.
+
+**Próximo passo:** etapa 3, Ilha de Névoa (`mist`). O ciclo é o mesmo:
+
+1. prévia de conteúdo em cartões, com as plantas de todos os combates, em `tmp/previas/ilha-nevoa/`;
+2. aprovação do PO;
+3. plano em `docs/superpowers/plans/`;
+4. execução com subagentes;
+5. validação no app;
+6. publicação.
+
+O tema já tem ecologia (`conditions: ["neblina"]`) e ícone, e ainda precisa de `arenaName`. Depois vem a etapa 4, o Cemitério de Navios, e o ponto de controle das iniciais.
 
 ## Fluxo de cada etapa
 
