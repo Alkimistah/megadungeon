@@ -71,7 +71,7 @@
 
 #### Passos
 
-- [ ] **Passo 1: testes que falham** em `scripts/tacticalScene.test.mjs`:
+- [x] **Passo 1: testes que falham** em `scripts/tacticalScene.test.mjs`:
   - `test("terrenos agrupados só têm borda no contorno")`:
     - Numa grade 5×4 com um bloco `advantage` de 3×2 em (1,1), a casa (2,1) tem `edge-top` e não tem `edge-bottom`, `edge-left` nem `edge-right`.
     - A casa (1,2) tem `edge-bottom` e `edge-left`.
@@ -84,16 +84,16 @@
     - Uma porta entre `wall` acima e abaixo gera `door-v`.
     - Duas portas empilhadas numa parede vertical geram `door-v`, a de cima com `join-bottom` e a de baixo com `join-top`.
     - Uma porta solta gera `door-h` sem `join-*`.
-- [ ] **Passo 2: rodar e ver falhar.** `node --test scripts/tacticalScene.test.mjs`.
-- [ ] **Passo 3: implementar** o helper e aplicá-lo no renderer, acrescentando as classes à `tactical-cell`. Copie o CSS da prévia para `src/tacticalTerrain.css`:
+- [x] **Passo 2: rodar e ver falhar.** `node --test scripts/tacticalScene.test.mjs`.
+- [x] **Passo 3: implementar** o helper e aplicá-lo no renderer, acrescentando as classes à `tactical-cell`. Copie o CSS da prévia para `src/tacticalTerrain.css`:
   - Use o seletor `.tactical-cell.tactical-sprite.is-auto…` (ou mais específico), para vencer a regra do sprite.
   - A porta mantém o sprite do chão por baixo (`--tactical-sprite-x: 0%`) e é desenhada num `::before`.
   - Não use o `::before` das outras casas, porque `shore-*` já usa esse pseudo-elemento na água. O contorno vai no `::after`.
   - Inclua as variantes de vantagem, inclinação, inclinação suave e íngreme, buraco, abismo, fosso, penhasco, paredão, toldo e porta.
-- [ ] **Passo 4: rodar.**
+- [x] **Passo 4: rodar.**
   - Os testes: `npm run test:ranges`, `node --test scripts/tacticalScene.test.mjs scripts/tacticalEncounterSession.test.mjs scripts/extendedTacticalMap.test.mjs scripts/dungeonTacticalLayouts.test.mjs scripts/forestTacticalLayouts.test.mjs`, `npm run test:archipelago` e `npm run build`. Tudo verde.
   - O QA visual: com `npm run dev`, abra um mapa com vantagem agrupada (por exemplo o Centro dos Náufragos ou o Observatório da Tropical) e tire uma captura. Confira que o platô aparece liso, sem os degraus do sprite. Grave a captura no relatório, não no repositório.
-- [ ] **Passo 5: commit.** `feat: terrenos agrupados com contorno único e porta sobre o chão na grade tática`
+- [x] **Passo 5: commit.** `feat: terrenos agrupados com contorno único e porta sobre o chão na grade tática`
 
 ---
 
@@ -113,13 +113,13 @@
 
 #### Passos
 
-- [ ] **Passo 1: testes que falham.**
+- [x] **Passo 1: testes que falham.**
   - **Teste da liburna:** o mapa da emboscada no convés tem as casas (16,6) e (16,7) como obstáculo com o rótulo "Mastro do toldo", e nenhuma peça inicial ocupa essas casas.
   - **QA:** no mapa da liburna, o elemento `.tactical-canopy-layer` existe depois de `.tactical-piece-layer` e tem `pointer-events` igual a `none`. Um clique numa peça sob o toldo seleciona a peça. Se não houver peça sob o toldo no início, mova uma para lá pelo estado da sessão ou pelo teclado, como os fluxos de QA existentes já fazem.
-- [ ] **Passo 2: rodar e ver falhar.**
-- [ ] **Passo 3: implementar** a camada, o CSS e os obstáculos.
-- [ ] **Passo 4: rodar.** As suítes da Tarefa 1 mais o QA do toldo: tudo verde. Tire uma captura da liburna com uma peça sob o toldo e grave-a no relatório.
-- [ ] **Passo 5: commit.** `feat: toldo da liburna por cima das peças e mastro de apoio`
+- [x] **Passo 2: rodar e ver falhar.**
+- [x] **Passo 3: implementar** a camada, o CSS e os obstáculos.
+- [x] **Passo 4: rodar.** As suítes da Tarefa 1 mais o QA do toldo: tudo verde. Tire uma captura da liburna com uma peça sob o toldo e grave-a no relatório.
+- [x] **Passo 5: commit.** `feat: toldo da liburna por cima das peças e mastro de apoio`
 
 ---
 
