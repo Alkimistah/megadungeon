@@ -6,6 +6,7 @@ import { seaCavesExploration } from "./archipelagoSeaCaves.js";
 import { volcanicExploration } from "./archipelagoVolcanic.js";
 import { atollExploration } from "./archipelagoAtoll.js";
 import { coralCoastExploration } from "./archipelagoCoralCoast.js";
+import { shipwreckedExploration } from "./archipelagoShipwrecked.js";
 import { getEligibleGuardianPenalties, getGuardianPenalty } from "./archipelagoGuardianPenalties.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getIslandCreatureRules } from "./archipelagoCreatureRules.js";
@@ -190,6 +191,7 @@ const SECTOR_ISLANDS = {
   storm: stormExploration,
   dinosaurs: dinosaurExploration,
   "coral-coast": coralCoastExploration,
+  shipwrecked: shipwreckedExploration,
   mangrove: { pilot: "mangrove-sectors", sectors: MANGROVE_SECTORS, guardians: GUARDIAN_COMPOSITIONS },
   tropical: {
     pilot: "tropical-sectors",

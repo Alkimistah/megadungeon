@@ -241,6 +241,28 @@ const layoutsByTheme = {
       ["water", 5, 2, 14, 9], ["clearing", 5, 7, 12, 2], ["advantage", 13, 6, 4, 2], ["wet", 5, 9, 7, 2]
     ])
   },
+  shipwrecked: {
+    N: layout("Bote de resgate", "O bote está encalhado acima da arrebentação. A maré sobe pela direita.", 14, 5, [
+      ["water", 15, 0, 5, 14], ["wet", 12, 0, 3, 14], ["obstacle", 9, 3, 3, 2], ["obstacle", 13, 9, 2, 2],
+      ["difficult", 6, 6, 5, 3], ["difficult", 10, 11, 3, 2]
+    ]),
+    S: layout("Barraca dos feridos", "As barracas dão cobertura. A paliçada fecha o fundo do acampamento.", 12, 6, [
+      ["wall", 17, 1, 1, 9], ["obstacle", 8, 2, 2, 2], ["obstacle", 13, 2, 2, 2], ["obstacle", 8, 9, 2, 2],
+      ["obstacle", 14, 9, 2, 2], ["clearing", 10, 5, 4, 3], ["advantage", 18, 2, 2, 3]
+    ]),
+    L: layout("Bacia da nascente", "A água doce se acumula entre as pedras, ao pé da encosta.", 12, 8, [
+      ["water", 11, 5, 4, 3], ["slope", 15, 1, 5, 6], ["tree", 6, 2, 2, 2], ["tree", 17, 10, 2, 2],
+      ["concealment", 6, 9, 4, 3], ["obstacle", 10, 9, 2, 1]
+    ]),
+    O: layout("Parede das rotas", "As rotas riscadas cobrem o fundo seco da gruta. A água entra pela boca.", 16, 6, [
+      ["wall", 0, 0, 20, 1], ["wall", 0, 13, 20, 1], ["wall", 8, 1, 2, 4], ["wall", 8, 10, 2, 3],
+      ["water", 4, 4, 5, 6], ["wet", 9, 5, 4, 4], ["advantage", 15, 4, 4, 5]
+    ]),
+    center: layout("Fogueira-farol", "A fogueira que imita a luz de um porto queima no alto do rochedo, ao lado do fragmento.", 16, 4, [
+      ["water", 0, 0, 20, 2], ["slope", 8, 4, 4, 6], ["advantage", 12, 2, 7, 6], ["deck", 9, 10, 6, 2],
+      ["obstacle", 14, 8, 2, 2], ["difficult", 4, 6, 4, 3]
+    ])
+  },
   "coral-coast": {
     N: layout("Rede presa nos corais", "A rede está enroscada numa crista. Nos baixios, a água cobre os tornozelos.", 14, 6, [
       ["water", 4, 2, 15, 8], ["difficult", 8, 4, 4, 2], ["obstacle", 12, 4, 2, 2], ["wet", 4, 8, 6, 2]
@@ -267,7 +289,11 @@ const landmarksByTask = {
   "Proteger o círculo de ruptura": ["Círculo de ruptura", "O círculo ritual está traçado em volta do altar."],
   "Tomar o pátio submerso": ["Pedestal da passagem", "O pedestal destrava a passagem para o santuário."],
   "Manter a ancoragem": ["Ancoragem da descida", "A linha está presa à borda da parede e precisa ser firmada antes que a corrente a solte."],
-  "Defender o sino de mergulho": ["Sino de mergulho", "O sino está preso a uma roldana na borda do poço."]
+  "Defender o sino de mergulho": ["Sino de mergulho", "O sino está preso a uma roldana na borda do poço."],
+  "Conter os afogados da arrebentação": ["Casco virado", "Os sobreviventes se abrigam sob o casco. Nenhuma criatura pode alcançá-lo."],
+  "Libertar os cativos da paliçada": ["Portão da paliçada", "Os cativos estão acorrentados do lado de dentro do portão."],
+  "Desviar o cano do farol": ["Junta do cano", "A junta de bambu leva a água da nascente até o farol."],
+  "Proteger o cartógrafo": ["Cartógrafo", "O velho cartógrafo trabalha junto à parede riscada."]
 };
 
 export function withIslandTacticalLayout(scene, themeId, objective) {

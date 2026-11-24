@@ -21,6 +21,12 @@ const islandCreatures = {
   volcanic: ["salamandra-plebeia", "salamandra-guerreira", "gargula-assassina", "gargula",
     "gargula-livro-basico", "cao-do-inferno", "centopeia-dragao", "kobold-veterano", "patrulha-kobold", "kobold-xama"],
   "coral-coast": [...coastAnimals, ...coastalHumanoids, "naiade", "aquinne", "lacedon"],
+  shipwrecked: [
+    "canceronte", "tumarkhan", "selako", "pliorex", "fobossuco", "crocodilo", "bando-pirata", "chefe-de-quadrilha",
+    "saqueador-lider-de-bando", "saqueador-pugilista", "jagunco", "homem-piranha-imediato", "cavaleiro-desonrado",
+    "lacedon", "imediato", "zumbi-fantasmagorico", "turba-zumbi", "aparicao", "carnical", "harpia-saqueadora",
+    "tempestade-de-lagartos"
+  ],
   atoll: [...coastAnimals, ...coastalHumanoids, "bando-pirata", "pirata", "naiade", "aquinne", "lacedon"],
   mangrove: [
     "lagarto-perseguidor", "crocodilo", "fobossuco", "hipopotamo", "pantera",
