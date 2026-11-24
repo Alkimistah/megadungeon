@@ -9,7 +9,7 @@ import { encodeSessionCode, decodeSessionCode } from "../src/sessionCode.js";
 import { formatElapsedTime } from "../src/format.js";
 import { calculateCombatND } from "../src/challenge.js";
 import { getCreatureUnits } from "../src/encounterCreatureHealth.js";
-import { canRerollNodeCreatures, resolveNodeEncounter } from "../src/encounterResolver.js";
+import { canRerollNodeCreatures, canRerollNodeTrap, resolveNodeEncounter } from "../src/encounterResolver.js";
 
 const production = process.argv.includes("--production");
 const url = process.env.QA_APP_URL || (production ? "http://localhost:4173/megadungeon/" : "http://localhost:5173/megadungeon/");
@@ -495,6 +495,67 @@ async function outdoorSceneFlow() {
   console.log("Descanso falso, emboscada opcional, salvamento e liberação da próxima rota: passaram.");
 }
 
+async function trapRerollFlow(role) {
+  let expedition;
+  let entry;
+  let node;
+  for (let attempt = 0; attempt < 32 && !node; attempt++) {
+    expedition = prepareForestExpedition({ seed: `qa-trap-reroll-${attempt}`, profile, startFloor: 12, missions: [] });
+    entry = expedition.floors[0];
+    node = entry.levels[0].find(candidate => {
+      if (candidate.trap?.role !== role) return false;
+      resolveNodeEncounter(candidate, { profile, mapSeed: entry.mapSeed });
+      return canRerollNodeTrap(candidate) && (role === "primary" || canRerollNodeCreatures(candidate));
+    });
+  }
+  assert.ok(node);
+  const index = entry.levels.flat().indexOf(node);
+  const session = sessionFor(expedition);
+  session.state.chosenByLevel = [[node.level, node.id]];
+  session.state.resolvedEncounters = [[node.id, node.resolvedEncounter]];
+  const serialized = encodeSessionCode(session);
+  const original = new Map(decodeSessionCode(serialized).state.resolvedEncounters).get(node.id);
+  const page = await pageFor(serialized);
+  try {
+    await page.locator(".node").nth(index).click();
+    const dialog = page.locator("#nodeDialog");
+    await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+    const rerollTrap = dialog.getByRole("button", { name: "Rerrolar armadilha" });
+    if (role === "incidental") {
+      const rerollCreatures = dialog.getByRole("button", { name: "Rerrolar criaturas" });
+      await rerollCreatures.waitFor();
+      assert.equal(await rerollTrap.getAttribute("class"), await rerollCreatures.getAttribute("class"));
+      assert.equal(await dialog.locator(".encounter-reroll-actions button").count(), 2);
+    }
+    await rerollTrap.click();
+    await dialog.getByRole("status").getByText("Armadilha atualizada com o mesmo ND.").waitFor();
+    await dialog.getByRole("button", { name: "Abrir mapa tático" }).click();
+    const map = page.locator(".tactical-map-fullscreen[open]");
+    await map.locator(".tactical-overlay.is-trap, .tactical-overlay.is-pit, .tactical-overlay.is-mechanism, .tactical-overlay.is-web").first().waitFor();
+    await map.getByRole("button", { name: "Fechar", exact: true }).click();
+    await page.locator("#nodeDialogClose").click();
+    const save = decodeSessionCode(await exportSession(page));
+    const updated = new Map(save.state.resolvedEncounters).get(node.id);
+    assert.equal(updated.trapRerolls, 1);
+    const updatedTrap = updated.items.find(item => item.kind === "trap");
+    assert.notEqual(updatedTrap.trapId, node.trap.id);
+    assert.equal(updatedTrap.challengeRating, node.trap.challengeRating);
+    assert.deepEqual(updated.items.filter(item => item.kind === "creature"),
+      original.items.filter(item => item.kind === "creature"));
+    const restored = await pageFor(encodeSessionCode(save));
+    try {
+      await restored.locator(".node").nth(index).click();
+      await restored.locator("#nodeDialog").getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+      await restored.locator("#nodeDialog").getByRole("button", { name: "Rerrolar armadilha" }).waitFor();
+    } finally {
+      await restored.close();
+    }
+  } finally {
+    await page.close();
+  }
+  console.log(`Rerrolagem de armadilha (${role}) e retomada da sessão: passaram.`);
+}
+
 async function creatureHealthFlow() {
   let expedition;
   let entry;
@@ -774,6 +835,8 @@ try {
   await missionFlow();
   await outdoorSceneFlow();
   await creatureHealthFlow();
+  await trapRerollFlow("primary");
+  await trapRerollFlow("incidental");
   await bossFlow();
   await configurationFailure();
   await futureAndLegacyFlow();

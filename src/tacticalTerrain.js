@@ -20,6 +20,7 @@ export const TACTICAL_TERRAIN_LABELS = {
   door: "Porta (entrada/saída)",
   clearing: "Clareira",
   deck: "Convés de madeira",
+  bridge: "Ponte",
   canopy: "Toldo da popa",
   ice: "Gelo",
   "frozen-river": "Rio congelado",

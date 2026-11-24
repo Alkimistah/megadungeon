@@ -2,14 +2,19 @@ import { formatChallengeRating } from "./challenge.js";
 import { assignCreatureProfile } from "./creatures.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getEncounterForSave, hasEncounterAdjustments } from "./encounterCreatureHealth.js";
+import {
+  createDungeonTacticalLayout,
+  DUNGEON_MAP_HEIGHT as TACTICAL_HEIGHT,
+  DUNGEON_MAP_WIDTH as TACTICAL_WIDTH,
+  dungeonTacticalLayouts
+} from "./dungeonTacticalLayouts.js";
+import { createExtendedTacticalMap } from "./extendedTacticalMap.js";
 import { resolveNodeEncounter } from "./encounterResolver.js";
 import { pick, randomInt } from "./random.js";
 import { assignTrapProfile } from "./traps.js";
 
 const INITIAL_LOG_LIMIT = 40;
 const COMBAT_CATEGORIES = new Set(["easy", "medium", "hard"]);
-const TACTICAL_WIDTH = 14;
-const TACTICAL_HEIGHT = 10;
 const BOSS_TACTICAL_WIDTH = 20;
 const BOSS_TACTICAL_HEIGHT = 14;
 const MENTAL_SOCIAL_SKILLS = ["Conhecimento", "Diplomacia", "Enganação", "Intimidação", "Intuição", "Misticismo", "Nobreza", "Religião", "Vontade"];
@@ -260,194 +265,10 @@ function hasTrap(encounterNode) {
   return Boolean(encounterNode?.resolvedEncounter?.items?.some((item) => item.kind === "trap"));
 }
 
-function createEmptyTacticalMap() {
-  return Array.from({ length: TACTICAL_HEIGHT }, (_, y) =>
-    Array.from({ length: TACTICAL_WIDTH }, (_, x) =>
-      x === 0 || y === 0 || x === TACTICAL_WIDTH - 1 || y === TACTICAL_HEIGHT - 1 ? "wall" : "floor"
-    )
-  );
-}
-
-function fillInterior(cells, marker) {
-  for (let y = 1; y < TACTICAL_HEIGHT - 1; y += 1) {
-    for (let x = 1; x < TACTICAL_WIDTH - 1; x += 1) {
-      cells[y][x] = marker;
-    }
-  }
-}
-
 function setCells(cells, positions, marker) {
   positions.forEach(([x, y]) => {
     if (cells[y]?.[x]) cells[y][x] = marker;
   });
-}
-
-function carveRect(cells, x1, y1, x2, y2) {
-  for (let y = y1; y <= y2; y += 1) {
-    for (let x = x1; x <= x2; x += 1) {
-      if (cells[y]?.[x]) cells[y][x] = "floor";
-    }
-  }
-}
-
-function createPassage(edge, index) {
-  if (edge === "top") return { edge, index, cells: [[index, 0], [index + 1, 0]] };
-  if (edge === "bottom") return { edge, index, cells: [[index, TACTICAL_HEIGHT - 1], [index + 1, TACTICAL_HEIGHT - 1]] };
-  if (edge === "left") return { edge, index, cells: [[0, index], [0, index + 1]] };
-  return { edge, index, cells: [[TACTICAL_WIDTH - 1, index], [TACTICAL_WIDTH - 1, index + 1]] };
-}
-
-function addLayoutMeta(cells, meta) {
-  Object.defineProperty(cells, "__layout", {
-    configurable: true,
-    enumerable: false,
-    value: meta
-  });
-}
-
-function carveCorridorTemplate(cells, template, rng) {
-  fillInterior(cells, "wall");
-
-  if (template === "corridor-2") {
-    const horizontal = rng() < 0.5;
-    if (horizontal) {
-      const y = randomInt(rng, 3, 5);
-      carveRect(cells, 1, y, 12, y + 1);
-      addLayoutMeta(cells, {
-        exits: [createPassage("left", y), createPassage("right", y)],
-        partyEdges: ["left", "right"]
-      });
-    } else {
-      const x = randomInt(rng, 5, 7);
-      carveRect(cells, x, 1, x + 1, 8);
-      addLayoutMeta(cells, {
-        exits: [createPassage("top", x), createPassage("bottom", x)],
-        partyEdges: ["top", "bottom"]
-      });
-    }
-    return;
-  }
-
-  if (template === "t-junction") {
-    const stemX = randomInt(rng, 5, 7);
-    const armY = randomInt(rng, 3, 5);
-    carveRect(cells, stemX, 1, stemX + 1, 8);
-    carveRect(cells, 2, armY, 11, armY + 1);
-    addLayoutMeta(cells, {
-      exits: [createPassage("top", stemX), createPassage("bottom", stemX), createPassage("left", armY), createPassage("right", armY)],
-      maxBlockedExits: 1,
-      partyEdges: ["left", "right", "top", "bottom"]
-    });
-    return;
-  }
-
-  if (template === "cross") {
-    const x = randomInt(rng, 5, 7);
-    const y = randomInt(rng, 3, 5);
-    carveRect(cells, x, 1, x + 1, 8);
-    carveRect(cells, 1, y, 12, y + 1);
-    addLayoutMeta(cells, {
-      exits: [createPassage("top", x), createPassage("bottom", x), createPassage("left", y), createPassage("right", y)],
-      partyEdges: ["left", "right", "top", "bottom"]
-    });
-    return;
-  }
-
-  if (template === "corridor-room") {
-    const roomOnTop = rng() < 0.5;
-    const y = roomOnTop ? 6 : 2;
-    carveRect(cells, 1, 4, 12, 5);
-    carveRect(cells, randomInt(rng, 5, 7), y, randomInt(rng, 9, 11), roomOnTop ? 8 : 3);
-    addLayoutMeta(cells, {
-      exits: [createPassage("left", 4), createPassage("right", 4), createPassage(roomOnTop ? "bottom" : "top", 8)],
-      maxBlockedExits: 1,
-      partyEdges: ["left", "right"]
-    });
-    return;
-  }
-
-  if (template === "room-corridor") {
-    const roomLeft = rng() < 0.5;
-    if (roomLeft) {
-      carveRect(cells, 1, 2, 5, 7);
-      carveRect(cells, 6, 4, 12, 5);
-      addLayoutMeta(cells, {
-        exits: [createPassage("left", 4), createPassage("right", 4), createPassage("top", 2), createPassage("bottom", 2)],
-        maxBlockedExits: 1,
-        partyEdges: ["left", "right"]
-      });
-    } else {
-      carveRect(cells, 8, 2, 12, 7);
-      carveRect(cells, 1, 4, 7, 5);
-      addLayoutMeta(cells, {
-        exits: [createPassage("left", 4), createPassage("right", 4), createPassage("top", 9), createPassage("bottom", 9)],
-        maxBlockedExits: 1,
-        partyEdges: ["left", "right"]
-      });
-    }
-  }
-}
-
-function carveTemplate(cells, template, rng) {
-  if (["corridor-2", "t-junction", "cross", "corridor-room", "room-corridor"].includes(template)) {
-    carveCorridorTemplate(cells, template, rng);
-    return;
-  }
-
-  if (template === "pillars") {
-    setCells(cells, [[5, 3], [8, 3], [5, 6], [8, 6]], "obstacle");
-    return;
-  }
-
-  if (template === "split") {
-    for (let y = 2; y <= 7; y += 1) {
-      if (y !== 4 && y !== 5) cells[y][7] = "wall";
-    }
-    return;
-  }
-
-  if (template === "alcoves") {
-    setCells(cells, [[3, 2], [3, 7], [10, 2], [10, 7]], "obstacle");
-    return;
-  }
-
-  if (template === "columns") {
-    setCells(cells, [[4, 2], [4, 7], [9, 2], [9, 7], [6, 4], [7, 5]], "obstacle");
-    return;
-  }
-
-  if (template === "choke") {
-    setCells(cells, [[5, 1], [5, 2], [5, 3], [5, 6], [5, 7], [5, 8], [8, 1], [8, 2], [8, 7], [8, 8]], "wall");
-    setCells(cells, [[6, 4], [7, 5]], "obstacle");
-    return;
-  }
-
-  if (template === "side-rooms") {
-    setCells(cells, [[4, 1], [4, 2], [4, 3], [4, 6], [4, 7], [4, 8], [9, 1], [9, 2], [9, 7], [9, 8]], "wall");
-    setCells(cells, [[6, 3], [7, 6]], "obstacle");
-    return;
-  }
-
-  if (template === "rubble") {
-    setCells(cells, [[4, 3], [5, 4], [6, 5], [7, 5], [8, 6], [9, 3], [10, 4]], "obstacle");
-    return;
-  }
-
-  if (template === "webbed") {
-    setCells(cells, [[3, 3], [4, 3], [8, 2], [9, 2], [6, 6], [7, 6], [10, 7]], "obstacle");
-    return;
-  }
-
-  if (template === "irregular") {
-    const blockers = [
-      [2, 2], [11, 2], [2, 7], [11, 7],
-      [6, 2 + randomInt(rng, 0, 1)],
-      [9, 6 + randomInt(rng, 0, 1)]
-    ];
-    blockers.forEach(([x, y]) => {
-      cells[y][x] = "wall";
-    });
-  }
 }
 
 function shufflePositions(positions, rng) {
@@ -489,104 +310,8 @@ function placeMarkers(cells, positions, marker, count, rng) {
   }
 }
 
-function getPartyFormations() {
-  const formations = [];
-
-  for (let y = 1; y < TACTICAL_HEIGHT - 1; y += 1) {
-    for (let x = 1; x < TACTICAL_WIDTH - 1; x += 1) {
-      if (x <= TACTICAL_WIDTH - 3 && y <= TACTICAL_HEIGHT - 3) {
-        formations.push([[x, y], [x + 1, y], [x, y + 1], [x + 1, y + 1]]);
-      }
-      if (x <= TACTICAL_WIDTH - 5) {
-        formations.push([[x, y], [x + 1, y], [x + 2, y], [x + 3, y]]);
-      }
-      if (y <= TACTICAL_HEIGHT - 5) {
-        formations.push([[x, y], [x, y + 1], [x, y + 2], [x, y + 3]]);
-      }
-      if (x <= TACTICAL_WIDTH - 3 && y <= TACTICAL_HEIGHT - 3) {
-        formations.push([[x, y], [x + 1, y], [x, y + 1], [x, y + 2]]);
-        formations.push([[x, y], [x + 1, y], [x + 1, y + 1], [x + 1, y + 2]]);
-        formations.push([[x, y], [x, y + 1], [x + 1, y + 1], [x + 2, y + 1]]);
-        formations.push([[x + 2, y], [x, y + 1], [x + 1, y + 1], [x + 2, y + 1]]);
-      }
-    }
-  }
-
-  return formations;
-}
-
-function distanceToEdges(formation, edges) {
-  return Math.min(...formation.map(([x, y]) =>
-    Math.min(...edges.map((edge) => {
-      if (edge === "left") return x;
-      if (edge === "right") return TACTICAL_WIDTH - 1 - x;
-      if (edge === "top") return y;
-      return TACTICAL_HEIGHT - 1 - y;
-    }))
-  ));
-}
-
-function isFormationFree(cells, formation) {
-  return formation.every(([x, y]) => cells[y]?.[x] === "floor");
-}
-
-function placePartyFormation(cells, rng) {
-  const preferredEdges = cells.__layout?.partyEdges || ["left", "right", "top", "bottom"];
-  const formations = getPartyFormations()
-    .filter((formation) => isFormationFree(cells, formation))
-    .sort((a, b) => distanceToEdges(a, preferredEdges) - distanceToEdges(b, preferredEdges));
-  if (!formations.length) return;
-
-  const bestDistance = distanceToEdges(formations[0], preferredEdges);
-  const nearBest = formations.filter((formation) =>
-    distanceToEdges(formation, preferredEdges) <= Math.min(3, bestDistance + 1)
-  );
-  const selected = pick(rng, nearBest.length ? nearBest : formations);
-
-  if (selected) setCells(cells, selected, "party");
-}
-
 function distanceBetween([x1, y1], [x2, y2]) {
   return Math.abs(x1 - x2) + Math.abs(y1 - y2);
-}
-
-function clearMarker(cells, marker) {
-  getMarkerPositions(cells, marker).forEach(([x, y]) => {
-    cells[y][x] = "floor";
-  });
-}
-
-function getThreatPositions(cells) {
-  const priority = ["trap", "pit", "mechanism", "enemy", "web", "difficult", "reinforcement"];
-
-  for (const marker of priority) {
-    const positions = getMarkerPositions(cells, marker);
-    if (positions.length) return positions;
-  }
-
-  return [];
-}
-
-function isAdjacentToAny(position, targets) {
-  return targets.some((target) => distanceBetween(position, target) === 1);
-}
-
-function placePartyAdjacentToThreat(cells, rng) {
-  const threats = getThreatPositions(cells);
-  if (!threats.length) return;
-
-  clearMarker(cells, "party");
-  const formations = shufflePositions(getPartyFormations(), rng)
-    .filter((formation) =>
-      isFormationFree(cells, formation) && formation.some((position) => isAdjacentToAny(position, threats))
-    );
-
-  if (formations.length) {
-    setCells(cells, formations[0], "party");
-    return;
-  }
-
-  placePartyFormation(cells, rng);
 }
 
 function isolatePartyMarker(cells, rng) {
@@ -613,130 +338,6 @@ function isolatePartyMarker(cells, rng) {
   }
 }
 
-function getRoomPlan(rng) {
-  return pick(rng, [
-    {
-      entrance: [[0, 4], [0, 5]],
-      exit: [[13, 4], [13, 5]],
-      party: [[1, 3], [1, 4], [1, 5], [1, 6], [2, 4], [2, 5]],
-      enemies: [[11, 3], [11, 4], [11, 5], [11, 6], [10, 2], [10, 7], [9, 4], [9, 5]],
-      traps: [[6, 4], [6, 5], [7, 3], [7, 6]],
-      advantages: [[3, 2], [3, 7], [4, 4]]
-    },
-    {
-      entrance: [[6, 9], [7, 9]],
-      exit: [[6, 0], [7, 0]],
-      party: [[5, 8], [6, 8], [7, 8], [8, 8], [6, 7], [7, 7]],
-      enemies: [[5, 1], [6, 1], [7, 1], [8, 1], [4, 2], [9, 2], [6, 3], [7, 3]],
-      traps: [[5, 5], [6, 5], [7, 4], [8, 4]],
-      advantages: [[2, 6], [11, 6], [3, 4]]
-    },
-    {
-      entrance: [[0, 2], [0, 3]],
-      exit: [[13, 6], [13, 7]],
-      party: [[1, 2], [1, 3], [2, 2], [2, 3], [3, 2]],
-      enemies: [[11, 6], [11, 7], [10, 6], [10, 7], [9, 5], [9, 7], [8, 6]],
-      traps: [[6, 4], [7, 4], [7, 5], [8, 5]],
-      advantages: [[3, 5], [4, 6], [5, 2]]
-    },
-    {
-      entrance: [[13, 2], [13, 3]],
-      exit: [[0, 6], [0, 7]],
-      party: [[12, 2], [12, 3], [11, 2], [11, 3], [10, 3]],
-      enemies: [[2, 6], [2, 7], [3, 6], [3, 7], [4, 5], [4, 7], [5, 6]],
-      traps: [[6, 4], [7, 4], [6, 5], [7, 5]],
-      advantages: [[10, 6], [9, 7], [8, 2]]
-    }
-  ]);
-}
-
-function getEdgePassagePairs(cells) {
-  const candidates = [];
-
-  for (let x = 1; x < TACTICAL_WIDTH - 2; x += 1) {
-    if (cells[1][x] === "floor" && cells[1][x + 1] === "floor") {
-      candidates.push({ edge: "top", index: x, cells: [[x, 0], [x + 1, 0]] });
-    }
-    if (cells[TACTICAL_HEIGHT - 2][x] === "floor" && cells[TACTICAL_HEIGHT - 2][x + 1] === "floor") {
-      candidates.push({ edge: "bottom", index: x, cells: [[x, TACTICAL_HEIGHT - 1], [x + 1, TACTICAL_HEIGHT - 1]] });
-    }
-  }
-
-  for (let y = 1; y < TACTICAL_HEIGHT - 2; y += 1) {
-    if (cells[y][1] === "floor" && cells[y + 1][1] === "floor") {
-      candidates.push({ edge: "left", index: y, cells: [[0, y], [0, y + 1]] });
-    }
-    if (cells[y][TACTICAL_WIDTH - 2] === "floor" && cells[y + 1][TACTICAL_WIDTH - 2] === "floor") {
-      candidates.push({ edge: "right", index: y, cells: [[TACTICAL_WIDTH - 1, y], [TACTICAL_WIDTH - 1, y + 1]] });
-    }
-  }
-
-  return candidates;
-}
-
-function isSeparatePassage(a, b) {
-  if (a.edge !== b.edge) return true;
-
-  return Math.abs(a.index - b.index) > 2;
-}
-
-function pickPassagePairs(cells, rng, count) {
-  const selected = [];
-  const candidates = shufflePositions(getEdgePassagePairs(cells), rng);
-
-  for (const candidate of candidates) {
-    if (selected.length >= count) break;
-    if (selected.every((other) => isSeparatePassage(candidate, other))) {
-      selected.push(candidate);
-    }
-  }
-
-  return selected;
-}
-
-function getInnerPassageCells(passage) {
-  if (passage.edge === "top") return passage.cells.map(([x]) => [x, 1]);
-  if (passage.edge === "bottom") return passage.cells.map(([x]) => [x, TACTICAL_HEIGHT - 2]);
-  if (passage.edge === "left") return passage.cells.map(([, y]) => [1, y]);
-  return passage.cells.map(([, y]) => [TACTICAL_WIDTH - 2, y]);
-}
-
-function placeEdgePassages(cells, rng) {
-  const layoutExits = cells.__layout?.exits || null;
-  const maxBlockedExits = cells.__layout?.maxBlockedExits ?? 0;
-  let passages;
-
-  if (layoutExits?.length) {
-    passages = [...layoutExits];
-    if (maxBlockedExits > 0 && passages.length > 2 && rng() < 0.22) {
-      const blockedCount = randomInt(rng, 1, maxBlockedExits);
-      const blocked = new Set(shufflePositions(passages, rng).slice(0, blockedCount));
-      passages = passages.filter((passage) => !blocked.has(passage));
-    }
-  } else {
-    const passageCount = pick(rng, [1, 2, 2, 3]);
-    passages = pickPassagePairs(cells, rng, passageCount);
-  }
-
-  passages.forEach((passage) => {
-    setCells(cells, [...passage.cells, ...getInnerPassageCells(passage)], "floor");
-  });
-
-  return passages;
-}
-
-function placeOptionalDoors(cells, rng, openPassages) {
-  const doorPairCount = pick(rng, [0, 0, 1, 1, 2]);
-  if (doorPairCount === 0) return;
-
-  const doorCandidates = shufflePositions(openPassages, rng).slice(0, doorPairCount);
-  doorCandidates.forEach((passage) => setCells(cells, passage.cells, "door"));
-}
-
-function isWalkableCell(cell) {
-  return ["floor", "door", "party", "enemy", "trap", "web", "difficult", "mechanism", "objective", "reinforcement", "advantage"].includes(cell);
-}
-
 function isTrapPlacementCell(cell) {
   return cell === "floor" || cell === "advantage";
 }
@@ -758,16 +359,7 @@ function getCenter(positions) {
   return [Math.round(sumX / positions.length), Math.round(sumY / positions.length)];
 }
 
-function getEdgeCenter(passages) {
-  return getCenter(passages.flatMap((passage) => passage.cells));
-}
-
-function getTrapZoneCandidates(cells, openPassages, rng) {
-  const partyCenter = getCenter(getMarkerPositions(cells, "party"));
-  const enemyPositions = getMarkerPositions(cells, "enemy");
-  const targetCenter = enemyPositions.length ? getCenter(enemyPositions) : getEdgeCenter(openPassages);
-  const midX = Math.round((partyCenter[0] + targetCenter[0]) / 2);
-  const midY = Math.round((partyCenter[1] + targetCenter[1]) / 2);
+function getTrapZoneCandidates(cells, [midX, midY], rng) {
   const zones = [];
 
   for (let y = 1; y < TACTICAL_HEIGHT - 1; y += 1) {
@@ -781,10 +373,6 @@ function getTrapZoneCandidates(cells, openPassages, rng) {
   zones.push([[midX - 1, midY], [midX, midY], [midX + 1, midY], [midX, midY - 1], [midX, midY + 1]]);
   zones.push([[midX - 1, midY - 1], [midX, midY - 1], [midX + 1, midY - 1], [midX - 1, midY], [midX, midY], [midX + 1, midY]]);
   zones.push([[midX - 1, midY - 1], [midX - 1, midY], [midX - 1, midY + 1], [midX, midY - 1], [midX, midY], [midX, midY + 1]]);
-
-  openPassages.forEach((passage) => {
-    zones.push([...passage.cells, ...getInnerPassageCells(passage)]);
-  });
 
   return shufflePositions(zones, rng)
     .map((zone) => zone.filter(([x, y]) =>
@@ -800,14 +388,14 @@ function getTrapZoneCandidates(cells, openPassages, rng) {
     });
 }
 
-function placeTrapZone(cells, openPassages, trapCount, rng) {
+function placeTrapZone(cells, center, trapCount, rng) {
   if (trapCount <= 0) return;
 
   const targetSize = randomInt(rng, 3, 7);
-  const candidates = getTrapZoneCandidates(cells, openPassages, rng);
+  const candidates = getTrapZoneCandidates(cells, center, rng);
   const selected = candidates.find((zone) => zone.length >= targetSize) || candidates[0];
 
-  if (!selected) return;
+  if (!selected) return setCellsIfOpen(cells, [center], "trap");
 
   setCells(cells, selected.slice(0, Math.min(selected.length, targetSize)), "trap");
 }
@@ -851,35 +439,58 @@ function getTacticalThreatKind(encounterNode) {
 
 function setCellsIfOpen(cells, positions, marker) {
   positions.forEach(([x, y]) => {
-    if (["floor", "trap", "web", "difficult", "advantage"].includes(cells[y]?.[x])) {
+    if (x > 0 && y > 0 && x < TACTICAL_WIDTH - 1 && y < TACTICAL_HEIGHT - 1 &&
+      ["floor", "trap", "web", "difficult", "advantage"].includes(cells[y]?.[x])) {
       cells[y][x] = marker;
     }
   });
 }
 
-function getThreatCenter(cells, openPassages) {
-  const partyCenter = getCenter(getMarkerPositions(cells, "party"));
-  const enemyPositions = getMarkerPositions(cells, "enemy");
-  const targetCenter = enemyPositions.length ? getCenter(enemyPositions) : getEdgeCenter(openPassages);
+function getThreatCenter(cells, openPassages, adjacentToParty) {
+  const party = getMarkerPositions(cells, "party");
+  const partyCenter = getCenter(party);
+  const enemies = getMarkerPositions(cells, "enemy");
+  const free = allFreePositions(cells);
+  const exits = openPassages.slice(1).flatMap(passage => passage.inner);
+  const farthest = free.reduce((best, point) =>
+    distanceBetween(point, partyCenter) > distanceBetween(best, partyCenter) ? point : best, partyCenter);
+  const target = enemies.length ? getCenter(enemies) : exits.length ? getCenter(exits) : farthest;
+  const center = getCenter([partyCenter, target]);
+  const distance = adjacentToParty
+    ? point => Math.min(...party.map(position => distanceBetween(position, point)))
+    : point => distanceBetween(point, center);
+  return free.sort((a, b) => distance(a) - distance(b))[0] ?? center;
+}
 
+function getThreatLines(cells, center) {
+  const trace = (dx, dy) => {
+    const points = [];
+    let [x, y] = center;
+    x += dx;
+    y += dy;
+    while (isTrapPlacementCell(cells[y]?.[x]) &&
+      x > 0 && y > 0 && x < TACTICAL_WIDTH - 1 && y < TACTICAL_HEIGHT - 1) {
+      points.push([x, y]);
+      x += dx;
+      y += dy;
+    }
+    return points;
+  };
   return [
-    Math.min(Math.max(Math.round((partyCenter[0] + targetCenter[0]) / 2), 2), TACTICAL_WIDTH - 3),
-    Math.min(Math.max(Math.round((partyCenter[1] + targetCenter[1]) / 2), 2), TACTICAL_HEIGHT - 3)
+    [...trace(-1, 0).reverse(), center, ...trace(1, 0)],
+    [...trace(0, -1).reverse(), center, ...trace(0, 1)]
   ];
 }
 
-function placePitThreat(cells, openPassages) {
-  const [centerX, centerY] = getThreatCenter(cells, openPassages);
-  const horizontal = centerY >= 3 && centerY <= TACTICAL_HEIGHT - 4;
-  const pitCells = horizontal
-    ? Array.from({ length: TACTICAL_WIDTH - 4 }, (_, index) => [index + 2, centerY])
-    : Array.from({ length: TACTICAL_HEIGHT - 4 }, (_, index) => [centerX, index + 2]);
-
-  setCellsIfOpen(cells, pitCells, "pit");
+function placePitThreat(cells, center) {
+  const lines = getThreatLines(cells, center).filter(line => line.length > 1);
+  const crossSection = lines.sort((a, b) => a.length - b.length)[0] ?? [center];
+  // A armadilha pode tomar uma faixa inteira quando a cena é só de travessia.
+  const pit = getMarkerPositions(cells, "enemy").length ? crossSection.slice(0, -1) : crossSection;
+  setCellsIfOpen(cells, pit.length ? pit : [center], "pit");
 }
 
-function placeBladeThreat(cells, openPassages) {
-  const [centerX, centerY] = getThreatCenter(cells, openPassages);
+function placeBladeThreat(cells, [centerX, centerY]) {
   const bladeCells = [
     [centerX, centerY],
     [centerX + 1, centerY],
@@ -889,22 +500,13 @@ function placeBladeThreat(cells, openPassages) {
   setCellsIfOpen(cells, bladeCells, "trap");
 }
 
-function placeProjectileThreat(cells, openPassages) {
-  const [centerX, centerY] = getThreatCenter(cells, openPassages);
-  const wallX = centerX < TACTICAL_WIDTH / 2 ? TACTICAL_WIDTH - 2 : 1;
-  const lineStart = Math.min(wallX, centerX);
-  const lineEnd = Math.max(wallX, centerX);
-
-  setCellsIfOpen(
-    cells,
-    Array.from({ length: lineEnd - lineStart + 1 }, (_, index) => [lineStart + index, centerY]),
-    "trap"
-  );
-  setCellsIfOpen(cells, [[wallX, centerY]], "mechanism");
+function placeProjectileThreat(cells, center) {
+  const [line] = getThreatLines(cells, center).sort((a, b) => b.length - a.length);
+  setCellsIfOpen(cells, line, "trap");
+  if (line.length > 1) setCellsIfOpen(cells, [line[0]], "mechanism");
 }
 
-function placeAreaThreat(cells, openPassages, marker = "trap") {
-  const [centerX, centerY] = getThreatCenter(cells, openPassages);
+function placeAreaThreat(cells, [centerX, centerY], marker = "trap") {
   const area = [
     [centerX - 1, centerY - 1], [centerX, centerY - 1],
     [centerX - 1, centerY], [centerX, centerY]
@@ -913,8 +515,7 @@ function placeAreaThreat(cells, openPassages, marker = "trap") {
   setCellsIfOpen(cells, area, marker);
 }
 
-function placeRubbleThreat(cells, openPassages) {
-  const [centerX, centerY] = getThreatCenter(cells, openPassages);
+function placeRubbleThreat(cells, [centerX, centerY]) {
   const rubble = [
     [centerX - 1, centerY], [centerX, centerY], [centerX + 1, centerY],
     [centerX, centerY - 1], [centerX, centerY + 1]
@@ -924,8 +525,7 @@ function placeRubbleThreat(cells, openPassages) {
   setCellsIfOpen(cells, rubble.slice(2), "difficult");
 }
 
-function placeWebThreat(cells, openPassages, rng, includeEgg = false) {
-  const [centerX, centerY] = getThreatCenter(cells, openPassages);
+function placeWebThreat(cells, [centerX, centerY], rng) {
   const web = [];
 
   for (let y = centerY - 1; y <= centerY + 1; y += 1) {
@@ -935,160 +535,97 @@ function placeWebThreat(cells, openPassages, rng, includeEgg = false) {
   }
 
   setCellsIfOpen(cells, web, "web");
-  if (includeEgg) setCellsIfOpen(cells, [[centerX, centerY]], "reinforcement");
+  setCellsIfOpen(cells, [[centerX, centerY]], "reinforcement");
 
   const extra = shufflePositions(allFreePositions(cells), rng).slice(0, 4);
   setCellsIfOpen(cells, extra, "web");
 }
 
-function placeThreatFeature(cells, { encounterNode, floor, openPassages, trapCount, rng }) {
-  const threatKind = getTacticalThreatKind(encounterNode);
+function placeThreatFeature(cells, { threat, openPassages, trapCount, rng, hasAdjacentThreat }) {
+  if (threat === "none") return;
 
-  if (threatKind === "none") return;
-  if (threatKind === "pit") return placePitThreat(cells, openPassages);
-  if (threatKind === "blade") return placeBladeThreat(cells, openPassages);
-  if (threatKind === "projectile") return placeProjectileThreat(cells, openPassages);
-  if (threatKind === "rune") return placeAreaThreat(cells, openPassages, "mechanism");
-  if (threatKind === "gas") return placeAreaThreat(cells, openPassages, "trap");
-  if (threatKind === "rubble") return placeRubbleThreat(cells, openPassages);
-  if (threatKind === "web") return placeWebThreat(cells, openPassages, rng, true);
-  if (threatKind === "webCombat") {
-    return placeWebThreat(cells, openPassages, rng, threatKind === "webCombat");
-  }
+  const center = getThreatCenter(cells, openPassages, hasAdjacentThreat);
+  if (threat === "pit") return placePitThreat(cells, center);
+  if (threat === "blade") return placeBladeThreat(cells, center);
+  if (threat === "projectile") return placeProjectileThreat(cells, center);
+  if (threat === "rune") return placeAreaThreat(cells, center, "mechanism");
+  if (threat === "gas") return placeAreaThreat(cells, center);
+  if (threat === "rubble") return placeRubbleThreat(cells, center);
+  if (threat === "web" || threat === "webCombat") return placeWebThreat(cells, center, rng);
+  if (hasAdjacentThreat) return placeAreaThreat(cells, center);
 
-  return placeTrapZone(cells, openPassages, trapCount, rng);
-}
-
-function getWalkablePositions(cells) {
-  const positions = [];
-  for (let y = 0; y < TACTICAL_HEIGHT; y += 1) {
-    for (let x = 0; x < TACTICAL_WIDTH; x += 1) {
-      if (isWalkableCell(cells[y][x])) positions.push([x, y]);
-    }
-  }
-  return positions;
-}
-
-function getNeighbors([x, y]) {
-  return [
-    [x + 1, y],
-    [x - 1, y],
-    [x, y + 1],
-    [x, y - 1]
-  ].filter(([nextX, nextY]) =>
-    nextX >= 0 && nextY >= 0 && nextX < TACTICAL_WIDTH && nextY < TACTICAL_HEIGHT
-  );
-}
-
-function keyOf([x, y]) {
-  return `${x},${y}`;
-}
-
-function floodWalkable(cells, start) {
-  const visited = new Set([keyOf(start)]);
-  const queue = [start];
-
-  while (queue.length) {
-    const current = queue.shift();
-    getNeighbors(current).forEach(([x, y]) => {
-      const key = `${x},${y}`;
-      if (visited.has(key) || !isWalkableCell(cells[y][x])) return;
-      visited.add(key);
-      queue.push([x, y]);
-    });
-  }
-
-  return visited;
-}
-
-function findNearestConnectedPosition(disconnected, connected) {
-  let best = null;
-  let bestDistance = Infinity;
-
-  connected.forEach((key) => {
-    const [x, y] = key.split(",").map(Number);
-    const distance = Math.abs(disconnected[0] - x) + Math.abs(disconnected[1] - y);
-    if (distance < bestDistance) {
-      best = [x, y];
-      bestDistance = distance;
-    }
-  });
-
-  return best;
-}
-
-function carveLine(cells, from, to) {
-  let [x, y] = from;
-  const [targetX, targetY] = to;
-
-  while (x !== targetX) {
-    if (!isWalkableCell(cells[y][x])) cells[y][x] = "floor";
-    x += x < targetX ? 1 : -1;
-  }
-
-  while (y !== targetY) {
-    if (!isWalkableCell(cells[y][x])) cells[y][x] = "floor";
-    y += y < targetY ? 1 : -1;
-  }
-
-  if (!isWalkableCell(cells[y][x])) cells[y][x] = "floor";
-}
-
-function normalizeTacticalConnectivity(cells) {
-  for (let attempt = 0; attempt < 12; attempt += 1) {
-    const walkable = getWalkablePositions(cells);
-    if (!walkable.length) return;
-
-    const connected = floodWalkable(cells, walkable[0]);
-    if (connected.size === walkable.length) return;
-
-    const disconnected = walkable.find((position) => !connected.has(keyOf(position)));
-    const target = findNearestConnectedPosition(disconnected, connected);
-    if (!target) return;
-
-    carveLine(cells, disconnected, target);
-  }
+  return placeTrapZone(cells, center, trapCount, rng);
 }
 
 function createTacticalMap({ encounterNode, floor, rng, sceneEffects = [] }) {
-  if (!encounterNode?.resolvedEncounter?.items?.length) return null;
+  if (floor < 1 || floor > 9 || !encounterNode?.resolvedEncounter?.items?.length) return null;
 
   const enemyCount = getEncounterEnemyCount(encounterNode);
   const trapCount = hasTrap(encounterNode) ? 1 : 0;
-  const hasAdvantage = sceneEffects.some((effect) => effect.type === "partyAdvantage");
-  const hasIsolatedParty = sceneEffects.some((effect) => effect.type === "isolatedParty");
-  const hasAdjacentThreat = sceneEffects.some((effect) => effect.type === "partyAdjacentToThreat");
-  const cells = createEmptyTacticalMap();
-  const templates = floor >= 7
-    ? ["pillars", "split", "alcoves", "irregular", "columns", "choke", "side-rooms", "rubble", "webbed", "corridor-2", "t-junction", "cross", "corridor-room", "room-corridor"]
-    : ["pillars", "split", "alcoves", "columns", "choke", "side-rooms", "rubble", "corridor-2", "t-junction", "cross", "corridor-room", "room-corridor"];
-  const template = pick(rng, templates);
-  const plan = getRoomPlan(rng);
+  const hasAdvantage = sceneEffects.some(effect => effect.type === "partyAdvantage");
+  const hasIsolatedParty = sceneEffects.some(effect => effect.type === "isolatedParty");
+  const hasAdjacentThreat = sceneEffects.some(effect => effect.type === "partyAdjacentToThreat");
+  const threat = getTacticalThreatKind(encounterNode);
+  const usesRoom = ["gas", "rubble", "web", "webCombat"].includes(threat) || enemyCount >= 5;
+  const usesCorridor = ["pit", "blade", "projectile"].includes(threat);
+  const rank = layout => {
+    if (usesCorridor) return layout.hall ? 1 : 0;
+    if (usesRoom) return layout.hall || layout.room ? 0 : 1;
+    return 0;
+  };
+  const candidates = shufflePositions(dungeonTacticalLayouts, rng).sort((a, b) => rank(a) - rank(b));
+  let bestMap;
+  let bestOverlap = Infinity;
 
-  carveTemplate(cells, template, rng);
-  const openPassages = placeEdgePassages(cells, rng);
-  placeOptionalDoors(cells, rng, openPassages);
+  for (const layout of candidates) {
+    const { cells, openPassages } = createDungeonTacticalLayout(layout, rng);
+    const party = getMarkerPositions(cells, "party");
+    const distanceToParty = point => Math.min(...party.map(position => distanceBetween(point, position)));
+    const free = allFreePositions(cells);
+    const enemyPositions = free.filter(position => distanceToParty(position) >= 5);
+    const adjacentEnemy = hasAdjacentThreat && threat === "none" && enemyCount > 0
+      ? pick(rng, free.filter(position => distanceToParty(position) === 1))
+      : null;
+    if (adjacentEnemy) setCells(cells, [adjacentEnemy], "enemy");
+    placeMarkers(cells, enemyPositions, "enemy", enemyCount - Number(Boolean(adjacentEnemy)), rng);
 
-  placePartyFormation(cells, rng);
-  placeMarkers(cells, plan.enemies, "enemy", enemyCount, rng);
+    if (hasAdvantage) {
+      const nearParty = allFreePositions(cells).filter(position => distanceToParty(position) <= 3);
+      placeMarkers(cells, nearParty, "advantage", 2, rng);
+    }
 
-  if (hasAdvantage) {
-    placeMarkers(cells, plan.advantages, "advantage", 2, rng);
+    placeThreatFeature(cells, { threat, openPassages, trapCount, rng, hasAdjacentThreat });
+    if (hasIsolatedParty) isolatePartyMarker(cells, rng);
+
+    const tacticalMap = {
+      cells: cells.flat(),
+      enemyCount,
+      height: TACTICAL_HEIGHT,
+      template: layout.id,
+      trapCount,
+      width: TACTICAL_WIDTH
+    };
+    const { scene } = createExtendedTacticalMap({ tacticalMap, encounterNode });
+    const occupied = new Set();
+    let overlap = 0;
+    for (const { x, y, width, height } of scene.pieces) {
+      for (let row = y; row < y + height; row += 1) {
+        for (let column = x; column < x + width; column += 1) {
+          const index = row * TACTICAL_WIDTH + column;
+          if (["wall", "pit", "obstacle", "reinforcement"].includes(tacticalMap.cells[index])) overlap += TACTICAL_WIDTH;
+          if (occupied.has(index)) overlap += 1;
+          occupied.add(index);
+        }
+      }
+    }
+    if (overlap === 0) return tacticalMap;
+    if (overlap < bestOverlap) {
+      bestOverlap = overlap;
+      bestMap = tacticalMap;
+    }
   }
 
-  normalizeTacticalConnectivity(cells);
-  placeThreatFeature(cells, { encounterNode, floor, openPassages, trapCount, rng });
-  if (hasAdjacentThreat) placePartyAdjacentToThreat(cells, rng);
-  if (hasIsolatedParty) isolatePartyMarker(cells, rng);
-
-  return {
-    cells: cells.flat(),
-    enemyCount,
-    height: TACTICAL_HEIGHT,
-    template,
-    trapCount,
-    width: TACTICAL_WIDTH
-  };
+  return bestMap;
 }
 
 // Mapas preset dos encontros finais: um caractere por célula, legenda no

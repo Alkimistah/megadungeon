@@ -10,7 +10,7 @@ import { applyWeaponVariation } from "./equipment/weaponVariation.js";
 import { getLegacyCandidateWeight, SUPPORT_CREATURE_IDS_BY_TYPE } from "./legacyEncounterPreferences.js";
 import { createRng, pickWeighted } from "./random.js";
 import { createModificationPlan, getThreatParameters, THREAT_CHALLENGE_ORDER } from "./threatCreationRules.js";
-import { getTrapById } from "./traps.js";
+import { getTrapById, pickReplacementTrap } from "./traps.js";
 
 const ENCOUNTER_RESOLUTION_VERSION = 9;
 
@@ -513,6 +513,11 @@ function getNodeEcology(node, profile) {
     : null;
 }
 
+function filterEncounterCatalog(node, catalog, ecology) {
+  const requiredTag = ecology?.rules.requiredTerrainTagByName?.[getTerrainName(node)];
+  return requiredTag ? catalog.filter(creature => creature.ecology?.terrains?.includes(requiredTag)) : catalog;
+}
+
 function resolveCreatureGroup(node, rng, catalog, ecology) {
   if (!node.creature || !node.challenge || node.challenge.creatures <= 0) return [];
 
@@ -636,7 +641,7 @@ export function rerollNodeCreatures(node, profile) {
   const challenge = calculateCombatND(original);
   const { type, allowedCreatureIds } = node.creature;
   const ecology = getNodeEcology(node, profile);
-  const catalog = getAllowedCatalog(allowedCreatureIds, profile)
+  const catalog = filterEncounterCatalog(node, getAllowedCatalog(allowedCreatureIds, profile), ecology)
     .filter(creature => ecology || !type || creature.type === type);
   if (!catalog.length || challenge <= 0) return null;
 
@@ -659,6 +664,31 @@ export function rerollNodeCreatures(node, profile) {
     }
   }
   return null;
+}
+
+function isNodeTrap(item, trap) {
+  return item.kind === "trap" && item.trapId === trap.id && item.role === trap.role;
+}
+
+export function canRerollNodeTrap(node) {
+  return Boolean(node?.trap
+    && ["primary", "incidental"].includes(node.trap.role)
+    && node.resolvedEncounter?.items.some(item => isNodeTrap(item, node.trap))
+    && !node.fixedComposition
+    && !node.fixedTacticalMap);
+}
+
+export function rerollNodeTrap(node, profile) {
+  if (!canRerollNodeTrap(node)) return null;
+
+  const current = node.resolvedEncounter;
+  const trapRerolls = (current.trapRerolls || 0) + 1;
+  const rng = createRng(`${current.seed}:trap-reroll:${trapRerolls}`);
+  const trap = pickReplacementTrap(node.trap, profile, rng);
+  if (!trap) return null;
+
+  const items = current.items.map(item => isNodeTrap(item, node.trap) ? getTrapSummary(trap) : item);
+  return { trap, encounter: { ...current, trapRerolls, items } };
 }
 
 // Builds items from a fixed composition ({ creatures: [{ id, quantity }], traps: [trapId] })
@@ -725,8 +755,8 @@ export function resolveForestAmbush(node, profile, { mapSeed } = {}) {
     challenge: { ...node.challenge, creatures: target }
   };
   assignCreatureProfile(ambushNode, profile, rng);
-  const catalog = getAllowedCatalog(ambushNode.creature?.allowedCreatureIds, profile);
   const ecology = getNodeEcology(ambushNode, profile);
+  const catalog = filterEncounterCatalog(ambushNode, getAllowedCatalog(ambushNode.creature?.allowedCreatureIds, profile), ecology);
   const items = resolveCreatureGroup(ambushNode, rng, catalog, ecology);
   if (items.length && calculateCombatND(items) === target) return createResolvedEncounter(ambushNode, items, seed);
 
@@ -756,7 +786,8 @@ export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidate
     const catalog = node.creature
       ? creatureCandidates ?? getAllowedCatalog(node.creature.allowedCreatureIds, profile)
       : [];
-    items = resolveCreatureGroup(node, rng, catalog, getNodeEcology(node, profile));
+    const ecology = getNodeEcology(node, profile);
+    items = resolveCreatureGroup(node, rng, filterEncounterCatalog(node, catalog, ecology), ecology);
     if (node.trap) items.push(getTrapSummary(node.trap));
   }
   if (items.length === 0) return null;

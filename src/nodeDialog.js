@@ -834,6 +834,7 @@ function createCombatUnavailableNotice() {
 export function createNodeDialogController({
   canReinforceCreatures = () => false,
   canRerollCreatures = () => false,
+  canRerollTrap = () => false,
   contentElement,
   dialogElement,
   footerElement,
@@ -849,6 +850,7 @@ export function createNodeDialogController({
   onAdjustMissionProgress = null,
   onOpenMission = () => {},
   onRerollCreatures = () => false,
+  onRerollTrap = () => false,
   onSetCreatureReinforcement = () => false,
   onRest,
   state,
@@ -989,7 +991,7 @@ export function createNodeDialogController({
       TACTICAL_MAP_ICON,
       "Abrir mapa tático",
       () => {
-        const map = createNodeTacticalMap(node, objectives);
+        const map = createNodeTacticalMap(node, objectives, { profileId: getProfileId() });
         openTacticalMapFullscreen(map, { state: tacticalEncounterSession.openMap(`node:${node.id}`, map) });
       }
     );
@@ -1046,27 +1048,52 @@ export function createNodeDialogController({
         contentElement.querySelector(`[data-creature-reinforcement="${stat}"]`)?.focus();
       })
     });
-    if (canRerollCreatures(node)) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "extended-action is-compact";
-      button.textContent = "Rerrolar criaturas";
+    const rerollActions = [
+      {
+        kind: "creature",
+        available: canRerollCreatures(node),
+        run: onRerollCreatures,
+        label: "Rerrolar criaturas",
+        success: "Criaturas atualizadas com o mesmo ND.",
+        failure: "Nenhuma outra composição compatível foi encontrada."
+      },
+      {
+        kind: "trap",
+        available: canRerollTrap(node),
+        run: onRerollTrap,
+        label: "Rerrolar armadilha",
+        success: "Armadilha atualizada com o mesmo ND.",
+        failure: "Nenhuma outra armadilha com o mesmo ND foi encontrada."
+      }
+    ].filter(action => action.available);
+    if (rerollActions.length) {
+      const actions = document.createElement("div");
+      actions.className = "encounter-reroll-actions";
       const status = document.createElement("p");
-      status.className = "node-dialog-meta";
+      status.className = "node-dialog-meta encounter-reroll-status";
       status.setAttribute("role", "status");
-      status.classList.add("creature-reroll-status");
-      button.addEventListener("click", () => {
-        if (!onRerollCreatures(node)) {
-          status.textContent = "Nenhuma outra composição compatível foi encontrada.";
-          return;
-        }
-        selectedEncounterItemByNode.delete(node.id);
-        render(node);
-        const replacement = contentElement.querySelector(".creature-reroll-status");
-        replacement.textContent = "Criaturas atualizadas com o mesmo ND.";
-        replacement.previousElementSibling.focus();
-      });
-      page.firstElementChild.append(button, status);
+      for (const action of rerollActions) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "extended-action is-compact";
+        button.dataset.encounterReroll = action.kind;
+        button.textContent = action.label;
+        button.addEventListener("click", () => {
+          if (!action.run(node)) {
+            status.textContent = action.failure;
+            return;
+          }
+          const items = node.resolvedEncounter.items;
+          const index = items.findIndex(item => item.kind === action.kind);
+          if (index !== -1) selectedEncounterItemByNode.set(node.id, getEncounterItemKey(items[index], index));
+          render(node);
+          const replacement = contentElement.querySelector(".encounter-reroll-status");
+          if (replacement) replacement.textContent = action.success;
+          contentElement.querySelector(`[data-encounter-reroll="${action.kind}"]`)?.focus();
+        });
+        actions.append(button);
+      }
+      page.firstElementChild.append(actions, status);
     }
     contentElement.appendChild(page);
   }

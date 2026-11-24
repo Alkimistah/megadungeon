@@ -566,11 +566,18 @@ Os mapas existentes dos andares 1 a 30 usam o renderizador compartilhado, inclui
 - **Peças e sessão.** Os tokens redondos identificam as criaturas e respeitam seu porte. O mestre pode ajustar apenas a formação inicial dos jogadores, mover peças por mouse, toque ou teclado, acrescentar invocações dos dois lados e remover qualquer peça. O rodapé do painel de ambiente reúne a peça selecionada e os botões de inclusão e remoção. As alterações do tabuleiro ficam em memória até a troca de encontro e ficam fora do arquivo de sessão.
 - **Deslocamento.** A posição de partida fica marcada com um X vermelho durante o arraste. O contador soma os trechos enquanto a peça estiver selecionada. A contagem considera diagonais, terreno difícil, quadrados de inimigos e saída de trincheira. Colossais ocupam 6×6. Natação, voo e regras que dependem da direção da inclinação ficam a cargo do mestre.
 
-#### Próximos passos da grade tática
+#### Plantas publicadas e ponto de retomada (24/11/2026)
 
-1. Criar mapas-base reutilizáveis por ambiente. Começar com poucas variações dos andares 1 a 10 e ampliar o repertório a partir dos andares 11 a 20, reaproveitando layouts em andares futuros quando as condições forem compatíveis.
-2. Selecionar cada layout conforme o cenário definido e localizar nele os elementos previstos pela ficha. Usar como casos de referência submersão, transição entre água rasa e profunda, terreno elevado e inclinações.
-3. Validar em mesa a coerência entre ficha, mapa e legenda e o uso no tablet. Registrar cenas que exigirem ajuste manual para orientar as próximas variações.
+- **Andares 1 a 9.** Os encontros sorteados usam 12 plantas de corredores e salas de 16×12 em `dungeonTacticalLayouts.js`. O grupo parte junto à abertura de chegada, e as demais extremidades podem ficar abertas, receber portas ou terminar em paredes. `extendedExplorationState.js` considera a ameaça e o espaço para as peças. As cenas finais curadas e a arena do andar 10 têm seus mapas próprios.
+- **Andares 11 a 20.** `forestTacticalLayouts.js` fornece 20 plantas reutilizáveis e quatro cenas específicas de missão. Há travessias com ponte, desfiladeiros de borda a borda e paredões com inclinação íngreme na volta. `nodeTacticalMap.js` posiciona os riscos e objetivos conforme o nodo. A arena da Quimera tem precedência.
+- **Encontros aquáticos.** A geração automática e a rerrolagem no terreno Aquático usam criaturas com a etiqueta `aquatico`. A regra respeita livros habilitados e o catálogo permitido.
+- **Rerrolagem de armadilhas.** Nos nodos pendentes da Floresta, armadilhas principais e incidentais podem ser substituídas por outra com o mesmo ND. A ficha e o mapa passam a usar a armadilha nova, que é registrada no código de sessão. Em encontros mistos, os botões de criaturas e armadilha ficam juntos.
+
+**Ao retomar, começar pela validação da grade no tablet**, comparando ficha, mapa e legenda em água rasa/profunda, submersão, ponte com armadilha e terreno elevado. Usar estes casos reproduzíveis para iniciar a revisão:
+
+1. Nos andares 11 a 20, a investigação das cinzas na clareira pode coincidir com submersão global. Conferir a elegibilidade da planta fixa quando a missão exige um objetivo em terra.
+2. Nos andares 1 a 9, conferir o presságio **Cristais falsos** com criaturas 2×2. A posição preferida pode ficar perto do grupo e o posicionamento final recuar porque a peça inteira não cabe.
+3. Registrar os casos observados em uso real e ajustar as plantas e suas condições de seleção. Depois, avaliar variações para os andares 21 a 30. O mapa tático avulso continua como prioridade baixa.
 
 #### Mapa tático avulso na tela inicial
 

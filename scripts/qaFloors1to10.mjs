@@ -220,6 +220,21 @@ async function runEmptyEncounterRegression(browser) {
       throw new Error(`Encontro vazio reapareceu na amostra ${attempt + 1}.`);
     }
 
+    if (attempt === 0) {
+      await page.getByRole("button", { name: "Abrir cena completa" }).click();
+      const panel = page.locator(".scene-modal-panel");
+      await panel.getByText(/Mapa 16x12/).waitFor();
+      await panel.getByRole("button", { name: "Gerar outro mapa" }).click();
+      await panel.getByRole("button", { name: "Expandir" }).click();
+      const board = page.locator(".tactical-map-fullscreen[open]");
+      await board.locator(".tactical-cell.is-wall").first().waitFor();
+      if (await board.locator(".tactical-cell").count() !== 192) {
+        throw new Error("A grade expandida do encontro sorteado não tem 16 por 12 células.");
+      }
+      await assertNoHorizontalOverflow(page, ".tactical-map-fullscreen");
+      await page.screenshot({ path: `${OUTPUT_DIR}/tablet-corridor-map.png` });
+    }
+
     await page.close();
   }
 }

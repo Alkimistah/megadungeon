@@ -1,4 +1,5 @@
 import { getEncounterForSave } from "./encounterCreatureHealth.js";
+import { syncRerolledTrapProfile } from "./traps.js";
 
 export const DISCOVERY_MINUTES = 15;
 
@@ -97,6 +98,7 @@ export function createExplorationState() {
     const resolvedEncounterByNode = new Map(sessionState.resolvedEncounters || []);
     levels.flat().forEach((node) => {
       node.resolvedEncounter = getEncounterForSave(resolvedEncounterByNode.get(node.id)) || null;
+      syncRerolledTrapProfile(node);
     });
 
     rebuildActiveNodesFromChosenRoutes();

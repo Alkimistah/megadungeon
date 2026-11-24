@@ -2415,6 +2415,12 @@ button.tactical-piece.is-dragging {
   background: rgba(18, 27, 19, 0.6);
 }
 
+.encounter-reroll-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .encounter-list-panel h3 {
   margin: 0;
   color: #f1d6a8;

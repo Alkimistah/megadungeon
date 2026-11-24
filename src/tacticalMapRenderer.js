@@ -14,7 +14,7 @@ const SIZE_OPTIONS = ["Minúsculo", "Pequeno", "Médio", "Grande", "Enorme", "Co
 
 export const TACTICAL_LEGEND_ORDER = [
   "wall", "party", "boss", "enemy", "hidden", "trap", "pit", "web",
-  "water", "current", "lava", "deck", "canopy", "tree", "foliage", "swamp", "wet", "clearing",
+  "water", "current", "lava", "deck", "bridge", "canopy", "tree", "foliage", "swamp", "wet", "clearing",
   "slope", "trench", "wind", "concealment", "difficult", "mechanism",
   "objective", "door", "advantage", "obstacle", "reinforcement"
 ];

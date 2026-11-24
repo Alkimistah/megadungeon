@@ -1,3 +1,5 @@
+import { createForestTacticalLayout } from "./forestTacticalLayouts.js";
+import { getForestTrapPresentation } from "./forestTrapPresentation.js";
 import { createRng, randomInt } from "./random.js";
 import { createTacticalScene, readLegacyTacticalScene } from "./tacticalScene.js";
 import { getTacticalEncounterUnits, getTacticalPartyPieces, placeTacticalEncounterUnits } from "./tacticalScenePieces.js";
@@ -16,6 +18,7 @@ const WALKABLE_CELLS = new Set([
   "concealment",
   "current",
   "deck",
+  "bridge",
   "difficult",
   "floor",
   "foliage",
@@ -162,12 +165,12 @@ function placeLine(cells, rng, marker, {
   }
 }
 
-function applyTerrain(cells, node, rng, features) {
+function applyTerrain(cells, node, rng, features, forestLayout) {
   const terrainName = node.environment?.terrain?.name;
   const featureNames = (node.environment?.terrain?.features || [])
     .filter(feature => !feature.area).map(feature => feature.name);
 
-  if (terrainName === "Floresta") {
+  if (!forestLayout && terrainName === "Floresta") {
     placeScattered(cells, rng, "tree", hasAnyName(featureNames, ["Árvores"]) ? 22 : 12);
     if (hasAnyName(featureNames, ["Folhagens"])) {
       placePatch(cells, rng, "foliage", { count: 3, height: 3, width: 4 });
@@ -186,7 +189,7 @@ function applyTerrain(cells, node, rng, features) {
     if (hasAnyName(featureNames, ["Penhasco"])) {
       placeLine(cells, rng, "cliff", { horizontal: rng() < 0.5, length: 9, thickness: 1 });
     }
-  } else if (terrainName === "Pântano") {
+  } else if (!forestLayout && terrainName === "Pântano") {
     placePatch(cells, rng, "water", { count: 3, height: 3, width: 5 });
     placePatch(cells, rng, "swamp", { count: 4, height: 2, width: 4, overwrite: ["floor", "water"] });
     placeScattered(cells, rng, "tree", 8);
@@ -199,18 +202,18 @@ function applyTerrain(cells, node, rng, features) {
     if (hasAnyName(featureNames, ["Árvores retorcidas"])) placeScattered(cells, rng, "tree", 6);
   }
 
-  if (terrainName === "Aquático" || hasAnyName(featureNames, ["Água corrente", "Água parada"]) && terrainName !== "Pântano") {
+  if ((!forestLayout && terrainName === "Aquático") || hasAnyName(featureNames, ["Água corrente", "Água parada"]) && !["Pântano", "Aquático"].includes(terrainName)) {
     const waterMarker = hasAnyName(featureNames, ["Água corrente"]) ? "current" : "water";
     placeLine(cells, rng, waterMarker, { horizontal: rng() < 0.55, length: 16, thickness: 3 });
     placePatch(cells, rng, "floor", { count: 2, height: 2, width: 4, overwrite: ["water", "current"] });
   }
 
-  if (terrainName === "Colinas") {
+  if (!forestLayout && terrainName === "Colinas") {
     placePatch(cells, rng, "gentle-slope", { count: 4, height: 2, width: 4 });
     placePatch(cells, rng, "advantage", { count: 2, height: 2, width: 3 });
     if (hasAnyName(featureNames, ["Inclinação íngreme"])) placePatch(cells, rng, "steep-slope", { count: 3, height: 2, width: 4 });
     if (hasAnyName(featureNames, ["Penhasco"])) placeLine(cells, rng, "cliff", { horizontal: rng() < 0.5, length: 8, thickness: 1 });
-  } else if (terrainName === "Planície aberta") {
+  } else if (!forestLayout && terrainName === "Planície aberta") {
     if (hasAnyName(featureNames, ["Trincheira"])) {
       placeLine(cells, rng, "trench", { horizontal: rng() < 0.5, length: 12, thickness: 1 });
     }
@@ -512,35 +515,43 @@ function withFixedScene(node, objectives) {
   return map;
 }
 
-export function createNodeTacticalMap(node, objectives = node?.missionObjectives || []) {
+export function createNodeTacticalMap(node, objectives = node?.missionObjectives || [], { profileId } = {}) {
   if (!node || (!node.resolvedEncounter?.items?.length && !objectives.length)) return null;
   if (node.fixedTacticalMap) return withFixedScene(node, objectives);
 
   const sceneSeed = `${node.resolvedEncounter?.seed || node.encounterSeed || node.id}:node-tactical-map`;
   const rng = createRng(sceneSeed);
-  const cells = createEmptyMap();
+  const size = { width: WIDTH, height: HEIGHT };
+  const layout = node.tacticalLayout;
+  const forestLayout = profileId === "forest-11-20" && !layout
+    ? createForestTacticalLayout(node, objectives, size) : null;
+  const cells = forestLayout?.cells ?? createEmptyMap();
   const terrainFeatures = [];
 
-  const layout = node.tacticalLayout;
   if (layout) {
     for (const zone of layout.zones) {
       for (const index of getZoneIndices(zone)) cells[Math.floor(index / WIDTH)][index % WIDTH] = zone.tile;
     }
   } else {
-    applyTerrain(cells, node, rng, terrainFeatures);
+    applyTerrain(cells, node, rng, terrainFeatures, forestLayout);
   }
   const { terrain: sceneTerrain, features, markers } = buildEnvironmentScene(cells, node, layout, terrainFeatures);
   if (layout?.landmark) cells[layout.landmark.y][layout.landmark.x] = "mechanism";
   applyLegacyClimate(cells, node, rng);
   const fallback = getFreePositions(cells);
-  const party = getTacticalPartyPieces(layout?.partyPositions ?? DEFAULT_PARTY_POSITIONS);
-  placeParty(cells, layout?.partyPositions ?? DEFAULT_PARTY_POSITIONS);
+  const partyPositions = layout?.partyPositions ?? forestLayout?.partyPositions ?? DEFAULT_PARTY_POSITIONS;
+  const party = getTacticalPartyPieces(partyPositions);
+  placeParty(cells, partyPositions);
   const enemies = placeEnemies(cells, node, rng);
   const beforeTrap = cells.flat();
-  placeTrapFeature(cells, node, rng);
-  addChangedLayers(markers, beforeTrap, cells, ["trap", "pit", "web", "mechanism"],
-    node.trap?.name ?? node.resolvedEncounter?.items.find(item => item.kind === "trap")?.name);
-  const size = { width: WIDTH, height: HEIGHT };
+  const trapItem = node.resolvedEncounter?.items.find(item => item.kind === "trap");
+  const trapLabel = getForestTrapPresentation(profileId, node, trapItem)?.name ?? node.trap?.name ?? trapItem?.name;
+  if (forestLayout?.trapPositions.length) {
+    addLayer(markers, "trap", forestLayout.trapPositions.map(([x, y]) => y * WIDTH + x), trapLabel);
+  } else {
+    placeTrapFeature(cells, node, rng);
+    addChangedLayers(markers, beforeTrap, cells, ["trap", "pit", "web", "mechanism"], trapLabel);
+  }
   const blockingFeatures = new Set(features.filter(feature => !WALKABLE_CELLS.has(feature.type))
     .flatMap(feature => feature.indices));
   const canOccupy = index => WALKABLE_CELLS.has(sceneTerrain[index]) && !blockingFeatures.has(index);
@@ -561,7 +572,8 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
       return enemies.filter(enemy => enemy.creatureId === objective.targetId)
         .map(({ index }) => ({ index, label: objective.targetName }));
     }
-    const position = findObjectivePosition(cells, createRng(`${sceneSeed}:objectives:${objective.missionId}`));
+    const position = forestLayout?.objectivePositions.get(objective) ??
+      findObjectivePosition(cells, createRng(`${sceneSeed}:objectives:${objective.missionId}`));
     if (!position) return [];
     const [x, y] = position;
     const index = y * WIDTH + x;
@@ -579,7 +591,7 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
     objectiveMarkers,
     ...(layout?.landmark ? { landmark: { index: layout.landmark.y * WIDTH + layout.landmark.x, label: layout.landmark.name } } : {}),
     terrain: node.environment?.terrain || null,
-    template: normalizeText(node.environment?.terrain?.name || "aberto"),
+    template: forestLayout?.id ?? normalizeText(node.environment?.terrain?.name || "aberto"),
     trapCount: getTrapCount(node),
     width: WIDTH
   };

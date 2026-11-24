@@ -75,6 +75,7 @@ export const forest11to20Profile = {
         Colinas: ["colina"],
         "Planície aberta": ["planicie"]
       },
+      requiredTerrainTagByName: { Aquático: "aquatico" },
       conditionTagsByName: {
         "Clima normal": [],
         Calor: ["calor"],

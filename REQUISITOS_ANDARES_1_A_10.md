@@ -142,7 +142,8 @@ Esse mapa não substitui o labirinto abstrato. Ele representa apenas a sala, cor
 
 Formato base:
 
-- matriz de 14 colunas por 10 linhas;
+- matriz de 16 colunas por 12 linhas nos encontros sorteados dos andares 1 a 9;
+- os encontros finais curados têm mapas próprios, geralmente de 14 por 10;
 - exceção: a sala do chefe do andar 10 usa mapa maior, atualmente 20x14;
 - cada célula representa um quadrado do mapa físico do usuário;
 - o tamanho real do quadrado não importa para o app;
@@ -169,17 +170,9 @@ Convenção visual sugerida:
 - branco ou marca clara: posição de vantagem;
 - cinza: obstáculo, coluna, entulho ou cobertura.
 
-Tipos de layout desejados:
+As 12 plantas incluem corredor reto, beco sem saída, corredor em L, corredor em cotovelo duplo, junção em T, encruzilhada, corredor para salão, salão com paredes em zigue-zague, corredor com sala lateral, corredor com duas salas laterais, corredores paralelos e duas salas em sequência.
 
-- sala retangular simples;
-- sala irregular;
-- corredor com alcovas;
-- câmara com pilares;
-- sala dividida por parede parcial;
-- ponte, fosso ou gargalo;
-- sala com área elevada;
-- sala com teias ou terreno difícil nos andares 7 a 10;
-- sala de chefe maior e mais controlada no andar 10.
+O grupo começa junto a uma abertura. As demais extremidades disponíveis na planta podem terminar em parede, ficar abertas ou receber portas. Essas passagens descrevem a geometria da cena.
 
 O gerador deve receber o contexto do encontro, como tier, categoria, presença de armadilha, quantidade de inimigos e tema do andar. A partir disso, posiciona elementos sem bloquear completamente o movimento do grupo.
 
@@ -357,7 +350,7 @@ O perfil dos andares 1 a 10 deve conter:
 - tesouros e achados úteis;
 - regras do encontro final por andar ou tier;
 - regra especial do andar 10;
-- templates e pesos para mapas táticos 14x10;
+- plantas e critérios de seleção para mapas táticos;
 - catálogo permitido de criaturas por andar, tier ou subtema;
 - pesos de seleção de criaturas por tema, como labirinto, masmorra e covil aracnídeo;
 - listas de bloqueio para criaturas inadequadas aos andares 1 a 10;
@@ -384,7 +377,7 @@ Criar ou separar:
 - painel de abordagem/teste;
 - resolvedor de d100;
 - resolvedor de encontro final do andar;
-- gerador de mapa tático 14x10;
+- gerador de mapas táticos de 16×12 para os encontros sorteados;
 - perfil `dungeon-1-10`.
 
 ## Critérios de Aceite
@@ -403,7 +396,7 @@ Criar ou separar:
 - Ao atingir os sucessos necessários, o app inicia o encontro final do andar.
 - O próximo andar só é liberado após o encontro final ser marcado como resolvido.
 - O andar 10 abre como sala de chefe, sem testes estendidos.
-- Encontros, armadilhas e chefe podem gerar um mapa tático 14x10.
+- Encontros e armadilhas sorteados nos andares 1 a 9 podem gerar mapas de 16×12. O chefe do andar 10 usa sua arena fixa de 20×14.
 - O mapa tático indica paredes, grupo, inimigos, armadilhas, portas e posições de vantagem.
 - A sessão preserva estado mecânico, progresso e log recente; cenas, mapas e encontros podem ser regenerados nesta versão.
 - Os encontros e armadilhas respeitam o patamar de personagens nível 1 a 4.
@@ -432,10 +425,9 @@ Criar ou separar:
 - Legenda global dos nodos escondida no modo labirinto dos andares 1 a 10.
 - Falhas que geram encontro, obstáculo ou armadilha já produzem cena concreta, em vez de apenas orientar consulta manual.
 - Encontro final obrigatório antes de liberar o próximo andar.
-- Mapa tático 14x10 gerado para cenas relevantes.
-- Layouts táticos com corredor de largura 2, T, cruz, corredor com sala, sala com corredor e variações internas.
-- Portas opcionais com exatamente 2 quadrados e saídas abertas representadas como chão quando não houver porta.
-- Grupo iniciado junto em 4 quadrados adjacentes.
+- Mapas de 16×12 gerados a partir das 12 plantas dos andares 1 a 9, com seleção por ameaça e espaço para as peças.
+- Corredores principais com largura de 2 quadrados e portas opcionais nos acessos previstos pela planta. Aberturas livres são representadas como chão.
+- Grupo iniciado junto à abertura de chegada em 4 quadrados adjacentes. O presságio Passagem estreita isola um personagem.
 - Armadilhas representadas como zonas de múltiplas células que podem bloquear ou pressionar o caminho.
 - Aranha Matriarca e filhotes adicionados ao catálogo de criaturas.
 - Encontros podem sortear armas compatíveis para criaturas armadas Pequenas ou Médias, preservando bônus de ataque e modificadores de dano da ficha base.

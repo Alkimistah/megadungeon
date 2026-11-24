@@ -27,6 +27,7 @@
 .tactical-sprite.is-wall { --tactical-sprite-x: 42.5%; }
 .tactical-sprite.is-door { --tactical-sprite-x: 45%; }
 .tactical-sprite.is-clearing { --tactical-sprite-x: 47.5%; }
+.tactical-sprite.is-bridge,
 .tactical-sprite.is-deck { --tactical-sprite-x: 50%; }
 .tactical-sprite.is-canopy { --tactical-sprite-x: 52.5%; }
 .tactical-sprite.is-ice { --tactical-sprite-x: 55%; }

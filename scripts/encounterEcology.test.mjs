@@ -4,6 +4,7 @@ import test from "node:test";
 import { calculateCombatND } from "../src/challenge.js";
 import { creatureCatalog, getAutomaticCreatureCatalog, getCreatureById } from "../src/creatureCatalog/index.js";
 import { getCreatureEcologyWeight, getEncounterEcologyContext } from "../src/encounterEcology.js";
+import { forest11to20Profile } from "../src/floorProfiles/forest11to20.js";
 import { rerollNodeCreatures, resolveForestAmbush, resolveNodeEncounter } from "../src/encounterResolver.js";
 
 const profile = {
@@ -122,4 +123,33 @@ test("ficha compartilhada continua elegível enquanto qualquer livro de origem e
 
   const profileWithoutEitherBook = { ...profile, disabledCreatureBooks: ["Ameaças de Arton", "Livro Básico"] };
   assert.equal(resolveNodeEncounter(nodeFor(0.25, ["glop"]), { profile: profileWithoutEitherBook }), null);
+});
+
+const floodedAquatic = { terrain: {
+  name: "Aquático",
+  features: ["Água corrente", "Personagens submersos", "Solo encharcado"].map(name => ({ name }))
+} };
+const hasAquaticTag = item =>
+  (item.creatureData ?? getCreatureById(item.creatureId))?.ecology?.terrains?.includes("aquatico");
+
+test("Floresta seleciona apenas criaturas aquáticas em encontros aquáticos", () => {
+  const ids = ["bandido-ligeiro", "drigg-cacador"];
+  for (const terrain of [floodedAquatic, { terrain: { name: "Aquático" } }]) {
+    for (let index = 0; index < 24; index++) {
+      const node = nodeFor(1, ids, terrain);
+      const encounter = resolveNodeEncounter(node, { profile: forest11to20Profile, mapSeed: `aquatic-${index}` });
+      assert.equal(calculateCombatND(encounter?.items), 1);
+      assert.ok(encounter.items.every(hasAquaticTag));
+    }
+  }
+});
+
+test("rerrolagem aquática mantém o ND e troca um grupo terrestre salvo", () => {
+  const node = nodeFor(1, ["bandido-ligeiro", "drigg-cacador"], floodedAquatic);
+  resolveNodeEncounter(node, { mapSeed: "old-aquatic", creatureCandidates: [getCreatureById("bandido-ligeiro")] });
+  assert.ok(node.resolvedEncounter.items.every(item => item.creatureId === "bandido-ligeiro"));
+  assert.ok(calculateCombatND(node.resolvedEncounter.items) === 1);
+  const candidate = rerollNodeCreatures(node, forest11to20Profile);
+  assert.equal(calculateCombatND(candidate?.items), 1);
+  assert.ok(candidate.items.every(hasAquaticTag));
 });

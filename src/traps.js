@@ -1,5 +1,5 @@
 import { formatChallengeRating, roundToQuarter } from "./challenge.js";
-import { pickWeighted } from "./random.js";
+import { pick, pickWeighted } from "./random.js";
 
 export const TRAP_SOURCES = {
   livroBasico: {
@@ -660,6 +660,38 @@ export function getTrapsBySource(sourceId) {
   return trapCatalog.filter((trapEntry) => trapEntry.source.id === sourceId);
 }
 
+export function pickReplacementTrap(trapEntry, profile, rng) {
+  const rules = getTrapRules(profile);
+  const allowedSources = rules.sources ?? Object.keys(TRAP_SOURCES);
+  const candidates = getTrapsByChallengeRating(trapEntry.challengeRating).filter(candidate =>
+    candidate.id !== trapEntry.id && allowedSources.includes(candidate.source.id) &&
+    candidate.challengeRating <= (rules.maximumChallenge ?? Infinity));
+  return candidates.length
+    ? withTrapRole(pick(rng, candidates), trapEntry.role, trapEntry.targetChallenge ?? trapEntry.challengeRating)
+    : null;
+}
+
+function withTrapRole(trapEntry, role, targetChallenge) {
+  return {
+    ...trapEntry,
+    role,
+    roleLabel: TRAP_ROLE_TYPES[role].label,
+    roleDescription: TRAP_ROLE_TYPES[role].description,
+    targetChallenge,
+    targetChallengeLabel: formatChallengeRating(targetChallenge)
+  };
+}
+
+export function syncRerolledTrapProfile(node) {
+  if (!node.resolvedEncounter?.trapRerolls) return;
+  const item = node.resolvedEncounter.items.find(entry =>
+    entry.kind === "trap" && Object.hasOwn(TRAP_ROLE_TYPES, entry.role));
+  const trapEntry = item && getTrapById(item.trapId);
+  if (trapEntry) {
+    node.trap = withTrapRole(trapEntry, item.role, node.trap?.targetChallenge ?? item.challengeRating);
+  }
+}
+
 export function assignTrapProfile(node, profile, rng) {
   const rules = getTrapRules(profile);
   let role = null;
@@ -696,14 +728,7 @@ export function assignTrapProfile(node, profile, rng) {
     )
     : node.challenge.total;
 
-  node.trap = {
-    ...selectedTrap,
-    role,
-    roleLabel: TRAP_ROLE_TYPES[role].label,
-    roleDescription: TRAP_ROLE_TYPES[role].description,
-    targetChallenge,
-    targetChallengeLabel: formatChallengeRating(targetChallenge)
-  };
+  node.trap = withTrapRole(selectedTrap, role, targetChallenge);
   node.challenge.encounter = effectiveEncounterChallenge;
   node.challenge.trap = roundToQuarter(trapChallenge);
   node.challenge.creatures = roundToQuarter(remainingCreatureChallenge);
