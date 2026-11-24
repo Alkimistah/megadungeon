@@ -157,6 +157,15 @@
 }
 .tactical-cell.tactical-sprite.is-door.is-auto.door-h::before { inset: 24% 4%; --door-dir: to right; }
 .tactical-cell.tactical-sprite.is-door.is-auto.door-v::before { inset: 4% 24%; --door-dir: to bottom; }
+/* Porta dupla: o painel encosta na borda do lado em que há outra porta. */
+.tactical-cell.tactical-sprite.is-door.is-auto.door-h.join-left::before { left: 0; }
+.tactical-cell.tactical-sprite.is-door.is-auto.door-h.join-right::before { right: 0; }
+.tactical-cell.tactical-sprite.is-door.is-auto.door-v.join-top::before { top: 0; }
+.tactical-cell.tactical-sprite.is-door.is-auto.door-v.join-bottom::before { bottom: 0; }
+
+/* A peça selecionada ou arrastada fica acima do toldo; as demais ficam por baixo. */
+.tactical-grid .tactical-piece.is-selected,
+.tactical-grid button.tactical-piece.is-dragging { z-index: 4; }
 
 /* Toldo por cima das peças: camada própria, transparente a cliques */
 .tactical-canopy-layer {
