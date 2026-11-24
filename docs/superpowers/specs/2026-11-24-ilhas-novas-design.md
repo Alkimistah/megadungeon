@@ -103,6 +103,8 @@ Os números abaixo seguem as ilhas atuais da mesma fileira. São a referência d
 - **Códigos de sessão.** As ilhas salvas guardam o `themeId` e os objetivos, então expedições antigas não sorteiam temas novos. Cada etapa inclui um teste de regressão: um código de sessão gerado antes da etapa carrega igual depois dela.
 - **Nome do Centro.** Toda ilha ativa tem `arenaName`. Cada ilha nova ganha um nome de Centro, definido na prévia e gravado no `themePools`.
 - **Mapas na prévia.** O esboço usa só os tipos de terreno que a grade já tem (água, água funda, corrente, lama, terreno difícil, obstáculo, parede, árvore, clareira, encosta, vantagem e afins). Se o tema pedir um terreno inédito, a prévia mostra isso à parte como tarefa extra, para o PO decidir se vale o custo.
+- **Ordem das listas (lição da etapa 1).** Temas novos entram no **fim** de `islandCreatures`. A origem de uma criatura é o primeiro tema da lista que a contém. Inserir um tema no meio mudaria a escolta de caçadas já salvas. Cada etapa testa que as criaturas compartilhadas mantêm a origem anterior.
+- **Testes antigos com seed fixa (lição da etapa 1).** Cada tema novo muda o sorteio das seeds fixas. Os testes que percorrem temas precisam continuar exercitando todos os temas que já cobriam e afirmar isso explicitamente.
 - **Testes.** Cada ilha ganha seu arquivo de testes, ou um bloco por tema num arquivo comum das ilhas novas, à escolha do implementador.
 
 ## Fica a cargo do implementador

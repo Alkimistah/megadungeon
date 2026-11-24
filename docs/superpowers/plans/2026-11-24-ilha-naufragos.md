@@ -98,25 +98,25 @@ O — `"Gruta dos mapas"`
 
 #### Passos
 
-- [ ] **Passo 1: capturar a fixture de sessão com o código atual (antes de qualquer mudança).**
+- [x] **Passo 1: capturar a fixture de sessão com o código atual (antes de qualquer mudança).**
   Escreva um script descartável no scratchpad que importe `createArchipelagoState`, `createRng` e `archipelago21to30Profile` e grave em `scripts/fixtures/archipelago-sessao-antes-naufragos.json` um objeto `{ "<seed>": exportSessionState() }` para as seeds `"regressao-1"`, `"regressao-2"` e `"regressao-3"`. Para cada seed, antes de exportar, chame a API pública de visita para registrar uma visita à ilha 21. Use a mesma API dos testes existentes em `scripts/archipelagoState.test.mjs`. Confirme que `git status` mostra só a fixture nova.
 
-- [ ] **Passo 2: escrever os testes em `scripts/archipelagoShipwrecked.test.mjs`.**
+- [x] **Passo 2: escrever os testes em `scripts/archipelagoShipwrecked.test.mjs`.**
   - `test("sessão salva antes da Ilha dos Náufragos restaura igual")`: para cada seed da fixture, `state.initialize(profile, createRng("x"), fixture[seed])` e compare `state.getSnapshot().islands.map(({ floor, themeId, objectives }) => ...)` e `exportSessionState()` com a fixture (`deepEqual` nos campos de ilhas, temas e objetivos).
   - `test("náufragos têm 4 setores com 3 variantes próprias e a compartilhada")`: monte `island = { floor: 21, themeId: "shipwrecked" }`. Para os setores 0 a 3 e as variantes 0 a 3, `createIslandSector(island, s, v, 22)` existe. Os títulos das variantes 0 a 2 são os do conteúdo aprovado, e a variante 3 é a compartilhada. Cada setor tem ao menos um `"combate"` e um não combate.
   - `test("combates de setor dos náufragos fecham ND 6 só com o elenco da ilha")`: como no teste `as variantes das quatro ilhas…` de `archipelagoState.test.mjs`, para cada variante de combate e as seeds `a`, `b` e `c`, `calculateCombatND(items) === 6`, todos os ids estão em `allowedCreatureIds`, e o marco do mapa vira `"mechanism"`.
   - `test("guardiões dos náufragos somam ND 8 e a criatura principal tem penalidades suficientes")`: para os índices 0 a 2, `createIslandGuardian(...).resolvedEncounter.budget.creatures === 8`, há `briefing`, o mapa do Centro tem o marco `"mechanism"`, e `getEligibleGuardianPenalties(getCreatureById(principal)).length >= 4`.
   - `test("náufragos têm terreno, ecologia e nome do Centro")`: `getIslandThemeTerrain("shipwrecked").name === "Costa de destroços"`, `archipelagoEcologyContexts.byTheme.shipwrecked` existe e o tema tem `arenaName === "Farol dos Acendedores"`.
 
-- [ ] **Passo 3: rodar e ver falhar.** `node --test scripts/archipelagoShipwrecked.test.mjs`. O teste de regressão passa e os outros falham (tema sem config).
+- [x] **Passo 3: rodar e ver falhar.** `node --test scripts/archipelagoShipwrecked.test.mjs`. O teste de regressão passa e os outros falham (tema sem config).
 
-- [ ] **Passo 4: implementar** o módulo, os registros, a lista, os mapas, os marcos e o perfil, com o conteúdo aprovado acima.
+- [x] **Passo 4: implementar** o módulo, os registros, a lista, os mapas, os marcos e o perfil, com o conteúdo aprovado acima.
 
-- [ ] **Passo 5: rodar e ver passar.** `node --test scripts/archipelagoShipwrecked.test.mjs`: todos passam. Se uma variante de combate não fechar ND 6, **não** mude o elenco nem o tipo preferido. Pare e informe o gerente, porque isso é decisão de conteúdo.
+- [x] **Passo 5: rodar e ver passar.** `node --test scripts/archipelagoShipwrecked.test.mjs`: todos passam. Se uma variante de combate não fechar ND 6, **não** mude o elenco nem o tipo preferido. Pare e informe o gerente, porque isso é decisão de conteúdo.
 
-- [ ] **Passo 6: suítes vizinhas.** Inclua o arquivo novo em `test:archipelago` no `package.json`. Rode `npm run test:archipelago`, `npm run test:archipelago-missions` e `npm run test:ecology`: tudo verde.
+- [x] **Passo 6: suítes vizinhas.** Inclua o arquivo novo em `test:archipelago` no `package.json`. Rode `npm run test:archipelago`, `npm run test:archipelago-missions` e `npm run test:ecology`: tudo verde.
 
-- [ ] **Passo 7: commit.** `feat: adiciona os dados da Ilha dos Náufragos`
+- [x] **Passo 7: commit.** `feat: adiciona os dados da Ilha dos Náufragos`
 
 ---
 
@@ -165,15 +165,15 @@ shipwrecked: {
 
 #### Passos
 
-- [ ] **Passo 1: teste da ilha sorteada.** Em `scripts/archipelagoShipwrecked.test.mjs`, `test("expedição nova pode sortear a Ilha dos Náufragos completa")`: procure, entre as seeds `"naufragos-0"` até `"naufragos-199"`, uma em que `createArchipelagoState(profile, createRng(seed))` sorteie `shipwrecked` (a primeira serve). Nela: a ilha está numa fileira inicial (21 a 24), `hasIslandSectors(island)` é verdadeiro, tem 4 objetivos com `penaltyId` distintos, tem `arenaName === "Farol dos Acendedores"` e `getArchipelagoMissionTheme("shipwrecked")` não é nulo.
-- [ ] **Passo 2: rodar e ver falhar.** `node --test scripts/archipelagoShipwrecked.test.mjs` falha nesse teste, porque o tema ainda não é sorteável.
-- [ ] **Passo 3: implementar.** Adicione o pacote de missões e `"shipwrecked"` a `enabledThemeIds`.
-- [ ] **Passo 4: ajustar os testes antigos.** Rode `npm run test:archipelago` e `npm run test:archipelago-missions`. Ajuste os testes que fixam o conjunto de temas:
+- [x] **Passo 1: teste da ilha sorteada.** Em `scripts/archipelagoShipwrecked.test.mjs`, `test("expedição nova pode sortear a Ilha dos Náufragos completa")`: procure, entre as seeds `"naufragos-0"` até `"naufragos-199"`, uma em que `createArchipelagoState(profile, createRng(seed))` sorteie `shipwrecked` (a primeira serve). Nela: a ilha está numa fileira inicial (21 a 24), `hasIslandSectors(island)` é verdadeiro, tem 4 objetivos com `penaltyId` distintos, tem `arenaName === "Farol dos Acendedores"` e `getArchipelagoMissionTheme("shipwrecked")` não é nulo.
+- [x] **Passo 2: rodar e ver falhar.** `node --test scripts/archipelagoShipwrecked.test.mjs` falha nesse teste, porque o tema ainda não é sorteável.
+- [x] **Passo 3: implementar.** Adicione o pacote de missões e `"shipwrecked"` a `enabledThemeIds`.
+- [x] **Passo 4: ajustar os testes antigos.** Rode `npm run test:archipelago` e `npm run test:archipelago-missions`. Ajuste os testes que fixam o conjunto de temas:
   - `expedições novas sorteiam posições apenas entre os dez temas…` passa a aceitar os 11 temas ativos. Verifique que cada fileira só tem temas ativos daquela fileira, sem exigir o conjunto exato.
   - Testes com seed fixa que mapeiam por `themeId` (por exemplo `objectiveCounts` em `as variantes das quatro ilhas…`) incluem `shipwrecked: [4, 4, 4, 4]` ou trocam de seed, mantendo o que verificam.
   - Não apague nenhuma verificação.
-- [ ] **Passo 5: rodar tudo.** `npm run test:archipelago`, `npm run test:archipelago-missions`, `npm run test:ecology`, `npm run test:ranges` e `npm run build`: tudo verde.
-- [ ] **Passo 6: documentação.** Em `REQUISITOS_ANDARES_21_A_30.md`, acrescente à "Retomada do Arquipélago", depois do parágrafo da Costa do Coral, um parágrafo no mesmo estilo dos vizinhos:
+- [x] **Passo 5: rodar tudo.** `npm run test:archipelago`, `npm run test:archipelago-missions`, `npm run test:ecology`, `npm run test:ranges` e `npm run build`: tudo verde.
+- [x] **Passo 6: documentação.** Em `REQUISITOS_ANDARES_21_A_30.md`, acrescente à "Retomada do Arquipélago", depois do parágrafo da Costa do Coral, um parágrafo no mesmo estilo dos vizinhos:
   - a ideia (Acendedores e farol falso);
   - os 4 setores com 4 variantes, incluindo a compartilhada;
   - combates ND 6;
@@ -181,7 +181,7 @@ shipwrecked: {
   - o Centro, Farol dos Acendedores.
 
   Atualize "a seleção da primeira versão continua com dez temas" para onze. No item 1 de "Por onde retomar" e em "Pendências conhecidas", passe de 13 para 12 temas e cite o design `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`. No `README.md`, troque "Os 13 temas fora do sorteio ainda não têm pacote de missões" por "Os 12 temas fora do sorteio voltam um a um como ilhas completas".
-- [ ] **Passo 7: commit.** `feat: coloca a Ilha dos Náufragos no sorteio das ilhas iniciais`
+- [x] **Passo 7: commit.** `feat: coloca a Ilha dos Náufragos no sorteio das ilhas iniciais`
 
 ---
 
