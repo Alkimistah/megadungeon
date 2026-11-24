@@ -10,8 +10,10 @@ import { calculateCombatND } from "../src/challenge.js";
 import { getCreatureById } from "../src/creatureCatalog/index.js";
 import { getEligibleGuardianPenalties } from "../src/archipelagoGuardianPenalties.js";
 import {
-  createIslandGuardian, createIslandSector, createIslandSectorCombat, getIslandThemeTerrain
+  createIslandGuardian, createIslandSector, createIslandSectorCombat, getIslandThemeTerrain, hasIslandSectors
 } from "../src/archipelagoPilot.js";
+import { getCreatureOriginThemeId, getIslandCreatureIds } from "../src/archipelagoCreatureRules.js";
+import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionThemes.js";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/archipelago-sessao-antes-naufragos.json", import.meta.url), "utf8"));
 const island = { floor: 21, themeId: "shipwrecked" };
@@ -80,7 +82,7 @@ test("combates de setor dos náufragos fecham ND 6 só com o elenco da ilha", ()
 });
 
 test("guardiões dos náufragos somam ND 8 e a criatura principal tem penalidades suficientes", () => {
-  const objectives = [0, 1, 2, 3].map(sector => ({ ...createIslandSector(island, sector, 0, 22), }));
+  const objectives = [0, 1, 2, 3].map(sector => createIslandSector(island, sector, 0, 22));
   const full = { ...island, baseChallenge: 8, objectives, outcomes: Object.fromEntries(objectives.map(({ id }) => [id, "failure"])) };
   const mains = ["legionario-insano", "cavaleiro-desonrado", "afogado"];
   for (const index of [0, 1, 2]) {
@@ -100,9 +102,7 @@ test("náufragos têm terreno, ecologia e nome do Centro", () => {
   assert.equal(theme.arenaName, "Farol dos Acendedores");
 });
 
-test("expedição nova pode sortear a Ilha dos Náufragos completa", async () => {
-  const { hasIslandSectors } = await import("../src/archipelagoPilot.js");
-  const { getArchipelagoMissionTheme } = await import("../src/missions/archipelagoMissionThemes.js");
+test("expedição nova pode sortear a Ilha dos Náufragos completa", () => {
   let found = null;
   for (let i = 0; i < 200 && !found; i += 1) {
     const seed = `naufragos-${i}`;
@@ -112,11 +112,22 @@ test("expedição nova pode sortear a Ilha dos Náufragos completa", async () =>
   }
   assert.ok(found, "nenhuma seed sorteou shipwrecked");
   const { hit } = found;
-  console.log("SEED", found.seed, "floor", hit.floor);
   assert.ok(hit.floor >= 21 && hit.floor <= 24);
   assert.equal(hasIslandSectors(hit), true);
   assert.equal(hit.objectives.length, 4);
   assert.equal(new Set(hit.objectives.map(item => item.penaltyId)).size, 4);
   assert.equal(hit.arenaName, "Farol dos Acendedores");
   assert.ok(getArchipelagoMissionTheme("shipwrecked"));
+  assert.ok(["ultimo-legionario", "senhor-dos-acendedores", "primeiro-naufrago"].includes(hit.guardianComposition), hit.guardianComposition);
+});
+
+test("a origem das criaturas compartilhadas não passa para os náufragos", () => {
+  const others = ["storm", "floating", "pirate-held", "sea-caves", "volcanic", "coral-coast", "atoll", "mangrove", "tropical"];
+  for (const id of getIslandCreatureIds("shipwrecked")) {
+    if (!others.some(theme => getIslandCreatureIds(theme).includes(id))) continue;
+    assert.notEqual(getCreatureOriginThemeId(id), "shipwrecked", id);
+  }
+  for (const id of ["crocodilo", "aparicao", "turba-zumbi", "fobossuco"]) {
+    assert.equal(getCreatureOriginThemeId(id), "mangrove", id);
+  }
 });

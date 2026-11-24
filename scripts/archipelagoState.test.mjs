@@ -104,7 +104,15 @@ test("a emboscada só rola depois da exploração e o descanso aguarda sua concl
 test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com pontos de interação", () => {
   const profile = archipelago21to30Profile;
   const objectiveCounts = { mangrove: [5, 5, 4, 5], tropical: [4, 4, 4, 4], atoll: [4, 4, 4, 4], "coral-coast": [4, 4, 4, 4], shipwrecked: [4, 4, 4, 4] };
-  const islands = createArchipelagoState(profile, createRng("variantes iniciais")).getSnapshot().islands.slice(0, 4);
+  const exercised = new Set();
+  const islands = [];
+  for (let i = 0; i < 200 && exercised.size < Object.keys(objectiveCounts).length; i += 1) {
+    for (const island of createArchipelagoState(profile, createRng(`variantes iniciais ${i}`)).getSnapshot().islands.slice(0, 4)) {
+      if (exercised.has(island.themeId)) continue;
+      exercised.add(island.themeId);
+      islands.push(island);
+    }
+  }
   for (const island of islands) {
     objectiveCounts[island.themeId].forEach((count, sector) => {
       for (let variant = 0; variant < count; variant += 1) {
@@ -131,6 +139,7 @@ test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com po
     const map = createNodeTacticalMap(withIslandTacticalLayout(guardian, island.themeId));
     assert.equal(map.cells[map.landmark.index], "mechanism");
   }
+  assert.deepEqual([...exercised].sort(), Object.keys(objectiveCounts).sort());
 });
 
 // A fileira inicial tem 5 temas ativos para 4 vagas. Com rolagem fixa, o tema excluído
@@ -312,10 +321,16 @@ test("expedições novas sorteiam posições apenas entre os onze temas ativos",
   const rowOf = floor => islandDifficultyByFloor[floor];
   for (const seed of ["primeira", "segunda", "terceira"]) {
     const { islands } = createArchipelagoState(archipelago21to30Profile, createRng(seed)).getSnapshot();
+    assert.equal(islands.length, 10);
     const ids = islands.map(island => island.themeId);
     assert.equal(new Set(ids).size, ids.length);
     for (const island of islands) {
       assert.ok(activeByRow[rowOf(island.floor)].includes(island.themeId), `${seed}: ${island.themeId} no andar ${island.floor}`);
+    }
+    for (const [row, active] of Object.entries(activeByRow)) {
+      const rowIds = islands.filter(island => rowOf(island.floor) === row).map(island => island.themeId);
+      if (row === "initial") assert.equal(new Set(rowIds).size, 4, seed);
+      else assert.deepEqual([...rowIds].sort(), [...active].sort(), `${seed}: ${row}`);
     }
     assert.equal(islands.find(island => island.floor === 30).themeId, "dinosaurs");
   }

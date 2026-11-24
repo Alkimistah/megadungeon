@@ -356,7 +356,7 @@ A primeira versão usa um conjunto de onze temas. A seed muda as posições dos 
 
 | Dificuldade | Andares | Temas da primeira versão |
 |---|---|---|
-| Inicial | 21–24 | Ilha Manguezal, Ilha Tropical, Atol Circular e Costa do Coral |
+| Inicial | 21–24 | Ilha Manguezal, Ilha Tropical, Atol Circular, Costa do Coral e Ilha dos Náufragos (quatro sorteadas entre as cinco) |
 | Intermediária | 25–27 | Ilha Vulcânica, Ilha-Labirinto de Cavernas Marinhas e Ilha Tomada por Piratas |
 | Avançada | 28–29 | Ilha Flutuante e Ilha de Tempestades Eternas |
 | Final | 30 | Ilha dos Dinossauros |

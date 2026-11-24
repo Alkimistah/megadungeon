@@ -7,6 +7,7 @@ const coastAnimals = ["canceronte", "enxame-de-aguas-vivas", "peixe-recife", "se
 const coastalHumanoids = ["elfo-do-mar-pescador", "elfo-do-mar-chefe", "irukanjin", "homem-piranha",
   "homem-piranha-imediato", "sahuagin-metamorfo"];
 
+// Temas novos entram no fim da lista para não mudar a origem de criaturas já usadas.
 const islandCreatures = {
   storm: ["lagarto-eletrico", "tempestade-de-lagartos", "hipogrifo-abissal", "lacedon",
     "serpe-ancia", "anciao-das-rochas", "grifo-celestial", "agua-viva-gigante", "harpia-saqueadora",
@@ -21,12 +22,6 @@ const islandCreatures = {
   volcanic: ["salamandra-plebeia", "salamandra-guerreira", "gargula-assassina", "gargula",
     "gargula-livro-basico", "cao-do-inferno", "centopeia-dragao", "kobold-veterano", "patrulha-kobold", "kobold-xama"],
   "coral-coast": [...coastAnimals, ...coastalHumanoids, "naiade", "aquinne", "lacedon"],
-  shipwrecked: [
-    "canceronte", "tumarkhan", "selako", "pliorex", "fobossuco", "crocodilo", "bando-pirata", "chefe-de-quadrilha",
-    "saqueador-lider-de-bando", "saqueador-pugilista", "jagunco", "homem-piranha-imediato", "cavaleiro-desonrado",
-    "lacedon", "imediato", "zumbi-fantasmagorico", "turba-zumbi", "aparicao", "carnical", "harpia-saqueadora",
-    "tempestade-de-lagartos"
-  ],
   atoll: [...coastAnimals, ...coastalHumanoids, "bando-pirata", "pirata", "naiade", "aquinne", "lacedon"],
   mangrove: [
     "lagarto-perseguidor", "crocodilo", "fobossuco", "hipopotamo", "pantera",
@@ -41,6 +36,12 @@ const islandCreatures = {
     "gargula", "gargula-livro-basico", "gargula-assassina", "gargula-de-topiaria-media", "gargula-de-topiaria-grande",
     "espada-da-floresta", "galhada-macho", "galhada-femea", "guardiao-de-palha",
     "kobold-veterano", "patrulha-kobold", "kobold-xama", "tendriculo", "cipo-assassino", "come-sonhos"
+  ],
+  shipwrecked: [
+    "canceronte", "tumarkhan", "selako", "pliorex", "fobossuco", "crocodilo", "bando-pirata", "chefe-de-quadrilha",
+    "saqueador-lider-de-bando", "saqueador-pugilista", "jagunco", "homem-piranha-imediato", "cavaleiro-desonrado",
+    "lacedon", "imediato", "zumbi-fantasmagorico", "turba-zumbi", "aparicao", "carnical", "harpia-saqueadora",
+    "tempestade-de-lagartos"
   ]
 };
 
