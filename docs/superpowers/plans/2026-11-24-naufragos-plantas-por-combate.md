@@ -63,7 +63,7 @@
 
 #### Passos
 
-- [ ] **Passo 1: testes que falham**, em `scripts/archipelagoShipwrecked.test.mjs`:
+- [x] **Passo 1: testes que falham**, em `scripts/archipelagoShipwrecked.test.mjs`:
   - `test("cada combate dos náufragos abre a planta da própria cena")`: para cada par de setor e variante de combate (0 a 3), monte a cena como no teste de ND 6 existente e gere o mapa. Confira que `map.cells[map.landmark.index] === "mechanism"` e que o nome do marco é o esperado:
 
     | Variante | Marco esperado |
@@ -81,10 +81,10 @@
   - `test("plantas por tarefa dos náufragos não vazam para outras ilhas")`: `withIslandTacticalLayout(cena, "atoll", { direction: "O", title: "Interceptar a patrulha" }).tacticalLayout` é igual (`deepEqual`) ao resultado obtido no commit base com o mesmo argumento. Na prática, a planta O do Atol com o marco "Borda do poço". O mesmo vale para `"coral-coast"` com `"Defender a posição avançada"`.
   - `test("o acampamento tem dois combates")`: as variantes de S do tipo `"combate"` são exatamente "Romper o cerco às barracas" e "Libertar os cativos da paliçada".
   - O teste de ND 6 já existente passa a cobrir a variante nova sem mudança.
-- [ ] **Passo 2: rodar e ver falhar.** `node --test scripts/archipelagoShipwrecked.test.mjs`.
-- [ ] **Passo 3: implementar** `byTask`, as plantas e a variante S3, com os valores acima.
-- [ ] **Passo 4: rodar e ver passar.** `npm run test:archipelago`, `npm run test:archipelago-missions` e `npm run build`: tudo verde e saída limpa.
-- [ ] **Passo 5: commit.** `feat: uma planta tática por combate na Ilha dos Náufragos`
+- [x] **Passo 2: rodar e ver falhar.** `node --test scripts/archipelagoShipwrecked.test.mjs`.
+- [x] **Passo 3: implementar** `byTask`, as plantas e a variante S3, com os valores acima.
+- [x] **Passo 4: rodar e ver passar.** `npm run test:archipelago`, `npm run test:archipelago-missions` e `npm run build`: tudo verde e saída limpa.
+- [x] **Passo 5: commit.** `feat: uma planta tática por combate na Ilha dos Náufragos`
 
 ---
 
@@ -110,21 +110,21 @@
 
 #### Passos
 
-- [ ] **Passo 1: testes que falham**, em `scripts/archipelagoShipwrecked.test.mjs`:
+- [x] **Passo 1: testes que falham**, em `scripts/archipelagoShipwrecked.test.mjs`:
   - `test("só o Primeiro Náufrago traz a regra da lente")`:
     - `createIslandGuardian(ilha, "primeiro-naufrago", …).rule` é igual ao texto aprovado e o `briefing` começa com "O céu está encoberto".
     - Para `"ultimo-legionario"` e `"senhor-dos-acendedores"`, `rule` é `undefined`.
     - Para um guardião do Atol (índice 0), `rule` é `undefined`.
   - `test("guardião salvo sem regra continua igual")`: uma cena de guardião criada como `{ ...cena, rule: undefined }` não gera texto `"undefined"`. Se o renderer não puder ser testado em Node sem DOM, deixe isso a cargo da validação em mesa e registre no relatório.
-- [ ] **Passo 2: rodar e ver falhar.**
-- [ ] **Passo 3: implementar** o pilot, o renderer e os dados.
-- [ ] **Passo 4: documentação.** No parágrafo dos Náufragos em `REQUISITOS_ANDARES_21_A_30.md`, registre:
+- [x] **Passo 2: rodar e ver falhar.**
+- [x] **Passo 3: implementar** o pilot, o renderer e os dados.
+- [x] **Passo 4: documentação.** No parágrafo dos Náufragos em `REQUISITOS_ANDARES_21_A_30.md`, registre:
   - cada combate tem planta própria;
   - o acampamento tem dois combates;
   - o Farol é uma torre com a lente no centro;
   - a regra da lente vale só para o Primeiro Náufrago e aparece na ficha.
-- [ ] **Passo 5: rodar tudo.** `npm run test:archipelago`, `npm run test:archipelago-missions`, `npm run test:ecology` e `npm run build`: tudo verde.
-- [ ] **Passo 6: commit.** `feat: lente do farol contra a aparição no guardião dos Náufragos`
+- [x] **Passo 5: rodar tudo.** `npm run test:archipelago`, `npm run test:archipelago-missions`, `npm run test:ecology` e `npm run build`: tudo verde.
+- [x] **Passo 6: commit.** `feat: lente do farol contra a aparição no guardião dos Náufragos`
 
 ---
 
