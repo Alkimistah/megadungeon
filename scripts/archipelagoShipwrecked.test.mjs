@@ -92,6 +92,7 @@ test("guardiões dos náufragos somam ND 8 e a criatura principal tem penalidade
     assert.ok(guardian.briefing);
     const map = createNodeTacticalMap(withIslandTacticalLayout(guardian, "shipwrecked"));
     assert.equal(map.cells[map.landmark.index], "mechanism");
+    assert.equal(guardian.resolvedEncounter.items[0].creatureId, mains[index], `criatura principal ${index}`);
     assert.ok(getEligibleGuardianPenalties(getCreatureById(mains[index])).length >= 4, mains[index]);
   }
 });

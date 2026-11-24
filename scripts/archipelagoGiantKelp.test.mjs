@@ -86,13 +86,14 @@ test("combates de setor das algas fecham ND 6 só com o elenco da ilha", () => {
 test("guardiões das algas somam ND 8 e a criatura principal tem penalidades suficientes", () => {
   const objectives = [0, 1, 2, 3].map(sector => createIslandSector(island, sector, 0, 22));
   const full = { ...island, baseChallenge: 8, objectives, outcomes: Object.fromEntries(objectives.map(({ id }) => [id, "failure"])) };
-  const mains = ["alghari", "peixe-recife", "elfo-do-mar-chefe"];
+  const mains = ["alghari", "enxame-de-aguas-vivas", "elfo-do-mar-chefe"];
   for (const index of [0, 1, 2]) {
     const guardian = createIslandGuardian(full, index, profile, "centro");
     assert.equal(guardian.resolvedEncounter.budget.creatures, 8, `guardião ${index}`);
     assert.ok(guardian.briefing);
     const map = createNodeTacticalMap(withIslandTacticalLayout(guardian, "giant-kelp"));
     assert.equal(map.cells[map.landmark.index], "mechanism");
+    assert.equal(guardian.resolvedEncounter.items[0].creatureId, mains[index], `criatura principal ${index}`);
     assert.ok(getEligibleGuardianPenalties(getCreatureById(mains[index])).length >= 4, mains[index]);
   }
 });

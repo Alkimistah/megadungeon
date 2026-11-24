@@ -155,9 +155,10 @@ test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com po
 });
 
 // A fileira inicial tem 6 temas ativos para 4 vagas. Com rolagem fixa, os temas excluídos
-// não são previsíveis, então estes testes usam a fileira sem a Ilha dos Náufragos
-// e sem a Ilha de Algas Gigantes.
-const archipelagoWithoutShipwrecked = {
+// não são previsíveis, então estes testes usam uma fileira que mantém só os quatro
+// temas iniciais originais, para que as rolagens fixas continuem determinísticas
+// quando novos temas são adicionados.
+const archipelagoBaseInitialRow = {
   ...archipelago21to30Profile,
   archipelago: {
     ...archipelago21to30Profile.archipelago,
@@ -256,7 +257,7 @@ test("combates da Tropical respeitam o tipo da cena e mostram seus mecanismos no
 });
 
 test("a Costa do Coral restaura as quatro cenas e tem três composições de combate ND 8", () => {
-  const profile = archipelagoWithoutShipwrecked;
+  const profile = archipelagoBaseInitialRow;
   const guards = [[0, "elfo-do-mar-chefe"], [0.5, "lula-gigante"], [0.99, "reishid"]];
   for (const [roll, creatureId] of guards) {
     const rng = () => roll;
@@ -281,7 +282,7 @@ test("a Costa do Coral restaura as quatro cenas e tem três composições de com
 });
 
 test("o Atol conclui a expedição com os três guardiões ND 8 possíveis", () => {
-  const profile = archipelagoWithoutShipwrecked;
+  const profile = archipelagoBaseInitialRow;
   const guards = [[0, "agua-viva-gigante"], [0.5, "capitao-do-conclave-pirata"], [0.99, "selako-tigre"]];
   for (const [roll, creatureId] of guards) {
     const rng = () => roll;
@@ -397,7 +398,7 @@ function setupPilot() {
 }
 
 test("a Ilha Tropical sorteia três guardiões ND 8 e preserva os setores e a escolha na sessão", () => {
-  const profile = archipelagoWithoutShipwrecked;
+  const profile = archipelagoBaseInitialRow;
   for (const [roll, name] of [[0, "Sentinela do Sol"], [0.5, "Defensor do Templo"], [0.99, "Serpe do Disco Solar"]]) {
     const rng = () => roll;
     const state = createArchipelagoState(profile, rng);
