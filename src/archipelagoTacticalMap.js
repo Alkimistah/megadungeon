@@ -278,6 +278,19 @@ const layoutsByTheme = {
       ["water", 9, 2, 10, 9, { terrainType: "deep-water" }],
       ["wet", 4, 8, 7, 2], ["obstacle", 10, 3, 1, 3], ["advantage", 13, 4, 4, 3]
     ])
+  },
+  "giant-kelp": {
+    N: layout("Proa do bote", "As gavinhas presas ao casco são cortadas daqui.", 9, 7, [["foliage", 4, 0, 16, 6], ["deep-water", 0, 6, 20, 3], ["foliage", 6, 9, 14, 5], ["concealment", 10, 1, 6, 4], ["concealment", 12, 10, 5, 3], ["deck", 7, 7, 3, 1], ["wet", 0, 9, 6, 5]]),
+    S: { ...layout("Concha de alarme", "Pendurada no meio do viveiro.", 13, 5, [["water", 0, 0, 20, 14], ["foliage", 0, 0, 6, 7], ["foliage", 16, 0, 4, 14], ["deck", 6, 3, 10, 7], ["deck", 2, 9, 5, 2], ["clearing", 0, 10, 4, 4], ["obstacle", 8, 4, 2, 1], ["obstacle", 11, 8, 2, 1], ["obstacle", 14, 6, 1, 2]]), enemyArea: { minX: 16, maxX: 19, minY: 0, maxY: 13 } },
+    L: layout("Pescador preso", "Enrolado nas gavinhas no meio do banco.", 14, 6, [["water", 0, 0, 20, 14], ["clearing", 2, 3, 15, 9], ["foliage", 12, 2, 6, 3], ["foliage", 5, 8, 3, 3], ["obstacle", 10, 5, 1, 1], ["difficult", 7, 3, 3, 2], ["wet", 1, 11, 12, 3], ["concealment", 16, 6, 3, 4]]),
+    O: layout("Escotilha do porão", "Dentro do casco engolido.", 14, 7, [["water", 0, 0, 20, 14], ["foliage", 0, 0, 8, 4], ["foliage", 17, 0, 3, 14], ["deck", 8, 4, 9, 6], ["obstacle", 8, 4, 9, 1], ["obstacle", 8, 9, 9, 1], ["foliage", 9, 11, 8, 3], ["concealment", 4, 5, 4, 4]]),
+    center: layout("Pedra do fragmento", "A rocha no meio do poço aberto entre as frondes.", 12, 6, [["water", 0, 0, 20, 14], ["foliage", 0, 0, 20, 3], ["foliage", 17, 3, 3, 11], ["foliage", 4, 12, 16, 2], ["deep-water", 6, 3, 11, 8], ["advantage", 11, 6, 3, 2], ["deck", 3, 7, 8, 1], ["concealment", 7, 3, 9, 2], ["wet", 0, 8, 3, 4]]),
+    byTask: {
+      "Cortar as redes dos sahuagin": layout("Rede do canal", "Estendida entre duas estacas no canal.", 12, 6, [["water", 0, 0, 20, 14], ["current", 11, 0, 3, 14], ["foliage", 4, 0, 6, 7], ["foliage", 15, 0, 5, 6], ["foliage", 15, 10, 5, 4], ["obstacle", 12, 4, 1, 1], ["obstacle", 12, 9, 1, 1], ["clearing", 0, 8, 7, 6]]),
+      "Impedir o roubo dos ovos": layout("Ninhal dos ovos", "A plataforma onde os ovos de selako ficam presos às frondes.", 8, 5, [["water", 0, 0, 20, 14], ["deck", 3, 7, 15, 2], ["deck", 7, 2, 3, 5], ["foliage", 12, 0, 8, 5], ["foliage", 12, 10, 8, 4], ["obstacle", 8, 3, 1, 1], ["clearing", 0, 9, 5, 5], ["deck", 4, 9, 1, 1]]),
+      "Interceptar a patrulha": { ...layout("Saída pelo canal fundo", "A criatura escolhida que chegar aqui escapa.", 17, 2, [["water", 0, 0, 20, 14], ["deep-water", 15, 0, 5, 14], ["clearing", 1, 6, 14, 6], ["foliage", 4, 1, 8, 4], ["foliage", 8, 12, 6, 2], ["wet", 13, 5, 2, 7]]), enemyArea: { minX: 6, maxX: 13, minY: 6, maxY: 11 } },
+      "Defender a posição avançada": layout("Jangada de frondes", "A posição é preparada sobre a jangada.", 9, 7, [["water", 0, 0, 20, 14], ["foliage", 0, 0, 20, 3], ["foliage", 15, 3, 5, 11], ["deep-water", 12, 4, 3, 7], ["deck", 7, 6, 5, 3], ["obstacle", 7, 5, 1, 1], ["foliage", 0, 12, 9, 2]])
+    }
   }
 };
 

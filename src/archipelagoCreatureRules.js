@@ -42,6 +42,11 @@ const islandCreatures = {
     "saqueador-lider-de-bando", "saqueador-pugilista", "jagunco", "homem-piranha-imediato", "cavaleiro-desonrado",
     "lacedon", "imediato", "zumbi-fantasmagorico", "turba-zumbi", "aparicao", "carnical", "harpia-saqueadora",
     "tempestade-de-lagartos"
+  ],
+  "giant-kelp": [
+    "canceronte", "platan", "selako", "selako-tigre", "pliorex", "peixe-recife", "enxame-de-aguas-vivas", "agua-viva",
+    "elfo-do-mar-pescador", "elfo-do-mar-chefe", "irukanjin", "sahuagin-metamorfo", "sahuagin-predador",
+    "homem-piranha", "homem-piranha-imediato", "alghari", "cipo-assassino", "tendriculo", "naiade", "aquinne"
   ]
 };
 
