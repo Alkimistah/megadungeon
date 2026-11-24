@@ -572,6 +572,12 @@ Os mapas existentes dos andares 1 a 30 usam o renderizador compartilhado, inclui
 2. Selecionar cada layout conforme o cenário definido e localizar nele os elementos previstos pela ficha. Usar como casos de referência submersão, transição entre água rasa e profunda, terreno elevado e inclinações.
 3. Validar em mesa a coerência entre ficha, mapa e legenda e o uso no tablet. Registrar cenas que exigirem ajuste manual para orientar as próximas variações.
 
+#### Mapa tático avulso na tela inicial
+
+**Prioridade baixa.** Adicionar **Gerar mapa tático** às Ferramentas rápidas. A ferramenta permitiria escolher a faixa de andares, o terreno, o clima, a formação de jogadores e as criaturas por tipo e quantidade. O mestre poderia montar a composição ou usar o gerador de encontros da faixa. A opção **Importar encontro** abriria a grade a partir de um código copiado, com a mesma apresentação e os mesmos controles dos mapas táticos atuais.
+
+Adicionar **Exportar hash** às grades táticas de todos os contextos do app. O código reuniria os dados necessários para reconstruir a cena, incluindo o mapa gerado, o clima e a formação dos tokens com as criaturas e quantidades escolhidas. As fichas completas das criaturas ficariam fora do código. A ferramenta funcionaria a partir da tela inicial sem precisar iniciar uma expedição.
+
 Continuam abertos:
 
 1. **Ressalvas do PO depois de validar a tarefa 4 (21/11).** Elas ficam fora do plano atual e precisam de uma conversa de design antes:
