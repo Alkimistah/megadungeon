@@ -10,9 +10,10 @@ import { calculateCombatND } from "../src/challenge.js";
 import { getCreatureById } from "../src/creatureCatalog/index.js";
 import { getEligibleGuardianPenalties } from "../src/archipelagoGuardianPenalties.js";
 import {
-  createIslandGuardian, createIslandSector, createIslandSectorCombat, getIslandThemeTerrain
+  createIslandGuardian, createIslandSector, createIslandSectorCombat, getIslandThemeTerrain, hasIslandSectors
 } from "../src/archipelagoPilot.js";
 import { getCreatureOriginThemeId, getIslandCreatureIds } from "../src/archipelagoCreatureRules.js";
+import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionThemes.js";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/archipelago-sessao-antes-algas.json", import.meta.url), "utf8"));
 const island = { floor: 21, themeId: "giant-kelp" };
@@ -180,4 +181,23 @@ test("inimigos das algas não começam colados ao ponto de interação", () => {
       }
     }
   }
+});
+
+test("expedição nova pode sortear a Ilha de Algas Gigantes completa", () => {
+  let found = null;
+  for (let i = 0; i < 200 && !found; i += 1) {
+    const seed = `algas-${i}`;
+    const { islands } = createArchipelagoState(profile, createRng(seed)).getSnapshot();
+    const hit = islands.find(item => item.themeId === "giant-kelp");
+    if (hit) found = { seed, hit };
+  }
+  assert.ok(found, "nenhuma seed sorteou giant-kelp");
+  const { hit } = found;
+  assert.ok(hit.floor >= 21 && hit.floor <= 24);
+  assert.equal(hasIslandSectors(hit), true);
+  assert.equal(hit.objectives.length, 4);
+  assert.equal(new Set(hit.objectives.map(item => item.penaltyId)).size, 4);
+  assert.equal(hit.arenaName, "Coração das Frondes");
+  assert.ok(getArchipelagoMissionTheme("giant-kelp"));
+  assert.ok(["isca-do-coracao", "mare-urticante", "pastor-das-frondes"].includes(hit.guardianComposition), hit.guardianComposition);
 });

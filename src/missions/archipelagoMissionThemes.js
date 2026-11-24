@@ -123,6 +123,30 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     }
   },
 
+  "giant-kelp": {
+    pools: {
+      locations: ["um canal aberto entre frondes gigantes", "uma plataforma de frondes trançadas", "um banco de areia preso pelas algas", "um casco engolido pela floresta verde"],
+      materials: ["seiva fresca de fronde antiga", "fibra de alga trançada", "pérolas de selako", "esporos verdes da arrebentação"],
+      objects: ["uma rede de pesca de elfo-do-mar", "um arpão de osso entalhado", "uma lanterna de concha", "o leme de um barco preso nas algas", "uma caixa de mantimentos lacrada"],
+      mementos: ["um colar de conchas trançado", "um pente de coral com um nome gravado", "uma carta selada num frasco", "o anzol de prata de um pescador"],
+      clues: ["frondes cortadas a faca", "ovos de selako quebrados na plataforma", "redes rasgadas por dentes", "uma trilha de bolhas que some entre as algas"],
+      challenges: ["atravessar a floresta sem se enroscar", "achar o canal que a maré abre", "convencer os pastores de algas a ouvir", "passar pelas frondes sem acordar o que vive nelas"],
+      phenomena: ["luzes que piscam entre as frondes", "algas que se fecham depois que o barco passa", "um canto baixo vindo do fundo", "a água ficando verde e espessa ao entardecer"]
+    },
+    featured: {
+      category: "collection",
+      title: "A seiva das frondes antigas",
+      targetName: "a seiva das frondes mais antigas",
+      lead: "Recolha a seiva das frondes mais antigas, que só crescem perto do centro da floresta",
+      condition: "Encher três frascos com seiva fresca sem cortar as frondes-mãe",
+      proofType: "Os três frascos lacrados, ainda verdes."
+    },
+    map: {
+      markers: ["water", "foliage", "concealment", "current"],
+      landmark: { name: "Fronde-mãe", effect: "A fronde mais antiga, de onde se recolhe a seiva." }
+    }
+  },
+
   volcanic: {
     pools: {
       locations: ["uma praia de cinzas negras", "uma encosta cortada por rios de lava", "o topo de uma encosta de cinzas", "um túnel de lava endurecida"],

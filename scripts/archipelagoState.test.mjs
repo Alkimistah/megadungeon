@@ -115,7 +115,7 @@ test("a emboscada só rola depois da exploração e o descanso aguarda sua concl
 
 test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com pontos de interação", () => {
   const profile = archipelago21to30Profile;
-  const objectiveCounts = { mangrove: [5, 5, 4, 5], tropical: [4, 4, 4, 4], atoll: [4, 4, 4, 4], "coral-coast": [4, 4, 4, 4], shipwrecked: [4, 4, 4, 4] };
+  const objectiveCounts = { mangrove: [5, 5, 4, 5], tropical: [4, 4, 4, 4], atoll: [4, 4, 4, 4], "coral-coast": [4, 4, 4, 4], shipwrecked: [4, 4, 4, 4], "giant-kelp": [4, 4, 4, 4] };
   const exercised = new Set();
   const islands = [];
   for (let i = 0; i < 200 && exercised.size < Object.keys(objectiveCounts).length; i += 1) {
@@ -140,7 +140,7 @@ test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com po
         }
         const map = createNodeTacticalMap(withIslandTacticalLayout(scene, island.themeId, objective));
         assert.equal(map.cells[map.landmark.index], "mechanism", objective.title);
-        assert.ok(map.cells.some(cell => ["water", "current", "swamp", "obstacle", "slope"].includes(cell)), objective.title);
+        assert.ok(map.cells.some(cell => ["water", "deep-water", "current", "swamp", "obstacle", "slope"].includes(cell)), objective.title);
       }
     });
 
@@ -154,13 +154,14 @@ test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com po
   assert.deepEqual([...exercised].sort(), Object.keys(objectiveCounts).sort());
 });
 
-// A fileira inicial tem 5 temas ativos para 4 vagas. Com rolagem fixa, o tema excluído
-// não é previsível, então estes testes usam a fileira sem a Ilha dos Náufragos.
+// A fileira inicial tem 6 temas ativos para 4 vagas. Com rolagem fixa, os temas excluídos
+// não são previsíveis, então estes testes usam a fileira sem a Ilha dos Náufragos
+// e sem a Ilha de Algas Gigantes.
 const archipelagoWithoutShipwrecked = {
   ...archipelago21to30Profile,
   archipelago: {
     ...archipelago21to30Profile.archipelago,
-    enabledThemeIds: archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "shipwrecked")
+    enabledThemeIds: archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "shipwrecked" && id !== "giant-kelp")
   }
 };
 
@@ -255,7 +256,7 @@ test("combates da Tropical respeitam o tipo da cena e mostram seus mecanismos no
 });
 
 test("a Costa do Coral restaura as quatro cenas e tem três composições de combate ND 8", () => {
-  const profile = archipelago21to30Profile;
+  const profile = archipelagoWithoutShipwrecked;
   const guards = [[0, "elfo-do-mar-chefe"], [0.5, "lula-gigante"], [0.99, "reishid"]];
   for (const [roll, creatureId] of guards) {
     const rng = () => roll;
@@ -322,10 +323,11 @@ test("os setores sorteiam penalidades distintas do conjunto de 16 e o código de
   for (const ids of idsSeenBySector) assert.equal(ids.size, 16);
 });
 
-test("expedições novas sorteiam posições apenas entre os onze temas ativos", () => {
+test("expedições novas sorteiam posições apenas entre os doze temas ativos", () => {
   const { enabledThemeIds, themePools } = archipelago21to30Profile.archipelago;
-  assert.equal(enabledThemeIds.length, 11);
+  assert.equal(enabledThemeIds.length, 12);
   assert.ok(enabledThemeIds.includes("shipwrecked"));
+  assert.ok(enabledThemeIds.includes("giant-kelp"));
   const activeByRow = Object.fromEntries(Object.entries(themePools).map(([row, themes]) => [
     row, themes.map(theme => theme.id).filter(id => enabledThemeIds.includes(id))
   ]));
