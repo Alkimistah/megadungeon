@@ -217,3 +217,32 @@ test("guardião salvo sem regra continua igual", () => {
   assert.equal("rule" in scene, false);
   assert.ok(!JSON.stringify(scene).includes('"rule"'));
 });
+
+test("inimigos dos náufragos não começam colados ao ponto de interação", () => {
+  const tasks = [
+    ["Conter os afogados da arrebentação", 0, 2, 2],
+    ["Romper o cerco às barracas", 1, 1, 2],
+    ["Interceptar a patrulha", 2, 3, 3]
+  ];
+  for (const [title, sector, variant, minDistance] of tasks) {
+    const objective = createIslandSector(island, sector, variant, 22);
+    assert.equal(objective.title, title);
+    for (let n = 0; n < 50; n += 1) {
+      const scene = createIslandSectorCombat({ ...island, objectives: [objective] }, objective, profile, `p${n}`);
+      const map = createNodeTacticalMap(withIslandTacticalLayout(scene, "shipwrecked", objective));
+      const expected = scene.resolvedEncounter.items.filter(item => item.kind === "creature")
+        .reduce((sum, item) => sum + (item.quantity || 1), 0);
+      const enemies = map.scene.pieces.filter(piece => piece.side === "enemy");
+      assert.equal(enemies.length, expected, `${title} p${n}: peças`);
+      const lx = map.landmark.index % map.width;
+      const ly = Math.floor(map.landmark.index / map.width);
+      for (const piece of enemies) {
+        const w = piece.width ?? 1;
+        const h = piece.height ?? 1;
+        const dx = Math.max(piece.x - lx, lx - (piece.x + w - 1), 0);
+        const dy = Math.max(piece.y - ly, ly - (piece.y + h - 1), 0);
+        assert.ok(Math.max(dx, dy) >= minDistance, `${title} p${n}: peça em ${piece.x},${piece.y} perto do marco`);
+      }
+    }
+  }
+});
