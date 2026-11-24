@@ -57,17 +57,17 @@
 
 #### Passos
 
-- [ ] **Passo 1: testes que falham.**
+- [x] **Passo 1: testes que falham.**
   - `test("elemento sobre o platô guarda a base")`: numa planta com `["advantage", 2, 2, 5, 4]` e depois `["obstacle", 4, 3, 1, 1]`, a cena tem `terrain[3*20+4] === "obstacle"` e `terrainBase[3*20+4] === "advantage"`. Com `["water", 4, 3, 1, 1]` por cima disso, a base volta a `null`. Um `["difficult", 10, 10, 2, 2]` fora do platô fica com base `null`.
   - `test("contorno ignora o elemento sobre a base")`: num platô 5×4 com um obstáculo no meio e `terrainBase` preenchido, `getTerrainTileClasses` das casas vizinhas ao obstáculo não traz `edge-*` voltado para ele. O obstáculo recebe `is-auto` com as bordas do contorno do platô. Sem `terrainBase`, o comportamento é o de antes.
   - `test("entrada do farol tem porta dupla")`: no mapa do Centro dos Náufragos, as casas (12,6) e (12,7) são `door`, e `getTerrainTileClasses` dá `door-v`, com `join-bottom` na de cima e `join-top` na de baixo.
-- [ ] **Passo 2: rodar e ver falhar.**
-- [ ] **Passo 3: implementar**, seguindo as interfaces acima.
-- [ ] **Passo 4: rodar.**
+- [x] **Passo 2: rodar e ver falhar.**
+- [x] **Passo 3: implementar**, seguindo as interfaces acima.
+- [x] **Passo 4: rodar.**
   - Os testes: `node --test scripts/tacticalScene.test.mjs scripts/tacticalEncounterSession.test.mjs scripts/extendedTacticalMap.test.mjs scripts/dungeonTacticalLayouts.test.mjs scripts/forestTacticalLayouts.test.mjs`, `npm run test:archipelago`, `npm run test:archipelago-missions`, `npm run test:ranges` e `npm run build`. Tudo verde.
   - O QA: `node scripts/qaTacticalScene.mjs`, com o dev server em http://localhost:5173/megadungeon/ já rodando.
   - A conferência visual: renderize o Centro dos Náufragos com os módulos reais do app, numa página descartável em `tmp/`, e tire uma captura no scratchpad. Confira que as pedras e as cinzas aparecem sobre o platô, sem buraco, e que a porta dupla aparece em pé na entrada. Apague a página depois.
-- [ ] **Passo 5: commit.** `feat: elementos sobre o platô no mesmo nível e porta dupla no Farol`
+- [x] **Passo 5: commit.** `feat: elementos sobre o platô no mesmo nível e porta dupla no Farol`
 
 ---
 
