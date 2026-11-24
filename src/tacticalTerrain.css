@@ -64,7 +64,7 @@
 .tactical-cell.shore-left::before { border-left-width: 2px; }
 
 /* Terrenos agrupados: miolo liso e contorno único (autotile). O atlas fica por baixo só na porta. */
-.tactical-cell.tactical-sprite.is-auto { background-image: none; box-shadow: none; }
+.tactical-cell.tactical-sprite.is-auto { background-image: none; background-size: auto; box-shadow: none; }
 .tactical-cell.tactical-sprite.is-auto::after {
   position: absolute;
   inset: 0;
@@ -136,7 +136,6 @@
 
 /* Porta desenhada sobre o chão, deitada ou em pé conforme as paredes vizinhas. */
 .tactical-cell.tactical-sprite.is-door.is-auto {
-  --tactical-sprite-x: 0%;
   background-color: var(--tactical-floor, #b9b0a1);
   background-image: url("/assets/tactical-terrain.png");
   background-position: 0% 0;
@@ -152,7 +151,3 @@
 }
 .tactical-cell.tactical-sprite.is-door.is-auto.door-h::before { inset: 24% 4%; --door-dir: to right; }
 .tactical-cell.tactical-sprite.is-door.is-auto.door-v::before { inset: 4% 24%; --door-dir: to bottom; }
-.tactical-cell.tactical-sprite.is-door.is-auto.door-h.join-left::before { left: -1px; }
-.tactical-cell.tactical-sprite.is-door.is-auto.door-h.join-right::before { right: -1px; }
-.tactical-cell.tactical-sprite.is-door.is-auto.door-v.join-top::before { top: -1px; }
-.tactical-cell.tactical-sprite.is-door.is-auto.door-v.join-bottom::before { bottom: -1px; }
