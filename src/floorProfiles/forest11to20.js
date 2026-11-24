@@ -1,4 +1,5 @@
 import { assetUrl } from "../assetUrl.js";
+import { submergedCharacters } from "../environment.js";
 
 export const forest11to20Profile = {
   id: "forest-11-20",
@@ -480,7 +481,7 @@ export const forest11to20Profile = {
             featureOptions: [
               { weight: 40, value: { name: "Água corrente", effect: "Corrente típica arrasta 1d6 x 3 m por rodada. No fim de cada rodada, todos na água são arrastados nessa velocidade. Nadar contra a corrente exige Atletismo CD 15 para corrente normal ou CD 20 para corrente rápida. Sair exige chegar à margem ou ponto de apoio e passar em Atletismo CD 20 para agarrar algo; em falha, segue sendo arrastado." } },
               { weight: 35, value: { name: "Água parada", effect: "Água parada exige testes de Atletismo para nadar, sem modificador adicional." } },
-              { weight: 25, value: { name: "Personagens submersos", effect: "Criaturas submersas sofrem -2 em ataques e -5 em Percepção. Deslocamento de natação ignora essas penalidades. Armas à distância não podem ser usadas, exceto arremesso de perfuração, bestas e redes. Armas de corte e impacto causam metade do dano debaixo d’água. Criaturas submersas recebem camuflagem e cobertura leves contra personagens fora d’água." } }
+              { weight: 25, value: submergedCharacters }
             ]
           }
         },

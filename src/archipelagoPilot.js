@@ -327,6 +327,7 @@ export function createIslandGuardian(island, selection, profile, mapSeed) {
     }, profile, mapSeed, composition);
   if (composition.briefing) scene.briefing = composition.briefing;
   const leader = scene.resolvedEncounter.items[0];
+  scene.bossCreatureId ??= leader.creatureId;
   const creature = leader.creatureData ?? getCreatureById(leader.creatureId);
   const stats = { ...creature.stats };
   let actions = creature.actions;

@@ -1,0 +1,63 @@
+/* Cada faixa de 16 px do atlas representa uma célula do tabuleiro. */
+.tactical-sprite[class*="is-"]:not(.tactical-marker-sprite) {
+  background-image: url("/assets/tactical-terrain.png");
+  background-position: var(--tactical-sprite-x, 0%) 0;
+  background-repeat: no-repeat;
+  background-size: 4100% 100%;
+  image-rendering: pixelated;
+}
+
+.tactical-sprite.is-floor { --tactical-sprite-x: 0%; }
+.tactical-sprite.is-water { --tactical-sprite-x: 2.5%; }
+.tactical-sprite.is-current { --tactical-sprite-x: 5%; }
+.tactical-sprite.is-swamp { --tactical-sprite-x: 7.5%; }
+.tactical-sprite.is-wet { --tactical-sprite-x: 10%; }
+.tactical-sprite.is-foliage { --tactical-sprite-x: 12.5%; }
+.tactical-sprite.is-tree { --tactical-sprite-x: 15%; }
+.tactical-sprite.is-obstacle { --tactical-sprite-x: 17.5%; }
+.tactical-sprite.is-difficult { --tactical-sprite-x: 20%; }
+.tactical-sprite.is-advantage { --tactical-sprite-x: 22.5%; }
+.tactical-sprite.is-slope { --tactical-sprite-x: 25%; }
+.tactical-sprite.is-mechanism { --tactical-sprite-x: 27.5%; }
+.tactical-sprite.is-deep-water { --tactical-sprite-x: 30%; }
+.tactical-sprite.is-cliff { --tactical-sprite-x: 32.5%; }
+.tactical-sprite.is-pit { --tactical-sprite-x: 35%; }
+.tactical-sprite.is-lava { --tactical-sprite-x: 37.5%; }
+.tactical-sprite.is-trench { --tactical-sprite-x: 40%; }
+.tactical-sprite.is-wall { --tactical-sprite-x: 42.5%; }
+.tactical-sprite.is-door { --tactical-sprite-x: 45%; }
+.tactical-sprite.is-clearing { --tactical-sprite-x: 47.5%; }
+.tactical-sprite.is-deck { --tactical-sprite-x: 50%; }
+.tactical-sprite.is-canopy { --tactical-sprite-x: 52.5%; }
+.tactical-sprite.is-ice { --tactical-sprite-x: 55%; }
+.tactical-sprite.is-frozen-river { --tactical-sprite-x: 57.5%; }
+.tactical-sprite.is-abyss { --tactical-sprite-x: 60%; }
+.tactical-sprite.is-escarpment { --tactical-sprite-x: 62.5%; }
+.tactical-sprite.is-pebbles { --tactical-sprite-x: 65%; }
+.tactical-sprite.is-dunes { --tactical-sprite-x: 67.5%; }
+.tactical-sprite.is-gentle-slope { --tactical-sprite-x: 70%; }
+.tactical-sprite.is-steep-slope { --tactical-sprite-x: 72.5%; }
+.tactical-sprite.is-web { --tactical-sprite-x: 75%; }
+.tactical-sprite.is-wind { --tactical-sprite-x: 77.5%; }
+.tactical-sprite.is-concealment { --tactical-sprite-x: 80%; }
+.tactical-sprite.tactical-feature-sprite.is-tree { --tactical-sprite-x: 82.5%; }
+.tactical-sprite.tactical-feature-sprite.is-obstacle { --tactical-sprite-x: 85%; }
+.tactical-sprite.tactical-feature-sprite.is-foliage { --tactical-sprite-x: 87.5%; }
+.tactical-sprite.tactical-feature-sprite.is-pebbles { --tactical-sprite-x: 90%; }
+.tactical-sprite.tactical-feature-sprite.is-mechanism { --tactical-sprite-x: 92.5%; }
+.tactical-sprite.tactical-feature-sprite.is-advantage { --tactical-sprite-x: 95%; }
+.tactical-sprite.tactical-feature-sprite.is-canopy { --tactical-sprite-x: 97.5%; }
+.tactical-sprite.tactical-feature-sprite.is-deck { --tactical-sprite-x: 100%; }
+
+.tactical-cell[class*="shore-"]::before {
+  position: absolute;
+  inset: 0;
+  border: 0 solid #cfb37fba;
+  content: "";
+  pointer-events: none;
+}
+
+.tactical-cell.shore-top::before { border-top-width: 2px; }
+.tactical-cell.shore-right::before { border-right-width: 2px; }
+.tactical-cell.shore-bottom::before { border-bottom-width: 2px; }
+.tactical-cell.shore-left::before { border-left-width: 2px; }

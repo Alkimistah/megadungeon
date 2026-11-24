@@ -1,4 +1,6 @@
 import { createRng, randomInt } from "./random.js";
+import { createTacticalScene, readLegacyTacticalScene } from "./tacticalScene.js";
+import { getTacticalEncounterUnits, getTacticalPartyPieces, placeTacticalEncounterUnits } from "./tacticalScenePieces.js";
 
 const WIDTH = 20;
 const HEIGHT = 14;
@@ -7,6 +9,7 @@ const DEFAULT_PARTY_POSITIONS = [[2, 10], [3, 10], [2, 11], [3, 11]];
 const MAX_VISIBLE_ENEMIES = 12;
 
 const WALKABLE_CELLS = new Set([
+  "deep-water", "dunes", "frozen-river", "gentle-slope", "ice", "pebbles", "steep-slope",
   "advantage",
   "canopy",
   "clearing",
@@ -38,10 +41,6 @@ function normalizeText(value) {
     .toLocaleLowerCase("pt-BR");
 }
 
-function getFeatureNames(node) {
-  return (node.environment?.terrain?.features || []).map((feature) => feature.name);
-}
-
 function hasAnyName(names, options) {
   const normalized = names.map(normalizeText);
 
@@ -56,14 +55,6 @@ function createEmptyMap() {
 
 function inBounds(x, y) {
   return x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT;
-}
-
-function isWalkable(cell) {
-  return WALKABLE_CELLS.has(cell);
-}
-
-function keyOf([x, y]) {
-  return `${x},${y}`;
 }
 
 function setCell(cells, x, y, value, overwrite = ["floor"]) {
@@ -97,25 +88,8 @@ function getPositions(cells, predicate) {
 }
 
 function getFreePositions(cells) {
-  return getPositions(cells, (cell) => [
-    "advantage",
-    "canopy",
-    "clearing",
-    "concealment",
-    "current",
-    "deck",
-    "difficult",
-    "floor",
-    "foliage",
-    "hidden",
-    "slope",
-    "swamp",
-    "trench",
-    "water",
-    "wet",
-    "wind",
-    "web"
-  ].includes(cell));
+  return getPositions(cells, cell => WALKABLE_CELLS.has(cell) &&
+    cell !== "party" && cell !== "enemy" && cell !== "boss" && cell !== "objective" && cell !== "trap");
 }
 
 function getMarkerPositions(cells, marker) {
@@ -136,15 +110,21 @@ function placePatch(cells, rng, marker, {
   yMax = HEIGHT - height - 1,
   yMin = 1
 }) {
+  let painted = false;
   for (let placed = 0; placed < count; placed += 1) {
     const x = randomInt(rng, xMin, Math.max(xMin, xMax));
     const y = randomInt(rng, yMin, Math.max(yMin, yMax));
 
     for (let dy = 0; dy < height; dy += 1) {
       for (let dx = 0; dx < width; dx += 1) {
-        if (rng() < 0.85) setCell(cells, x + dx, y + dy, marker, overwrite);
+        if (rng() < 0.85 && setCell(cells, x + dx, y + dy, marker, overwrite)) painted = true;
       }
     }
+  }
+  if (!painted) {
+    const [position] = getPositions(cells, (cell, x, y) => overwrite.includes(cell) &&
+      x >= xMin && x < xMax + width && y >= yMin && y < yMax + height);
+    if (position) cells[position[1]][position[0]] = marker;
   }
 }
 
@@ -182,12 +162,13 @@ function placeLine(cells, rng, marker, {
   }
 }
 
-function applyTerrain(cells, node, rng) {
+function applyTerrain(cells, node, rng, features) {
   const terrainName = node.environment?.terrain?.name;
-  const featureNames = getFeatureNames(node);
+  const featureNames = (node.environment?.terrain?.features || [])
+    .filter(feature => !feature.area).map(feature => feature.name);
 
   if (terrainName === "Floresta") {
-    placeScattered(cells, rng, hasAnyName(featureNames, ["Árvores"]) ? "tree" : "obstacle", hasAnyName(featureNames, ["Árvores"]) ? 22 : 12);
+    placeScattered(cells, rng, "tree", hasAnyName(featureNames, ["Árvores"]) ? 22 : 12);
     if (hasAnyName(featureNames, ["Folhagens"])) {
       placePatch(cells, rng, "foliage", { count: 3, height: 3, width: 4 });
     }
@@ -197,44 +178,70 @@ function applyTerrain(cells, node, rng) {
     if (hasAnyName(featureNames, ["Clareira"])) {
       placePatch(cells, rng, "clearing", { count: 1, height: 4, width: 6, overwrite: ["floor", "foliage"] });
     }
-    if (hasAnyName(featureNames, ["Inclinação suave", "Inclinação íngreme"])) {
-      placePatch(cells, rng, "slope", { count: 2, height: 2, width: 4 });
-      placePatch(cells, rng, "advantage", { count: 1, height: 2, width: 3 });
-    }
+    const gentle = hasAnyName(featureNames, ["Inclinação suave"]);
+    const steep = hasAnyName(featureNames, ["Inclinação íngreme"]);
+    if (gentle) placePatch(cells, rng, "gentle-slope", { count: 2, height: 2, width: 4 });
+    if (steep) placePatch(cells, rng, "steep-slope", { count: 2, height: 2, width: 4 });
+    if (gentle || steep) placePatch(cells, rng, "advantage", { count: 1, height: 2, width: 3 });
     if (hasAnyName(featureNames, ["Penhasco"])) {
-      placeLine(cells, rng, "pit", { horizontal: rng() < 0.5, length: 9, thickness: 1 });
+      placeLine(cells, rng, "cliff", { horizontal: rng() < 0.5, length: 9, thickness: 1 });
     }
   } else if (terrainName === "Pântano") {
     placePatch(cells, rng, "water", { count: 3, height: 3, width: 5 });
     placePatch(cells, rng, "swamp", { count: 4, height: 2, width: 4, overwrite: ["floor", "water"] });
     placeScattered(cells, rng, "tree", 8);
     if (hasAnyName(featureNames, ["Lodaçal"])) placePatch(cells, rng, "swamp", { count: 2, height: 3, width: 4, overwrite: ["floor", "water"] });
-    if (hasAnyName(featureNames, ["Vegetação alagada"])) placePatch(cells, rng, "foliage", { count: 2, height: 2, width: 4, overwrite: ["floor", "swamp"] });
+    if (hasAnyName(featureNames, ["Vegetação alagada"])) {
+      const foliage = cells.map(row => [...row]);
+      placePatch(foliage, rng, "foliage", { count: 2, height: 2, width: 4, overwrite: ["swamp", "water"] });
+      addChangedLayers(features, cells.flat(), foliage, ["foliage"], "Vegetação alagada");
+    }
     if (hasAnyName(featureNames, ["Árvores retorcidas"])) placeScattered(cells, rng, "tree", 6);
-  } else if (terrainName === "Aquático") {
+  }
+
+  if (terrainName === "Aquático" || hasAnyName(featureNames, ["Água corrente", "Água parada"]) && terrainName !== "Pântano") {
     const waterMarker = hasAnyName(featureNames, ["Água corrente"]) ? "current" : "water";
     placeLine(cells, rng, waterMarker, { horizontal: rng() < 0.55, length: 16, thickness: 3 });
     placePatch(cells, rng, "floor", { count: 2, height: 2, width: 4, overwrite: ["water", "current"] });
-    if (hasAnyName(featureNames, ["Personagens submersos"])) placeScattered(cells, rng, "concealment", 6, ["water"]);
-  } else if (terrainName === "Colinas") {
-    placePatch(cells, rng, "slope", { count: 4, height: 2, width: 4 });
+  }
+
+  if (terrainName === "Colinas") {
+    placePatch(cells, rng, "gentle-slope", { count: 4, height: 2, width: 4 });
     placePatch(cells, rng, "advantage", { count: 2, height: 2, width: 3 });
-    placeScattered(cells, rng, "obstacle", 12);
-    if (hasAnyName(featureNames, ["Inclinação íngreme"])) placePatch(cells, rng, "difficult", { count: 3, height: 2, width: 4 });
-    if (hasAnyName(featureNames, ["Penhasco"])) placeLine(cells, rng, "pit", { horizontal: rng() < 0.5, length: 8, thickness: 1 });
+    if (hasAnyName(featureNames, ["Inclinação íngreme"])) placePatch(cells, rng, "steep-slope", { count: 3, height: 2, width: 4 });
+    if (hasAnyName(featureNames, ["Penhasco"])) placeLine(cells, rng, "cliff", { horizontal: rng() < 0.5, length: 8, thickness: 1 });
   } else if (terrainName === "Planície aberta") {
     if (hasAnyName(featureNames, ["Trincheira"])) {
       placeLine(cells, rng, "trench", { horizontal: rng() < 0.5, length: 12, thickness: 1 });
-      placeScattered(cells, rng, "obstacle", 8);
     }
   }
 
+  for (const [name, tile] of [["Abismo", "abyss"], ["Paredão", "escarpment"]]) {
+    if (hasAnyName(featureNames, [name])) placeLine(cells, rng, tile, { horizontal: rng() < 0.5, length: 8 });
+  }
+  for (const [name, tile] of [["Gelo", "ice"], ["Rio congelado", "frozen-river"], ["Dunas", "dunes"]]) {
+    if (hasAnyName(featureNames, [name])) {
+      placePatch(cells, rng, tile, { count: 2, height: 2, width: 5, overwrite: ["floor", "water", "current", "steep-slope"] });
+    }
+  }
+
+  if (hasAnyName(featureNames, ["Seixos"])) {
+    if (!getMarkerPositions(cells, "steep-slope").length) {
+      placePatch(cells, rng, "steep-slope", { count: 2, height: 2, width: 5 });
+    }
+    const slopes = cells.map(row => [...row]);
+    placeScattered(slopes, rng, "pebbles", 6, ["steep-slope"]);
+    addChangedLayers(features, cells.flat(), slopes, ["pebbles"], "Seixos");
+  }
+
   if (hasAnyName(featureNames, ["Solo encharcado"])) {
-    placePatch(cells, rng, "wet", { count: 2, height: 2, width: 5, overwrite: ["floor", "water", "swamp"] });
+    const wetCells = cells.map(row => [...row]);
+    placePatch(wetCells, rng, "wet", { count: 2, height: 2, width: 5, overwrite: ["floor", "water", "swamp"] });
+    addChangedLayers(features, cells.flat(), wetCells, ["wet"], "Solo encharcado");
   }
 }
 
-function applyClimate(cells, node, rng) {
+function applyLegacyClimate(cells, node, rng) {
   const climateNames = (node.environment?.climate || []).map((climate) => climate.name);
 
   if (hasAnyName(climateNames, ["Neblina"])) placeScattered(cells, rng, "concealment", 8, ["floor", "difficult", "water", "foliage", "swamp", "wet"]);
@@ -245,7 +252,7 @@ function applyClimate(cells, node, rng) {
     placeScattered(cells, rng, "wind", 8, ["floor", "foliage", "wet"]);
   }
   if (hasAnyName(climateNames, ["Tempestade", "Furacão", "Tornado"])) {
-    placeScattered(cells, rng, "trap", hasAnyName(climateNames, ["Tornado"]) ? 4 : 2, ["floor", "difficult", "water", "foliage", "swamp", "wet"]);
+    placeScattered(cells, rng, "wind", hasAnyName(climateNames, ["Tornado"]) ? 4 : 2, ["floor", "difficult", "water", "foliage", "swamp", "wet"]);
     placeScattered(cells, rng, "wind", 10, ["floor", "foliage", "wet"]);
   }
 }
@@ -343,56 +350,234 @@ function findObjectivePosition(cells, rng) {
   return candidates[0] || getFreePositions(cells)[0];
 }
 
-function protectMarkers(cells) {
-  getPositions(cells, (cell) => ["party", "enemy", "boss", "objective"].includes(cell)).forEach(([x, y]) => {
-    if (!isWalkable(cells[y][x])) cells[y][x] = "floor";
+const FEATURE_TILES = {
+  canopy: "canopy",
+  concealment: "concealment",
+  current: "current",
+  wet: "wet",
+  wind: "wind",
+  web: "web"
+};
+const MARKER_TILES = new Set(["mechanism", "trap"]);
+const TERRAIN_FEATURE_NAMES = {
+  clearing: ["Clareira"],
+  cliff: ["Penhasco"],
+  current: ["Água corrente"],
+  difficult: ["Vegetação rasteira"],
+  dunes: ["Dunas"],
+  escarpment: ["Paredão"],
+  foliage: ["Folhagens", "Vegetação alagada"],
+  "frozen-river": ["Rio congelado"],
+  "gentle-slope": ["Inclinação suave"],
+  ice: ["Gelo"],
+  pebbles: ["Seixos"],
+  "steep-slope": ["Inclinação íngreme"],
+  swamp: ["Lodaçal"],
+  tree: ["Árvores", "Árvores retorcidas"],
+  trench: ["Trincheira"],
+  wet: ["Solo encharcado", "Chuva", "Neve", "Granizo"],
+  wind: ["Vento forte", "Vendaval", "Tempestade", "Furacão", "Tornado"],
+  concealment: ["Neblina"],
+  abyss: ["Abismo"]
+};
+
+function getZoneIndices({ x, y, width, height }) {
+  const indices = [];
+  for (let row = Math.max(0, y); row < Math.min(HEIGHT, y + height); row += 1) {
+    for (let column = Math.max(0, x); column < Math.min(WIDTH, x + width); column += 1) {
+      indices.push(row * WIDTH + column);
+    }
+  }
+  return indices;
+}
+
+function getTileLabel(tile, features) {
+  return features.find(feature => hasAnyName(TERRAIN_FEATURE_NAMES[tile] || [], [feature.name]))?.name;
+}
+
+function addLayer(layers, type, indices, label, id) {
+  if (!indices.length) return;
+  layers.push({ type, indices, ...(label ? { label } : {}), ...(id ? { id } : {}) });
+}
+
+function buildEnvironmentScene(cells, node, layout, features) {
+  const terrain = cells.flat().map(() => "floor");
+  const markers = [];
+  const definitions = node.environment?.terrain?.features || [];
+  const submersion = definitions.find(feature =>
+    feature.id === "submersion" || hasAnyName([feature.name], ["Personagens submersos"]));
+  const flooded = new Set(submersion?.area ? getZoneIndices(submersion.area) : submersion
+    ? terrain.map((_, index) => index) : []);
+  const baseCells = cells.flat();
+  const layoutLayers = layout ? layout.zones : [...new Set(baseCells)].map(tile => ({
+    tile,
+    indices: baseCells.flatMap((cell, index) => cell === tile ? [index] : [])
+  }));
+
+  for (const zone of layoutLayers) {
+    const { tile, terrainType = tile, featureType, label = getTileLabel(tile, definitions), id } = zone;
+    const indices = zone.indices ?? getZoneIndices(zone);
+    if (MARKER_TILES.has(tile)) {
+      addLayer(markers, tile, indices, label, id);
+    } else if (FEATURE_TILES[tile] || featureType) {
+      addLayer(features, featureType ?? tile, indices, label, id);
+      if (tile === "current" || terrainType !== tile) {
+        for (const index of indices) terrain[index] = terrainType === "current" ? "deep-water" : terrainType;
+      }
+    } else {
+      for (const index of indices) terrain[index] = terrainType;
+      if (layout && (tile === "floor" || tile === "deck")) {
+        const replaced = new Set(indices);
+        for (const feature of features) feature.indices = feature.indices.filter(index => !replaced.has(index));
+      }
+    }
+    if (layout && submersion && !submersion.area && ["floor", "deck", "clearing", "water"].includes(tile)) {
+      for (const index of indices) flooded.delete(index);
+    }
+  }
+
+  const localClimate = (node.environment?.climate || []).filter(condition => condition.area);
+  const localDefinitions = [...definitions, ...localClimate];
+  for (const definition of localDefinitions) {
+    if (!definition.area || definition === submersion) continue;
+    const indices = getZoneIndices(definition.area);
+    const tile = definition.type ?? Object.keys(TERRAIN_FEATURE_NAMES)
+      .find(key => hasAnyName(TERRAIN_FEATURE_NAMES[key], [definition.name]));
+    if (!tile) continue;
+    if (!FEATURE_TILES[tile]) {
+      for (const index of indices) {
+        terrain[index] = tile;
+        if (submersion && !submersion.area && ["floor", "deck", "clearing", "water"].includes(tile)) {
+          flooded.delete(index);
+        }
+      }
+    } else {
+      addLayer(features, tile, indices, definition.name, definition.id);
+    }
+  }
+  const submergedFeatures = new Map();
+  for (const index of flooded) {
+    const tile = terrain[index];
+    if (!["floor", "water", "deep-water"].includes(tile)) {
+      if (!submergedFeatures.has(tile)) submergedFeatures.set(tile, []);
+      submergedFeatures.get(tile).push(index);
+    }
+    terrain[index] = "deep-water";
+  }
+  for (const [type, indices] of submergedFeatures) {
+    addLayer(features, type, indices, getTileLabel(type, definitions));
+  }
+
+  if (layout?.landmark) {
+    const { x, y, name, id } = layout.landmark;
+    addLayer(markers, "mechanism", [y * WIDTH + x], name, id);
+  }
+  return { terrain, features: features.filter(feature => feature.indices.length), markers };
+}
+
+function addChangedLayers(layers, before, cells, types, label) {
+  const after = cells.flat();
+  for (const type of types) {
+    addLayer(layers, type, after.flatMap((cell, index) => cell === type && before[index] !== type ? [index] : []), label);
+  }
+}
+
+function getNodeUnits(node) {
+  return getTacticalEncounterUnits(node.resolvedEncounter?.items, {
+    isBoss: node.type === "boss" || Boolean(node.bossCreatureId),
+    bossCreatureId: node.bossCreatureId
   });
+}
+
+function withFixedScene(node, objectives) {
+  const map = structuredClone(node.fixedTacticalMap);
+  const scene = readLegacyTacticalScene(map);
+  if (!scene) return map;
+  const party = scene.pieces.filter(piece => piece.kind === "party");
+  const asPosition = ({ x, y }) => [x, y];
+  const originalPositions = scene.pieces.filter(piece => piece.side === "enemy").map(asPosition);
+  const fallback = scene.terrain.flatMap((tile, index) => WALKABLE_CELLS.has(tile)
+    ? [[index % scene.width, Math.floor(index / scene.width)]] : []);
+  const enemies = placeTacticalEncounterUnits(getNodeUnits(node), originalPositions, fallback, scene, party, {
+    canOccupy: index => WALKABLE_CELLS.has(scene.terrain[index])
+  });
+  const objectiveMarkers = objectives.filter(objective => objective.targetType === "creature")
+    .flatMap(objective => enemies.filter(piece => piece.creatureId === objective.targetId)
+      .map(piece => ({ type: "objective", label: objective.targetName, pieceId: piece.id })));
+  map.scene = createTacticalScene({
+    ...scene,
+    pieces: [...party, ...enemies],
+    markers: [...scene.markers, ...objectiveMarkers]
+  });
+  return map;
 }
 
 export function createNodeTacticalMap(node, objectives = node?.missionObjectives || []) {
   if (!node || (!node.resolvedEncounter?.items?.length && !objectives.length)) return null;
-  if (node.fixedTacticalMap) return structuredClone(node.fixedTacticalMap);
+  if (node.fixedTacticalMap) return withFixedScene(node, objectives);
 
   const sceneSeed = `${node.resolvedEncounter?.seed || node.encounterSeed || node.id}:node-tactical-map`;
   const rng = createRng(sceneSeed);
   const cells = createEmptyMap();
+  const terrainFeatures = [];
 
   const layout = node.tacticalLayout;
   if (layout) {
-    for (const { x, y, width, height, tile } of layout.zones) {
-      for (let row = y; row < y + height; row += 1) {
-        for (let column = x; column < x + width; column += 1) cells[row][column] = tile;
-      }
+    for (const zone of layout.zones) {
+      for (const index of getZoneIndices(zone)) cells[Math.floor(index / WIDTH)][index % WIDTH] = zone.tile;
     }
-    cells[layout.landmark.y][layout.landmark.x] = "mechanism";
   } else {
-    applyTerrain(cells, node, rng);
+    applyTerrain(cells, node, rng, terrainFeatures);
   }
-  applyClimate(cells, node, rng);
+  const { terrain: sceneTerrain, features, markers } = buildEnvironmentScene(cells, node, layout, terrainFeatures);
+  if (layout?.landmark) cells[layout.landmark.y][layout.landmark.x] = "mechanism";
+  applyLegacyClimate(cells, node, rng);
+  const fallback = getFreePositions(cells);
+  const party = getTacticalPartyPieces(layout?.partyPositions ?? DEFAULT_PARTY_POSITIONS);
   placeParty(cells, layout?.partyPositions ?? DEFAULT_PARTY_POSITIONS);
   const enemies = placeEnemies(cells, node, rng);
+  const beforeTrap = cells.flat();
   placeTrapFeature(cells, node, rng);
-  protectMarkers(cells);
-  const objectiveMarkers = objectives.flatMap((objective) => {
+  addChangedLayers(markers, beforeTrap, cells, ["trap", "pit", "web", "mechanism"],
+    node.trap?.name ?? node.resolvedEncounter?.items.find(item => item.kind === "trap")?.name);
+  const size = { width: WIDTH, height: HEIGHT };
+  const blockingFeatures = new Set(features.filter(feature => !WALKABLE_CELLS.has(feature.type))
+    .flatMap(feature => feature.indices));
+  const canOccupy = index => WALKABLE_CELLS.has(sceneTerrain[index]) && !blockingFeatures.has(index);
+  const enemyTiles = layout?.enemyTiles;
+  const canPrefer = index => {
+    const tile = sceneTerrain[index];
+    const legacyTile = beforeTrap[index];
+    return canOccupy(index) && (!enemyTiles || enemyTiles.includes(tile)
+      || enemyTiles.includes("water") && tile === "deep-water" || enemyTiles.includes(legacyTile));
+  };
+  const enemyPieces = placeTacticalEncounterUnits(getNodeUnits(node), enemies.map(({ index }) =>
+    [index % WIDTH, Math.floor(index / WIDTH)]), fallback, size, party, { canOccupy, canPrefer });
+  const objectiveMarkers = objectives.flatMap(objective => {
     if (objective.targetType === "creature") {
-      return enemies
-        .filter(enemy => enemy.creatureId === objective.targetId)
+      for (const piece of enemyPieces.filter(piece => piece.creatureId === objective.targetId)) {
+        markers.push({ type: "objective", pieceId: piece.id, label: objective.targetName });
+      }
+      return enemies.filter(enemy => enemy.creatureId === objective.targetId)
         .map(({ index }) => ({ index, label: objective.targetName }));
     }
     const position = findObjectivePosition(cells, createRng(`${sceneSeed}:objectives:${objective.missionId}`));
     if (!position) return [];
     const [x, y] = position;
-    return [{ index: y * WIDTH + x, label: objective.targetName }];
+    const index = y * WIDTH + x;
+    addLayer(markers, "objective", [index], objective.targetName);
+    return [{ index, label: objective.targetName }];
   });
-
+  const climate = node.environment?.climate || [];
   return {
     cells: cells.flat(),
+    scene: createTacticalScene({ ...size, terrain: sceneTerrain, features, markers, pieces: [...party, ...enemyPieces], climate }),
     climate: node.environment?.climate || [],
     enemyCount: getEnemyCount(node),
     height: HEIGHT,
     objectiveCount: objectiveMarkers.length,
     objectiveMarkers,
-    ...(layout ? { landmark: { index: layout.landmark.y * WIDTH + layout.landmark.x, label: layout.landmark.name } } : {}),
+    ...(layout?.landmark ? { landmark: { index: layout.landmark.y * WIDTH + layout.landmark.x, label: layout.landmark.name } } : {}),
     terrain: node.environment?.terrain || null,
     template: normalizeText(node.environment?.terrain?.name || "aberto"),
     trapCount: getTrapCount(node),

@@ -1,4 +1,5 @@
 import { createTacticalMapPanel } from "../tacticalMapRenderer.js";
+import { tacticalEncounterSession } from "../tacticalEncounterSession.js";
 import { formatChallengeRating } from "../challenge.js";
 import { getCreatureById } from "../creatureCatalog/index.js";
 import { CREATURE_TYPES } from "../creatures.js";
@@ -494,14 +495,20 @@ function renderMissionCard(mission, {
 }
 
 function renderMissionRunContent(mission, onComplete, context = null, profile = null, onAdjustProgress = null, rewardExpanded = false, onToggleReward = null, unknownPaths = false) {
-  if (context?.kind === "node") return renderIntegratedMission(mission, context.node, onComplete, onAdjustProgress);
+  if (context?.kind === "node") {
+    tacticalEncounterSession.activate(`node:${context.node.id}`);
+    return renderIntegratedMission(mission, context.node, onComplete, onAdjustProgress);
+  }
 
   const container = createElement("div", "mission-run");
   const card = renderMissionCard(mission, { onAdjustProgress, onComplete, onToggleReward, rewardExpanded, unknownPaths });
   const guidance = createElement("section", "mission-run-guidance");
   const pendingNode = context?.kind === "pending-node";
   const tacticalMap = pendingNode ? null : createMissionTacticalMap(mission, { profile });
-  const tacticalPanel = createTacticalMapPanel(tacticalMap, { mapKind: "Mapa tático da missão" });
+  const tacticalPanel = createTacticalMapPanel(tacticalMap, {
+    mapKind: "Mapa tático da missão",
+    state: tacticalEncounterSession.openMap(`mission:${mission.id}`, tacticalMap)
+  });
   const title = createElement("h3", null, "Encontro de missão");
   const text = createElement(
     "p",

@@ -3,6 +3,8 @@ import { createEncounterCombatPage, getDefaultEncounterItemKey } from "./nodeDia
 import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
 import { createRangeEndActions } from "./rangeEndActions.js";
 import { createTacticalMapPanel } from "./tacticalMapRenderer.js";
+import { createExtendedTacticalMap } from "./extendedTacticalMap.js";
+import { tacticalEncounterSession } from "./tacticalEncounterSession.js";
 
 function createElement(tagName, className = null, text = null) {
   const element = document.createElement(tagName);
@@ -287,121 +289,6 @@ function createPendingDescentPanel(snapshot, onConfirmPitDescent, onDismissPitDe
   return section;
 }
 
-const TACTICAL_CELL_LABELS = {
-  advantage: "Vantagem/elevação",
-  boss: "Chefe Grande",
-  difficult: "Terreno difícil",
-  door: "Porta (entrada/saída)",
-  enemy: "Inimigo",
-  floor: "Chão",
-  hidden: "Inimigo oculto/em potencial",
-  mechanism: "Mecanismo",
-  objective: "Objetivo/achado",
-  obstacle: "Obstáculo",
-  party: "Grupo",
-  pit: "Fosso/vão",
-  reinforcement: "Entrada de reforço",
-  trap: "Armadilha",
-  wall: "Parede",
-  web: "Teia/casulo"
-};
-
-const TACTICAL_CELL_GLYPHS = {
-  advantage: "✦",
-  boss: "B",
-  difficult: "D",
-  enemy: "E",
-  hidden: "?",
-  mechanism: "M",
-  objective: "!",
-  party: "G",
-  pit: "F",
-  reinforcement: "R",
-  trap: "T",
-  web: "W"
-};
-
-const TACTICAL_LEGEND_ORDER = [
-  "wall", "party", "boss", "enemy", "hidden", "trap", "pit", "web",
-  "difficult", "mechanism", "objective", "door", "advantage", "obstacle", "reinforcement"
-];
-
-function getTacticalCellLabel(cell) {
-  return TACTICAL_CELL_LABELS[cell] || cell;
-}
-
-function createTacticalGrid(tacticalMap) {
-  const grid = createElement("div", "tactical-grid");
-
-  grid.style.setProperty("--tactical-width", String(tacticalMap.width));
-  grid.style.setProperty("--tactical-height", String(tacticalMap.height));
-  grid.style.setProperty("--tactical-aspect", `${tacticalMap.width} / ${tacticalMap.height}`);
-  grid.style.setProperty("--tactical-fit-ratio", String(tacticalMap.width / tacticalMap.height));
-  grid.style.setProperty("--tactical-max-width", `${tacticalMap.width * 40}px`);
-
-  tacticalMap.cells.forEach((cell) => {
-    const tile = createElement("span", `tactical-cell is-${cell}`);
-    const glyph = TACTICAL_CELL_GLYPHS[cell];
-    tile.title = getTacticalCellLabel(cell);
-    if (glyph) tile.textContent = glyph;
-    grid.appendChild(tile);
-  });
-
-  return grid;
-}
-
-function createTacticalLegend(tacticalMap) {
-  const legend = createElement("div", "tactical-legend");
-  const presentCells = new Set(tacticalMap?.cells || []);
-  const cells = TACTICAL_LEGEND_ORDER.filter((cell) => presentCells.has(cell));
-
-  cells.forEach((cell) => {
-    const item = createElement("span", "tactical-legend-item");
-    const swatch = createElement("span", `tactical-swatch is-${cell}`);
-    const glyph = TACTICAL_CELL_GLYPHS[cell];
-
-    if (glyph) swatch.textContent = glyph;
-    item.appendChild(swatch);
-    item.appendChild(document.createTextNode(getTacticalCellLabel(cell)));
-    legend.appendChild(item);
-  });
-
-  return legend;
-}
-
-function openTacticalMapFullscreen(tacticalMap) {
-  const overlay = createElement("div", "tactical-fullscreen tactical-map-fullscreen");
-  const panel = createElement("div", "tactical-fullscreen-panel tactical-map-fullscreen-panel");
-  const header = createElement("div", "tactical-map-header");
-  const title = createElement(
-    "strong",
-    null,
-    `Mapa ${tacticalMap.width}x${tacticalMap.height} | ${tacticalMap.enemyCount} inimigo(s) | ${tacticalMap.trapCount} zona(s) de risco`
-  );
-
-  function close() {
-    document.removeEventListener("keydown", onKeyDown);
-    overlay.remove();
-  }
-
-  function onKeyDown(event) {
-    if (event.key === "Escape") close();
-  }
-
-  overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) close();
-  });
-  document.addEventListener("keydown", onKeyDown);
-
-  header.appendChild(title);
-  header.appendChild(createButton("Fechar", "extended-action is-compact", close));
-  panel.appendChild(header);
-  panel.appendChild(createTacticalGrid(tacticalMap));
-  panel.appendChild(createTacticalLegend(tacticalMap));
-  overlay.appendChild(panel);
-  document.body.appendChild(overlay);
-}
-
 function openSceneModal({ title, tabs, initialTabIndex = 0 }) {
   const overlay = createElement("div", "tactical-fullscreen scene-modal");
   const panel = createElement("div", "tactical-fullscreen-panel scene-modal-panel");
@@ -416,7 +303,7 @@ function openSceneModal({ title, tabs, initialTabIndex = 0 }) {
   }
 
   function onKeyDown(event) {
-    if (event.key === "Escape") close();
+    if (event.key === "Escape" && !document.querySelector(".tactical-map-fullscreen[open], .tactical-piece-dialog[open]")) close();
   }
 
   function renderTabBar() {
@@ -455,7 +342,11 @@ function openSceneModal({ title, tabs, initialTabIndex = 0 }) {
 }
 
 function createTacticalMap(scene, onRerollMap, extraActions = []) {
-  return createTacticalMapPanel(scene?.tacticalMap, {
+  const key = `extended:${getSceneKey(scene)}`;
+  tacticalEncounterSession.activate(key);
+  const map = createExtendedTacticalMap(scene);
+  return createTacticalMapPanel(map, {
+    state: tacticalEncounterSession.openMap(key, map),
     extraActions,
     mapKind: scene?.tacticalMap?.preset ? "Mapa da cena (fixo)" : "Mapa",
     onRerollMap

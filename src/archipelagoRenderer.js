@@ -8,6 +8,7 @@ import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { createRng, randomInt } from "./random.js";
 import { createRangeEndActions } from "./rangeEndActions.js";
 import { openTacticalMapFullscreen } from "./tacticalMapRenderer.js";
+import { tacticalEncounterSession } from "./tacticalEncounterSession.js";
 import { formatComponents, formatItemLine } from "./treasure/treasureFormat.js";
 import { summarizeGains } from "./treasure/treasureSummary.js";
 
@@ -151,12 +152,19 @@ function createIslandEncounter(scene, onEncounterAdjusted = () => {}, {
   return sheet;
 }
 
+function getTacticalEncounterKey(scene) {
+  return `archipelago:${scene.id}`;
+}
+
 function createIslandMapButton(scene, themeId, objective) {
   return createIconButton({
     className: "icon-button modal-tactical-map-toggle",
     icon: "/assets/icons/game-icons--treasure-map.svg",
     label: "Abrir mapa tático",
-    onClick: () => openTacticalMapFullscreen(createNodeTacticalMap(withIslandTacticalLayout(scene, themeId, objective)))
+    onClick: () => {
+      const map = createNodeTacticalMap(withIslandTacticalLayout(scene, themeId, objective));
+      openTacticalMapFullscreen(map, { state: tacticalEncounterSession.openMap(getTacticalEncounterKey(scene), map) });
+    }
   });
 }
 
@@ -257,6 +265,7 @@ export function createArchipelagoRenderer({
     const footer = document.createElement("footer");
     footer.className = "archipelago-encounter-footer";
     if (scene?.resolvedEncounter) {
+      tacticalEncounterSession.activate(getTacticalEncounterKey(scene));
       const center = document.createElement("div");
       center.className = "archipelago-map-control";
       center.appendChild(createIslandMapButton(scene, themeId, objective));

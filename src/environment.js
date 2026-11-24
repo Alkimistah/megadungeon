@@ -155,6 +155,12 @@ const damagingClimateNames = [
   "Tornado"
 ];
 
+export const submergedCharacters = {
+  id: "submersion",
+  name: "Personagens submersos",
+  effect: "Debaixo d’água, criaturas não podem falar nem lançar magias. Sofrem -2 em testes de ataque e -5 em Percepção e precisam de testes de Atletismo para nadar. Criaturas com deslocamento de natação ignoram essas penalidades. Ataques à distância ficam restritos a armas de arremesso de perfuração, bestas e redes. Armas de corte e impacto causam metade do dano. Contra personagens fora d’água, criaturas submersas recebem camuflagem e cobertura leves."
+};
+
 const forestFeatures = [
   { weight: 26, value: { name: "Árvores", effect: "Árvores estreitas têm menos de 1,5 m de largura; árvores largas têm mais de 1,5 m. Árvore estreita concede cobertura leve; árvore larga tem RD 5 e 500 PV. Subir exige Atletismo CD 15; permanecer no topo exige Equilíbrio CD 15, exceto em árvore larga, que concede cobertura leve contra criaturas no solo." } },
   { weight: 24, value: { name: "Folhagens", effect: "Mato e arbustos contam como terreno difícil e fornecem camuflagem leve para criaturas dentro deles." } },
@@ -195,7 +201,7 @@ const terrainOptions = [
       featureOptions: [
         { weight: 40, value: { name: "Água corrente", effect: "Corrente típica arrasta 1d6 x 3 m por rodada. No fim de cada rodada, todos na água são arrastados nessa velocidade. Nadar contra a corrente exige Atletismo CD 15 para corrente normal ou CD 20 para corrente rápida. Sair exige chegar à margem ou ponto de apoio e passar em Atletismo CD 20 para agarrar algo; em falha, segue sendo arrastado." } },
         { weight: 35, value: { name: "Água parada", effect: "Água parada exige testes de Atletismo para nadar, sem modificador adicional." } },
-        { weight: 25, value: { name: "Personagens submersos", effect: "Criaturas submersas sofrem -2 em ataques e -5 em Percepção. Deslocamento de natação ignora essas penalidades. Armas à distância não podem ser usadas, exceto arremesso de perfuração, bestas e redes. Armas de corte e impacto causam metade do dano debaixo d’água. Criaturas submersas recebem camuflagem e cobertura leves contra personagens fora d’água." } }
+        { weight: 25, value: submergedCharacters }
       ]
     }
   },

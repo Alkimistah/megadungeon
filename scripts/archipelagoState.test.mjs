@@ -35,6 +35,10 @@ test("a chance da emboscada sobe 5 pontos por fragmento e o ND acompanha a exped
       const map = createNodeTacticalMap(scene);
       assert.equal(map.terrain.name, "Convés da liburna");
       assert.equal(map.cells[0], "water");
+      assert.equal(map.scene.terrain[0], "deep-water");
+      assert.equal(map.scene.terrain[6 * map.width + 15], "deck");
+      assert.ok(map.scene.features.some(feature => feature.id === "stern-canopy"));
+      assert.ok(map.scene.markers.some(marker => marker.id === "square-mast"));
       assert.equal(map.cells.at(-1), "water");
       assert.equal(map.cells[map.landmark.index], "mechanism");
       assert.equal(map.landmark.label, "Mastro da vela quadrada");
@@ -1020,4 +1024,17 @@ test("o barco acompanha o último desembarque, inclusive após descansar e revis
   }
   state.initialize(productionProfile, rng, JSON.parse(JSON.stringify(state.exportSessionState())));
   assert.equal(state.getSnapshot().lastVisitedFloor, 21);
+});
+
+test("costa do coral diferencia margem rasa e canal fundo no nicho", () => {
+  const encounter = {
+    id: "nicho-margem-e-canal",
+    environment: { terrain: { name: "Costa do Coral", features: [] }, climate: [] },
+    resolvedEncounter: { seed: "nicho-margem-e-canal", items: [{ kind: "creature", creatureId: "animal", name: "Animal" }] }
+  };
+  const map = createNodeTacticalMap(withIslandTacticalLayout(encounter, "coral-coast"));
+  assert.ok(map.scene);
+  assert.equal(map.scene.terrain[6 * 20 + 6], "water");
+  assert.equal(map.scene.terrain[6 * 20 + 11], "deep-water");
+  assert.ok(map.scene.markers.some(marker => marker.label === "Nicho do fragmento" && marker.indices.includes(5 * 20 + 15)));
 });

@@ -1461,6 +1461,9 @@ test("Quimera is alone in the same simple arena for every seed", () => {
     const tactical = createNodeTacticalMap(boss);
     assert.equal(tactical.cells.filter(c => c === "party").length, 4);
     assert.equal(tactical.cells.filter(c => c === "boss").length, 4);
+    const chimera = tactical.scene.pieces.find(piece => piece.kind === "boss");
+    assert.equal(chimera.name, "Quimera");
+    assert.deepEqual([chimera.width, chimera.height], [2, 2]);
     assert.ok(tactical.cells.includes("obstacle"));
     assert.ok(tactical.cells.every(c => ["floor", "party", "boss", "obstacle"].includes(c)));
     if (first) assert.deepEqual({ environment: boss.environment, tactical }, first);
@@ -2170,4 +2173,74 @@ test("abilities printed with the magical spiral carry the magical mark", () => {
     const ability = [...(creature.abilities ?? []), ...(creature.actions ?? [])].find(entry => entry.name === name);
     assert.equal(ability?.magical, true, `${id}: ${name}`);
   }
+});
+
+test("floresta submersa tem água profunda sob a formação e árvores, e chuva na cena", () => {
+  const map = createNodeTacticalMap({
+    id: "floresta-submersa",
+    environment: {
+      terrain: { name: "Floresta", features: [{ name: "Personagens submersos" }, { name: "Árvores" }] },
+      climate: [{ name: "Chuva" }]
+    },
+    resolvedEncounter: { seed: "floresta-submersa", items: [{ kind: "creature", creatureId: "animal", name: "Animal" }] }
+  });
+  assert.ok(map.scene);
+  assert.ok(map.scene.terrain.every(tile => tile === "deep-water"));
+  assert.ok(map.scene.features.some(feature => feature.type === "tree"));
+  assert.ok(map.scene.pieces.some(piece => piece.kind === "party"));
+  assert.deepEqual(map.scene.climate.map(climate => climate.name), ["Chuva"]);
+});
+
+test("submersão localizada mantém o piso fora da área e admite outros efeitos dentro dela", () => {
+  const map = createNodeTacticalMap({
+    id: "submersao-localizada",
+    environment: { terrain: { name: "Planície aberta", features: [
+      { name: "Personagens submersos", area: { x: 5, y: 4, width: 3, height: 2 } }
+    ] }, climate: [] },
+    resolvedEncounter: { seed: "submersao-localizada", items: [{ kind: "creature", creatureId: "animal", name: "Animal" }] }
+  });
+  assert.ok(map.scene);
+  assert.equal(map.scene.terrain.filter(tile => tile === "deep-water").length, 6);
+  assert.equal(map.scene.terrain[85], "deep-water");
+  assert.equal(map.scene.terrain[84], "floor");
+});
+
+test("tempestade global fica no cabeçalho e não cria armadilhas", () => {
+  const map = createNodeTacticalMap({
+    id: "tempestade-sem-armadilha",
+    environment: { climate: [{ name: "Tempestade" }] },
+    resolvedEncounter: { seed: "tempestade-sem-armadilha", items: [{ kind: "creature", creatureId: "animal", name: "Animal" }] }
+  });
+  assert.ok(map.scene);
+  assert.equal(map.trapCount, 0);
+  assert.ok(!map.cells.includes("trap"));
+  assert.ok(!map.scene.markers.some(marker => marker.type === "trap"));
+  assert.ok(!map.scene.features.some(feature => feature.type === "wind"));
+  assert.deepEqual(map.scene.climate.map(climate => climate.name), ["Tempestade"]);
+});
+
+test("penhasco florestal e fosso da armadilha ocupam camadas distintas", () => {
+  const map = createNodeTacticalMap({
+    id: "penhasco-e-fosso",
+    environment: { terrain: { name: "Floresta", features: [{ name: "Penhasco" }] } },
+    trap: { name: "Fosso" },
+    resolvedEncounter: { seed: "penhasco-e-fosso", items: [{ kind: "trap", name: "Fosso" }] }
+  });
+  assert.ok(map.scene);
+  assert.ok(map.scene.terrain.includes("cliff"));
+  assert.ok(map.scene.markers.some(marker => marker.type === "pit" && marker.label === "Fosso"));
+});
+
+test("inclinações simultâneas e seixos preservam as regras distintas", () => {
+  const map = createNodeTacticalMap({
+    id: "inclinacoes-e-seixos",
+    environment: { terrain: { name: "Floresta", features: [
+      { name: "Inclinação suave" }, { name: "Inclinação íngreme" }, { name: "Seixos" }
+    ] } },
+    resolvedEncounter: { seed: "inclinacoes-e-seixos", items: [{ kind: "creature", creatureId: "animal", name: "Animal" }] }
+  });
+  assert.ok(map.scene.terrain.includes("gentle-slope"));
+  assert.ok(map.scene.terrain.includes("steep-slope"));
+  const pebbles = map.scene.features.find(feature => feature.type === "pebbles");
+  assert.ok(pebbles.indices.every(index => map.scene.terrain[index] === "steep-slope"));
 });

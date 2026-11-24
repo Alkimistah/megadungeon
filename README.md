@@ -11,7 +11,8 @@ Gerador procedural de exploração e encontros para Tormenta20. Os andares 1 a 1
 - O jogador navega pelo mapa escolhendo rotas, marcando encontros como explorados ou tentados, e descansando em acampamentos.
 - No arquipélago, distribui nove ilhas em três fileiras, quatro iniciais, três intermediárias e duas avançadas, e a ilha final do Rei Tirano. As iniciais têm quatro setores, as intermediárias seis e as avançadas oito, com mapas táticos e um guardião no Centro. Cada uma das nove pode ter uma missão própria, ligada ao seu tema.
 - No descanso na liburna, pode abrir uma emboscada com chance e ND definidos pela quantidade de fragmentos. O descanso termina depois que o mestre encerra o encontro.
-- O estado completo da exploração é exportado como um código de sessão que pode ser copiado e restaurado a qualquer momento, sem conta e sem backend.
+- Os mapas táticos das três faixas têm terreno e efeitos em camadas, tokens móveis e contador de deslocamento. É possível ajustar a formação dos jogadores, adicionar invocações aliadas ou inimigas e remover peças durante o encontro.
+- O estado da exploração é exportado como um código de sessão que pode ser copiado e restaurado a qualquer momento, sem conta e sem backend.
 - Funciona offline e pode ser instalado como PWA.
 
 ## Desenvolvimento local

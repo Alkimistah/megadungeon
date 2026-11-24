@@ -200,7 +200,7 @@ async function missionFlow() {
       assert.match(await page.locator("#nodeDialogMeta").innerText(), new RegExp(`Com clima e terreno.*${xp.format(node.challenge.total * 1000)} XP`, "i"));
       assert.match(await page.locator("#nodeDialogMeta").innerText(), new RegExp(`Sem clima e terreno.*${xp.format(node.challenge.encounter * 1000)} XP`, "i"));
       await page.locator('[aria-label="Abrir mapa tático"]').click();
-      assert.ok(await page.locator(".tactical-map-fullscreen .is-enemy.has-objective").count() > 0);
+      assert.ok(await page.locator(".tactical-map-fullscreen .tactical-piece.is-enemy .tactical-marker.is-objective").count() > 0);
       await page.keyboard.press("Escape");
       await page.locator(".mission-context-action").nth(extermIndex).click();
       await page.locator("#missionDialog[open]").waitFor();
@@ -522,6 +522,24 @@ async function creatureHealthFlow() {
   const map = page.locator(".tactical-map-fullscreen-panel");
   assert.deepEqual(combatBounds, await map.boundingBox(), "A ficha de combate deve ocupar a mesma área que o mapa tático");
   assert.deepEqual(environmentBounds, combatBounds, "A modal deve manter as dimensões ao trocar de tela");
+  const matchingTokens = map.locator(`.tactical-piece[data-piece-id^="creature:0:${item.creatureId}:"]`);
+  const firstToken = matchingTokens.first();
+  const position = token => token.evaluate(element => [
+    element.style.getPropertyValue("--piece-x"), element.style.getPropertyValue("--piece-y")
+  ]);
+  const initialPosition = await position(firstToken);
+  await firstToken.focus();
+  await firstToken.press(Number(initialPosition[0]) > 0 ? "ArrowLeft" : "ArrowRight");
+  const movedPosition = await position(firstToken);
+  assert.notDeepEqual(movedPosition, initialPosition);
+  const addFooter = map.locator(".tactical-environment-panel > .tactical-add-piece:last-child");
+  assert.equal(await addFooter.evaluate(element => getComputedStyle(element).alignSelf), "center");
+  await addFooter.getByRole("button", { name: "Adicionar peça" }).click();
+  await map.getByRole("textbox", { name: "Nome da peça" }).fill("Lobo invocado no QA");
+  await map.getByRole("combobox", { name: "Lado da peça" }).selectOption("enemy");
+  await map.getByRole("button", { name: "Adicionar", exact: true }).click();
+  await map.getByRole("dialog", { name: "Adicionar peça temporária" }).waitFor({ state: "hidden" });
+  await map.getByRole("button", { name: "Lobo invocado no QA" }).waitFor();
   await map.getByRole("button", { name: "Fechar", exact: true }).click();
   await page.setViewportSize({ width: 768, height: 600 });
   const content = dialog.locator("#nodeDialogContent");
@@ -554,8 +572,14 @@ async function creatureHealthFlow() {
   await amount.fill("1");
   await dialog.getByRole("button", { name: "Curar" }).click();
   assert.match(await units.locator("option").nth(1).innerText(), new RegExp(`${max - 2}/${max} PV`));
+  await dialog.getByRole("button", { name: "Abrir mapa tático" }).click();
+  assert.deepEqual(await position(firstToken), movedPosition);
+  assert.equal(await matchingTokens.count(), item.quantity + 1);
+  await map.getByRole("button", { name: "Lobo invocado no QA" }).waitFor();
+  await map.getByRole("button", { name: "Fechar", exact: true }).click();
   await dialog.locator("#nodeDialogClose").click();
   const exported = decodeSessionCode(await exportSession(page));
+  assert.doesNotMatch(JSON.stringify(exported), /Lobo invocado no QA/);
   const encounter = new Map(exported.state.resolvedEncounters).get(node.id);
   assert.deepEqual(encounter.budget, node.resolvedEncounter.budget);
   assert.equal(encounter.items[0].quantity, item.quantity);
@@ -574,6 +598,10 @@ async function creatureHealthFlow() {
   assert.equal(await units.locator("option").count(), item.quantity);
   assert.equal(await dialog.getByRole("button", { name: "Desfazer último lançamento" }).isEnabled(), false);
   assert.match(await units.locator("option").nth(1).innerText(), new RegExp(`${max}/${max} PV`));
+  await dialog.getByRole("button", { name: "Abrir mapa tático" }).click();
+  assert.deepEqual(await position(firstToken), initialPosition);
+  assert.equal(await map.getByRole("button", { name: "Lobo invocado no QA" }).count(), 0);
+  await map.getByRole("button", { name: "Fechar", exact: true }).click();
   await dialog.locator("#nodeDialogClose").click();
 
   await page.getByRole("button", { name: "Gerar encontro manual" }).click();

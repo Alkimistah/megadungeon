@@ -1,3 +1,4 @@
+import { tacticalEncounterSession } from "./tacticalEncounterSession.js";
 import "./styles.css";
 import { assetUrl } from "./assetUrl.js";
 import { createExplorationState } from "./appState.js";
@@ -89,6 +90,7 @@ const elements = {
   rangeConfirm: document.getElementById("rangeConfirm"),
   resumeExpedition: document.getElementById("resumeExpedition"),
   sessionStatus: document.getElementById("sessionStatus"),
+  tacticalPartySizeInput: document.getElementById("tacticalPartySizeInput"),
   nodeDialog: document.getElementById("nodeDialog"),
   nodeDialogTitle: document.getElementById("nodeDialogTitle"),
   nodeDialogType: document.getElementById("nodeDialogType"),
@@ -626,11 +628,14 @@ function updateTimeTracker() {
 }
 
 function getCurrentSession() {
+  const tacticalPartySize = Number(elements.tacticalPartySizeInput.value);
+  const tacticalPreferences = tacticalPartySize === 4 ? {} : { tacticalPartySize };
   if (isArchipelagoMode()) {
     const snapshot = archipelagoState.getSnapshot();
 
     return {
       v: 1,
+      ...tacticalPreferences,
       mode: activeFloorRange.mode,
       profile: activeFloorRange.id,
       floor: snapshot.activeExploration?.floor || 21,
@@ -647,6 +652,7 @@ function getCurrentSession() {
 
     return {
       v: 1,
+      ...tacticalPreferences,
       mode: activeFloorRange.mode,
       profile: activeFloorRange.id,
       floor: snapshot.floor,
@@ -659,6 +665,7 @@ function getCurrentSession() {
 
   return {
     v: 1,
+    ...tacticalPreferences,
     mode: "node-map",
     profile: activeFloorRange.id,
     ...renderedNodeMapSettings,
@@ -825,7 +832,15 @@ function openMissionSelectionForNewExploration() {
   missionDialogController.openSelection();
 }
 
+function setTacticalPartySize(value) {
+  const count = Number.isInteger(value) && value >= 1 && value <= 8 ? value : 4;
+  elements.tacticalPartySizeInput.value = String(count);
+  tacticalEncounterSession.setPartySize(count);
+}
+
 function restoreSession(session) {
+  tacticalEncounterSession.reset();
+  setTacticalPartySize(session.tacticalPartySize);
   const savedBooks = Array.isArray(session.disabledCreatureBooks) ? session.disabledCreatureBooks : [];
   disabledCreatureBooks = creatureBooks.filter(book => savedBooks.includes(book));
   applyFloorRange(session.profile);
@@ -1088,6 +1103,7 @@ function setUnknownPathsMode(isEnabled) {
 }
 
 function generateMap({ reuseSeed = false, startSession = true } = {}) {
+  tacticalEncounterSession.reset();
   if (isArchipelagoMode()) {
     if (!reuseSeed) currentMapSeed = createRandomSeed();
     renderedNodeMapFloor = null;
@@ -1256,6 +1272,11 @@ function bindEvents() {
 
   elements.reloadAppButton.addEventListener("click", () => {
     window.location.reload();
+  });
+
+  elements.tacticalPartySizeInput.addEventListener("change", () => {
+    setTacticalPartySize(Number(elements.tacticalPartySizeInput.value));
+    if (autosaveActive) void saveCurrentExpedition();
   });
 
   elements.settingsToggle.addEventListener("click", () => {

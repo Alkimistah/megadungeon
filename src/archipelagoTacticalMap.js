@@ -35,7 +35,7 @@ const tropicalLayouts = {
 function layout(name, effect, x, y, zones) {
   return {
     landmark: { name, effect, x, y },
-    zones: zones.map(([tile, left, top, width, height]) => ({ tile, x: left, y: top, width, height }))
+    zones: zones.map(([tile, left, top, width, height, metadata]) => ({ tile, x: left, y: top, width, height, ...metadata }))
   };
 }
 
@@ -45,7 +45,7 @@ const layoutsByTheme = {
       ["obstacle", 8, 3, 2, 5], ["obstacle", 14, 7, 2, 3], ["difficult", 10, 4, 4, 4], ["tree", 0, 0, 5, 5]
     ]),
     L: layout("Círculo da escarpa", "O círculo de pedras e ossos fortalece as resistências do Rei Tirano.", 14, 5, [
-      ["slope", 8, 5, 5, 5], ["advantage", 13, 3, 6, 5], ["pit", 8, 0, 4, 4], ["obstacle", 16, 9, 2, 2]
+      ["slope", 8, 5, 5, 5], ["advantage", 13, 3, 6, 5], ["pit", 8, 0, 4, 4, { terrainType: "cliff" }], ["obstacle", 16, 9, 2, 2]
     ]),
     S: layout("Lajes de ressonância", "As lajes prolongam o rugido do Rei Tirano pelo vale.", 12, 7, [
       ["water", 8, 0, 4, 14], ["difficult", 8, 6, 4, 3], ["wet", 12, 3, 3, 7], ["tree", 15, 9, 4, 4]
@@ -235,7 +235,7 @@ const layoutsByTheme = {
       ["obstacle", 8, 4, 8, 1], ["obstacle", 8, 5, 1, 4], ["advantage", 9, 5, 7, 3], ["water", 13, 9, 6, 3]
     ]),
     O: layout("Borda do poço", "A corda e o sino de mergulho ficam junto à borda, onde a lagoa aprofunda.", 12, 6, [
-      ["water", 7, 2, 12, 7], ["pit", 13, 4, 5, 4], ["wet", 6, 8, 5, 2]
+      ["water", 7, 2, 12, 7], ["water", 13, 4, 5, 4, { terrainType: "deep-water" }], ["wet", 6, 8, 5, 2]
     ]),
     center: layout("Pedra do fragmento", "Um banco de areia ladeia o canal da lagoa e dá acesso ao fragmento.", 14, 6, [
       ["water", 5, 2, 14, 9], ["clearing", 5, 7, 12, 2], ["advantage", 13, 6, 4, 2], ["wet", 5, 9, 7, 2]
@@ -249,13 +249,15 @@ const layoutsByTheme = {
       ["water", 4, 2, 15, 9], ["obstacle", 9, 1, 2, 4], ["obstacle", 9, 8, 2, 4], ["difficult", 8, 5, 4, 3]
     ]),
     L: layout("Câmara de ar", "A câmara tem uma borda firme para prender o cabo; as galerias ao redor estão inundadas.", 15, 5, [
-      ["water", 4, 3, 10, 9], ["wall", 7, 2, 10, 1], ["wall", 14, 8, 4, 1], ["clearing", 14, 3, 4, 4]
+      ["water", 4, 3, 10, 9, { terrainType: "deep-water" }], ["wall", 7, 2, 10, 1], ["wall", 14, 8, 4, 1], ["clearing", 14, 3, 4, 4]
     ]),
     O: layout("Altar das pérolas", "O pedestal controla a passagem do pátio para o altar. As conchas do santuário ficam no fundo.", 14, 5, [
-      ["water", 4, 2, 15, 9], ["obstacle", 8, 3, 1, 3], ["obstacle", 8, 8, 1, 2], ["advantage", 13, 4, 4, 3]
+      ["water", 4, 2, 15, 9, { terrainType: "deep-water" }], ["obstacle", 8, 3, 1, 3], ["obstacle", 8, 8, 1, 2], ["advantage", 13, 4, 4, 3]
     ]),
     center: layout("Nicho do fragmento", "O nicho fica sob um arco de coral entre a borda rasa e o canal fundo.", 15, 5, [
-      ["water", 5, 2, 14, 9], ["wet", 4, 8, 7, 2], ["obstacle", 10, 3, 1, 3], ["advantage", 13, 4, 4, 3]
+      ["water", 5, 2, 14, 9],
+      ["water", 9, 2, 10, 9, { terrainType: "deep-water" }],
+      ["wet", 4, 8, 7, 2], ["obstacle", 10, 3, 1, 3], ["advantage", 13, 4, 4, 3]
     ])
   }
 };
@@ -272,13 +274,23 @@ export function withIslandTacticalLayout(scene, themeId, objective) {
   const base = layoutsByTheme[themeId]?.[objective?.direction ?? "center"];
   if (!scene || !base) return scene;
   const taskLandmark = landmarksByTask[objective?.title];
-  const landmark = taskLandmark
-    ? { ...base.landmark, name: taskLandmark[0], effect: taskLandmark[1] }
-    : base.landmark;
+  const landmark = {
+    ...base.landmark,
+    id: `${themeId}:${objective?.direction ?? "center"}:landmark`,
+    ...(taskLandmark ? { name: taskLandmark[0], effect: taskLandmark[1] } : {})
+  };
   const terrain = scene.environment.terrain;
+  const leader = objective == null ? scene.resolvedEncounter?.items.find(item => item.kind === "creature") : null;
   return {
     ...scene,
-    tacticalLayout: { ...base, landmark },
+    ...(leader ? { bossCreatureId: scene.bossCreatureId ?? leader.creatureId } : {}),
+    tacticalLayout: {
+      ...base,
+      landmark,
+      zones: themeId === "floating"
+        ? base.zones.map(zone => zone.tile === "pit" ? { ...zone, terrainType: "abyss" } : zone)
+        : base.zones
+    },
     environment: {
       ...scene.environment,
       terrain: { ...terrain, features: [...terrain.features, landmark] }

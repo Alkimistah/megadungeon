@@ -1,4 +1,6 @@
 import { createRng, randomInt } from "../random.js";
+import { createTacticalScene } from "../tacticalScene.js";
+import { getTacticalEncounterUnits, getTacticalPartyPieces, placeTacticalEncounterUnits } from "../tacticalScenePieces.js";
 import { getAbilityDcForChallenge } from "../threatCreationRules.js";
 import { trapCatalog } from "../traps.js";
 import { getIslandThemeTerrain } from "../archipelagoPilot.js";
@@ -135,11 +137,13 @@ function placeObjective(cells, mission, rng, size) {
     rng
   );
 
-  candidates.slice(0, objectiveCount).forEach(([x, y]) => {
-    setCell(cells, x, y, "objective", ["floor", "difficult", "foliage", "concealment"], size);
-  });
-
-  return objectiveCount;
+  let placed = 0;
+  const fallback = getFreePositions(cells, size).sort(([x1], [x2]) => x2 - x1);
+  for (const [x, y] of [...candidates, ...fallback]) {
+    if (placed === objectiveCount) break;
+    if (setCell(cells, x, y, "objective", ["floor", "difficult", "foliage", "concealment"], size)) placed += 1;
+  }
+  return placed;
 }
 
 function getIslandMapTheme(mission) {
@@ -308,6 +312,61 @@ function formatResolutionCheck(check) {
   return `${check.skill} CD ${check.dc} (${check.action})`;
 }
 
+const MISSION_TERRAIN_EFFECTS = new Set(["canopy", "concealment", "current", "mechanism", "wet", "wind"]);
+
+function buildMissionScene(size, baseCells, cells, mission, huntEncounter, risk, riskDetails, landmark) {
+  const features = [];
+  const markers = [];
+  const terrain = baseCells.map((tile, index) => {
+    if (!MISSION_TERRAIN_EFFECTS.has(tile)) {
+      return tile === "pit" && mission.destination?.targetId === "floating" ? "abyss" : tile;
+    }
+    features.push({ type: tile, indices: [index] });
+    return tile === "current" ? "deep-water" : "floor";
+  });
+  const toPosition = index => [index % size.width, Math.floor(index / size.width)];
+  const indicesFor = tile => cells.flatMap((cell, index) => cell === tile ? [index] : []);
+  const party = getTacticalPartyPieces(indicesFor("party").map(toPosition));
+  const enemyPositions = indicesFor("enemy").map(toPosition);
+  const enemyItems = (huntEncounter?.items ?? (enemyPositions.length ? [{
+    creatureId: mission.objective?.targetId ?? "mission-threat",
+    name: mission.objective?.targetName ?? "Ameaça da missão",
+    quantity: enemyPositions.length
+  }] : [])).map(item => ({ ...item, kind: "creature" }));
+  const units = getTacticalEncounterUnits(enemyItems);
+  const fallback = terrain.flatMap((tile, index) =>
+    ["floor", "difficult", "foliage"].includes(tile) ? [toPosition(index)] : []);
+  const blocked = new Set(["obstacle", "tree", "wall", "lava", "abyss", "pit", "cliff", "escarpment"]);
+  const enemies = placeTacticalEncounterUnits(units, enemyPositions, fallback, size, party, {
+    canOccupy: index => !blocked.has(terrain[index])
+  });
+  const targetIndex = huntEncounter?.items.findIndex(item => item.isTarget) ?? -1;
+  const targetPiece = targetIndex >= 0 ? enemies.find(piece =>
+    piece.id === `creature:${targetIndex}:${huntEncounter.items[targetIndex].creatureId}:0`) : null;
+  const objectiveIndices = indicesFor("objective");
+  if (targetPiece) {
+    markers.push({ type: "objective", pieceId: targetPiece.id, label: targetPiece.name });
+  } else {
+    for (const index of objectiveIndices) {
+      markers.push({ type: "objective", indices: [index], label: mission.objective?.targetName });
+    }
+  }
+  if (landmark && objectiveIndices.length) {
+    markers.push({
+      type: "mechanism",
+      id: landmark.id,
+      label: landmark.name,
+      indices: [objectiveIndices[0]]
+    });
+  }
+  const riskIndices = indicesFor(risk.marker).filter(index => baseCells[index] !== risk.marker);
+  riskDetails.forEach((detail, index) => {
+    const cellIndex = riskIndices[index];
+    if (cellIndex !== undefined) markers.push({ type: risk.marker, label: detail.name, indices: [cellIndex] });
+  });
+  return createTacticalScene({ ...size, terrain, features, markers, pieces: [...party, ...enemies] });
+}
+
 export function createMissionTacticalMap(mission, { profile = null } = {}) {
   const rng = createRng(`${mission.id}:mission-tactical-map`);
   const detailRng = createRng(`${mission.id}:mission-tactical-details`);
@@ -321,6 +380,7 @@ export function createMissionTacticalMap(mission, { profile = null } = {}) {
     : null;
 
   placeTerrain(cells, mission, rng, size, islandTheme?.theme.map.markers);
+  const baseCells = cells.flat();
   placeParty(cells, size);
   const objectiveCount = placeObjective(cells, mission, rng, size);
   const enemyCount = placeEnemies(cells, mission, rng, size, enemyTotal);
@@ -351,6 +411,10 @@ export function createMissionTacticalMap(mission, { profile = null } = {}) {
     }
   ];
   const effect = `Objetivo: ${objectiveLabel}. Teste central: ${formatResolutionCheck(resolutionCheck)}.`;
+  const sourceLandmark = mission.featured && islandTheme?.theme.featured.landmark
+    ? islandTheme.theme.featured.landmark
+    : islandTheme?.theme.map.landmark;
+  const landmark = sourceLandmark ? { ...sourceLandmark, id: `${mission.id}:landmark` } : null;
   const terrain = islandTheme
     ? {
       name: islandTheme.terrain.name,
@@ -358,9 +422,7 @@ export function createMissionTacticalMap(mission, { profile = null } = {}) {
       features: [
         ...islandTheme.terrain.features,
         ...missionFeatures,
-        mission.featured && islandTheme.theme.featured.landmark
-          ? islandTheme.theme.featured.landmark
-          : islandTheme.theme.map.landmark
+        landmark
       ]
     }
     : {
@@ -371,8 +433,10 @@ export function createMissionTacticalMap(mission, { profile = null } = {}) {
       features: missionFeatures
     };
 
+  const legacyCells = cells.flat();
   return {
-    cells: cells.flat(),
+    cells: legacyCells,
+    scene: buildMissionScene(size, baseCells, legacyCells, mission, huntEncounter, risk, riskDetails, landmark),
     climate: [],
     enemyCount,
     height: size.height,

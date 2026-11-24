@@ -558,33 +558,19 @@ O descanso após uma exploração pode abrir uma emboscada no convés. `archipel
 
 O botão de descanso usa `public/assets/icons/archipelago-boat.svg`. Na pirâmide, `index.html` define o filtro que transforma o brilho das artes com preenchimento em transparência. `src/styles.css` aplica o filtro aos temas que precisam dele e ao ícone de ilha desconhecida. O estado de conclusão usa a mesma cor verde para todos os temas.
 
-### Melhorias futuras dos mapas táticos
+### Grade tática compartilhada
 
-A revisão da grade tática compartilhada segue como uma frente própria. A comparação abaixo serve de referência para a retomada.
+Os mapas existentes dos andares 1 a 30 usam o renderizador compartilhado, incluindo setores, arenas, liburna e missões. `tacticalScene.js` reúne terreno, efeitos locais, marcadores, peças e clima. Os geradores preservam os layouts de cada contexto, e a adaptação dos mapas legados preserva as posições iniciais disponíveis. O atlas de pixel art faz parte do build e do cache offline. [Design](docs/superpowers/specs/2026-11-23-grade-tatica-design.md) · [Plano e critérios de validação](docs/superpowers/plans/2026-11-23-grade-tatica.md)
 
-Na retomada, avaliar também se vale reestruturar a grade compartilhada. Comparar o aproveitamento do gerador e do renderizador atuais com outra abordagem de código para montar cenas. Um caminho a testar é representar o mapa-base, os efeitos de terreno e clima e as posições das peças como partes independentes da cena. Usar a mesma cena que hoje exige adaptação na mesa para comparar a coerência entre descrição e grade, a facilidade de criar variações e a atualização das posições durante o combate. A escolha de ferramenta fica para depois dessa comparação.
+- **Terreno e ficha.** Elementos táticos localizados aparecem no mapa e na legenda. Efeitos globais ficam no cabeçalho. Em cenas de submersão global, a base é de água profunda, com elementos do ambiente por cima. O atlas distingue água rasa, água profunda e correnteza, além de penhasco, fosso, abismo, paredão, gelo, rio congelado, dunas, seixos e inclinações.
+- **Peças e sessão.** Os tokens redondos identificam as criaturas e respeitam seu porte. O mestre pode ajustar apenas a formação inicial dos jogadores, mover peças por mouse, toque ou teclado, acrescentar invocações dos dois lados e remover qualquer peça. O rodapé do painel de ambiente reúne a peça selecionada e os botões de inclusão e remoção. As alterações do tabuleiro ficam em memória até a troca de encontro e ficam fora do arquivo de sessão.
+- **Deslocamento.** A posição de partida fica marcada com um X vermelho durante o arraste. O contador soma os trechos enquanto a peça estiver selecionada. A contagem considera diagonais, terreno difícil, quadrados de inimigos e saída de trincheira. Colossais ocupam 6×6. Natação, voo e regras que dependem da direção da inclinação ficam a cargo do mestre.
 
-A primeira comparação ficava em `tmp/mapas-taticos/comparacao.html`. Ela e a comparação com a cena real foram perdidas na limpeza de 23/11/2026 e serão refeitas no início da revisão da grade tática. O protótipo local usa o terreno do gerador atual e mantém as mesmas posições de duas cenas sintéticas. No pântano com neblina, a grade atual encobre três quadrados de terreno. Na floresta com tempestade, encobre um e desenha dois símbolos de armadilha em um encontro com zero armadilhas. O protótipo mostra o clima no cabeçalho da cena e sobrepõe peças e objetivos ao terreno. A comparação com a missão da bússola do andar 14 ficava em `tmp/mapas-taticos/comparacao-cena-real.html`. O encontro foi reconstruído a partir da sessão recuperada. Seis quadrados de terreno ficam encobertos na grade atual. A sobreposição preserva a posição da bússola e permite consultar terreno e armadilha juntos. A decisão sobre mapas-base fixos segue aberta.
+#### Próximos passos da grade tática
 
-**Roteiro da retomada (23/11/2026).**
-
-1. Refazer em `tmp/previas/grade-tatica/` as duas comparações perdidas: duas cenas sintéticas (pântano com neblina, floresta com tempestade) e uma cena real que exigiu adaptação na mesa, com a grade atual ao lado da sobreposição de peças sobre o terreno.
-2. Acrescentar uma cena de cada contexto novo: arena de ilha, convés da liburna e mapa de missão por ilha.
-3. Levar ao PO as perguntas abaixo, uma por vez, com prévias renderizadas no app.
-4. Escrever o design e o plano em `docs/superpowers/` e executar pelo processo de subagentes.
-
-Perguntas para o PO:
-
-- **Sobreposição:** peças, objetivos e armadilhas passam a ficar por cima do terreno, sem esconder o quadrado?
-- **Mapas-base fixos:** um conjunto pequeno de mapas por ambiente, com poucas adições por cena, ou a geração livre atual?
-- **Coerência entre ficha e grade:** cada obstáculo ou efeito na grade precisa ter regra na descrição e na legenda, e o que não tiver efeito tático sai?
-- **Clima:** fica no cabeçalho da cena, e não como células na grade?
-- **Alcance:** a mudança vale para as três faixas, incluindo setores, arenas, convés e mapas de missão?
-- **Movimentação de peças durante o combate:** entra agora ou fica para depois (hoje está com prioridade menor)?
-- **Ferramenta:** manter o renderizador atual ajustado ou testar outra forma de montar cenas (mapa-base, terreno, clima e peças como partes independentes)?
-
-- **Repaginar a geração.** Explorar um conjunto pequeno de mapas fixos com variações por ambiente e poucas adições de terreno ou clima por cena. A dor na mesa é conciliar o que a ficha do encontro descreve com o que a grade mostra, especialmente quando o mapa repete um efeito ou coloca um obstáculo sem função clara. Na retomada, partir de cenas reais que exigiram adaptação manual e verificar se cada adição tem efeito tático claro, combina com o mapa escolhido e aparece de forma coerente na descrição e na legenda.
-- **Movimentar jogadores e inimigos durante a sessão.** Ideia de prioridade menor que a revisão da geração. Na grade atual, as posições iniciais são marcadores da cena. Ao retomar, conferir se há algum protótipo anterior e estudar a movimentação de peças sobre a grade, mantendo o terreno e os objetivos em suas posições.
+1. Criar mapas-base reutilizáveis por ambiente. Começar com poucas variações dos andares 1 a 10 e ampliar o repertório a partir dos andares 11 a 20, reaproveitando layouts em andares futuros quando as condições forem compatíveis.
+2. Selecionar cada layout conforme o cenário definido e localizar nele os elementos previstos pela ficha. Usar como casos de referência submersão, transição entre água rasa e profunda, terreno elevado e inclinações.
+3. Validar em mesa a coerência entre ficha, mapa e legenda e o uso no tablet. Registrar cenas que exigirem ajuste manual para orientar as próximas variações.
 
 Continuam abertos:
 

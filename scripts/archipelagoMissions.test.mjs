@@ -441,7 +441,12 @@ test("missão sem targetId usa o mapa genérico de antes", () => {
     objective: { kind: "collect", quantity: 3, progressMode: "aggregate", targetName: "cristais", condition: "Colete" },
     proofType: "Amostra"
   };
-  assert.deepEqual(createMissionTacticalMap(mission, { profile }), GENERIC_MAP_FIXTURE);
+  const { scene, ...legacyMap } = createMissionTacticalMap(mission, { profile });
+  assert.deepEqual(legacyMap, GENERIC_MAP_FIXTURE);
+  assert.ok(scene);
+  assert.equal(scene.markers.filter(marker => marker.type === "objective").length, 3);
+  assert.deepEqual(scene.markers.filter(marker => marker.type === "trap").map(marker => marker.label),
+    legacyMap.riskDetails.map(risk => risk.name));
 });
 
 test("destaque com landmark substitui o ponto de referência", () => {
@@ -466,6 +471,11 @@ test("mapa da caçada posiciona um inimigo por criatura do encontro", () => {
     const map = createMissionTacticalMap(mission, { profile });
     assert.equal(map.enemyCount, total, mission.id);
     assert.equal(map.cells.filter(c => c === "enemy").length, total, mission.id);
+    assert.ok(map.scene);
+    const targetMarker = map.scene.markers.find(marker => marker.type === "objective");
+    const target = map.scene.pieces.find(piece => piece.id === targetMarker?.pieceId);
+    assert.equal(target?.name, mission.objective.targetName, mission.id);
+    assert.equal(map.scene.pieces.filter(piece => piece.side === "enemy").length, total, mission.id);
   }
 });
 
@@ -555,4 +565,15 @@ test("missão sem perfil usa o ND da recompensa + 1", () => {
 
 test("CD da floresta segue a mesma tabela", () => {
   assert.equal(createMissionTacticalMap(dcMission(15, 3), { profile: forest11to20Profile }).missionDc, 18);
+});
+
+test("coleta agregada preenche os pontos mesmo com terreno bloqueando a primeira opção", () => {
+  const map = createMissionTacticalMap({
+    id: "review-14",
+    difficulty: "standard",
+    destination: { kind: "island", targetId: "submerged" },
+    objective: { kind: "collect", targetName: "Concha", quantity: 3, progressMode: "aggregate" }
+  });
+  assert.equal(map.objectiveCount, 3);
+  assert.equal(map.scene.markers.filter(marker => marker.type === "objective").length, 3);
 });

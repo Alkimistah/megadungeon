@@ -11,6 +11,7 @@ import { GENERAL_CREATURE_ABILITIES, getSharedSubtypeRules } from "./generalCrea
 import { getEncounterMissionMatches } from "./missions/missionEncounterIntegration.js";
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { openTacticalMapFullscreen } from "./tacticalMapRenderer.js";
+import { tacticalEncounterSession } from "./tacticalEncounterSession.js";
 import { getTrapById } from "./traps.js";
 import { assetUrl } from "./assetUrl.js";
 import { getNodeContentPresentation, getNodeProgressPresentation } from "./nodeProgressPresentation.js";
@@ -987,7 +988,10 @@ export function createNodeDialogController({
       "icon-button modal-tactical-map-toggle",
       TACTICAL_MAP_ICON,
       "Abrir mapa tático",
-      () => openTacticalMapFullscreen(createNodeTacticalMap(node, objectives))
+      () => {
+        const map = createNodeTacticalMap(node, objectives);
+        openTacticalMapFullscreen(map, { state: tacticalEncounterSession.openMap(`node:${node.id}`, map) });
+      }
     );
   }
 
@@ -1141,7 +1145,11 @@ export function createNodeDialogController({
 
   return {
     clearCurrent,
-    open: render,
+    open(node) {
+      if (!state.canOpenNode(node)) return;
+      tacticalEncounterSession.activate(`node:${node.id}`);
+      render(node);
+    },
     rerenderCurrent
   };
 }

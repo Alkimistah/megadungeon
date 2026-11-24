@@ -31,27 +31,27 @@ const briefings = {
   pirates: "Um barco se aproxima na escuridão. Os piratas lançam cabos na amurada e saltam para o convés."
 };
 
+const mast = { id: "square-mast", name: "Mastro da vela quadrada", effect: "O mastro fica no centro do convés." };
+const cargo = { id: "cargo", name: "Carga", effect: "Caixas e barris junto à amurada servem de cobertura." };
+const canopy = { id: "stern-canopy", name: "Toldo da popa", effect: "A lona cobre os quadrados claros da popa, por onde se pode passar." };
+
 const deck = {
   name: "Convés da liburna",
   effect: "O casco estreito corre da proa, à esquerda, até a popa coberta, à direita. O grupo começa junto ao toldo.",
-  features: [
-    { name: "Mastro da vela quadrada", effect: "O mastro fica no centro do convés." },
-    { name: "Carga", effect: "Caixas e barris junto à amurada servem de cobertura." },
-    { name: "Toldo da popa", effect: "A lona cobre os quadrados claros da popa, por onde se pode passar." }
-  ]
+  features: [mast, cargo, canopy]
 };
 
 const tacticalLayout = {
   zones: [
-    { x: 0, y: 0, width: 20, height: 14, tile: "water" },
+    { x: 0, y: 0, width: 20, height: 14, tile: "water", terrainType: "deep-water" },
     { x: 1, y: 6, width: 18, height: 2, tile: "deck" },
     { x: 3, y: 5, width: 16, height: 4, tile: "deck" },
     { x: 6, y: 4, width: 11, height: 6, tile: "deck" },
-    { x: 15, y: 5, width: 3, height: 4, tile: "canopy" },
-    { x: 7, y: 4, width: 2, height: 1, tile: "obstacle" },
-    { x: 12, y: 9, width: 2, height: 1, tile: "obstacle" }
+    { x: 15, y: 5, width: 3, height: 4, tile: "canopy", id: canopy.id, label: canopy.name },
+    { x: 7, y: 4, width: 2, height: 1, tile: "obstacle", featureType: "obstacle", id: cargo.id, label: cargo.name },
+    { x: 12, y: 9, width: 2, height: 1, tile: "obstacle", featureType: "obstacle", id: cargo.id, label: cargo.name }
   ],
-  landmark: { x: 9, y: 6, name: "Mastro da vela quadrada" },
+  landmark: { x: 9, y: 6, ...mast },
   partyPositions: [[13, 6], [14, 6], [13, 7], [14, 7]],
   enemyArea: { minX: 1, maxX: 9, minY: 2, maxY: 11 }
 };
