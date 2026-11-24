@@ -130,7 +130,7 @@ export const archipelago21to30Profile = {
       30: 1
     },
     enabledThemeIds: [
-      "tropical", "mangrove", "atoll", "coral-coast",
+      "tropical", "mangrove", "atoll", "coral-coast", "shipwrecked",
       "volcanic", "sea-caves", "pirate-held",
       "floating", "storm", "dinosaurs"
     ],

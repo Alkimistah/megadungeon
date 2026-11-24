@@ -99,6 +99,30 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     }
   },
 
+  shipwrecked: {
+    pools: {
+      locations: ["um casco virado na linha da maré", "a paliçada do acampamento", "a trilha de bambu até a nascente", "a boca da gruta dos mapas"],
+      materials: ["lona de vela ainda impermeável", "breu para calafetar", "cordame de cânhamo sem podridão", "óleo de baleia para lamparinas"],
+      objects: ["um baú de cartas náuticas lacrado", "a luneta do capitão de um navio perdido", "um sino de bordo com o nome raspado", "uma caixa de instrumentos de navegação", "o diário de bordo de um náufrago"],
+      mementos: ["um anel de noivado amarrado num barbante", "uma carta nunca enviada", "um boneco de pano encharcado", "uma medalha de marinheiro gravada"],
+      clues: ["marcas de lenha arrastada até o rochedo", "cinzas frescas numa noite sem navio", "nomes riscados na parede da gruta", "pegadas que saem do mar e não voltam"],
+      challenges: ["atravessar o recife na maré baixa", "subir o rochedo sem ser visto do farol", "achar água doce antes do anoitecer", "convencer o acampamento a falar"],
+      phenomena: ["uma luz no rochedo que imita um porto", "destroços que chegam à praia toda manhã", "um sino de navio que toca sob a água", "fumaça de fogueira que não se dispersa"]
+    },
+    featured: {
+      category: "rescue",
+      title: "Os últimos do Estrela-d’Alva",
+      targetName: "os sobreviventes do Estrela-d’Alva, escondidos num casco virado",
+      lead: "Resgate os sobreviventes do Estrela-d’Alva, o último navio atraído pela luz falsa, que se esconderam num casco virado",
+      condition: "Chegar ao casco antes do bando, tirar os sobreviventes de lá e levá-los até o barco do grupo",
+      proofType: "Os sobreviventes embarcados e o nome do navio no diário de bordo."
+    },
+    map: {
+      markers: ["water", "wet", "obstacle", "difficult"],
+      landmark: { name: "Casco do Estrela-d’Alva", effect: "O casco virado dá cobertura. Os sobreviventes estão escondidos lá dentro." }
+    }
+  },
+
   volcanic: {
     pools: {
       locations: ["uma praia de cinzas negras", "uma encosta cortada por rios de lava", "o topo de uma encosta de cinzas", "um túnel de lava endurecida"],

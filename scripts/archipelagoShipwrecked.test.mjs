@@ -99,3 +99,24 @@ test("náufragos têm terreno, ecologia e nome do Centro", () => {
   const theme = profile.archipelago.themePools.initial.find(({ id }) => id === "shipwrecked");
   assert.equal(theme.arenaName, "Farol dos Acendedores");
 });
+
+test("expedição nova pode sortear a Ilha dos Náufragos completa", async () => {
+  const { hasIslandSectors } = await import("../src/archipelagoPilot.js");
+  const { getArchipelagoMissionTheme } = await import("../src/missions/archipelagoMissionThemes.js");
+  let found = null;
+  for (let i = 0; i < 200 && !found; i += 1) {
+    const seed = `naufragos-${i}`;
+    const { islands } = createArchipelagoState(profile, createRng(seed)).getSnapshot();
+    const hit = islands.find(item => item.themeId === "shipwrecked");
+    if (hit) found = { seed, hit };
+  }
+  assert.ok(found, "nenhuma seed sorteou shipwrecked");
+  const { hit } = found;
+  console.log("SEED", found.seed, "floor", hit.floor);
+  assert.ok(hit.floor >= 21 && hit.floor <= 24);
+  assert.equal(hasIslandSectors(hit), true);
+  assert.equal(hit.objectives.length, 4);
+  assert.equal(new Set(hit.objectives.map(item => item.penaltyId)).size, 4);
+  assert.equal(hit.arenaName, "Farol dos Acendedores");
+  assert.ok(getArchipelagoMissionTheme("shipwrecked"));
+});

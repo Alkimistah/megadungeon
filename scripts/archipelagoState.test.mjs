@@ -103,7 +103,7 @@ test("a emboscada só rola depois da exploração e o descanso aguarda sua concl
 
 test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com pontos de interação", () => {
   const profile = archipelago21to30Profile;
-  const objectiveCounts = { mangrove: [5, 5, 4, 5], tropical: [4, 4, 4, 4], atoll: [4, 4, 4, 4], "coral-coast": [4, 4, 4, 4] };
+  const objectiveCounts = { mangrove: [5, 5, 4, 5], tropical: [4, 4, 4, 4], atoll: [4, 4, 4, 4], "coral-coast": [4, 4, 4, 4], shipwrecked: [4, 4, 4, 4] };
   const islands = createArchipelagoState(profile, createRng("variantes iniciais")).getSnapshot().islands.slice(0, 4);
   for (const island of islands) {
     objectiveCounts[island.themeId].forEach((count, sector) => {
@@ -132,6 +132,16 @@ test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com po
     assert.equal(map.cells[map.landmark.index], "mechanism");
   }
 });
+
+// A fileira inicial tem 5 temas ativos para 4 vagas. Com rolagem fixa, o tema excluído
+// não é previsível, então estes testes usam a fileira sem a Ilha dos Náufragos.
+const archipelagoWithoutShipwrecked = {
+  ...archipelago21to30Profile,
+  archipelago: {
+    ...archipelago21to30Profile.archipelago,
+    enabledThemeIds: archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "shipwrecked")
+  }
+};
 
 test("sessão anterior mantém a terceira composição original do Atol", () => {
   const profile = archipelago21to30Profile;
@@ -198,10 +208,12 @@ test("combates da Tropical respeitam o tipo da cena e mostram seus mecanismos no
   const profile = archipelago21to30Profile;
   const expected = { N: "Comporta", S: "Contrapeso de jade", L: "Pedestal do alarme", O: "Roda de trava" };
   const seen = new Set();
-  for (let roll = 0; roll < 24; roll += 1) {
+  for (let roll = 0, visited = 0; visited < 24; roll += 1) {
     const seed = `cenas tropicais ${roll}`;
     const state = createArchipelagoState(profile, createRng(seed));
     const getIsland = () => state.getSnapshot().islands.find(item => item.themeId === "tropical");
+    if (!getIsland()) continue;
+    visited += 1;
     const { floor, objectives } = getIsland();
     assert.ok(state.exploreIsland(floor, { mapSeed: seed }));
     for (const objective of objectives.filter(item => item.type === "combate")) {
@@ -247,7 +259,7 @@ test("a Costa do Coral restaura as quatro cenas e tem três composições de com
 });
 
 test("o Atol conclui a expedição com os três guardiões ND 8 possíveis", () => {
-  const profile = archipelago21to30Profile;
+  const profile = archipelagoWithoutShipwrecked;
   const guards = [[0, "agua-viva-gigante"], [0.5, "capitao-do-conclave-pirata"], [0.99, "selako-tigre"]];
   for (const [roll, creatureId] of guards) {
     const rng = () => roll;
@@ -277,6 +289,7 @@ test("os setores sorteiam penalidades distintas do conjunto de 16 e o código de
   for (let seed = 0; seed < 512; seed += 1) {
     const state = createArchipelagoState(profile, createRng(`penalidades-${seed}`));
     const getTropical = () => state.getSnapshot().islands.find(island => island.themeId === "tropical");
+    if (!getTropical()) continue;
     const ids = getTropical().objectives.map(item => item.penaltyId);
     assert.equal(new Set(ids).size, 4);
     ids.forEach((id, index) => idsSeenBySector[index].add(id));
@@ -288,11 +301,22 @@ test("os setores sorteiam penalidades distintas do conjunto de 16 e o código de
   for (const ids of idsSeenBySector) assert.equal(ids.size, 16);
 });
 
-test("expedições novas sorteiam posições apenas entre os dez temas da primeira versão", () => {
-  const expected = ["tropical", "mangrove", "atoll", "coral-coast", "volcanic", "sea-caves", "pirate-held", "floating", "storm", "dinosaurs"];
+test("expedições novas sorteiam posições apenas entre os onze temas ativos", () => {
+  const { enabledThemeIds, themePools } = archipelago21to30Profile.archipelago;
+  assert.equal(enabledThemeIds.length, 11);
+  assert.ok(enabledThemeIds.includes("shipwrecked"));
+  const activeByRow = Object.fromEntries(Object.entries(themePools).map(([row, themes]) => [
+    row, themes.map(theme => theme.id).filter(id => enabledThemeIds.includes(id))
+  ]));
+  const { islandDifficultyByFloor } = archipelago21to30Profile.archipelago;
+  const rowOf = floor => islandDifficultyByFloor[floor];
   for (const seed of ["primeira", "segunda", "terceira"]) {
     const { islands } = createArchipelagoState(archipelago21to30Profile, createRng(seed)).getSnapshot();
-    assert.deepEqual(islands.map(island => island.themeId).sort(), [...expected].sort());
+    const ids = islands.map(island => island.themeId);
+    assert.equal(new Set(ids).size, ids.length);
+    for (const island of islands) {
+      assert.ok(activeByRow[rowOf(island.floor)].includes(island.themeId), `${seed}: ${island.themeId} no andar ${island.floor}`);
+    }
     assert.equal(islands.find(island => island.floor === 30).themeId, "dinosaurs");
   }
 });
@@ -344,7 +368,7 @@ function setupPilot() {
 }
 
 test("a Ilha Tropical sorteia três guardiões ND 8 e preserva os setores e a escolha na sessão", () => {
-  const profile = archipelago21to30Profile;
+  const profile = archipelagoWithoutShipwrecked;
   for (const [roll, name] of [[0, "Sentinela do Sol"], [0.5, "Defensor do Templo"], [0.99, "Serpe do Disco Solar"]]) {
     const rng = () => roll;
     const state = createArchipelagoState(profile, rng);
