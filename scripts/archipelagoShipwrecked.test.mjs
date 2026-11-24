@@ -191,3 +191,29 @@ test("o acampamento tem dois combates", () => {
   }
   assert.deepEqual(titles, ["Romper o cerco às barracas", "Libertar os cativos da paliçada"]);
 });
+
+const lensRule = "Lente do farol: uma personagem adjacente à lente pode gastar uma ação padrão para apontar o facho para a aparição, se ela estiver em linha de visão. Até o fim do próximo turno da aparição, ela conta como exposta à luz do dia e fica debilitada (Vulnerabilidade à Luz do Dia). A ação pode ser repetida nas rodadas seguintes.";
+
+function fullIsland(base) {
+  const objectives = [0, 1, 2, 3].map(sector => createIslandSector(base, sector, 0, 22));
+  return { ...base, baseChallenge: 8, objectives, outcomes: Object.fromEntries(objectives.map(({ id }) => [id, "failure"])) };
+}
+
+test("só o Primeiro Náufrago traz a regra da lente", () => {
+  const full = fullIsland(island);
+  const first = createIslandGuardian(full, "primeiro-naufrago", profile, "centro");
+  assert.equal(first.rule, lensRule);
+  assert.ok(first.briefing.startsWith("O céu está encoberto"));
+  for (const id of ["ultimo-legionario", "senhor-dos-acendedores"]) {
+    assert.equal(createIslandGuardian(full, id, profile, "centro").rule, undefined, id);
+  }
+  const atoll = fullIsland({ floor: 21, themeId: "atoll" });
+  assert.equal(createIslandGuardian(atoll, 0, profile, "centro").rule, undefined);
+});
+
+test("guardião salvo sem regra continua igual", () => {
+  // O renderer depende de DOM; aqui só se garante que a cena não carrega a chave quando não há regra.
+  const scene = createIslandGuardian(fullIsland(island), "ultimo-legionario", profile, "centro");
+  assert.equal("rule" in scene, false);
+  assert.ok(!JSON.stringify(scene).includes('"rule"'));
+});

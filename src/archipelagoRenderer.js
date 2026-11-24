@@ -629,6 +629,12 @@ export function createArchipelagoRenderer({
       introduction.textContent = scene.briefing;
       detail.appendChild(introduction);
     }
+    if (scene?.rule) {
+      const rule = document.createElement("p");
+      rule.className = "archipelago-encounter-briefing archipelago-guardian-rule";
+      rule.textContent = scene.rule;
+      detail.appendChild(rule);
+    }
     if (island.floor !== 30 || guardian.effects.length || guardian.buffs.length) {
       renderGuardianEffects(detail, island, scene);
     }

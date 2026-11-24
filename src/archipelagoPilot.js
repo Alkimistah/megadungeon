@@ -328,6 +328,7 @@ export function createIslandGuardian(island, selection, profile, mapSeed) {
       objectives: [{ id: `${island.floor}-centro`, type: "combate", challenge: island.baseChallenge }]
     }, profile, mapSeed, composition);
   if (composition.briefing) scene.briefing = composition.briefing;
+  if (composition.rule) scene.rule = composition.rule;
   const leader = scene.resolvedEncounter.items[0];
   scene.bossCreatureId ??= leader.creatureId;
   const creature = leader.creatureData ?? getCreatureById(leader.creatureId);
