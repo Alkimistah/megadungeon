@@ -62,3 +62,97 @@
 .tactical-cell.shore-right::before { border-right-width: 2px; }
 .tactical-cell.shore-bottom::before { border-bottom-width: 2px; }
 .tactical-cell.shore-left::before { border-left-width: 2px; }
+
+/* Terrenos agrupados: miolo liso e contorno único (autotile). O atlas fica por baixo só na porta. */
+.tactical-cell.tactical-sprite.is-auto { background-image: none; box-shadow: none; }
+.tactical-cell.tactical-sprite.is-auto::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background-image: var(--e-bottom, none), var(--e-top, none), var(--e-left, none), var(--e-right, none);
+}
+
+/* Vantagem/elevação */
+.tactical-cell.tactical-sprite.is-auto.is-advantage { background-color: #ccb072;
+    background-image: radial-gradient(circle at 30% 35%, #dcc383 0 7%, transparent 8%), radial-gradient(circle at 72% 70%, #bfa266 0 6%, transparent 7%); }
+.tactical-cell.tactical-sprite.is-auto.is-advantage.edge-bottom { --e-bottom: linear-gradient(to top, #6e4d31 0 6%, #87613e 6% 30%, transparent 30%); }
+.tactical-cell.tactical-sprite.is-auto.is-advantage.edge-top { --e-top: linear-gradient(to bottom, #f1d38b 0 12%, transparent 12%); }
+.tactical-cell.tactical-sprite.is-auto.is-advantage.edge-left { --e-left: linear-gradient(to right, #b0925c 0 10%, transparent 10%); }
+.tactical-cell.tactical-sprite.is-auto.is-advantage.edge-right { --e-right: linear-gradient(to left, #9c7d4b 0 12%, transparent 12%); }
+  /* Inclinação */
+.tactical-cell.tactical-sprite.is-auto.is-slope { background-color: #b08e58; background-image: repeating-linear-gradient(to bottom, transparent 0 38%, #8c6a40 38% 46%, transparent 46% 50%); }
+.tactical-cell.tactical-sprite.is-auto.is-slope.edge-bottom { --e-bottom: linear-gradient(to top, #775538 0 12%, transparent 12%); }
+.tactical-cell.tactical-sprite.is-auto.is-slope.edge-top { --e-top: linear-gradient(to bottom, #c6a76e 0 10%, transparent 10%); }
+.tactical-cell.tactical-sprite.is-auto.is-slope.edge-left { --e-left: linear-gradient(to right, #9a7a4b 0 8%, transparent 8%); }
+.tactical-cell.tactical-sprite.is-auto.is-slope.edge-right { --e-right: linear-gradient(to left, #8f6f43 0 8%, transparent 8%); }
+.tactical-cell.tactical-sprite.is-auto.is-gentle-slope { background-color: #bca46b; background-image: linear-gradient(to bottom, transparent 0 46%, #a68d58 46% 54%, transparent 54%); }
+.tactical-cell.tactical-sprite.is-auto.is-gentle-slope.edge-bottom { --e-bottom: linear-gradient(to top, #8e7748 0 10%, transparent 10%); }
+.tactical-cell.tactical-sprite.is-auto.is-gentle-slope.edge-top { --e-top: linear-gradient(to bottom, #d3bd84 0 8%, transparent 8%); }
+.tactical-cell.tactical-sprite.is-auto.is-gentle-slope.edge-left { --e-left: linear-gradient(to right, #ad9560 0 8%, transparent 8%); }
+.tactical-cell.tactical-sprite.is-auto.is-gentle-slope.edge-right { --e-right: linear-gradient(to left, #a08a57 0 8%, transparent 8%); }
+.tactical-cell.tactical-sprite.is-auto.is-steep-slope { background-color: #a5785a; background-image: repeating-linear-gradient(to bottom, transparent 0 22%, #6f4a35 22% 30%, transparent 30% 33.333%); }
+.tactical-cell.tactical-sprite.is-auto.is-steep-slope.edge-bottom { --e-bottom: linear-gradient(to top, #4f3427 0 16%, transparent 16%); }
+.tactical-cell.tactical-sprite.is-auto.is-steep-slope.edge-top { --e-top: linear-gradient(to bottom, #c99a76 0 10%, transparent 10%); }
+.tactical-cell.tactical-sprite.is-auto.is-steep-slope.edge-left { --e-left: linear-gradient(to right, #8a6249 0 8%, transparent 8%); }
+.tactical-cell.tactical-sprite.is-auto.is-steep-slope.edge-right { --e-right: linear-gradient(to left, #7c5641 0 8%, transparent 8%); }
+
+  /* Buraco: fundo escuro único; borda de terra em volta; parede interna visível no lado de cima */
+.tactical-cell.tactical-sprite.is-auto.is-pit { background-color: #1d191b; background-image: radial-gradient(circle at 50% 55%, #141113 0 40%, transparent 70%); }
+.tactical-cell.tactical-sprite.is-auto.is-pit.edge-top { --e-top: linear-gradient(to bottom, #a1845a 0 10%, #6b573e 10% 34%, #3a2f27 34% 42%, transparent 42%); }
+.tactical-cell.tactical-sprite.is-auto.is-pit.edge-bottom { --e-bottom: linear-gradient(to top, #a1845a 0 12%, transparent 12%); }
+.tactical-cell.tactical-sprite.is-auto.is-pit.edge-left { --e-left: linear-gradient(to right, #8f7650 0 10%, #4a3d30 10% 16%, transparent 16%); }
+.tactical-cell.tactical-sprite.is-auto.is-pit.edge-right { --e-right: linear-gradient(to left, #8f7650 0 10%, #4a3d30 10% 16%, transparent 16%); }
+  /* Abismo (Ilha Flutuante): vazio azulado, borda de rocha */
+.tactical-cell.tactical-sprite.is-auto.is-abyss { background-color: #2a2836; background-image: radial-gradient(circle at 30% 30%, #4b4a63 0 3%, transparent 4%), radial-gradient(circle at 70% 75%, #3a394f 0 3%, transparent 4%); }
+.tactical-cell.tactical-sprite.is-auto.is-abyss.edge-top { --e-top: linear-gradient(to bottom, #8c7a66 0 10%, #5a4d44 10% 30%, transparent 30%); }
+.tactical-cell.tactical-sprite.is-auto.is-abyss.edge-bottom { --e-bottom: linear-gradient(to top, #8c7a66 0 10%, transparent 10%); }
+.tactical-cell.tactical-sprite.is-auto.is-abyss.edge-left { --e-left: linear-gradient(to right, #7b6b5a 0 10%, transparent 10%); }
+.tactical-cell.tactical-sprite.is-auto.is-abyss.edge-right { --e-right: linear-gradient(to left, #7b6b5a 0 10%, transparent 10%); }
+  /* Fosso/trincheira: canaleta de terra com sombra no lado de cima */
+.tactical-cell.tactical-sprite.is-auto.is-trench { background-color: #7f5f42; background-image: repeating-linear-gradient(to right, transparent 0 46%, #6c4f37 46% 54%, transparent 54% 100%); }
+.tactical-cell.tactical-sprite.is-auto.is-trench.edge-top { --e-top: linear-gradient(to bottom, #c8a171 0 10%, #4f3a2a 10% 30%, transparent 30%); }
+.tactical-cell.tactical-sprite.is-auto.is-trench.edge-bottom { --e-bottom: linear-gradient(to top, #c8a171 0 12%, transparent 12%); }
+.tactical-cell.tactical-sprite.is-auto.is-trench.edge-left { --e-left: linear-gradient(to right, #b48f62 0 10%, transparent 10%); }
+.tactical-cell.tactical-sprite.is-auto.is-trench.edge-right { --e-right: linear-gradient(to left, #b48f62 0 10%, transparent 10%); }
+  /* Penhasco e paredão: rocha contínua; topo claro, pé escuro */
+.tactical-cell.tactical-sprite.is-auto.is-cliff { background-color: #6e543c; background-image: repeating-linear-gradient(to bottom, transparent 0 30%, #5a4331 30% 36%, transparent 36% 50%); }
+.tactical-cell.tactical-sprite.is-auto.is-cliff.edge-top { --e-top: linear-gradient(to bottom, #d1ac77 0 14%, #997851 14% 26%, transparent 26%); }
+.tactical-cell.tactical-sprite.is-auto.is-cliff.edge-bottom { --e-bottom: linear-gradient(to top, #2f241d 0 16%, transparent 16%); }
+.tactical-cell.tactical-sprite.is-auto.is-cliff.edge-left { --e-left: linear-gradient(to right, #826549 0 10%, transparent 10%); }
+.tactical-cell.tactical-sprite.is-auto.is-cliff.edge-right { --e-right: linear-gradient(to left, #59432f 0 10%, transparent 10%); }
+.tactical-cell.tactical-sprite.is-auto.is-escarpment { background-color: #5e4a3c; background-image: repeating-linear-gradient(to right, transparent 0 30%, #4b3a2e 30% 40%, transparent 40% 50%); }
+.tactical-cell.tactical-sprite.is-auto.is-escarpment.edge-top { --e-top: linear-gradient(to bottom, #c9a774 0 14%, #8b6d50 14% 24%, transparent 24%); }
+.tactical-cell.tactical-sprite.is-auto.is-escarpment.edge-bottom { --e-bottom: linear-gradient(to top, #2b211b 0 16%, transparent 16%); }
+.tactical-cell.tactical-sprite.is-auto.is-escarpment.edge-left { --e-left: linear-gradient(to right, #75604d 0 10%, transparent 10%); }
+.tactical-cell.tactical-sprite.is-auto.is-escarpment.edge-right { --e-right: linear-gradient(to left, #4a3a2e 0 10%, transparent 10%); }
+  /* Toldo/tenda: lona listrada contínua, moldura escura só no contorno */
+.tactical-cell.tactical-sprite.is-auto.is-canopy { background-color: #c1947a; background-image: repeating-linear-gradient(to right, #d7a98a 0 25%, #8f5f4c 25% 50%); }
+.tactical-cell.tactical-sprite.is-auto.is-canopy.edge-top { --e-top: linear-gradient(to bottom, #5c4548 0 12%, #e0b59a 12% 18%, transparent 18%); }
+.tactical-cell.tactical-sprite.is-auto.is-canopy.edge-bottom { --e-bottom: linear-gradient(to top, #3f2f31 0 10%, #5c4548 10% 22%, transparent 22%); }
+.tactical-cell.tactical-sprite.is-auto.is-canopy.edge-left { --e-left: linear-gradient(to right, #5c4548 0 12%, transparent 12%); }
+.tactical-cell.tactical-sprite.is-auto.is-canopy.edge-right { --e-right: linear-gradient(to left, #5c4548 0 12%, transparent 12%); }
+
+
+/* Porta desenhada sobre o chão, deitada ou em pé conforme as paredes vizinhas. */
+.tactical-cell.tactical-sprite.is-door.is-auto {
+  --tactical-sprite-x: 0%;
+  background-color: var(--tactical-floor, #b9b0a1);
+  background-image: url("/assets/tactical-terrain.png");
+  background-position: 0% 0;
+  background-size: 4100% 100%;
+}
+.tactical-cell.tactical-sprite.is-door.is-auto::after { background-image: none; }
+.tactical-cell.tactical-sprite.is-door.is-auto::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  background: linear-gradient(var(--door-dir, to right), #7c6651 0 22%, #5c4a3b 22% 26%, #8a735b 26% 48%, #5c4a3b 48% 52%, #7c6651 52% 74%, #5c4a3b 74% 78%, #8a735b 78% 100%);
+  box-shadow: 0 0 0 2px #403129;
+}
+.tactical-cell.tactical-sprite.is-door.is-auto.door-h::before { inset: 24% 4%; --door-dir: to right; }
+.tactical-cell.tactical-sprite.is-door.is-auto.door-v::before { inset: 4% 24%; --door-dir: to bottom; }
+.tactical-cell.tactical-sprite.is-door.is-auto.door-h.join-left::before { left: -1px; }
+.tactical-cell.tactical-sprite.is-door.is-auto.door-h.join-right::before { right: -1px; }
+.tactical-cell.tactical-sprite.is-door.is-auto.door-v.join-top::before { top: -1px; }
+.tactical-cell.tactical-sprite.is-door.is-auto.door-v.join-bottom::before { bottom: -1px; }

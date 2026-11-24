@@ -59,3 +59,42 @@ export const TACTICAL_MARKER_GLYPHS = {
   hidden: "?",
   mechanism: "M"
 };
+
+export const TERRAIN_AUTOTILE_JOINS = {
+  advantage: ["advantage", "slope", "gentle-slope", "steep-slope"],
+  slope: ["slope", "advantage"],
+  "gentle-slope": ["gentle-slope", "advantage"],
+  "steep-slope": ["steep-slope", "advantage"],
+  pit: ["pit"],
+  abyss: ["abyss"],
+  trench: ["trench"],
+  cliff: ["cliff", "escarpment"],
+  escarpment: ["escarpment", "cliff"],
+  canopy: ["canopy"]
+};
+
+export function getTerrainTileClasses(terrain, width, index) {
+  const type = terrain[index];
+  const isAuto = type in TERRAIN_AUTOTILE_JOINS;
+  if (!isAuto && type !== "door") return [];
+  const x = index % width;
+  const neighbors = {
+    top: index >= width ? terrain[index - width] : null,
+    right: x < width - 1 ? terrain[index + 1] : null,
+    bottom: terrain[index + width] ?? null,
+    left: x > 0 ? terrain[index - 1] : null
+  };
+  const classes = ["is-auto"];
+  if (isAuto) {
+    const joins = TERRAIN_AUTOTILE_JOINS[type];
+    for (const [side, other] of Object.entries(neighbors)) {
+      if (!other || !joins.includes(other)) classes.push(`edge-${side}`);
+    }
+    return classes;
+  }
+  const solid = (t) => t === "wall" || t === "door";
+  const vertical = (solid(neighbors.top) || solid(neighbors.bottom)) && neighbors.left !== "wall" && neighbors.right !== "wall";
+  classes.push(vertical ? "door-v" : "door-h");
+  for (const [side, other] of Object.entries(neighbors)) if (other === "door") classes.push(`join-${side}`);
+  return classes;
+}

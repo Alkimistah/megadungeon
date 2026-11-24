@@ -3,7 +3,8 @@ import {
   TACTICAL_FEATURE_LABELS,
   TACTICAL_MARKER_GLYPHS,
   TACTICAL_MARKER_LABELS,
-  TACTICAL_TERRAIN_LABELS
+  TACTICAL_TERRAIN_LABELS,
+  getTerrainTileClasses
 } from "./tacticalTerrain.js";
 
 const PIECE_LABELS = { party: "Grupo", boss: "Chefe", enemy: "Inimigo", extra: "Peça temporária" };
@@ -146,6 +147,7 @@ function renderTacticalGrid(scene, state, updateLegend, updateControls) {
   const tiles = scene.terrain.map((type, index) => {
     const tile = createElement("span", `tactical-cell tactical-sprite is-${type}`);
     tile.title = TACTICAL_TERRAIN_LABELS[type] || type;
+    tile.classList.add(...getTerrainTileClasses(scene.terrain, scene.width, index));
     if (WATER_TILES.has(type)) {
       const x = index % scene.width;
       const neighbors = {
