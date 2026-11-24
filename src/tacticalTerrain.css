@@ -74,6 +74,23 @@
   background-image: var(--e-bottom, none), var(--e-top, none), var(--e-left, none), var(--e-right, none);
 }
 
+/* Elemento sobre a base (platô): o sprite do item fica no ::before, sobre o fundo da base. */
+.tactical-cell.tactical-sprite.has-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("/assets/tactical-terrain.png");
+  background-repeat: no-repeat;
+  background-size: 4100% 100%;
+  background-position: var(--item-x) 0;
+  image-rendering: pixelated;
+}
+.tactical-cell.tactical-sprite.item-obstacle { --item-x: 85%; }
+.tactical-cell.tactical-sprite.item-difficult { --item-x: 90%; }
+.tactical-cell.tactical-sprite.item-tree { --item-x: 82.5%; }
+.tactical-cell.tactical-sprite.item-foliage { --item-x: 87.5%; }
+
 /* Vantagem/elevação */
 .tactical-cell.tactical-sprite.is-auto.is-advantage { background-color: #ccb072;
     background-image: radial-gradient(circle at 30% 35%, #dcc383 0 7%, transparent 8%), radial-gradient(circle at 72% 70%, #bfa266 0 6%, transparent 7%); }

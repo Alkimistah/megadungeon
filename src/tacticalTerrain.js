@@ -60,6 +60,9 @@ export const TACTICAL_MARKER_GLYPHS = {
   mechanism: "M"
 };
 
+export const TERRAIN_ITEM_TYPES = ["obstacle", "difficult", "tree", "foliage"];
+export const TERRAIN_BASE_TYPES = ["advantage", "slope", "gentle-slope", "steep-slope"];
+
 export const TERRAIN_AUTOTILE_JOINS = {
   advantage: ["advantage", "slope", "gentle-slope", "steep-slope"],
   slope: ["slope", "advantage"],
@@ -89,11 +92,26 @@ export function getFeatureAutotileClasses(type, indices, width, index) {
   return joins.includes(type) ? classes : [];
 }
 
-export function getTerrainTileClasses(terrain, width, index) {
-  const type = terrain[index];
+export function getTerrainTileClasses(terrain, width, index, terrainBase = null) {
+  const look = (i) => terrainBase?.[i] ?? terrain[i];
+  const type = look(index);
   const isAuto = type in TERRAIN_AUTOTILE_JOINS;
   if (!isAuto && type !== "door") return [];
   const x = index % width;
+  if (isAuto) {
+    const neighbors = {
+      top: index >= width ? look(index - width) : null,
+      right: x < width - 1 ? look(index + 1) : null,
+      bottom: look(index + width) ?? null,
+      left: x > 0 ? look(index - 1) : null
+    };
+    const classes = ["is-auto"];
+    const joins = TERRAIN_AUTOTILE_JOINS[type];
+    for (const [side, other] of Object.entries(neighbors)) {
+      if (!other || !joins.includes(other)) classes.push(`edge-${side}`);
+    }
+    return classes;
+  }
   const neighbors = {
     top: index >= width ? terrain[index - width] : null,
     right: x < width - 1 ? terrain[index + 1] : null,
@@ -101,13 +119,6 @@ export function getTerrainTileClasses(terrain, width, index) {
     left: x > 0 ? terrain[index - 1] : null
   };
   const classes = ["is-auto"];
-  if (isAuto) {
-    const joins = TERRAIN_AUTOTILE_JOINS[type];
-    for (const [side, other] of Object.entries(neighbors)) {
-      if (!other || !joins.includes(other)) classes.push(`edge-${side}`);
-    }
-    return classes;
-  }
   const solid = (t) => t === "wall" || t === "door";
   const vertical = (solid(neighbors.top) || solid(neighbors.bottom)) && neighbors.left !== "wall" && neighbors.right !== "wall";
   classes.push(vertical ? "door-v" : "door-h");

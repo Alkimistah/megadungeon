@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { createTacticalScene, getTacticalFootprint, readLegacyTacticalScene } from "../src/tacticalScene.js";
+import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
 import { TACTICAL_FEATURE_LABELS, TACTICAL_TERRAIN_LABELS, getTerrainTileClasses } from "../src/tacticalTerrain.js";
 
 test("keeps water beneath a piece, two effects and a location marker", () => {
@@ -118,4 +119,46 @@ test("porta fica deitada ou em pé conforme as paredes", () => {
   assert.ok(lower.includes("door-v") && lower.includes("join-top") && !lower.includes("join-bottom"));
   const lone = getTerrainTileClasses(["floor", "door", "floor"], 3, 1);
   assert.ok(lone.includes("door-h") && !lone.some((c) => c.startsWith("join-")));
+});
+
+function mapWithZones(zones) {
+  const node = {
+    id: "plateau",
+    resolvedEncounter: { seed: "s", items: [{ kind: "creature", creatureId: "afogado", name: "Afogado", quantity: 1 }] },
+    tacticalLayout: { landmark: { name: "Marco", effect: "x", x: 0, y: 0 },
+      zones: zones.map(([tile, x, y, width, height]) => ({ tile, x, y, width, height })) },
+    environment: { terrain: { name: "Costa", features: [] }, climate: [] }
+  };
+  return createNodeTacticalMap(node).scene;
+}
+
+test("elemento sobre o platô guarda a base", () => {
+  const plateau = [["advantage", 2, 2, 5, 4]];
+  const scene = mapWithZones([...plateau, ["obstacle", 4, 3, 1, 1], ["difficult", 10, 10, 2, 2]]);
+  const k = 3 * 20 + 4;
+  assert.equal(scene.terrain[k], "obstacle");
+  assert.equal(scene.terrainBase[k], "advantage");
+  assert.equal(scene.terrainBase[10 * 20 + 10], null);
+  const wet = mapWithZones([...plateau, ["obstacle", 4, 3, 1, 1], ["water", 4, 3, 1, 1]]);
+  assert.equal(wet.terrain[k], "water");
+  assert.equal(wet.terrainBase?.[k] ?? null, null);
+});
+
+test("contorno ignora o elemento sobre a base", () => {
+  const width = 5;
+  const terrain = Array(width * 4).fill("floor");
+  for (let y = 1; y <= 2; y++) for (let x = 1; x <= 3; x++) terrain[y * width + x] = "advantage";
+  const mid = 1 * width + 2;
+  terrain[mid] = "obstacle";
+  const base = Array(width * 4).fill(null);
+  base[mid] = "advantage";
+  const edges = (i, b) => getTerrainTileClasses(terrain, width, i, b).filter((c) => c.startsWith("edge-"));
+  assert.ok(!edges(mid + 1, base).includes("edge-left"));
+  assert.ok(!edges(mid - 1, base).includes("edge-right"));
+  assert.ok(!edges(mid + width, base).includes("edge-top"));
+  const own = getTerrainTileClasses(terrain, width, mid, base);
+  assert.ok(own.includes("is-auto") && own.includes("edge-top"));
+  assert.ok(!own.includes("edge-left") && !own.includes("edge-bottom"));
+  assert.ok(edges(mid + 1).includes("edge-left"), "sem base, como antes");
+  assert.deepEqual(getTerrainTileClasses(terrain, width, mid), []);
 });

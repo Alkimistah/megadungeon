@@ -9,11 +9,12 @@ function copyLocation(entry) {
   return entry.indices ? { ...entry, indices: [...entry.indices] } : { ...entry };
 }
 
-export function createTacticalScene({ width, height, terrain, features = [], markers = [], pieces = [], climate = [] }) {
+export function createTacticalScene({ width, height, terrain, terrainBase = null, features = [], markers = [], pieces = [], climate = [] }) {
   return {
     width,
     height,
     terrain: [...terrain],
+    ...(terrainBase?.some(Boolean) ? { terrainBase: [...terrainBase] } : {}),
     features: features.map(copyLocation),
     markers: markers.map(copyLocation),
     pieces: pieces.map((piece) => ({ ...piece })),

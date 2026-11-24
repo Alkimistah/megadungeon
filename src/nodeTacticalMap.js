@@ -1,6 +1,7 @@
 import { createForestTacticalLayout } from "./forestTacticalLayouts.js";
 import { getForestTrapPresentation } from "./forestTrapPresentation.js";
 import { createRng, randomInt } from "./random.js";
+import { TERRAIN_BASE_TYPES, TERRAIN_ITEM_TYPES } from "./tacticalTerrain.js";
 import { createTacticalScene, readLegacyTacticalScene } from "./tacticalScene.js";
 import { getTacticalEncounterUnits, getTacticalPartyPieces, placeTacticalEncounterUnits } from "./tacticalScenePieces.js";
 
@@ -405,6 +406,13 @@ function addLayer(layers, type, indices, label, id) {
 
 function buildEnvironmentScene(cells, node, layout, features) {
   const terrain = cells.flat().map(() => "floor");
+  const terrainBase = terrain.map(() => null);
+  const paint = (index, type) => {
+    const previous = terrain[index];
+    terrainBase[index] = TERRAIN_ITEM_TYPES.includes(type) && (terrainBase[index] || TERRAIN_BASE_TYPES.includes(previous))
+      ? terrainBase[index] ?? previous : null;
+    terrain[index] = type;
+  };
   const markers = [];
   const definitions = node.environment?.terrain?.features || [];
   const submersion = definitions.find(feature =>
@@ -425,10 +433,10 @@ function buildEnvironmentScene(cells, node, layout, features) {
     } else if (FEATURE_TILES[tile] || featureType) {
       addLayer(features, featureType ?? tile, indices, label, id);
       if (tile === "current" || terrainType !== tile) {
-        for (const index of indices) terrain[index] = terrainType === "current" ? "deep-water" : terrainType;
+        for (const index of indices) paint(index, terrainType === "current" ? "deep-water" : terrainType);
       }
     } else {
-      for (const index of indices) terrain[index] = terrainType;
+      for (const index of indices) paint(index, terrainType);
       if (layout && (tile === "floor" || tile === "deck")) {
         const replaced = new Set(indices);
         for (const feature of features) feature.indices = feature.indices.filter(index => !replaced.has(index));
@@ -449,7 +457,7 @@ function buildEnvironmentScene(cells, node, layout, features) {
     if (!tile) continue;
     if (!FEATURE_TILES[tile]) {
       for (const index of indices) {
-        terrain[index] = tile;
+        paint(index, tile);
         if (submersion && !submersion.area && ["floor", "deck", "clearing", "water"].includes(tile)) {
           flooded.delete(index);
         }
@@ -465,6 +473,7 @@ function buildEnvironmentScene(cells, node, layout, features) {
       if (!submergedFeatures.has(tile)) submergedFeatures.set(tile, []);
       submergedFeatures.get(tile).push(index);
     }
+    terrainBase[index] = null;
     terrain[index] = "deep-water";
   }
   for (const [type, indices] of submergedFeatures) {
@@ -475,7 +484,7 @@ function buildEnvironmentScene(cells, node, layout, features) {
     const { x, y, name, id } = layout.landmark;
     addLayer(markers, "mechanism", [y * WIDTH + x], name, id);
   }
-  return { terrain, features: features.filter(feature => feature.indices.length), markers };
+  return { terrain, terrainBase, features: features.filter(feature => feature.indices.length), markers };
 }
 
 function addChangedLayers(layers, before, cells, types, label) {
@@ -535,7 +544,7 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
   } else {
     applyTerrain(cells, node, rng, terrainFeatures, forestLayout);
   }
-  const { terrain: sceneTerrain, features, markers } = buildEnvironmentScene(cells, node, layout, terrainFeatures);
+  const { terrain: sceneTerrain, terrainBase, features, markers } = buildEnvironmentScene(cells, node, layout, terrainFeatures);
   if (layout?.landmark) cells[layout.landmark.y][layout.landmark.x] = "mechanism";
   applyLegacyClimate(cells, node, rng);
   const fallback = getFreePositions(cells);
@@ -583,7 +592,7 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
   const climate = node.environment?.climate || [];
   return {
     cells: cells.flat(),
-    scene: createTacticalScene({ ...size, terrain: sceneTerrain, features, markers, pieces: [...party, ...enemyPieces], climate }),
+    scene: createTacticalScene({ ...size, terrain: sceneTerrain, terrainBase, features, markers, pieces: [...party, ...enemyPieces], climate }),
     climate: node.environment?.climate || [],
     enemyCount: getEnemyCount(node),
     height: HEIGHT,

@@ -146,9 +146,11 @@ function renderTacticalGrid(scene, state, updateLegend, updateControls) {
   grid.style.setProperty("--tactical-max-width", `${scene.width * 40}px`);
 
   const tiles = scene.terrain.map((type, index) => {
-    const tile = createElement("span", `tactical-cell tactical-sprite is-${type}`);
+    const base = scene.terrainBase?.[index] ?? null;
+    const tile = createElement("span", `tactical-cell tactical-sprite is-${base ?? type}`);
+    if (base) tile.classList.add("has-item", `item-${type}`);
     tile.title = TACTICAL_TERRAIN_LABELS[type] || type;
-    tile.classList.add(...getTerrainTileClasses(scene.terrain, scene.width, index));
+    tile.classList.add(...getTerrainTileClasses(scene.terrain, scene.width, index, scene.terrainBase));
     if (WATER_TILES.has(type)) {
       const x = index % scene.width;
       const neighbors = {

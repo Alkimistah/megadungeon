@@ -7,6 +7,7 @@ import { createRng } from "../src/random.js";
 import { withIslandTacticalLayout } from "../src/archipelagoTacticalMap.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
 import { calculateCombatND } from "../src/challenge.js";
+import { getTerrainTileClasses } from "../src/tacticalTerrain.js";
 import { getCreatureById } from "../src/creatureCatalog/index.js";
 import { getEligibleGuardianPenalties } from "../src/archipelagoGuardianPenalties.js";
 import {
@@ -245,4 +246,19 @@ test("inimigos dos náufragos não começam colados ao ponto de interação", ()
       }
     }
   }
+});
+
+test("entrada do farol tem porta dupla", () => {
+  const guardian = createIslandGuardian(
+    { ...island, baseChallenge: 8, objectives: [0, 1, 2, 3].map(sector => createIslandSector(island, sector, 0, 22)) },
+    0, profile, "centro");
+  const { terrain, width } = createNodeTacticalMap(withIslandTacticalLayout(guardian, "shipwrecked")).scene;
+  const upper = 6 * width + 12;
+  const lower = 7 * width + 12;
+  assert.equal(terrain[upper], "door");
+  assert.equal(terrain[lower], "door");
+  const top = getTerrainTileClasses(terrain, width, upper);
+  const bottom = getTerrainTileClasses(terrain, width, lower);
+  assert.ok(top.includes("door-v") && top.includes("join-bottom"));
+  assert.ok(bottom.includes("door-v") && bottom.includes("join-top"));
 });
