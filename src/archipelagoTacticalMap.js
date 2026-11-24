@@ -246,22 +246,19 @@ const layoutsByTheme = {
       ["water", 15, 0, 5, 14], ["wet", 12, 0, 3, 14], ["obstacle", 9, 3, 3, 2], ["obstacle", 13, 9, 2, 2],
       ["difficult", 6, 6, 5, 3], ["difficult", 10, 11, 3, 2]
     ]),
-    S: layout("Barraca dos feridos", "As barracas dão cobertura. A paliçada fecha o fundo do acampamento.", 12, 6, [
-      ["wall", 17, 1, 1, 9], ["obstacle", 8, 2, 2, 2], ["obstacle", 13, 2, 2, 2], ["obstacle", 8, 9, 2, 2],
-      ["obstacle", 14, 9, 2, 2], ["clearing", 10, 5, 4, 3], ["advantage", 18, 2, 2, 3]
-    ]),
-    L: layout("Bacia da nascente", "A água doce se acumula entre as pedras, ao pé da encosta.", 12, 8, [
-      ["water", 11, 5, 4, 3], ["slope", 15, 1, 5, 6], ["tree", 6, 2, 2, 2], ["tree", 17, 10, 2, 2],
-      ["concealment", 6, 9, 4, 3], ["obstacle", 10, 9, 2, 1]
-    ]),
+    S: layout("Porta da barraca dos feridos", "Se um adversário terminar a terceira rodada adjacente à barraca, leva um sobrevivente.", 11, 8, [["clearing", 7, 4, 9, 6], ["wall", 5, 0, 13, 1], ["wall", 18, 0, 1, 6], ["wall", 18, 10, 1, 4], ["difficult", 17, 6, 3, 4], ["obstacle", 6, 2, 2, 2], ["obstacle", 10, 1, 2, 2], ["obstacle", 14, 2, 2, 2], ["obstacle", 5, 6, 2, 2], ["obstacle", 15, 6, 2, 2], ["obstacle", 7, 11, 2, 2], ["obstacle", 12, 11, 2, 2], ["obstacle", 16, 11, 2, 2], ["obstacle", 10, 5, 3, 3]]),
+    L: layout("Margem dos odres", "O único ponto de acesso firme à água. É aqui que se enchem os odres.", 11, 7, [["clearing", 4, 8, 7, 2], ["wall", 13, 0, 7, 2], ["slope", 13, 2, 7, 2], ["water", 15, 2, 1, 2], ["water", 12, 4, 5, 4], ["obstacle", 11, 4, 1, 2], ["obstacle", 17, 5, 1, 2], ["obstacle", 13, 8, 2, 1], ["water", 12, 8, 1, 3], ["water", 11, 11, 1, 3], ["concealment", 17, 8, 3, 3], ["tree", 18, 11, 2, 2], ["tree", 6, 1, 2, 2], ["concealment", 5, 4, 3, 2]]),
     O: layout("Parede das rotas", "As rotas riscadas cobrem o fundo seco da gruta. A água entra pela boca.", 16, 6, [
       ["wall", 0, 0, 20, 1], ["wall", 0, 13, 20, 1], ["wall", 8, 1, 2, 4], ["wall", 8, 10, 2, 3],
       ["water", 4, 4, 5, 6], ["wet", 9, 5, 4, 4], ["advantage", 15, 4, 4, 5]
     ]),
-    center: layout("Fogueira-farol", "A fogueira que imita a luz de um porto queima no alto do rochedo, ao lado do fragmento.", 16, 4, [
-      ["water", 0, 0, 20, 2], ["slope", 8, 4, 4, 6], ["advantage", 12, 2, 7, 6], ["deck", 9, 10, 6, 2],
-      ["obstacle", 14, 8, 2, 2], ["difficult", 4, 6, 4, 3]
-    ])
+    center: layout("Lente do farol", "O espelho de cristal concentra a pouca luz que atravessa as nuvens e a joga sobre o mar.", 15, 6, [["water", 0, 0, 20, 2], ["water", 18, 2, 2, 12], ["advantage", 11, 2, 7, 10], ["deck", 5, 9, 5, 2], ["slope", 9, 7, 3, 3], ["wall", 12, 4, 6, 1], ["wall", 12, 9, 6, 1], ["wall", 17, 5, 1, 4], ["wall", 12, 5, 1, 1], ["wall", 12, 8, 1, 1], ["deck", 13, 5, 4, 4], ["obstacle", 16, 2, 2, 1], ["obstacle", 17, 10, 1, 2], ["obstacle", 11, 3, 1, 1], ["obstacle", 10, 4, 1, 1], ["difficult", 13, 10, 3, 2]]),
+    byTask: {
+      "Conter os afogados da arrebentação": layout("Casco virado", "Os sobreviventes se abrigam sob o casco. Nenhuma criatura pode alcançá-lo.", 10, 6, [["water", 15, 0, 5, 14], ["wet", 12, 0, 3, 14], ["obstacle", 6, 5, 4, 3], ["difficult", 11, 2, 3, 3], ["obstacle", 13, 10, 2, 2], ["difficult", 5, 10, 4, 2]]),
+      "Libertar os cativos da paliçada": layout("Portão da paliçada", "Os cativos estão acorrentados nos postes do lado de dentro.", 12, 6, [["clearing", 12, 3, 6, 7], ["wall", 11, 2, 8, 1], ["wall", 11, 10, 8, 1], ["wall", 18, 3, 1, 7], ["wall", 11, 3, 1, 3], ["wall", 11, 8, 1, 2], ["obstacle", 16, 5, 1, 1], ["obstacle", 16, 8, 1, 1], ["advantage", 17, 3, 1, 2], ["obstacle", 6, 3, 2, 2], ["obstacle", 8, 7, 2, 2], ["difficult", 5, 8, 3, 2]]),
+      "Interceptar a patrulha": layout("Saída da trilha", "Se a criatura escolhida chegar aqui, escapa para o farol.", 18, 1, [["slope", 12, 0, 8, 5], ["clearing", 4, 8, 8, 2], ["clearing", 10, 4, 3, 5], ["clearing", 13, 1, 5, 2], ["tree", 6, 3, 2, 2], ["tree", 15, 8, 2, 2], ["concealment", 14, 5, 3, 2], ["concealment", 8, 11, 4, 2], ["water", 11, 10, 3, 2]]),
+      "Defender a posição avançada": layout("Barricada da boca", "A posição é preparada atrás da barricada, na entrada da gruta.", 10, 7, [["wall", 0, 0, 20, 1], ["wall", 0, 13, 20, 1], ["wall", 12, 1, 2, 4], ["wall", 12, 9, 2, 4], ["obstacle", 11, 6, 1, 2], ["water", 15, 2, 5, 10], ["wet", 13, 5, 2, 4], ["difficult", 4, 3, 4, 3]])
+    }
   },
   "coral-coast": {
     N: layout("Rede presa nos corais", "A rede está enroscada numa crista. Nos baixios, a água cobre os tornozelos.", 14, 6, [
@@ -290,16 +287,15 @@ const landmarksByTask = {
   "Tomar o pátio submerso": ["Pedestal da passagem", "O pedestal destrava a passagem para o santuário."],
   "Manter a ancoragem": ["Ancoragem da descida", "A linha está presa à borda da parede e precisa ser firmada antes que a corrente a solte."],
   "Defender o sino de mergulho": ["Sino de mergulho", "O sino está preso a uma roldana na borda do poço."],
-  "Conter os afogados da arrebentação": ["Casco virado", "Os sobreviventes se abrigam sob o casco. Nenhuma criatura pode alcançá-lo."],
-  "Libertar os cativos da paliçada": ["Portão da paliçada", "Os cativos estão acorrentados do lado de dentro do portão."],
-  "Desviar o cano do farol": ["Junta do cano", "A junta de bambu leva a água da nascente até o farol."],
   "Proteger o cartógrafo": ["Cartógrafo", "O velho cartógrafo trabalha junto à parede riscada."]
 };
 
 export function withIslandTacticalLayout(scene, themeId, objective) {
-  const base = layoutsByTheme[themeId]?.[objective?.direction ?? "center"];
+  const theme = layoutsByTheme[themeId];
+  const byTask = theme?.byTask?.[objective?.title];
+  const base = byTask ?? theme?.[objective?.direction ?? "center"];
   if (!scene || !base) return scene;
-  const taskLandmark = landmarksByTask[objective?.title];
+  const taskLandmark = byTask ? null : landmarksByTask[objective?.title];
   const landmark = {
     ...base.landmark,
     id: `${themeId}:${objective?.direction ?? "center"}:landmark`,

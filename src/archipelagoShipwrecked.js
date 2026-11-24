@@ -20,7 +20,7 @@ export const shipwreckedExploration = {
       tasks: [
         ["Ganhar a confiança dos sobreviventes", "exploração", "Obtenha 3 sucessos antes de 2 falhas. Ouça o porta-voz com Diplomacia, perceba quem mente sobre os Acendedores com Intuição e trate os feridos com Cura. Cada etapa exige um sucesso. Na segunda falha, os sobreviventes se fecham e escondem o que sabem."],
         ["Romper o cerco às barracas", "combate", "Os Acendedores cercam o acampamento para levar os sobreviventes. Vença o combate. Se ao fim da terceira rodada houver um adversário adjacente à barraca dos feridos, ele leva um sobrevivente. Registre sucesso apenas se ninguém for levado.", "humanoid"],
-        ["Libertar os cativos da paliçada", "infiltração", "Obtenha 2 sucessos antes de 2 falhas. Passe pelos vigias com Furtividade ou Enganação e abra as correntes com Ladinagem. Na segunda falha, os vigias dão o alarme e os cativos são levados para o farol."]
+        ["Libertar os cativos da paliçada", "combate", "Os vigias da paliçada guardam os cativos acorrentados. Vença o combate e, até o fim da quarta rodada, uma personagem adjacente ao portão gasta uma ação padrão em duas rodadas diferentes para soltar as correntes. Registre sucesso se o grupo vencer e soltar os cativos.", "humanoid"]
       ]
     },
     {

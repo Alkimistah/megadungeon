@@ -131,3 +131,63 @@ test("a origem das criaturas compartilhadas não passa para os náufragos", () =
     assert.equal(getCreatureOriginThemeId(id), "mangrove", id);
   }
 });
+
+const combatLandmarks = {
+  "Afastar os carniceiros da praia": "Bote de resgate",
+  "Conter os afogados da arrebentação": "Casco virado",
+  "Romper o cerco às barracas": "Porta da barraca dos feridos",
+  "Libertar os cativos da paliçada": "Portão da paliçada",
+  "Disputar a bacia": "Margem dos odres",
+  "Interceptar a patrulha": "Saída da trilha",
+  "Proteger o cartógrafo": "Cartógrafo",
+  "Defender a posição avançada": "Barricada da boca"
+};
+
+function shipwreckedCombatMap(sector, variant) {
+  const objective = createIslandSector(island, sector, variant, 22);
+  if (objective.type !== "combate") return null;
+  const scene = createIslandSectorCombat({ ...island, objectives: [objective] }, objective, profile, `${sector}:${variant}:a`);
+  const withLayout = withIslandTacticalLayout(scene, "shipwrecked", objective);
+  return { objective, withLayout, map: createNodeTacticalMap(withLayout) };
+}
+
+test("cada combate dos náufragos abre a planta da própria cena", () => {
+  const seen = new Set();
+  for (let sector = 0; sector < 4; sector += 1) {
+    const zonesInSector = [];
+    for (let variant = 0; variant < 4; variant += 1) {
+      const result = shipwreckedCombatMap(sector, variant);
+      if (!result) continue;
+      const { objective, withLayout, map } = result;
+      seen.add(objective.title);
+      assert.equal(map.cells[map.landmark.index], "mechanism", objective.title);
+      assert.equal(withLayout.tacticalLayout.landmark.name, combatLandmarks[objective.title], objective.title);
+      assert.ok(withLayout.environment.terrain.features.some(feature => feature.name === combatLandmarks[objective.title]), objective.title);
+      zonesInSector.push(JSON.stringify(withLayout.tacticalLayout.zones));
+    }
+    assert.equal(new Set(zonesInSector).size, zonesInSector.length, `zonas repetidas no setor ${sector}`);
+  }
+  assert.deepEqual([...seen].sort(), Object.keys(combatLandmarks).sort());
+});
+
+test("plantas por tarefa dos náufragos não vazam para outras ilhas", () => {
+  const scene = { environment: { terrain: { features: [] } } };
+  for (const [themeId, title] of [["atoll", "Interceptar a patrulha"], ["coral-coast", "Defender a posição avançada"]]) {
+    const result = withIslandTacticalLayout(scene, themeId, { direction: "O", title }).tacticalLayout;
+    const expected = withIslandTacticalLayout(scene, themeId, { direction: "O", title: "sem título" }).tacticalLayout;
+    assert.deepEqual(result, expected, themeId);
+  }
+  assert.equal(withIslandTacticalLayout(scene, "atoll", { direction: "O", title: "Interceptar a patrulha" }).tacticalLayout.landmark.name, "Borda do poço");
+  assert.equal(withIslandTacticalLayout(scene, "coral-coast", { direction: "O", title: "Defender a posição avançada" }).tacticalLayout.landmark.name, "Altar das pérolas");
+  const leaky = withIslandTacticalLayout(scene, "atoll", { direction: "O", title: "Conter os afogados da arrebentação" }).tacticalLayout.landmark.name;
+  assert.equal(leaky, "Borda do poço");
+});
+
+test("o acampamento tem dois combates", () => {
+  const titles = [];
+  for (let variant = 0; variant < 3; variant += 1) {
+    const objective = createIslandSector(island, 1, variant, 22);
+    if (objective.type === "combate") titles.push(objective.title);
+  }
+  assert.deepEqual(titles, ["Romper o cerco às barracas", "Libertar os cativos da paliçada"]);
+});
