@@ -106,8 +106,8 @@ Plantas de direção:
 
 #### Passos
 
-- [ ] **Passo 1: capturar a fixture com o código atual**, antes de qualquer mudança. Use a técnica de `scripts/fixtures/archipelago-sessao-antes-naufragos.json` (seeds `"regressao-algas-1"` a `"regressao-algas-3"`, com uma visita à ilha 21) e grave em `scripts/fixtures/archipelago-sessao-antes-algas.json`.
-- [ ] **Passo 2: testes** em `scripts/archipelagoGiantKelp.test.mjs`, espelhando `scripts/archipelagoShipwrecked.test.mjs`:
+- [x] **Passo 1: capturar a fixture com o código atual**, antes de qualquer mudança. Use a técnica de `scripts/fixtures/archipelago-sessao-antes-naufragos.json` (seeds `"regressao-algas-1"` a `"regressao-algas-3"`, com uma visita à ilha 21) e grave em `scripts/fixtures/archipelago-sessao-antes-algas.json`.
+- [x] **Passo 2: testes** em `scripts/archipelagoGiantKelp.test.mjs`, espelhando `scripts/archipelagoShipwrecked.test.mjs`:
   - a regressão com a fixture nova;
   - os 4 setores com as 3 variantes próprias e a compartilhada, cada setor com pelo menos 2 combates sorteáveis;
   - o ND 6 de cada combate em três seeds, só com o elenco;
@@ -128,10 +128,10 @@ Plantas de direção:
   | Enfrentar os predadores do casco | Escotilha do porão |
   | Defender a posição avançada | Jangada de frondes |
 
-- [ ] **Passo 3: rodar e ver falhar.** A regressão passa e o resto falha.
-- [ ] **Passo 4: implementar** com o conteúdo acima.
-- [ ] **Passo 5: rodar e ver passar.** Se algum combate não fechar ND 6 ou alguma criatura principal tiver menos de 4 penalidades, **pare e informe o gerente**, porque o conteúdo foi aprovado pelo PO. Depois rode `npm run test:archipelago`, `npm run test:archipelago-missions` e `npm run test:ecology`: tudo verde.
-- [ ] **Passo 6: commit.** `feat: adiciona os dados da Ilha de Algas Gigantes`
+- [x] **Passo 3: rodar e ver falhar.** A regressão passa e o resto falha.
+- [x] **Passo 4: implementar** com o conteúdo acima.
+- [x] **Passo 5: rodar e ver passar.** Se algum combate não fechar ND 6 ou alguma criatura principal tiver menos de 4 penalidades, **pare e informe o gerente**, porque o conteúdo foi aprovado pelo PO. Depois rode `npm run test:archipelago`, `npm run test:archipelago-missions` e `npm run test:ecology`: tudo verde.
+- [x] **Passo 6: commit.** `feat: adiciona os dados da Ilha de Algas Gigantes`
 
 ---
 
@@ -177,23 +177,23 @@ Plantas de direção:
 
 #### Passos
 
-- [ ] **Passo 1: teste da ilha sorteada** em `scripts/archipelagoGiantKelp.test.mjs`, como o dos Náufragos:
+- [x] **Passo 1: teste da ilha sorteada** em `scripts/archipelagoGiantKelp.test.mjs`, como o dos Náufragos:
   - seeds `"algas-0"` a `"algas-199"`;
   - a ilha está entre os andares 21 e 24;
   - `hasIslandSectors` é verdadeiro e os 4 `penaltyId` são distintos;
   - `arenaName === "Coração das Frondes"`;
   - `guardianComposition` é um dos três ids;
   - o tema de missões existe.
-- [ ] **Passo 2: rodar e ver falhar.**
-- [ ] **Passo 3: implementar** o pacote e a ativação.
-- [ ] **Passo 4: ajustar os testes antigos.** O teste "as variantes das quatro ilhas…" passa a incluir `"giant-kelp": [4, 4, 4, 4]` em `objectiveCounts` e continua afirmando que todas as chaves foram exercitadas. O teste de sorteio aceita os 12 temas ativos, mantendo `islands.length === 10` e as fileiras exatas. Não apague nenhuma verificação.
-- [ ] **Passo 5: rodar tudo.** `npm run test:archipelago`, `npm run test:archipelago-missions`, `npm run test:ecology`, `npm run test:ranges` e `npm run build`: tudo verde.
-- [ ] **Passo 6: documentação.**
+- [x] **Passo 2: rodar e ver falhar.**
+- [x] **Passo 3: implementar** o pacote e a ativação.
+- [x] **Passo 4: ajustar os testes antigos.** O teste "as variantes das quatro ilhas…" passa a incluir `"giant-kelp": [4, 4, 4, 4]` em `objectiveCounts` e continua afirmando que todas as chaves foram exercitadas. O teste de sorteio aceita os 12 temas ativos, mantendo `islands.length === 10` e as fileiras exatas. Não apague nenhuma verificação.
+- [x] **Passo 5: rodar tudo.** `npm run test:archipelago`, `npm run test:archipelago-missions`, `npm run test:ecology`, `npm run test:ranges` e `npm run build`: tudo verde.
+- [x] **Passo 6: documentação.**
   - Em `REQUISITOS_ANDARES_21_A_30.md`, acrescente um parágrafo da ilha logo depois do parágrafo dos Náufragos, no mesmo estilo. Cubra a ideia, os setores, os combates por planta, os guardiões e o Centro.
   - Atualize "onze temas" para doze e a tabela "Temas da primeira versão" (linha Inicial: seis temas, quatro sorteados).
   - Em "Por onde retomar" e em "Pendências", passe de 12 para 11 temas fora do sorteio.
   - No `README.md`, troque "Os 12 temas fora do sorteio" por "Os 11 temas fora do sorteio".
-- [ ] **Passo 7: commit.** `feat: coloca a Ilha de Algas Gigantes no sorteio das ilhas iniciais`
+- [x] **Passo 7: commit.** `feat: coloca a Ilha de Algas Gigantes no sorteio das ilhas iniciais`
 
 ---
 
