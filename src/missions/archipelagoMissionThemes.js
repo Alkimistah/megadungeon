@@ -185,7 +185,7 @@ export const ARCHIPELAGO_MISSION_THEMES = {
       category: "recovery",
       title: "A bandeira da frota perdida",
       targetName: "a bandeira da frota do almirante",
-      lead: "Recupere a bandeira da frota que afundou com o almirante",
+      lead: "Recupere a bandeira que a frota do almirante perdeu",
       condition: "Achar a bandeira no casco do almirante e trazê-la inteira, antes que os Desmanchadores a vendam",
       proofType: "A bandeira dobrada, com o brasão do almirante."
     },

@@ -166,10 +166,11 @@ test("cada combate do cemitério abre a planta da própria cena", () => {
 
 test("inimigos do cemitério não começam colados ao ponto de interação", () => {
   const minDistances = {
-    "Segurar a prancha entre os cascos": 2, "Tirar o grumete da sentina": 2, "Interceptar a patrulha": 3
+    "Segurar a prancha entre os cascos": 2, "Tirar o grumete da sentina": 2, "Interceptar a patrulha": 3,
+    "Limpar o ninho do cordame": 2
   };
   const cases = [
-    ["Segurar a prancha entre os cascos", 0, 1], ["Tirar o grumete da sentina", 1, 2], ["Interceptar a patrulha", 2, 3]
+    ["Segurar a prancha entre os cascos", 0, 1], ["Tirar o grumete da sentina", 1, 2], ["Interceptar a patrulha", 2, 3], ["Limpar o ninho do cordame", 0, 2]
   ];
   for (const [title, sector, variant] of cases) {
     const objective = createIslandSector(island, sector, variant, 22);
