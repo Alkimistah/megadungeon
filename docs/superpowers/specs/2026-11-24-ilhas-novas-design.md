@@ -48,8 +48,8 @@ O PO pediu que o trabalho ande **de pouco em pouco**, com qualidade máxima em c
 | 3 | Inicial | Ilha de Névoa (`mist`) | Concluída e publicada (25/11/2026) |
 | 4 | Inicial | Ilha-Cemitério de Navios (`ship-graveyard`) | Concluída e publicada (25/11/2026) |
 | — | Ponto de controle das iniciais | | Concluído (25/11/2026) |
-| 5 | Intermediária | Ilha das Ruínas Ciclópicas (`cyclopean-ruins`) | **Próxima.** Começa pela prévia de conteúdo |
-| 6 | Intermediária | Ilha Sagrada (`sacred`) | Pendente |
+| 5 | Intermediária | Ilha das Ruínas Ciclópicas (`cyclopean-ruins`) | Concluída e publicada (25/11/2026) |
+| 6 | Intermediária | Ilha Sagrada (`sacred`) | **Próxima.** Começa pela prévia de conteúdo |
 | 7 | Intermediária | Ilha de Cristal (`crystal`) | Pendente |
 | 8 | Intermediária | Navio Abandonado (`abandoned-ship`) | Pendente |
 | 9 | Intermediária | Ilha de Maré Impossível (`impossible-tide`) | Pendente |
@@ -72,13 +72,17 @@ O modelo de dados de uma ilha nova está em `src/archipelagoMist.js` e `src/arch
 
 **Ponto de controle das iniciais (25/11/2026).** As quatro ilhas novas estão no padrão. O PO decidiu a ordem das intermediárias (Ruínas Ciclópicas, Sagrada, Cristal, Navio Abandonado e Maré Impossível) e o formato delas, descrito em "Formato por fileira". O Navio Abandonado fica longe do Cemitério de Navios para não repetir. A Maré Impossível fica por último, porque é a mais difícil de expressar sem mexer no motor.
 
-**Próximo passo:** etapa 5, Ilha das Ruínas Ciclópicas (`cyclopean-ruins`), pelo mesmo ciclo: prévia em `tmp/previas/ilha-ruinas/`, aprovação, plano, subagentes, validação no app e publicação.
+A etapa 5 (Ruínas Ciclópicas) foi concluída e publicada em 25/11/2026. Foi a primeira intermediária no formato novo. O modelo de ilha intermediária está em `src/archipelagoCyclopeanRuins.js` e `scripts/archipelagoCyclopeanRuins.test.mjs`. Para manter as rolagens fixas, os testes antigos da fileira intermediária usam `archipelagoBaseIntermediateRow`.
+
+**Próximo passo:** etapa 6, Ilha Sagrada (`sacred`). O PO quer espíritos e coisas sagradas, e também a Supremacia Purista na ilha, como releitura inspirada no Atlas de Arton. O tema ainda não tem etiquetas de ecologia, que entram nesta etapa. A prévia fica em `tmp/previas/ilha-sagrada/`.
 
 **Lições das etapas 3 e 4.**
 
 - **0 PV (decisão do PO):** na megadungeon, quem cai a 0 PV sai da masmorra. Nenhum guardião ou regra de cena pode ter como saída natural derrubar uma personagem. Por isso o Rival Espelho foi vetado.
 - **Peças grandes e `enemyArea`:** quando as peças 2x2 não cabem na área inicial, o motor as coloca no primeiro espaço livre, ignorando a área. A planta precisa de espaço de sobra na área inicial, e o teste de distância ao marco deve cobrir todo combate em que um inimigo colado ao marco atrapalhe a tarefa.
 - **Missão em destaque:** o texto não pode citar o nome da arena do guardião, e a frase de abertura recebe o nome da ilha no fim.
+- **Releitura de Arton (decisão do PO, etapa 5):** as ilhas podem representar locais e culturas do Atlas de Arton (`recursos/livros/`), mas sempre como cenário ou releitura dentro da megadungeon, nunca como o lugar verdadeiro.
+- **Peças grandes no Centro:** o ponto sorteado da área inicial precisa caber a peça inteira, senão ela cai no primeiro espaço livre. Deixe o marco na borda do estrado e a área livre de obstáculos.
 
 ## Fluxo de cada etapa
 
