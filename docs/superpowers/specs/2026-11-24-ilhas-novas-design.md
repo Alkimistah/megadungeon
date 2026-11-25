@@ -14,7 +14,7 @@ O PO pediu que o trabalho ande **de pouco em pouco**, com qualidade máxima em c
   3. **Lista de criaturas da ilha** em `archipelagoCreatureRules.js`, capaz de gerar os combates de setor no ND exato.
   4. **Terreno** da ilha (`terrain`: nome, efeito e elementos) e **mapa tático** para cada setor e para o Centro em `archipelagoTacticalMap.js`, com ponto de referência e, quando a tarefa pedir, marco próprio em `landmarksByTask`.
   5. **Pacote de missões** em `src/missions/archipelagoMissionThemes.js`: listas temáticas, missão em destaque escrita à mão e marcadores e ponto de referência do mapa.
-  6. **Etiquetas de ecologia** em `archipelagoEcologyContexts.byTheme`. Faltam hoje em Ilha dos Náufragos (`shipwrecked`), Ilha Sagrada (`sacred`) e Ilha Viva (`living`).
+  6. **Etiquetas de ecologia** em `archipelagoEcologyContexts.byTheme`. Hoje falta só na Ilha Viva (`living`). Os Náufragos e a Ilha Sagrada já têm.
   7. **Testes** que cubram o novo tema e **documentação** atualizada (REQUISITOS_ANDARES_21_A_30.md, seção Retomada, e README).
 - Cada ilha nova é ativada em `enabledThemeIds` na própria etapa, depois de passar nos testes.
 
@@ -49,8 +49,8 @@ O PO pediu que o trabalho ande **de pouco em pouco**, com qualidade máxima em c
 | 4 | Inicial | Ilha-Cemitério de Navios (`ship-graveyard`) | Concluída e publicada (25/11/2026) |
 | — | Ponto de controle das iniciais | | Concluído (25/11/2026) |
 | 5 | Intermediária | Ilha das Ruínas Ciclópicas (`cyclopean-ruins`) | Concluída e publicada (25/11/2026) |
-| 6 | Intermediária | Ilha Sagrada (`sacred`) | **Próxima.** Começa pela prévia de conteúdo |
-| 7 | Intermediária | Ilha de Cristal (`crystal`) | Pendente |
+| 6 | Intermediária | Ilha Sagrada (`sacred`) | Concluída e publicada (25/11/2026) |
+| 7 | Intermediária | Ilha de Cristal (`crystal`) | **Próxima.** Começa pela prévia de conteúdo |
 | 8 | Intermediária | Navio Abandonado (`abandoned-ship`) | Pendente |
 | 9 | Intermediária | Ilha de Maré Impossível (`impossible-tide`) | Pendente |
 | — | Ponto de controle das intermediárias | | Pendente |
@@ -74,7 +74,9 @@ O modelo de dados de uma ilha nova está em `src/archipelagoMist.js` e `src/arch
 
 A etapa 5 (Ruínas Ciclópicas) foi concluída e publicada em 25/11/2026. Foi a primeira intermediária no formato novo. O modelo de ilha intermediária está em `src/archipelagoCyclopeanRuins.js` e `scripts/archipelagoCyclopeanRuins.test.mjs`. Para manter as rolagens fixas, os testes antigos da fileira intermediária usam `archipelagoBaseIntermediateRow`.
 
-**Próximo passo:** etapa 6, Ilha Sagrada (`sacred`). O PO quer espíritos e coisas sagradas, e também a Supremacia Purista na ilha, como releitura inspirada no Atlas de Arton. O tema ainda não tem etiquetas de ecologia, que entram nesta etapa. A prévia fica em `tmp/previas/ilha-sagrada/`.
+A etapa 6 (Ilha Sagrada) foi concluída e publicada em 25/11/2026. É uma ilha dividida: os espíritos antigos a oeste e uma cruzada da Supremacia Purista a leste, como releitura do Atlas de Arton. O Centro é o "Altar da Trilha Branca", e dois dos três guardiões são solo (Companhia Blindada e Forjador Litúrgico). Na mesma etapa, o motor passou a tentar toda a `enemyArea` antes de colocar uma peça grande fora dela (`src/nodeTacticalMap.js`, teste `scripts/tacticalEnemyArea.test.mjs`).
+
+**Próximo passo:** etapa 7, Ilha de Cristal (`crystal`), pelo mesmo ciclo, com a prévia em `tmp/previas/ilha-cristal/`. Vale buscar no Atlas de Arton um lugar ou cultura para servir de releitura.
 
 **Lições das etapas 3 e 4.**
 
@@ -82,7 +84,7 @@ A etapa 5 (Ruínas Ciclópicas) foi concluída e publicada em 25/11/2026. Foi a 
 - **Peças grandes e `enemyArea`:** quando as peças 2x2 não cabem na área inicial, o motor as coloca no primeiro espaço livre, ignorando a área. A planta precisa de espaço de sobra na área inicial, e o teste de distância ao marco deve cobrir todo combate em que um inimigo colado ao marco atrapalhe a tarefa.
 - **Missão em destaque:** o texto não pode citar o nome da arena do guardião, e a frase de abertura recebe o nome da ilha no fim.
 - **Releitura de Arton (decisão do PO, etapa 5):** as ilhas podem representar locais e culturas do Atlas de Arton (`recursos/livros/`), mas sempre como cenário ou releitura dentro da megadungeon, nunca como o lugar verdadeiro.
-- **Peças grandes no Centro:** o ponto sorteado da área inicial precisa caber a peça inteira, senão ela cai no primeiro espaço livre. Deixe o marco na borda do estrado e a área livre de obstáculos.
+- **Peças grandes:** desde a etapa 6, o motor tenta toda a área inicial antes de colocar a peça fora. Mesmo assim, a área precisa ter espaço para o elenco inteiro, como os gigantes 3x3, ou o excedente vai para o primeiro espaço livre.
 
 ## Fluxo de cada etapa
 
