@@ -10,6 +10,7 @@ import { shipwreckedExploration } from "./archipelagoShipwrecked.js";
 import { giantKelpExploration } from "./archipelagoGiantKelp.js";
 import { mistExploration } from "./archipelagoMist.js";
 import { shipGraveyardExploration } from "./archipelagoShipGraveyard.js";
+import { cyclopeanRuinsExploration } from "./archipelagoCyclopeanRuins.js";
 import { getEligibleGuardianPenalties, getGuardianPenalty } from "./archipelagoGuardianPenalties.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getIslandCreatureRules } from "./archipelagoCreatureRules.js";
@@ -198,6 +199,7 @@ const SECTOR_ISLANDS = {
   "giant-kelp": giantKelpExploration,
   mist: mistExploration,
   "ship-graveyard": shipGraveyardExploration,
+  "cyclopean-ruins": cyclopeanRuinsExploration,
   mangrove: { pilot: "mangrove-sectors", sectors: MANGROVE_SECTORS, guardians: GUARDIAN_COMPOSITIONS },
   tropical: {
     pilot: "tropical-sectors",

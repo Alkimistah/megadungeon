@@ -59,7 +59,14 @@ const islandCreatures = {
     "aranha-gigante", "aranha-matriarca", "mimico-menor", "mimico", "otyugh", "ameba-gigante", "ganchador",
     "gnoll-capanga", "gnoll-saqueador", "gnoll-filibusteiro", "gnoll-lider-de-alcateia", "gnoll-xama-de-megalokk", "gnoll-cacador-de-cabecas",
     "esqueleto", "esqueleto-de-elite", "lacedon", "imediato", "capitao-pirata", "amalgama-esqueleto"
-  ]
+  ],
+  "cyclopean-ruins": [
+  "canceronte", "selako", "selako-tigre", "pliorex", "lula-gigante", "crocodilo",
+  "soldado-mecanico", "gargula-assassina", "cariatide-mecanica", "carrasco-oco", "instrumento-divino",
+  "cocatriz", "basilisco", "gorgona", "cocatriz-real", "grifo", "serpe",
+  "esqueleto", "esqueleto-de-elite", "ogro-esqueleto", "gigante-esqueleto",
+  "capanga", "jagunco", "lider-mercenario-de-aslothia", "gigante-das-colinas", "necromante"
+]
 };
 
 export function getIslandCreatureRules(island, objective, rules) {
