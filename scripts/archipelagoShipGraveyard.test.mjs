@@ -10,9 +10,10 @@ import { calculateCombatND } from "../src/challenge.js";
 import { getCreatureById } from "../src/creatureCatalog/index.js";
 import { getEligibleGuardianPenalties } from "../src/archipelagoGuardianPenalties.js";
 import {
-  createIslandGuardian, createIslandSector, createIslandSectorCombat, getIslandThemeTerrain
+  createIslandGuardian, createIslandSector, createIslandSectorCombat, getIslandThemeTerrain, hasIslandSectors
 } from "../src/archipelagoPilot.js";
 import { getCreatureOriginThemeId, getIslandCreatureIds } from "../src/archipelagoCreatureRules.js";
+import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionThemes.js";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/archipelago-sessao-antes-cemiterio.json", import.meta.url), "utf8"));
 const island = { floor: 21, themeId: "ship-graveyard" };
@@ -191,4 +192,23 @@ test("inimigos do cemitério não começam colados ao ponto de interação", () 
       }
     }
   }
+});
+
+test("expedição nova pode sortear a Ilha-Cemitério de Navios completa", () => {
+  let found = null;
+  for (let i = 0; i < 200 && !found; i += 1) {
+    const seed = `cemiterio-${i}`;
+    const { islands } = createArchipelagoState(profile, createRng(seed)).getSnapshot();
+    const hit = islands.find(item => item.themeId === "ship-graveyard");
+    if (hit) found = { seed, hit };
+  }
+  assert.ok(found, "nenhuma seed sorteou ship-graveyard");
+  const { hit } = found;
+  assert.ok(hit.floor >= 21 && hit.floor <= 24);
+  assert.equal(hasIslandSectors(hit), true);
+  assert.equal(hit.objectives.length, 4);
+  assert.equal(new Set(hit.objectives.map(item => item.penaltyId)).size, 4);
+  assert.equal(hit.arenaName, "Nau Capitânia");
+  assert.ok(getArchipelagoMissionTheme("ship-graveyard"));
+  assert.ok(["capitao-dos-ossos", "tesouro-que-morde", "cacador-de-cabecas"].includes(hit.guardianComposition), hit.guardianComposition);
 });

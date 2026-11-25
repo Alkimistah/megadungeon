@@ -171,6 +171,30 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     }
   },
 
+  "ship-graveyard": {
+    pools: {
+      locations: ["um convés inclinado entre dois cascos", "o porão alagado de uma galé antiga", "uma ponte de pranchas sobre a água", "a cabine trancada de um almirante"],
+      materials: ["madeira de lei de um casco antigo", "pregos de bronze sem ferrugem", "breu de calafeto ainda mole", "lona de vela encerada"],
+      objects: ["um sextante de latão amassado", "o sino de bordo de um navio sem nome", "uma luneta com a lente rachada", "um baú de soldo com o cadeado arrombado", "a bandeira de uma frota que não existe mais"],
+      mementos: ["a carta de um marinheiro para a mãe", "um anel de noivado preso num prego", "um retrato pintado numa tampa de caixa", "um apito de contramestre"],
+      clues: ["marcas de garras de gnoll nas amuradas", "cordas roídas", "um rastro de lodo que sobe do porão", "nomes de navios riscados num mastro"],
+      challenges: ["atravessar de um casco a outro sem cair", "achar o porão certo entre dezenas iguais", "negociar com os Desmanchadores", "sair antes que o casco afunde"],
+      phenomena: ["cascos que rangem como se ainda navegassem", "um sino de bordo que toca com a maré", "luzes de lanterna em conveses vazios", "o monte inteiro inclinando quando a maré vira"]
+    },
+    featured: {
+      category: "recovery",
+      title: "A bandeira da frota perdida",
+      targetName: "a bandeira da frota do almirante",
+      lead: "Recupere a bandeira da frota que afundou com o almirante",
+      condition: "Achar a bandeira no casco do almirante e trazê-la inteira, antes que os Desmanchadores a vendam",
+      proofType: "A bandeira dobrada, com o brasão do almirante."
+    },
+    map: {
+      markers: ["deck", "water", "obstacle", "difficult"],
+      landmark: { name: "Mastro dos nomes", effect: "Mastro onde os marinheiros riscaram os nomes dos navios. Ponto de referência da missão." }
+    }
+  },
+
   volcanic: {
     pools: {
       locations: ["uma praia de cinzas negras", "uma encosta cortada por rios de lava", "o topo de uma encosta de cinzas", "um túnel de lava endurecida"],

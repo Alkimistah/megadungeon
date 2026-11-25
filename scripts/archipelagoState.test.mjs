@@ -115,7 +115,7 @@ test("a emboscada só rola depois da exploração e o descanso aguarda sua concl
 
 test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com pontos de interação", () => {
   const profile = archipelago21to30Profile;
-  const objectiveCounts = { mangrove: [5, 5, 4, 5], tropical: [4, 4, 4, 4], atoll: [4, 4, 4, 4], "coral-coast": [4, 4, 4, 4], shipwrecked: [4, 4, 4, 4], "giant-kelp": [4, 4, 4, 4], mist: [4, 4, 4, 4] };
+  const objectiveCounts = { mangrove: [5, 5, 4, 5], tropical: [4, 4, 4, 4], atoll: [4, 4, 4, 4], "coral-coast": [4, 4, 4, 4], shipwrecked: [4, 4, 4, 4], "giant-kelp": [4, 4, 4, 4], mist: [4, 4, 4, 4], "ship-graveyard": [4, 4, 4, 4] };
   const exercised = new Set();
   const islands = [];
   for (let i = 0; i < 200 && exercised.size < Object.keys(objectiveCounts).length; i += 1) {
@@ -162,7 +162,7 @@ const archipelagoBaseInitialRow = {
   ...archipelago21to30Profile,
   archipelago: {
     ...archipelago21to30Profile.archipelago,
-    enabledThemeIds: archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "shipwrecked" && id !== "giant-kelp" && id !== "mist")
+    enabledThemeIds: archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "shipwrecked" && id !== "giant-kelp" && id !== "mist" && id !== "ship-graveyard")
   }
 };
 
@@ -324,12 +324,13 @@ test("os setores sorteiam penalidades distintas do conjunto de 16 e o código de
   for (const ids of idsSeenBySector) assert.equal(ids.size, 16);
 });
 
-test("expedições novas sorteiam posições apenas entre os treze temas ativos", () => {
+test("expedições novas sorteiam posições apenas entre os catorze temas ativos", () => {
   const { enabledThemeIds, themePools } = archipelago21to30Profile.archipelago;
-  assert.equal(enabledThemeIds.length, 13);
+  assert.equal(enabledThemeIds.length, 14);
   assert.ok(enabledThemeIds.includes("shipwrecked"));
   assert.ok(enabledThemeIds.includes("giant-kelp"));
   assert.ok(enabledThemeIds.includes("mist"));
+  assert.ok(enabledThemeIds.includes("ship-graveyard"));
   const activeByRow = Object.fromEntries(Object.entries(themePools).map(([row, themes]) => [
     row, themes.map(theme => theme.id).filter(id => enabledThemeIds.includes(id))
   ]));
