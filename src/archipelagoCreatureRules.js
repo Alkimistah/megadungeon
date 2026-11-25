@@ -53,6 +53,12 @@ const islandCreatures = {
     "come-sonhos", "silfide-travessa", "duende-menor", "duende-maior", "vestigio-da-encruzilhada", "mastim-das-sombras", "corcel-das-trevas",
     "duplo", "falso-vidente", "bruxo-rural", "necromante", "pirata",
     "harpia-saqueadora", "coruja-gigante", "estirge", "enxame-estirge"
+  ],
+  "ship-graveyard": [
+    "canceronte", "selako", "crocodilo", "rato-gigante", "lula-gigante", "aranhas-filhotes",
+    "aranha-gigante", "aranha-matriarca", "mimico-menor", "mimico", "otyugh", "ameba-gigante", "ganchador",
+    "gnoll-capanga", "gnoll-saqueador", "gnoll-filibusteiro", "gnoll-lider-de-alcateia", "gnoll-xama-de-megalokk", "gnoll-cacador-de-cabecas",
+    "esqueleto", "esqueleto-de-elite", "lacedon", "imediato", "capitao-pirata", "amalgama-esqueleto"
   ]
 };
 
