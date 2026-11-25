@@ -166,6 +166,8 @@ const archipelagoBaseInitialRow = {
   }
 };
 
+// A fileira intermediária tem quatro temas ativos para três vagas. Pelo mesmo motivo, estes testes
+// mantêm só os três temas intermediários originais, para que as rolagens fixas continuem iguais.
 const archipelagoBaseIntermediateRow = {
   ...archipelago21to30Profile,
   archipelago: {

@@ -61,12 +61,12 @@ const islandCreatures = {
     "esqueleto", "esqueleto-de-elite", "lacedon", "imediato", "capitao-pirata", "amalgama-esqueleto"
   ],
   "cyclopean-ruins": [
-  "canceronte", "selako", "selako-tigre", "pliorex", "lula-gigante", "crocodilo",
-  "soldado-mecanico", "gargula-assassina", "cariatide-mecanica", "carrasco-oco", "instrumento-divino",
-  "cocatriz", "basilisco", "gorgona", "cocatriz-real", "grifo", "serpe",
-  "esqueleto", "esqueleto-de-elite", "ogro-esqueleto", "gigante-esqueleto",
-  "capanga", "jagunco", "lider-mercenario-de-aslothia", "gigante-das-colinas", "necromante"
-]
+    "canceronte", "selako", "selako-tigre", "pliorex", "lula-gigante", "crocodilo",
+    "soldado-mecanico", "gargula-assassina", "cariatide-mecanica", "carrasco-oco", "instrumento-divino",
+    "cocatriz", "basilisco", "gorgona", "cocatriz-real", "grifo", "serpe",
+    "esqueleto", "esqueleto-de-elite", "ogro-esqueleto", "gigante-esqueleto",
+    "capanga", "jagunco", "lider-mercenario-de-aslothia", "gigante-das-colinas", "necromante"
+  ]
 };
 
 export function getIslandCreatureRules(island, objective, rules) {
