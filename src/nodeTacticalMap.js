@@ -283,7 +283,7 @@ function placeParty(cells, positions) {
 
 function placeEnemies(cells, node, rng) {
   const count = Math.min(getEnemyCount(node), MAX_VISIBLE_ENEMIES);
-  if (!count) return [];
+  if (!count) return { placements: [], candidates: [] };
 
   const [partyStart] = node.tacticalLayout?.partyPositions ?? DEFAULT_PARTY_POSITIONS;
   const { enemyTiles, enemyArea = { minX: 10, maxX: WIDTH - 1, minY: 0, maxY: 9 } } = node.tacticalLayout ?? {};
@@ -293,7 +293,7 @@ function placeEnemies(cells, node, rng) {
     .filter(position => distance(position, partyStart) >= 8);
   const positions = candidates.slice(0, count);
   let firstPosition = 0;
-  return node.resolvedEncounter.items.filter(item => item.kind === "creature").flatMap(item => {
+  const placements = node.resolvedEncounter.items.filter(item => item.kind === "creature").flatMap(item => {
     const nextPosition = firstPosition + (item.quantity || 1);
     const placements = positions.slice(firstPosition, nextPosition);
     const isBoss = node.type === "boss" && (!node.bossCreatureId || item.creatureId === node.bossCreatureId);
@@ -301,6 +301,7 @@ function placeEnemies(cells, node, rng) {
     firstPosition = nextPosition;
     return placements.map(([x, y]) => ({ index: y * WIDTH + x, creatureId: item.creatureId }));
   });
+  return { placements, candidates };
 }
 
 function getThreatCenter(cells) {
@@ -551,7 +552,7 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
   const partyPositions = layout?.partyPositions ?? forestLayout?.partyPositions ?? DEFAULT_PARTY_POSITIONS;
   const party = getTacticalPartyPieces(partyPositions);
   placeParty(cells, partyPositions);
-  const enemies = placeEnemies(cells, node, rng);
+  const { placements: enemies, candidates: enemyAreaCandidates } = placeEnemies(cells, node, rng);
   const beforeTrap = cells.flat();
   const trapItem = node.resolvedEncounter?.items.find(item => item.kind === "trap");
   const trapLabel = getForestTrapPresentation(profileId, node, trapItem)?.name ?? node.trap?.name ?? trapItem?.name;
@@ -572,7 +573,7 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
       || enemyTiles.includes("water") && tile === "deep-water" || enemyTiles.includes(legacyTile));
   };
   const enemyPieces = placeTacticalEncounterUnits(getNodeUnits(node), enemies.map(({ index }) =>
-    [index % WIDTH, Math.floor(index / WIDTH)]), fallback, size, party, { canOccupy, canPrefer });
+    [index % WIDTH, Math.floor(index / WIDTH)]), [...enemyAreaCandidates, ...fallback], size, party, { canOccupy, canPrefer });
   const objectiveMarkers = objectives.flatMap(objective => {
     if (objective.targetType === "creature") {
       for (const piece of enemyPieces.filter(piece => piece.creatureId === objective.targetId)) {
