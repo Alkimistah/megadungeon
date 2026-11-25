@@ -198,3 +198,22 @@ test("inimigos da névoa não começam colados ao ponto de interação", () => {
     }
   }
 });
+
+test("expedição nova pode sortear a Ilha de Névoa completa", () => {
+  let found = null;
+  for (let i = 0; i < 200 && !found; i += 1) {
+    const seed = `nevoa-${i}`;
+    const { islands } = createArchipelagoState(profile, createRng(seed)).getSnapshot();
+    const hit = islands.find(item => item.themeId === "mist");
+    if (hit) found = { seed, hit };
+  }
+  assert.ok(found, "nenhuma seed sorteou mist");
+  const { hit } = found;
+  assert.ok(hit.floor >= 21 && hit.floor <= 24);
+  assert.equal(hasIslandSectors(hit), true);
+  assert.equal(hit.objectives.length, 4);
+  assert.equal(new Set(hit.objectives.map(item => item.penaltyId)).size, 4);
+  assert.equal(hit.arenaName, "Campanário da Bruma");
+  assert.ok(getArchipelagoMissionTheme("mist"));
+  assert.ok(["sineiro", "rostos-emprestados", "mestre-dos-ouvintes"].includes(hit.guardianComposition), hit.guardianComposition);
+});

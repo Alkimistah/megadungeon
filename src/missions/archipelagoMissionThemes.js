@@ -147,6 +147,30 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     }
   },
 
+  mist: {
+    pools: {
+      locations: ["um cais de tábuas que some na bruma", "a praça de uma aldeia de portas fechadas", "um charco de luzes que se movem", "um cemitério de lápides sem data"],
+      materials: ["orvalho recolhido da bruma ao amanhecer", "sal do círculo dos Ouvintes", "cera das velas da vigília", "musgo pálido das lápides"],
+      objects: ["a bússola de um capitão desaparecido", "um sino de mão rachado", "uma lanterna de vigia com o vidro fumê", "o diário de bordo de um barco que nunca chegou", "uma corneta de nevoeiro de latão"],
+      mementos: ["uma aliança presa num barbante", "um retrato com o rosto raspado", "uma carta que termina no meio da frase", "um lenço bordado com o nome de um barco"],
+      clues: ["pegadas que andam em círculo", "uma voz que repete a última frase do grupo", "lápides com o mesmo nome e datas diferentes", "marcas de corda no poste do sino"],
+      challenges: ["seguir a voz certa no meio dos ecos", "manter o grupo junto na bruma", "separar a profecia da mentira", "achar o caminho de volta ao bote"],
+      phenomena: ["vozes conhecidas chamando de longe", "um sino que bate sem ninguém tocar", "a bruma se abrindo só em volta de uma lanterna", "passos que acompanham o grupo e param quando ele para"]
+    },
+    featured: {
+      category: "investigation",
+      title: "A verdade sob a bruma",
+      targetName: "o que aconteceu com o último barco do sineiro",
+      lead: "Descubra por que o sino do campanário ainda chama barcos que não existem",
+      condition: "Reunir o diário de bordo, a lápide trocada e o relato do náufrago verdadeiro, e apontar quem mentiu",
+      proofType: "Relatar o que houve com o último barco e entregar a página arrancada do diário."
+    },
+    map: {
+      markers: ["concealment", "swamp", "wet", "obstacle"],
+      landmark: { name: "Pedra dos ecos", effect: "Rocha alta onde as vozes da bruma chegam mais nítidas. Ponto de referência da missão." }
+    }
+  },
+
   volcanic: {
     pools: {
       locations: ["uma praia de cinzas negras", "uma encosta cortada por rios de lava", "o topo de uma encosta de cinzas", "um túnel de lava endurecida"],
