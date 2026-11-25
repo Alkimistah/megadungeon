@@ -45,8 +45,8 @@ O PO pediu que o trabalho ande **de pouco em pouco**, com qualidade máxima em c
 |---|---|---|---|
 | 1 | Inicial | Ilha dos Náufragos (`shipwrecked`) | Concluída e publicada (24/11/2026) |
 | 2 | Inicial | Ilha de Algas Gigantes (`giant-kelp`) | Concluída e publicada (24/11/2026) |
-| 3 | Inicial | Ilha de Névoa (`mist`) | **Próxima.** Começa pela prévia de conteúdo |
-| 4 | Inicial | Ilha-Cemitério de Navios (`ship-graveyard`) | Pendente |
+| 3 | Inicial | Ilha de Névoa (`mist`) | Concluída e validada (25/11/2026), aguardando publicação |
+| 4 | Inicial | Ilha-Cemitério de Navios (`ship-graveyard`) | **Próxima.** Começa pela prévia de conteúdo |
 | — | Ponto de controle das iniciais | | Pendente |
 | 5–9 | Intermediária | Navio Abandonado, Ruínas Ciclópicas, Ilha Sagrada, Maré Impossível, Ilha de Cristal (ordem definida no ponto de controle) | Pendente |
 | — | Ponto de controle das intermediárias | | Pendente |
@@ -57,7 +57,7 @@ O PO definiu a ordem das iniciais. A ordem das demais fileiras fica para o ponto
 
 ### Onde paramos
 
-As etapas 1 e 2 foram concluídas e publicadas em 24/11/2026. Junto com elas, entraram melhorias que passam a valer para as próximas ilhas:
+As etapas 1 e 2 foram concluídas e publicadas em 24/11/2026. A etapa 3 (Névoa) foi concluída e validada em 25/11/2026, e aguarda publicação. Junto com as etapas 1 e 2, entraram melhorias que passam a valer para as próximas ilhas:
 
 - **Uma planta por combate.** A planta é escolhida pela tarefa, em `byTask`, e cada setor tem pelo menos dois combates sorteáveis.
 - **Mecânica própria de guardião (`rule`).** Por exemplo, a lente do farol contra a Aparição.
@@ -66,16 +66,18 @@ As etapas 1 e 2 foram concluídas e publicadas em 24/11/2026. Junto com elas, en
 
 O modelo de dados de uma ilha nova está em `src/archipelagoShipwrecked.js` e `src/archipelagoGiantKelp.js`. Os testes de modelo estão em `scripts/archipelagoShipwrecked.test.mjs` e `scripts/archipelagoGiantKelp.test.mjs`.
 
-**Próximo passo:** etapa 3, Ilha de Névoa (`mist`). O ciclo é o mesmo:
+**Próximo passo:** etapa 4, Ilha-Cemitério de Navios (`ship-graveyard`). O ciclo é o mesmo:
 
-1. prévia de conteúdo em cartões, com as plantas de todos os combates, em `tmp/previas/ilha-nevoa/`;
+1. prévia de conteúdo em cartões, com as plantas de todos os combates, em `tmp/previas/ilha-cemiterio/`;
 2. aprovação do PO;
 3. plano em `docs/superpowers/plans/`;
 4. execução com subagentes;
 5. validação no app;
 6. publicação.
 
-O tema já tem ecologia (`conditions: ["neblina"]`) e ícone, e ainda precisa de `arenaName`. Depois vem a etapa 4, o Cemitério de Navios, e o ponto de controle das iniciais.
+O tema já tem ecologia (a mesma dos Náufragos) e ícone, e ainda precisa de `arenaName`. Depois vem o ponto de controle das iniciais.
+
+**Lição da etapa 3 (decisão do PO):** na megadungeon, quem cai a 0 PV sai da masmorra. Nenhum guardião ou regra de cena pode ter como saída natural derrubar uma personagem. Por isso o Rival Espelho foi vetado.
 
 ## Fluxo de cada etapa
 
