@@ -132,7 +132,7 @@ export const archipelago21to30Profile = {
     },
     enabledThemeIds: [
       "tropical", "mangrove", "atoll", "coral-coast", "shipwrecked", "giant-kelp", "mist", "ship-graveyard",
-      "volcanic", "sea-caves", "pirate-held", "cyclopean-ruins",
+      "volcanic", "sea-caves", "pirate-held", "cyclopean-ruins", "sacred",
       "floating", "storm", "dinosaurs"
     ],
     themePools: {

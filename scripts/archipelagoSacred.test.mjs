@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { archipelago21to30Profile as profile, archipelagoEcologyContexts } from "../src/floorProfiles/archipelago21to30.js";
+import { createRng } from "../src/random.js";
 import { createArchipelagoState } from "../src/archipelagoState.js";
 import { withIslandTacticalLayout } from "../src/archipelagoTacticalMap.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
@@ -9,9 +10,10 @@ import { calculateCombatND } from "../src/challenge.js";
 import { getCreatureById } from "../src/creatureCatalog/index.js";
 import { getEligibleGuardianPenalties } from "../src/archipelagoGuardianPenalties.js";
 import {
-  createIslandGuardian, createIslandSector, createIslandSectorCombat, getIslandThemeTerrain
+  createIslandGuardian, createIslandSector, createIslandSectorCombat, getIslandThemeTerrain, hasIslandSectors
 } from "../src/archipelagoPilot.js";
 import { getCreatureOriginThemeId, getIslandCreatureIds } from "../src/archipelagoCreatureRules.js";
+import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionThemes.js";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/archipelago-sessao-antes-sagrada.json", import.meta.url), "utf8"));
 const island = { floor: 25, themeId: "sacred" };
@@ -197,4 +199,24 @@ test("inimigos da Ilha Sagrada não começam colados ao ponto de interação", (
       }
     }
   }
+});
+
+test("expedição nova pode sortear a Ilha Sagrada completa", () => {
+  let found = null;
+  for (let i = 0; i < 200 && !found; i += 1) {
+    const seed = `sagrada-${i}`;
+    const { islands } = createArchipelagoState(profile, createRng(seed)).getSnapshot();
+    const hit = islands.find(item => item.themeId === "sacred");
+    if (hit) found = { seed, hit };
+  }
+  assert.ok(found, "nenhuma seed sorteou sacred");
+  const { hit } = found;
+  assert.ok(hit.floor >= 25 && hit.floor <= 27);
+  assert.equal(hasIslandSectors(hit), true);
+  assert.equal(hit.objectives.length, 6);
+  assert.equal(new Set(hit.objectives.slice(0, 4).map(item => item.penaltyId)).size, 4);
+  for (const objective of hit.objectives.slice(4)) assert.ok(objective.guardianBuffId, objective.id);
+  assert.equal(hit.arenaName, "Altar da Trilha Branca");
+  assert.ok(getArchipelagoMissionTheme("sacred"));
+  assert.ok(["protetor-da-ilha", "companhia-blindada", "forjador-liturgico"].includes(hit.guardianComposition), hit.guardianComposition);
 });

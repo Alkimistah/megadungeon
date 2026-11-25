@@ -219,6 +219,30 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     }
   },
 
+  sacred: {
+    pools: {
+      locations: ["um bosque de pilares cobertos de oferendas", "o pátio de uma muralha com estandartes puristas", "uma fonte onde as aves bebem em silêncio", "um altar com dois símbolos gravados um por cima do outro"],
+      materials: ["penas brancas caídas na escadaria", "água da fonte recolhida antes do amanhecer", "sal consagrado pelos capelães", "lascas de prata das correntes puristas"],
+      objects: ["um estandarte de Valkaria com as armas de Arsenal", "uma gaiola de ferro frio vazia", "um livro de preces do Templo da Pureza Divina", "uma oferenda de mel deixada no pilar", "um apito de caça de um clã purista"],
+      mementos: ["o colar de um prisioneiro não humano", "uma pena de unicórnio presa num galho", "a carta de um soldado purista com dúvidas sobre a fé", "uma fita de oração amarrada num pilar"],
+      clues: ["oferendas pisadas no caminho", "marcas de corrente nas árvores do bosque", "aves que voam sempre para o oeste", "estandartes rasgados por garras"],
+      challenges: ["cumprir os tabus sem ofender os espíritos", "atravessar o lado purista sem ser descoberto", "escolher a quem a ilha vai pertencer", "desfazer o que os capelães consagraram"],
+      phenomena: ["aves que circulam sem pousar", "um silêncio que cai quando alguém mente", "estandartes que se viram contra o vento", "pedras brancas que brilham à noite"]
+    },
+    featured: {
+      category: "trial",
+      title: "A prova das duas metades",
+      targetName: "o favor dos espíritos da ilha",
+      lead: "Conquiste o favor dos espíritos antigos",
+      condition: "Cumprir um tabu do bosque, libertar um espírito preso pelos puristas e voltar à fonte sem derramar sangue no chão consagrado",
+      proofType: "Uma pena branca entregue pela ninfa da fonte."
+    },
+    map: {
+      markers: ["tree", "clearing", "wall", "advantage"],
+      landmark: { name: "Pedras brancas", effect: "As pedras brancas que separam as duas metades da ilha. Ponto de referência da missão." }
+    }
+  },
+
   volcanic: {
     pools: {
       locations: ["uma praia de cinzas negras", "uma encosta cortada por rios de lava", "o topo de uma encosta de cinzas", "um túnel de lava endurecida"],

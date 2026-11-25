@@ -89,7 +89,7 @@ test("missões em destaque e pontos de referência não usam a arena do guardiã
 // --- Gerador: uma missão por ilha (Tarefa 2) ---
 
 const profile = archipelago21to30Profile;
-const SEEDS = 300;
+const SEEDS = 600;
 const CATEGORY_POOL = {
   collection: "materials", exploration: "locations", recovery: "objects", rescue: "mementos",
   escort: "mementos", anomalous: "phenomena", investigation: "clues", trial: "challenges"

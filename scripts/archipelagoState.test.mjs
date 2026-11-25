@@ -172,7 +172,7 @@ const archipelagoBaseIntermediateRow = {
   ...archipelago21to30Profile,
   archipelago: {
     ...archipelago21to30Profile.archipelago,
-    enabledThemeIds: archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "cyclopean-ruins")
+    enabledThemeIds: archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "cyclopean-ruins" && id !== "sacred")
   }
 };
 
@@ -334,14 +334,15 @@ test("os setores sorteiam penalidades distintas do conjunto de 16 e o código de
   for (const ids of idsSeenBySector) assert.equal(ids.size, 16);
 });
 
-test("expedições novas sorteiam posições apenas entre os quinze temas ativos", () => {
+test("expedições novas sorteiam posições apenas entre os dezesseis temas ativos", () => {
   const { enabledThemeIds, themePools } = archipelago21to30Profile.archipelago;
-  assert.equal(enabledThemeIds.length, 15);
+  assert.equal(enabledThemeIds.length, 16);
   assert.ok(enabledThemeIds.includes("shipwrecked"));
   assert.ok(enabledThemeIds.includes("giant-kelp"));
   assert.ok(enabledThemeIds.includes("mist"));
   assert.ok(enabledThemeIds.includes("ship-graveyard"));
   assert.ok(enabledThemeIds.includes("cyclopean-ruins"));
+  assert.ok(enabledThemeIds.includes("sacred"));
   const activeByRow = Object.fromEntries(Object.entries(themePools).map(([row, themes]) => [
     row, themes.map(theme => theme.id).filter(id => enabledThemeIds.includes(id))
   ]));
