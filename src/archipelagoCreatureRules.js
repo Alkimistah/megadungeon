@@ -47,6 +47,12 @@ const islandCreatures = {
     "canceronte", "platan", "selako", "selako-tigre", "pliorex", "peixe-recife", "enxame-de-aguas-vivas", "agua-viva",
     "elfo-do-mar-pescador", "elfo-do-mar-chefe", "irukanjin", "sahuagin-metamorfo", "sahuagin-predador",
     "homem-piranha", "homem-piranha-imediato", "alghari", "cipo-assassino", "tendriculo", "naiade", "aquinne"
+  ],
+  mist: [
+    "lacedon", "livido", "zumbi-fantasmagorico", "aparicao", "imediato", "capitao-pirata", "fantasma", "alma-acorrentada",
+    "come-sonhos", "silfide-travessa", "duende-menor", "duende-maior", "vestigio-da-encruzilhada", "mastim-das-sombras", "corcel-das-trevas",
+    "duplo", "falso-vidente", "bruxo-rural", "necromante", "pirata",
+    "harpia-saqueadora", "coruja-gigante", "estirge", "enxame-estirge"
   ]
 };
 

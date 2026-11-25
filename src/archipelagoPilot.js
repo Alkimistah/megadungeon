@@ -8,6 +8,7 @@ import { atollExploration } from "./archipelagoAtoll.js";
 import { coralCoastExploration } from "./archipelagoCoralCoast.js";
 import { shipwreckedExploration } from "./archipelagoShipwrecked.js";
 import { giantKelpExploration } from "./archipelagoGiantKelp.js";
+import { mistExploration } from "./archipelagoMist.js";
 import { getEligibleGuardianPenalties, getGuardianPenalty } from "./archipelagoGuardianPenalties.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getIslandCreatureRules } from "./archipelagoCreatureRules.js";
@@ -194,6 +195,7 @@ const SECTOR_ISLANDS = {
   "coral-coast": coralCoastExploration,
   shipwrecked: shipwreckedExploration,
   "giant-kelp": giantKelpExploration,
+  mist: mistExploration,
   mangrove: { pilot: "mangrove-sectors", sectors: MANGROVE_SECTORS, guardians: GUARDIAN_COMPOSITIONS },
   tropical: {
     pilot: "tropical-sectors",
