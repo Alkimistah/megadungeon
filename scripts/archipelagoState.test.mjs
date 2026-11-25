@@ -154,7 +154,7 @@ test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com po
   assert.deepEqual([...exercised].sort(), Object.keys(objectiveCounts).sort());
 });
 
-// A fileira inicial tem 6 temas ativos para 4 vagas. Com rolagem fixa, os temas excluídos
+// A fileira inicial tem mais temas ativos do que as 4 vagas. Com rolagem fixa, os temas excluídos
 // não são previsíveis, então estes testes usam uma fileira que mantém só os quatro
 // temas iniciais originais, para que as rolagens fixas continuem determinísticas
 // quando novos temas são adicionados.
