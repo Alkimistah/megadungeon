@@ -195,6 +195,30 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     }
   },
 
+  "cyclopean-ruins": {
+    pools: {
+      locations: ["uma escadaria de degraus gigantes saindo do mar", "um jardim de estátuas cobertas de sal", "a borda de um poço redondo do tamanho de uma praça", "a sombra de um arco partido sobre a água"],
+      materials: ["pó de pedra de uma estátua quebrada", "musgo de sal que cresce nos blocos", "bronze verde de uma engrenagem antiga", "lascas de basalto com runas"],
+      objects: ["um cinzel de gigante do tamanho de uma lança", "uma placa de bronze com o mapa das ruínas", "um cristal de comando apagado", "o elmo de um mercenário de Aslothia", "uma chave de pedra com dentes de um palmo"],
+      mementos: ["a estatueta de um explorador petrificado", "o diário de um arqueólogo com a última página em branco", "um anel preso no dedo de uma estátua", "um mapa rabiscado por um guia local"],
+      clues: ["marcas de serra no pescoço das estátuas", "pegadas enormes sob a água rasa", "uma runa que brilha quando alguém pisa perto", "acampamentos abandonados com fogueiras frias"],
+      challenges: ["subir degraus feitos para gigantes", "não olhar nos olhos de quem vive no jardim", "chegar ao trono antes dos mercenários", "decifrar uma escrita que ninguém usa há séculos"],
+      phenomena: ["pedras que rangem como se respirassem", "o olho do poço que se abre na maré cheia", "estátuas que mudam de lugar à noite", "um eco grave que vem de baixo da água"]
+    },
+    featured: {
+      category: "exploration",
+      title: "O mapa dos construtores",
+      targetName: "as inscrições dos construtores das ruínas",
+      lead: "Copie as inscrições que mostram como as ruínas foram erguidas",
+      condition: "Copiar as três inscrições maiores antes que os mercenários de Aslothia as quebrem",
+      proofType: "As três cópias, com os símbolos completos."
+    },
+    map: {
+      markers: ["obstacle", "water", "slope", "difficult"],
+      landmark: { name: "Cabeça de pedra", effect: "A cabeça de uma estátua gigante tombada na água. Ponto de referência da missão." }
+    }
+  },
+
   volcanic: {
     pools: {
       locations: ["uma praia de cinzas negras", "uma encosta cortada por rios de lava", "o topo de uma encosta de cinzas", "um túnel de lava endurecida"],

@@ -352,12 +352,12 @@ Cada ilha deve ter um tema próprio, com pequena variação local. O tema pode s
 
 Como o grupo pode sair da masmorra e retornar depois com progresso parcial em várias ilhas, a geração aleatória precisa ser persistente e específica. Se temas ou objetivos forem sorteados, o código de sessão deve preservar o resultado gerado para cada ilha, não apenas a seed global mínima.
 
-A primeira versão usa um conjunto de catorze temas. A seed muda as posições dos temas ativos dentro de cada dificuldade. Na fileira inicial, oito temas disputam quatro vagas. A Ilha dos Dinossauros ocupa o andar 30. O código de sessão preserva os temas sorteados e o progresso de cada ilha. Os outros temas continuam cadastrados para restaurar expedições antigas e poderão voltar ao sorteio depois da validação completa em mesa.
+A primeira versão usa um conjunto de quinze temas. A seed muda as posições dos temas ativos dentro de cada dificuldade. Na fileira inicial, oito temas disputam quatro vagas. A Ilha dos Dinossauros ocupa o andar 30. O código de sessão preserva os temas sorteados e o progresso de cada ilha. Os outros temas continuam cadastrados para restaurar expedições antigas e poderão voltar ao sorteio depois da validação completa em mesa.
 
 | Dificuldade | Andares | Temas da primeira versão |
 |---|---|---|
 | Inicial | 21–24 | Ilha Manguezal, Ilha Tropical, Atol Circular, Costa do Coral, Ilha dos Náufragos, Ilha de Algas Gigantes, Ilha de Névoa e Ilha-Cemitério de Navios (quatro sorteadas entre as oito) |
-| Intermediária | 25–27 | Ilha Vulcânica, Ilha-Labirinto de Cavernas Marinhas e Ilha Tomada por Piratas |
+| Intermediária | 25–27 | Ilha Vulcânica, Ilha-Labirinto de Cavernas Marinhas, Ilha Tomada por Piratas e Ilha das Ruínas Ciclópicas (três sorteadas entre as quatro) |
 | Avançada | 28–29 | Ilha Flutuante e Ilha de Tempestades Eternas |
 | Final | 30 | Ilha dos Dinossauros |
 
@@ -764,6 +764,8 @@ A Ilha de Névoa é uma ilha coberta de bruma, onde ecos falsos chamam os viajan
 
 A Ilha-Cemitério de Navios é um monte de cascos encalhados e empilhados, onde os Desmanchadores, um bando de gnolls, desmontam navios mortos e tiram deles o que ainda vale algo. Ela tem quatro setores. As Proas Encalhadas, os Porões Alagados, o Convés dos Desmanchadores e o Casco da Carranca têm quatro variantes cada, incluindo uma compartilhada. Os combates são de ND 6 e usam só a lista de criaturas da ilha. Cada combate tem planta própria, montada em volta dos conveses, das pranchas, da água e das escotilhas. O Centro sorteia um de três guardiões ND 8: o Capitão dos Ossos (Capitão Pirata com Amálgama de Esqueleto e Esqueleto de Elite), o Tesouro que Morde (dois Mímicos) ou o Caçador de Cabeças (Gnoll Caçador de Cabeças com Líder de Alcateia e Xamã de Megalokk). A arena do Centro é a Nau Capitânia. A missão em destaque é a recuperação da bandeira da frota do almirante. Com esta ilha, a fileira inicial está completa: todos os seus temas já entram no sorteio.
 
+A Ilha das Ruínas Ciclópicas é a primeira ilha intermediária no formato novo, com seis setores de dois combates e um teste cada e uma planta própria por combate. Pedras do tamanho de casas saem da água, cobertas de sal, e os mercenários de Aslothia disputam com os construtos e os gigantes das ruínas o trono no centro. Os setores são a Escadaria afundada, o Jardim das estátuas, o Poço do olho, o Acampamento de Aslothia, o Arco partido e o Trono afundado, com três variantes próprias cada. Os combates são de ND 7 e usam só a lista de criaturas da ilha. Os quatro primeiros setores aplicam penalidades distintas à criatura principal, e o Arco partido e o Trono afundado concedem bônus ao guardião. O Centro sorteia um de três guardiões ND 9: o Gigante do Trono (Gigante dos Mares), a Senhora das Estátuas (Górgona com Defensor Rochoso) ou o Golem Religado (Golem de Bronze com Líder Mercenário de Aslothia). A arena do Centro é o Trono dos Gigantes. A missão em destaque é copiar as inscrições dos construtores antes que os mercenários as quebrem.
+
 As quatro ilhas iniciais sorteiam quatro penalidades distintas do conjunto compartilhado de 16. O sorteio considera as proteções do guardião e fica salvo na expedição. As penalidades só afetam a criatura principal, e um setor reaberto mantém a penalidade sorteada.
 
 - A ficha aplica automaticamente as penalidades de PV máximos, Defesa, Iniciativa e testes de resistência.
@@ -772,7 +774,7 @@ As quatro ilhas iniciais sorteiam quatro penalidades distintas do conjunto compa
 
 Os combates dos setores usam listas de criaturas próprias de cada ilha. Os mapas táticos incluem os elementos de terreno e os pontos de interação dos setores e do Centro. O mestre pode rerrolar os combates de setor antes de registrar dano ou ajustes, mantendo o ND e a lista de criaturas da cena. O botão fica centralizado no rodapé do painel de criaturas. A modal da ilha mostra sucesso ou falha no Centro. A vitória acrescenta um fragmento à expedição. Cristais e inventário ficam sob controle do mestre.
 
-A liburna é o ícone dourado do botão de descanso. [A emboscada no convés](#81-ataques-ao-barco) já usa os fragmentos para determinar a chance e o ND. O restante da expedição aguarda a conclusão do combate para encerrar o descanso. A pirâmide usa traços claros sobre transparência nos 23 temas cadastrados, incluindo os que estão fora do sorteio, e aplica o mesmo tratamento ao ícone de ilha desconhecida. A seleção da primeira versão continua com catorze temas.
+A liburna é o ícone dourado do botão de descanso. [A emboscada no convés](#81-ataques-ao-barco) já usa os fragmentos para determinar a chance e o ND. O restante da expedição aguarda a conclusão do combate para encerrar o descanso. A pirâmide usa traços claros sobre transparência nos 23 temas cadastrados, incluindo os que estão fora do sorteio, e aplica o mesmo tratamento ao ícone de ilha desconhecida. A seleção da primeira versão continua com quinze temas.
 
 A Ilha Vulcânica tem seis setores. A Praia de Cinzas, a Ponte de Basalto, o Campo de Fumarolas, a Galeria de Obsidiana, o Terraço da Forja e a Borda da Caldeira têm três variantes cada, com combates de ND 7 e testes de ND 2 ou 3. A recompensa segue a mesma regra das ilhas iniciais. Os mapas incluem cinzas, lava intransitável, fumarolas e obstáculos de obsidiana conforme a cena.
 
@@ -802,14 +804,14 @@ As missões das ilhas 21 a 29 são cenas próprias de cada ilha. `src/missions/a
 
 A grade em camadas já cobre setores, arenas, convés da liburna e mapas de missão. Os mapas-base reutilizáveis ficaram para a próxima etapa da [grade tática compartilhada](ARCHITECTURE.md#grade-tática-compartilhada).
 
-1. **Reativar os 9 temas restantes, um a um como ilhas completas, cada um com seu pacote em `archipelagoMissionThemes.js`.** A fileira inicial já está completa; faltam as fileiras intermediária e avançada. O design está em `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`. O teste de cobertura cobra o pacote de cada tema ao ativá-lo.
+1. **Reativar os 8 temas restantes, um a um como ilhas completas, cada um com seu pacote em `archipelagoMissionThemes.js`.** A fileira inicial já está completa; a intermediária tem a Ilha das Ruínas Ciclópicas e faltam as demais intermediárias e as avançadas. O design está em `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`. O teste de cobertura cobra o pacote de cada tema ao ativá-lo.
 2. **Validar a campanha completa em mesa.** Usar como referência o grupo chegando no nível 7 e testar os marcos de nível 8, 9 e 10 aos 4, 7 e 9 fragmentos. Conferir duração das sessões, recursos que sobram para o guardião, XP, tesouros, reaberturas e emboscadas. Testar o Rei Tirano com todos os bônus e com todos removidos, com atenção à CD 27 do Rugido Ensurdecedor e ao impacto de dois Deinonicos. Fica por último, depois que o restante estiver pronto, para que a sessão em mesa só gere ajustes pequenos.
 
 ### Pendências Conhecidas
 
 - Repetir a validação visual quando houver troca de arte, conferindo as ilhas reveladas, concluídas e bloqueadas.
 - Os fragmentos obtidos ainda são representados principalmente por contador/progresso; a exibição visual individual no barco pode evoluir.
-- Os 9 temas fora do sorteio ainda não têm pacote de missões. A fileira inicial está completa. Ao ativar cada um, o teste de cobertura exige o pacote completo. O design está em `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`.
+- Os 8 temas fora do sorteio ainda não têm pacote de missões. A fileira inicial está completa. Ao ativar cada um, o teste de cobertura exige o pacote completo. O design está em `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`.
 - Ajustes pequenos de código anotados na revisão das missões: congelar o encontro da caçada guardado em memória, unificar a janela de ND da caçada com a do gerador, criar um teste fixo que garanta as mesmas ofertas na floresta e na masmorra e agrupar os parâmetros de `renderMissionRunContent`.
 
 ### A Definir

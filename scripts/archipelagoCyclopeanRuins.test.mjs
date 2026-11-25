@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { archipelago21to30Profile as profile, archipelagoEcologyContexts } from "../src/floorProfiles/archipelago21to30.js";
+import { createRng } from "../src/random.js";
 import { createArchipelagoState } from "../src/archipelagoState.js";
 import { withIslandTacticalLayout } from "../src/archipelagoTacticalMap.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
@@ -9,9 +10,10 @@ import { calculateCombatND } from "../src/challenge.js";
 import { getCreatureById } from "../src/creatureCatalog/index.js";
 import { getEligibleGuardianPenalties } from "../src/archipelagoGuardianPenalties.js";
 import {
-  createIslandGuardian, createIslandSector, createIslandSectorCombat, getIslandThemeTerrain
+  createIslandGuardian, createIslandSector, createIslandSectorCombat, getIslandThemeTerrain, hasIslandSectors
 } from "../src/archipelagoPilot.js";
 import { getCreatureOriginThemeId, getIslandCreatureIds } from "../src/archipelagoCreatureRules.js";
+import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionThemes.js";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/archipelago-sessao-antes-ruinas.json", import.meta.url), "utf8"));
 const island = { floor: 25, themeId: "cyclopean-ruins" };
@@ -200,4 +202,24 @@ test("inimigos das ruínas não começam colados ao ponto de interação", () =>
       }
     }
   }
+});
+
+test("expedição nova pode sortear a Ilha das Ruínas Ciclópicas completa", () => {
+  let found = null;
+  for (let i = 0; i < 200 && !found; i += 1) {
+    const seed = `ruinas-${i}`;
+    const { islands } = createArchipelagoState(profile, createRng(seed)).getSnapshot();
+    const hit = islands.find(item => item.themeId === "cyclopean-ruins");
+    if (hit) found = { seed, hit };
+  }
+  assert.ok(found, "nenhuma seed sorteou cyclopean-ruins");
+  const { hit } = found;
+  assert.ok(hit.floor >= 25 && hit.floor <= 27);
+  assert.equal(hasIslandSectors(hit), true);
+  assert.equal(hit.objectives.length, 6);
+  assert.equal(new Set(hit.objectives.slice(0, 4).map(item => item.penaltyId)).size, 4);
+  for (const objective of hit.objectives.slice(4)) assert.ok(objective.guardianBuffId, objective.id);
+  assert.equal(hit.arenaName, "Trono dos Gigantes");
+  assert.ok(getArchipelagoMissionTheme("cyclopean-ruins"));
+  assert.ok(["gigante-do-trono", "senhora-das-estatuas", "golem-religado"].includes(hit.guardianComposition), hit.guardianComposition);
 });

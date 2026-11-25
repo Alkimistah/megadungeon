@@ -166,6 +166,14 @@ const archipelagoBaseInitialRow = {
   }
 };
 
+const archipelagoBaseIntermediateRow = {
+  ...archipelago21to30Profile,
+  archipelago: {
+    ...archipelago21to30Profile.archipelago,
+    enabledThemeIds: archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "cyclopean-ruins")
+  }
+};
+
 test("sessão anterior mantém a terceira composição original do Atol", () => {
   const profile = archipelago21to30Profile;
   const rng = () => 0.99;
@@ -324,13 +332,14 @@ test("os setores sorteiam penalidades distintas do conjunto de 16 e o código de
   for (const ids of idsSeenBySector) assert.equal(ids.size, 16);
 });
 
-test("expedições novas sorteiam posições apenas entre os catorze temas ativos", () => {
+test("expedições novas sorteiam posições apenas entre os quinze temas ativos", () => {
   const { enabledThemeIds, themePools } = archipelago21to30Profile.archipelago;
-  assert.equal(enabledThemeIds.length, 14);
+  assert.equal(enabledThemeIds.length, 15);
   assert.ok(enabledThemeIds.includes("shipwrecked"));
   assert.ok(enabledThemeIds.includes("giant-kelp"));
   assert.ok(enabledThemeIds.includes("mist"));
   assert.ok(enabledThemeIds.includes("ship-graveyard"));
+  assert.ok(enabledThemeIds.includes("cyclopean-ruins"));
   const activeByRow = Object.fromEntries(Object.entries(themePools).map(([row, themes]) => [
     row, themes.map(theme => theme.id).filter(id => enabledThemeIds.includes(id))
   ]));
@@ -347,6 +356,7 @@ test("expedições novas sorteiam posições apenas entre os catorze temas ativo
     for (const [row, active] of Object.entries(activeByRow)) {
       const rowIds = islands.filter(island => rowOf(island.floor) === row).map(island => island.themeId);
       if (row === "initial") assert.equal(new Set(rowIds).size, 4, seed);
+      else if (row === "intermediate") assert.equal(new Set(rowIds).size, 3, seed);
       else assert.deepEqual([...rowIds].sort(), [...active].sort(), `${seed}: ${row}`);
     }
     assert.equal(islands.find(island => island.floor === 30).themeId, "dinosaurs");
@@ -598,7 +608,7 @@ test("a Ilha Vulcânica só libera o guardião ND 9 após seis resultados e conc
 });
 
 test("os três guardiões vulcânicos têm ND 9 nos dois extremos de enfraquecimento", () => {
-  const profile = archipelago21to30Profile;
+  const profile = archipelagoBaseIntermediateRow;
   for (const roll of [0, 0.5, 0.99]) {
     const state = createArchipelagoState(profile, () => roll);
     const island = state.getSnapshot().islands.find(item => item.themeId === "volcanic");
@@ -663,7 +673,7 @@ test("o acesso normal exige a conclusão de cada faixa e nove fragmentos para a 
 });
 
 test("a Vulcânica sorteia bônus variados sem repetição e restaura os mesmos bônus", () => {
-  const profile = archipelago21to30Profile;
+  const profile = archipelagoBaseIntermediateRow;
   const observed = new Set();
   for (let seed = 0; seed < 30; seed++) {
     const rng = createRng(`bonus-vulcanicos-${seed}`);
@@ -695,7 +705,7 @@ test("a Vulcânica sorteia bônus variados sem repetição e restaura os mesmos 
 });
 
 test("a Ilha-Labirinto conserva seis resultados até o Centro ND 9 e concede um fragmento", () => {
-  const profile = archipelago21to30Profile;
+  const profile = archipelagoBaseIntermediateRow;
   for (const roll of [0, 0.5, 0.99]) {
     const rng = () => roll;
     const state = createArchipelagoState(profile, rng);
@@ -730,7 +740,7 @@ test("a Ilha-Labirinto conserva seis resultados até o Centro ND 9 e concede um 
 });
 
 test("o fortim pirata tem seis setores, guarda as proteções sorteadas e concede um fragmento", () => {
-  const profile = archipelago21to30Profile;
+  const profile = archipelagoBaseIntermediateRow;
   const leaders = ["capitao-do-conclave-pirata", "capitao-pirata", "ogro-das-sanguinarias"];
   for (const [index, roll] of [0, 0.5, 0.99].entries()) {
     const rng = () => roll;
