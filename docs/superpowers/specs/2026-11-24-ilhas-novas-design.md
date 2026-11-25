@@ -47,8 +47,12 @@ O PO pediu que o trabalho ande **de pouco em pouco**, com qualidade máxima em c
 | 2 | Inicial | Ilha de Algas Gigantes (`giant-kelp`) | Concluída e publicada (24/11/2026) |
 | 3 | Inicial | Ilha de Névoa (`mist`) | Concluída e publicada (25/11/2026) |
 | 4 | Inicial | Ilha-Cemitério de Navios (`ship-graveyard`) | Concluída e publicada (25/11/2026) |
-| — | Ponto de controle das iniciais | | **Próximo** |
-| 5–9 | Intermediária | Navio Abandonado, Ruínas Ciclópicas, Ilha Sagrada, Maré Impossível, Ilha de Cristal (ordem definida no ponto de controle) | Pendente |
+| — | Ponto de controle das iniciais | | Concluído (25/11/2026) |
+| 5 | Intermediária | Ilha das Ruínas Ciclópicas (`cyclopean-ruins`) | **Próxima.** Começa pela prévia de conteúdo |
+| 6 | Intermediária | Ilha Sagrada (`sacred`) | Pendente |
+| 7 | Intermediária | Ilha de Cristal (`crystal`) | Pendente |
+| 8 | Intermediária | Navio Abandonado (`abandoned-ship`) | Pendente |
+| 9 | Intermediária | Ilha de Maré Impossível (`impossible-tide`) | Pendente |
 | — | Ponto de controle das intermediárias | | Pendente |
 | 10–13 | Avançada | Iceberg, Ilha Viva, Sal e Ossos, Ilha Elemental (ordem definida no ponto de controle) | Pendente |
 | — | Ponto de controle final | | Pendente |
@@ -66,7 +70,9 @@ As etapas 1 e 2 foram concluídas e publicadas em 24/11/2026. As etapas 3 (Névo
 
 O modelo de dados de uma ilha nova está em `src/archipelagoMist.js` e `src/archipelagoShipGraveyard.js`. Os testes de modelo estão em `scripts/archipelagoMist.test.mjs` e `scripts/archipelagoShipGraveyard.test.mjs`, que também conferem `calculateCombatND` dos guardiões e a distância dos inimigos ao marco.
 
-**Próximo passo:** o ponto de controle das iniciais. Ele revisa as quatro ilhas novas da fileira, decide a ordem das cinco intermediárias e detalha o formato delas (6 setores, combate ND 7, setores que removem bônus do guardião). Depois disso, cada intermediária segue o mesmo ciclo: prévia em `tmp/previas/ilha-<tema>/`, aprovação, plano, subagentes, validação no app e publicação.
+**Ponto de controle das iniciais (25/11/2026).** As quatro ilhas novas estão no padrão. O PO decidiu a ordem das intermediárias (Ruínas Ciclópicas, Sagrada, Cristal, Navio Abandonado e Maré Impossível) e o formato delas, descrito em "Formato por fileira". O Navio Abandonado fica longe do Cemitério de Navios para não repetir. A Maré Impossível fica por último, porque é a mais difícil de expressar sem mexer no motor.
+
+**Próximo passo:** etapa 5, Ilha das Ruínas Ciclópicas (`cyclopean-ruins`), pelo mesmo ciclo: prévia em `tmp/previas/ilha-ruinas/`, aprovação, plano, subagentes, validação no app e publicação.
 
 **Lições das etapas 3 e 4.**
 
@@ -96,7 +102,13 @@ Os números abaixo seguem as ilhas atuais da mesma fileira. São a referência d
 - Penalidades do guardião: as 4 sorteadas do conjunto compartilhado de 16, automáticas pelo motor. Sem bônus de guardião.
 - Guardião: 3 composições ND 8.
 
-**Intermediárias (Centro ND 9) e avançadas (Centro ND 10):** os formatos são os de Vulcânica, Cavernas Marinhas e Ilha Tomada por Piratas (6 setores, 3 variantes, combate ND 7, setores que removem bônus) e os de Flutuante e Tempestades (8 setores, 3 variantes, combate ND 8, quatro setores de penalidade e quatro de bônus). Esses formatos são detalhados no ponto de controle de cada fileira.
+**Intermediárias (andares 25–27; Centro ND 9), decididas no ponto de controle das iniciais:**
+- 6 setores (NO, NL, O, L, SO, SL), cada um com **3 variantes próprias: 2 combates e 1 teste estendido**. Não há variante compartilhada, porque as tarefas compartilhadas do motor só cobrem 4 setores.
+- Combates ND 7 (`combatChallenge: 7`), cada um com a própria planta. São 12 plantas de combate e a do Centro.
+- Os 4 primeiros setores aplicam as penalidades sorteadas. Os 2 últimos (SO e SL) removem um bônus do guardião (`defaultGuardianBuff`), como na Vulcânica.
+- Guardião: 3 composições ND 9.
+
+**Avançadas (Centro ND 10):** o formato é o de Flutuante e Tempestades (8 setores, 3 variantes, combate ND 8, quatro setores de penalidade e quatro de bônus). Ele será detalhado no ponto de controle das intermediárias.
 
 ## Restrições
 
