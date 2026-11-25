@@ -66,6 +66,12 @@ const islandCreatures = {
     "cocatriz", "basilisco", "gorgona", "cocatriz-real", "grifo", "serpe",
     "esqueleto", "esqueleto-de-elite", "ogro-esqueleto", "gigante-esqueleto",
     "capanga", "jagunco", "lider-mercenario-de-aslothia", "gigante-das-colinas", "necromante"
+  ],
+  sacred: [
+    "pegaso", "unicornio", "dragonete", "ninfa", "protetor", "eiradaan-guardiao",
+    "hipogrifo", "grifo", "coruja-gigante",
+    "recruta-purista", "soldado-purista", "purificado", "sargento-mor", "capelao-de-guerra",
+    "arcano-de-guerra-adepto", "capitao-baluarte", "cacador-de-impuros", "bispo-de-guerra"
   ]
 };
 
