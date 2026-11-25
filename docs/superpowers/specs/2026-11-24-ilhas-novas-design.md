@@ -45,9 +45,9 @@ O PO pediu que o trabalho ande **de pouco em pouco**, com qualidade máxima em c
 |---|---|---|---|
 | 1 | Inicial | Ilha dos Náufragos (`shipwrecked`) | Concluída e publicada (24/11/2026) |
 | 2 | Inicial | Ilha de Algas Gigantes (`giant-kelp`) | Concluída e publicada (24/11/2026) |
-| 3 | Inicial | Ilha de Névoa (`mist`) | Concluída e validada (25/11/2026), aguardando publicação |
-| 4 | Inicial | Ilha-Cemitério de Navios (`ship-graveyard`) | **Próxima.** Começa pela prévia de conteúdo |
-| — | Ponto de controle das iniciais | | Pendente |
+| 3 | Inicial | Ilha de Névoa (`mist`) | Concluída e publicada (25/11/2026) |
+| 4 | Inicial | Ilha-Cemitério de Navios (`ship-graveyard`) | Concluída e publicada (25/11/2026) |
+| — | Ponto de controle das iniciais | | **Próximo** |
 | 5–9 | Intermediária | Navio Abandonado, Ruínas Ciclópicas, Ilha Sagrada, Maré Impossível, Ilha de Cristal (ordem definida no ponto de controle) | Pendente |
 | — | Ponto de controle das intermediárias | | Pendente |
 | 10–13 | Avançada | Iceberg, Ilha Viva, Sal e Ossos, Ilha Elemental (ordem definida no ponto de controle) | Pendente |
@@ -57,27 +57,22 @@ O PO definiu a ordem das iniciais. A ordem das demais fileiras fica para o ponto
 
 ### Onde paramos
 
-As etapas 1 e 2 foram concluídas e publicadas em 24/11/2026. A etapa 3 (Névoa) foi concluída e validada em 25/11/2026, e aguarda publicação. Junto com as etapas 1 e 2, entraram melhorias que passam a valer para as próximas ilhas:
+As etapas 1 e 2 foram concluídas e publicadas em 24/11/2026. As etapas 3 (Névoa) e 4 (Cemitério de Navios) foram concluídas e publicadas em 25/11/2026. Com elas, a fileira inicial está completa: oito temas para quatro vagas. Junto com as etapas 1 e 2, entraram melhorias que passam a valer para as próximas ilhas:
 
 - **Uma planta por combate.** A planta é escolhida pela tarefa, em `byTask`, e cada setor tem pelo menos dois combates sorteáveis.
 - **Mecânica própria de guardião (`rule`).** Por exemplo, a lente do farol contra a Aparição.
 - **Área inicial dos inimigos (`enemyArea`).** Ela impede que a tarefa comece perdida.
 - **Visual dos terrenos agrupados.** Elevação, inclinação, buraco, abismo, fosso, penhasco e toldo aparecem com contorno único. A porta é desenhada sobre o chão, o toldo fica por cima das peças, e os elementos sobre o platô ficam no mesmo nível dele.
 
-O modelo de dados de uma ilha nova está em `src/archipelagoShipwrecked.js` e `src/archipelagoGiantKelp.js`. Os testes de modelo estão em `scripts/archipelagoShipwrecked.test.mjs` e `scripts/archipelagoGiantKelp.test.mjs`.
+O modelo de dados de uma ilha nova está em `src/archipelagoMist.js` e `src/archipelagoShipGraveyard.js`. Os testes de modelo estão em `scripts/archipelagoMist.test.mjs` e `scripts/archipelagoShipGraveyard.test.mjs`, que também conferem `calculateCombatND` dos guardiões e a distância dos inimigos ao marco.
 
-**Próximo passo:** etapa 4, Ilha-Cemitério de Navios (`ship-graveyard`). O ciclo é o mesmo:
+**Próximo passo:** o ponto de controle das iniciais. Ele revisa as quatro ilhas novas da fileira, decide a ordem das cinco intermediárias e detalha o formato delas (6 setores, combate ND 7, setores que removem bônus do guardião). Depois disso, cada intermediária segue o mesmo ciclo: prévia em `tmp/previas/ilha-<tema>/`, aprovação, plano, subagentes, validação no app e publicação.
 
-1. prévia de conteúdo em cartões, com as plantas de todos os combates, em `tmp/previas/ilha-cemiterio/`;
-2. aprovação do PO;
-3. plano em `docs/superpowers/plans/`;
-4. execução com subagentes;
-5. validação no app;
-6. publicação.
+**Lições das etapas 3 e 4.**
 
-O tema já tem ecologia (a mesma dos Náufragos) e ícone, e ainda precisa de `arenaName`. Depois vem o ponto de controle das iniciais.
-
-**Lição da etapa 3 (decisão do PO):** na megadungeon, quem cai a 0 PV sai da masmorra. Nenhum guardião ou regra de cena pode ter como saída natural derrubar uma personagem. Por isso o Rival Espelho foi vetado.
+- **0 PV (decisão do PO):** na megadungeon, quem cai a 0 PV sai da masmorra. Nenhum guardião ou regra de cena pode ter como saída natural derrubar uma personagem. Por isso o Rival Espelho foi vetado.
+- **Peças grandes e `enemyArea`:** quando as peças 2x2 não cabem na área inicial, o motor as coloca no primeiro espaço livre, ignorando a área. A planta precisa de espaço de sobra na área inicial, e o teste de distância ao marco deve cobrir todo combate em que um inimigo colado ao marco atrapalhe a tarefa.
+- **Missão em destaque:** o texto não pode citar o nome da arena do guardião, e a frase de abertura recebe o nome da ilha no fim.
 
 ## Fluxo de cada etapa
 
