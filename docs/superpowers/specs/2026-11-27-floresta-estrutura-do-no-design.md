@@ -1,6 +1,6 @@
 # Floresta (11–20): estrutura do nó
 
-Situação: design revisado, aguardando aprovação do PO. O PO escolheu a abordagem A em 27/11/2026. O plano de implementação vem depois da aprovação deste documento.
+Situação: design aprovado pelo PO com ajuste no texto de XP. A abordagem A foi escolhida em 27/11/2026. O plano está em [Estrutura dos nós da floresta](../plans/2026-11-27-floresta-estrutura-do-no.md).
 
 ## Escopo
 
@@ -49,11 +49,11 @@ O resolvedor tenta a outra variante quando a primeira não tem composição comp
 
 Mostrar três parcelas com nome, ND e XP no cabeçalho do nó revelado. O modo de jogo continua mostrando os dados de descoberta e exploração. Exemplo para um combate normal do andar 15:
 
-- Ambiente · ND ½ · até 500 XP se influenciou a cena
+- Ambiente · ND ½ · 500 XP
 - Criaturas · ND 3 · 3.000 XP
 - Armadilha · ND 1 · 1.000 XP
 
-A proposta mantém a conversão atual de 1.000 XP por ND e mostra zero nas parcelas ausentes. A parcela de ambiente soma terreno e clima, com os pesos vigentes. O mestre decide na mesa se ela se aplica. O cabeçalho apresenta os valores sem calcular um total automático de XP. O valor agregado usado pelo mapa e por outros consumidores soma ambiente, criaturas e armadilhas e segue os limites atuais do perfil, de ND ¼ a 8. Ele funciona como indicador do nó. Para cenas com ND próprio, preservar o cálculo específico da cena.
+A proposta mantém a conversão atual de 1.000 XP por ND e mostra zero nas parcelas ausentes. A parcela de ambiente soma terreno e clima, com os pesos vigentes. O mestre decide na mesa se ela se aplica. Cada parcela mostra apenas o valor de XP, no formato atual, ao lado do ND. O cabeçalho também dispensa o total automático de XP. O valor agregado usado pelo mapa e por outros consumidores soma ambiente, criaturas e armadilhas e segue os limites atuais do perfil, de ND ¼ a 8. Ele funciona como indicador do nó. Para cenas com ND próprio, preservar o cálculo específico da cena.
 
 A parcela das criaturas usa o alvo antes da resolução e o ND do grupo encontrado depois. A parcela da armadilha usa a ficha selecionada. Em encontros fixos com mais de uma armadilha, soma as parcelas das fichas fixas. Se uma cena escrita tiver ND próprio e nenhuma dessas três fontes o representar, usar a indicação própria da cena, inclusive no falso descanso até a emboscada ser resolvida.
 
