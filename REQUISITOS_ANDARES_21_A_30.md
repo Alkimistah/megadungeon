@@ -826,6 +826,7 @@ A grade em camadas já cobre setores, arenas, convés da liburna e mapas de miss
 
 ### Pendências Conhecidas
 
+- **Ilha Vulcânica.** Revisar o elenco de setor e as composições do Centro. O elenco atual ainda explora pouco o tema vulcânico. Buscar criaturas e combinações que façam sentido na caldeira e nos demais setores, mantendo os encontros de setor em ND 7 e os guardiões em ND 9.
 - Repetir a validação visual quando houver troca de arte, conferindo as ilhas reveladas, concluídas e bloqueadas.
 - Os fragmentos obtidos ainda são representados principalmente por contador/progresso; a exibição visual individual no barco pode evoluir.
 - Os 5 temas fora do sorteio ainda não têm pacote de missões. A fileira inicial está completa. Ao ativar cada um, o teste de cobertura exige o pacote completo. O design está em `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`.
