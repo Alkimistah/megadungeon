@@ -243,6 +243,54 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     }
   },
 
+  crystal: {
+    pools: {
+      locations: ["uma galeria sob placas translúcidas", "uma encosta de cristal polido", "uma trilha entre agulhas violetas", "uma bacia aquecida por feixes de luz"],
+      materials: ["quartzo leitoso partido", "farpas de cristal violeta", "lascas que filtram a luz em azul", "fragmentos de âmbar aquecidos ao sol"],
+      objects: ["uma mochila presa no fim de uma encosta", "uma corda enrolada numa coluna", "um estojo de amostras", "uma haste de cobre usada para firmar uma passagem"],
+      mementos: ["uma lente rachada dentro de um estojo", "um caderno com desenhos das galerias", "um pedaço de fita refletora", "um pingente de quartzo bruto"],
+      clues: ["sombras que passam sob as placas", "saliências foscas na encosta", "cacos empurrados para as bordas da trilha", "marcas escuras deixadas por um foco solar"],
+      challenges: ["cruzar as placas sem cair nas farpas", "recolher uma amostra no fundo do poço", "recuperar um objeto antes que deslize para a fenda", "retirar uma pessoa presa entre focos solares"],
+      phenomena: ["feixes violetas que se repetem nas colunas", "cristais que estalam quando o sol bate", "ar que ondula sobre uma faixa dourada", "placas que deixam ver movimento por baixo"]
+    },
+    featured: {
+      category: "trial",
+      title: "Abrir uma passagem à sombra",
+      targetName: "a passagem à sombra sob o cristal central",
+      lead: "Abra uma passagem à sombra e vença o guardião",
+      condition: "Desobstruir a passagem com duas ações padrão em rodadas diferentes, junto ao marco, e vencer o combate enquanto o foco solar muda a cada rodada",
+      proofType: "Mostrar a passagem desobstruída."
+    },
+    map: {
+      markers: ["polished-crystal", "crystal-shards", "obstacle", "clearing"],
+      landmark: { name: "Passagem sob o prisma", effect: "A passagem fica sob o cristal central. Desobstrua a entrada em duas rodadas diferentes." }
+    }
+  },
+
+  "abandoned-ship": {
+    pools: {
+      locations: ["a proa sob o sino", "o corredor das redes da tripulação", "o porão com água no assoalho", "a passagem de serviço ao lado da enfermaria"],
+      materials: ["terra acumulada nas frestas da cabine", "um trecho de cordame partido", "lascas do estrado do porão", "resíduos da água que cobre o manifesto"],
+      objects: ["uma chave presa à rede de um marinheiro", "uma carta de navegação manchada de água", "o caderno do cirurgião", "o badalo solto do sino"],
+      mementos: ["um medalhão preso ao cordame", "uma carta de despedida guardada na rede", "um anel caído no porão", "uma fita com o nome de um vigia"],
+      clues: ["reflexos que retomam os postos a cada badalada", "sinais de arrasto entre o porão e a cabine", "ferimentos anotados pelo cirurgião", "uma ordem de fechar as escotilhas"],
+      challenges: ["seguir a passagem indicada por um vigia no reflexo", "cruzar o cordame e firmar uma rota de retorno", "travar o badalo antes que feche a escotilha", "liberar o leme preso"],
+      phenomena: ["um sino que toca sozinho", "uma ordem repetida pelo tubo de voz", "um reflexo sem dono no bronze", "uma noite que persiste qualquer que seja a hora"]
+    },
+    featured: {
+      category: "investigation",
+      title: "A Última Entrada",
+      targetName: "a origem da maldição da tripulação",
+      lead: "Reconstitua o que aconteceu com a tripulação",
+      condition: "Cruzar o manifesto, o registro do cirurgião e a carta de navegação. Recolher o diário junto à mesa com uma ação padrão e levá-lo após a vitória",
+      proofType: "Entregar o diário de bordo recolhido na cabine."
+    },
+    map: {
+      markers: ["deck", "water", "obstacle", "door"],
+      landmark: { name: "Mesa de cartas", effect: "A mesa de cartas, junto à qual o diário de bordo pode ser recolhido." }
+    }
+  },
+
   volcanic: {
     pools: {
       locations: ["uma praia de cinzas negras", "uma encosta cortada por rios de lava", "o topo de uma encosta de cinzas", "um túnel de lava endurecida"],

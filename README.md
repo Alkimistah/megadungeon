@@ -82,7 +82,7 @@ Os perfis atuais são:
 
 - `dungeon1to10`: exploração estendida dos andares 1 a 10, com ações por andar, tabela d100, efeitos mecânicos, mapas táticos, encontros finais e chefe do andar 10.
 - `forest11to20`: mapa em nodos dos andares 11 a 20, usado como representação de uma área maior com rotas pré-geradas.
-- `archipelago-21-30`: arquipélago com dez ilhas e progressão por fragmentos. As nove ilhas e a ilha final têm exploração completa, e as nove têm missões por tema. Outros 7 temas estão desligados até receberem setores e pacote de missões.
+- `archipelago-21-30`: arquipélago com dez ilhas e progressão por fragmentos. As nove ilhas e a ilha final têm exploração completa, e as nove têm missões por tema. Outros 5 temas estão desligados até receberem setores e pacote de missões.
 
 Para adicionar uma nova faixa de andares:
 
@@ -94,7 +94,7 @@ Para adicionar uma nova faixa de andares:
 
 - Criar uma mecânica especial para a Quimera; o MVP usa o chefe sozinho em arena fixa simples.
 - Ampliar os desconhecidos e evoluir a continuidade de clima/terreno e as pistas de rota dos andares 11–20.
-- As três ilhas intermediárias têm seis setores cada. As duas avançadas têm oito setores cada. A expedição começa com quatro ilhas abertas e zero fragmentos. Concluir as iniciais libera as intermediárias. Concluir as intermediárias libera as avançadas. Nove fragmentos abrem a rota até o Rei Tirano ND 11. Com Caminhos desconhecidos, cada fileira aparece ao ser liberada e as ilhas só revelam o tema no desembarque. O ícone do barco marca a última ilha explorada, e o botão Retornar ao barco fica disponível no mapa durante a visita. As missões já seguem o tema de cada ilha, com mapa próprio, acesso no centro do rodapé da ficha e CD pela tabela de ND do Ameaças de Arton. Os 7 temas fora do sorteio voltam um a um como ilhas completas. O próximo trabalho é revisar a grade tática compartilhada. A validação em mesa fica por último, depois que tudo estiver pronto. [Ordem de implementação](REQUISITOS_ANDARES_21_A_30.md#por-onde-retomar)
+- As três ilhas intermediárias têm seis setores cada. As duas avançadas têm oito setores cada. A expedição começa com quatro ilhas abertas e zero fragmentos. Concluir as iniciais libera as intermediárias. Concluir as intermediárias libera as avançadas. Nove fragmentos abrem a rota até o Rei Tirano ND 11. Com Caminhos desconhecidos, cada fileira aparece ao ser liberada e as ilhas só revelam o tema no desembarque. O ícone do barco marca a última ilha explorada, e o botão Retornar ao barco fica disponível no mapa durante a visita. As missões já seguem o tema de cada ilha, com mapa próprio, acesso no centro do rodapé da ficha e CD pela tabela de ND do Ameaças de Arton. Os 5 temas fora do sorteio voltam um a um como ilhas completas. A Ilha de Cristal e o Navio Abandonado fazem parte da fileira intermediária. Cada um tem doze plantas de setor e uma arena do Centro. A validação em mesa fica por último, depois que tudo estiver pronto. [Ordem de implementação](REQUISITOS_ANDARES_21_A_30.md#por-onde-retomar)
 
 ## MVP dos andares 11–20
 

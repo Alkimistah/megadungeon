@@ -170,6 +170,12 @@ export function createArchipelagoState(profile, rng = Math.random) {
     return [];
   }
 
+  function getIslandVictoryNarrative(island) {
+    if (!hasIslandSectors(island)) return undefined;
+    return activeProfile.archipelago.themePools[island.difficulty]
+      ?.find(theme => theme.id === island.themeId)?.victoryNarrative;
+  }
+
   function getFragments() {
     return [...completedFloors].filter((floor) => floor >= 21 && floor <= 29).length;
   }
@@ -367,7 +373,8 @@ export function createArchipelagoState(profile, rng = Math.random) {
 
     completedFloors.add(floor);
     activeExploration = null;
-    log = [`Ilha ${floor} concluída.${floor === 30 ? " Etapa finalizada." : " Fragmento recuperado."}`, ...log].slice(0, 8);
+    const ending = getIslandVictoryNarrative(island) ?? (floor === 30 ? "Etapa finalizada." : "Fragmento recuperado.");
+    log = [`Ilha ${floor} concluída. ${ending}`, ...log].slice(0, 8);
     return true;
   }
 
@@ -447,6 +454,7 @@ export function createArchipelagoState(profile, rng = Math.random) {
         available: isIslandAvailable(floor),
         visited: visitedFloors.has(floor),
         completed: completedFloors.has(floor),
+        ...(completedFloors.has(floor) ? { victoryNarrative: getIslandVictoryNarrative(islands[floor]) } : {}),
         status: islands[floor].defeated ? "grupo derrotado" : getIslandStatus(floor),
         ...(floor === 30 || hasIslandSectors(islands[floor]) ? {
           guardian: {

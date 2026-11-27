@@ -20,7 +20,7 @@ export const archipelagoEcologyContexts = {
     mist: { ...island, conditions: ["neblina"] },
     "ship-graveyard": shipwreck,
     volcanic: { ...island, terrains: ["montanha"], places: ["costa-ilhas", "vulcanico"], conditions: ["calor"] },
-    "abandoned-ship": shipwreck,
+    "abandoned-ship": { ...shipwreck, conditions: ["escuridao"] },
     "cyclopean-ruins": shipwreck,
     sacred: { ...island, terrains: ["floresta", "colina"], places: ["costa-ilhas", "ruinas"] },
     "sea-caves": { ...coast, terrains: ["aquatico", "subterraneo"], places: ["costa-ilhas", "cavernas-profundas"] },
@@ -132,7 +132,7 @@ export const archipelago21to30Profile = {
     },
     enabledThemeIds: [
       "tropical", "mangrove", "atoll", "coral-coast", "shipwrecked", "giant-kelp", "mist", "ship-graveyard",
-      "volcanic", "sea-caves", "pirate-held", "cyclopean-ruins", "sacred",
+      "volcanic", "sea-caves", "pirate-held", "cyclopean-ruins", "sacred", "crystal", "abandoned-ship",
       "floating", "storm", "dinosaurs"
     ],
     themePools: {
@@ -148,13 +148,19 @@ export const archipelago21to30Profile = {
       ],
       intermediate: [
         { id: "volcanic", name: "Ilha Vulcânica", arenaName: "Caldeira de Basalto", icon: "/assets/icons/islands/ilha-vulcanica.webp", narrative: "É uma montanha negra soltando fumaça, com rios vermelhos descendo pelas encostas e o ar tremendo de calor.", objective: "Sobreviver à instabilidade do vulcão e estabilizar a rota até o fragmento." },
-        { id: "abandoned-ship", name: "Navio Abandonado", icon: "/assets/icons/islands/navio-abandonado.webp", narrative: "Há um navio enorme parado onde não deveria existir navio algum, velho, torto e silencioso demais para estar vazio.", objective: "Explorar um navio encalhado ou fantasma que substitui o terreno da ilha." },
+        {
+          id: "abandoned-ship", name: "Navio Abandonado", arenaName: "Cabine do Capitão",
+          icon: "/assets/icons/islands/navio-abandonado.webp",
+          narrative: "Sob uma noite eterna, o navio avança contra o vento. A cada badalada, os reflexos da tripulação voltam aos seus postos.",
+          objective: "Reconstituir a última viagem do navio fantasma.",
+          victoryNarrative: "O sol rompe a noite eterna. A primeira luz atravessa as janelas da cabine e rompe o caixão, revelando o fragmento. A maldição termina."
+        },
         { id: "cyclopean-ruins", name: "Ilha das Ruínas Ciclópicas", arenaName: "Trono dos Gigantes", icon: "/assets/icons/islands/ilha-das-ruinas-ciclopicas.webp", narrative: "Pedras gigantes se erguem da água como ossos de deuses afogados, todas cobertas de musgo e sal.", objective: "Ativar ou atravessar estruturas gigantescas semi-afundadas." },
         { id: "sea-caves", name: "Ilha-Labirinto de Cavernas Marinhas", arenaName: "Câmara da Maré", icon: "/assets/icons/islands/ilha-labirinto-de-cavernas-marinhas.webp", narrative: "A costa é furada como queijo, cheia de bocas escuras onde a maré entra cantando baixo.", objective: "Navegar túneis inundados, bolsões de ar e passagens que somem com a maré." },
         { id: "pirate-held", name: "Ilha Tomada por Piratas", arenaName: "Galeão da Caveira", icon: "/assets/icons/islands/ilha-tomada-por-piratas.webp", narrative: "Dá para ver paliçadas, bandeiras rasgadas e gente armada nas pedras antes mesmo de ancorar.", objective: "Romper um fortim costeiro e recuperar o fragmento antes que ele seja vendido." },
         { id: "sacred", name: "Ilha Sagrada", arenaName: "Altar da Trilha Branca", icon: "/assets/icons/islands/ilha-sagrada.webp", narrative: "Ela parece calma demais, com pilares antigos, aves em círculo e uma sensação clara de que não fomos convidados.", objective: "Cumprir tabus, provações ou negociações com guardiões espirituais." },
         { id: "impossible-tide", name: "Ilha de Maré Impossível", icon: "/assets/icons/islands/ilha-de-mare-impossivel.webp", narrative: "A água sobe, desce e corre contra si mesma, revelando caminhos que somem antes da gente terminar de apontar.", objective: "Resolver o objetivo enquanto caminhos, armadilhas e salas mudam com o ciclo da maré." },
-        { id: "crystal", name: "Ilha de Cristal", icon: "/assets/icons/islands/ilha-de-cristal.webp", narrative: "Brilha como uma joia quebrada no sol, cheia de torres translúcidas e reflexos que mostram coisas que não estão lá.", objective: "Atravessar cavernas brilhantes, ilusões naturais e formações cortantes." }
+        { id: "crystal", name: "Ilha de Cristal", arenaName: "Prisma da Maré", icon: "/assets/icons/islands/ilha-de-cristal.webp", narrative: "Brilha como uma joia quebrada no sol, cheia de torres translúcidas e reflexos que mostram coisas que não estão lá.", objective: "Atravessar cavernas brilhantes, ilusões naturais e formações cortantes." }
       ],
       advanced: [
         { id: "iceberg", name: "Iceberg", icon: "/assets/icons/islands/iceberg.webp", narrative: "É uma fortaleza de gelo à deriva, branca e azul, estalando alto como madeira prestes a partir.", objective: "Explorar uma ilha de gelo móvel com risco de fratura e frio extremo." },

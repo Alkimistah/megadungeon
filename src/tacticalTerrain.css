@@ -195,3 +195,28 @@
   pointer-events: none;
 }
 .tactical-canopy-cell { position: relative; opacity: 0.7; pointer-events: none; }
+
+.tactical-sprite[class*="is-"].is-polished-crystal {
+  background: linear-gradient(155deg, #8ed4e1 0%, #68a9c5 37%, #d2f5ec 44%, #74a0c6 53%, #689ba9 100%);
+}
+
+.tactical-sprite[class*="is-"].is-crystal-shards {
+  background: repeating-conic-gradient(from 12deg, #ac86be 0 23deg, #734b88 24deg 41deg, #c39eac 42deg 52deg, #795e8b 53deg 86deg);
+}
+
+.tactical-sprite[class*="is-"].is-solar-focus,
+.tactical-sprite[class*="is-"].is-solar-focus-a,
+.tactical-sprite[class*="is-"].is-solar-focus-b,
+.tactical-sprite[class*="is-"].is-solar-focus-c {
+  background: radial-gradient(circle at 50% 50%, #ffe59dba 0%, var(--solar-focus-color, #ca7834bb) 100%);
+  color: #3b2114;
+  font-size: clamp(7px, calc(40cqw / var(--tactical-width, 20)), 13px);
+  font-weight: 750;
+}
+
+.tactical-sprite.is-solar-focus-b { --solar-focus-color: #d69943bb; }
+.tactical-sprite.is-solar-focus-c { --solar-focus-color: #c17866bb; }
+
+.tactical-sprite.is-solar-focus-a::after { content: "A"; }
+.tactical-sprite.is-solar-focus-b::after { content: "B"; }
+.tactical-sprite.is-solar-focus-c::after { content: "C"; }

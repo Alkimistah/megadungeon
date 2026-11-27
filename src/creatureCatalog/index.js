@@ -7,6 +7,7 @@ import { undeadCreatures } from "./undead.js";
 import { eventCreatures } from "./events.js";
 import { bestiaryCreatures } from "./bestiary.js";
 import { basicBookRoleByCreatureId, sourceByCreatureId, threatsBookRoleByCreatureId } from "./sources.js";
+import { getCrystalVariant } from "./crystalVariants.js";
 import { ecologyByCreatureId } from "./ecology.js";
 import { NEUTRAL_ECOLOGY, validateEcology } from "./ecologyVocabulary.js";
 import { inferThreatRole, getThreatRole } from "../threatCreationRules.js";
@@ -112,11 +113,12 @@ for (const creature of bestiaryCreatures) {
 }
 
 export const creaturesByType = Object.fromEntries(
-  Object.entries(creaturesByTypeRaw).map(([type, creatures]) => [
-    type,
-    dedupeById([...creatures, ...(bestiaryByType.get(type) ?? [])])
-      .map(withCreatureSources).map(withThreatRoleMetadata).map(withEcology)
-  ])
+  Object.entries(creaturesByTypeRaw).map(([type, creatures]) => {
+    const catalog = dedupeById([...creatures, ...(bestiaryByType.get(type) ?? [])])
+      .map(withCreatureSources).map(withThreatRoleMetadata);
+    const crystalVariants = catalog.map(getCrystalVariant).filter(Boolean);
+    return [type, [...catalog, ...crystalVariants].map(withEcology)];
+  })
 );
 
 export const creatureCatalog = Object.values(creaturesByType).flat();
@@ -129,6 +131,7 @@ for (const creature of creatureCatalog) {
 }
 
 function isLegacyAutomaticCreature(creature, profile) {
+  if (creature.regionalVariantOf) return false;
   const family = creature.variantOf || creature.id;
   const variants = variantsByFamily.get(family);
   if (!variants) return true;
@@ -157,7 +160,7 @@ function getEcologicalFamilyRepresentative(family, variants, profile, disabledBo
 }
 
 function isEcologicalAutomaticCreature(creature, profile, disabledBooks, candidateIds) {
-  if (!isEcologyEligible(creature, disabledBooks)) return false;
+  if ((creature.regionalVariantOf && !candidateIds) || !isEcologyEligible(creature, disabledBooks)) return false;
   const family = creature.variantOf || creature.id;
   const variants = variantsByFamily.get(family);
   return !variants || getEcologicalFamilyRepresentative(family, variants, profile, disabledBooks, candidateIds)?.id === creature.id;

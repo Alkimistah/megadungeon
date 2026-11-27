@@ -1,3 +1,5 @@
+import { bestiaryCreatures } from "./bestiary.js";
+
 export const zombie = {
     id: "zumbi",
     name: "Zumbi",
@@ -3864,6 +3866,30 @@ const avatarDeTenebraDeusesDeArton = {
     "roleSource": "pdf-review"
 };
 
+const vampiroFidalgo = bestiaryCreatures.find(creature => creature.id === "vampiro-fidalgo");
+
+const vampiroPassageiroDaUltimaViagem = {
+    ...vampiroFidalgo,
+    id: "vampiro-passageiro-da-ultima-viagem",
+    name: "O Passageiro da Última Viagem",
+    regionalVariantOf: vampiroFidalgo.id,
+    challengeRating: 9,
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "O nobre viajava no caixão que agora guarda a saída do porão. Na penumbra do navio, mantém a elegância de um fidalgo mesmo ao sacar a espada.",
+        "Adaptação do Vampiro Fidalgo, do Bestiário de Arton, p. 161."
+    ],
+    stats: { ...vampiroFidalgo.stats, fortitude: 9, hitPoints: 360 },
+    actions: [
+        { name: "Corpo a Corpo", text: "Espada longa +27 (1d8+20, 18, mais 2d10 trevas) e garra +27 (1d8+20 mais 2d10 trevas)." }
+    ],
+    abilities: vampiroFidalgo.abilities.map(ability => ({
+        ...ability,
+        text: ability.text.replace("CD 26", "CD 28")
+    }))
+};
+
 export const undeadCreatures = [
     avatarDeTenebraDeusesDeArton,
     lyuba,
@@ -3880,5 +3906,5 @@ export const undeadCreatures = [
     necrodracoLich, necrodracoZumbi, reiTiranoEsqueleto, senhorDasMumias,
     tarsoDragaoReiDosMortos, afogado, capitaoAfogado, capitaoPirata,
     imediato, alzeras, arquilichFerrenAsloth, cemiterioVivo, chacalZumbi,
-    lich, lichDeAslothia, morgueRaz, wisphago
+    lich, lichDeAslothia, morgueRaz, wisphago, vampiroPassageiroDaUltimaViagem
 ];

@@ -624,6 +624,72 @@ export const centopeiasDragao = {
     skillsText: null
 };
 
+const escorpiaoDeCristal = {
+    id: "escorpiao-de-cristal",
+    name: "Escorpião de Cristal",
+    type: "monster",
+    subtype: null,
+    size: "Grande",
+    challengeRating: 4,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "Predador das galerias da Ilha de Cristal. Suas pinças são de quartzo leitoso e sua carapaça translúcida toma a cor do veio onde se abriga.",
+        "Adaptação do Escorpião-de-Megalon, do Bestiário de Arton."
+    ],
+    stats: {
+        initiative: 5, perception: 6, defense: 23, fortitude: 16, reflex: 10, will: 4,
+        hitPoints: 140,
+        speedText: "12m (8q), escalada 12m (8q)",
+        senses: "visão no escuro",
+        attributes: { str: 6, dex: 2, con: 4, int: -5, wis: 1, cha: -2 }
+    },
+    actions: [
+        { name: "Corpo a Corpo", text: "Pinças +16 (2d6+6) e ferrão +16 (1d10+5)." }
+    ],
+    abilities: [
+        { name: "Agarrar Aprimorado", timing: null, text: "Pinças (teste +18)." },
+        { name: "Ferrão Farpado", timing: null, text: "Ao acertar com o ferrão, deixa uma farpa. O alvo fica lento até o fim do próximo turno dele (Fortitude CD 18 evita)." },
+        { name: "Carapaça Cristalina", timing: null, text: "Redução de dano 5 contra todos os tipos de dano, exceto impacto." },
+        { name: "Feito de Cristal", timing: null, text: "Sofre 1 ponto de dano adicional por dado de dano de impacto." }
+    ],
+    treasure: "Riquezas Menores. O Escorpião de Cristal possui 1d4 gemas em seu corpo."
+};
+
+const centopeiaSolar = {
+    id: "centopeia-solar",
+    name: "Centopeia Solar",
+    type: "monster",
+    subtype: null,
+    size: "Enorme",
+    challengeRating: 9,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "Uma fileira de segmentos âmbar se acende sob o piso translúcido. A centopeia percorre as galerias rasas do Prisma da Maré e irrompe por uma fenda com as mandíbulas brilhando de calor.",
+        "Adaptação da Centopeia-dragão, do Livro Básico."
+    ],
+    stats: {
+        initiative: 10, perception: 8, defense: 34, fortitude: 21, reflex: 15, will: 9,
+        hitPoints: 360,
+        speedText: "15m (10q), escavar 6m (4q)",
+        senses: "visão no escuro",
+        defensesText: "imunidade a fogo e à condição caído",
+        attributes: { str: 11, dex: 3, con: 9, int: -4, wis: 1, cha: 0 }
+    },
+    actions: [
+        { name: "Corpo a Corpo", text: "Mordida +27 (2d10+26 mais 2d6 de fogo)." }
+    ],
+    abilities: [
+        { name: "Agarrar Aprimorado", timing: "livre", text: "Quando acerta com a mordida, pode tentar agarrar o alvo (teste +32)." },
+        { name: "Aura de Calor", timing: null, text: "Enquanto estiver em uma zona iluminada pelo sol, o corpo inteiro da centopeia irradia calor intenso. No início de cada turno dela, todas as criaturas em alcance curto sofrem 6d6+9 pontos de dano de fogo (Reflexos CD 28 reduz à metade)." },
+        { name: "Engolir", timing: "padrão", text: "Se começar o turno agarrando uma criatura Média ou menor, pode fazer um novo teste de agarrar para engoli-la. A criatura engolida permanece agarrada e sofre 2d10+26 de impacto mais 2d6 de fogo no início de cada turno da centopeia. Para escapar, deve causar 20 pontos de dano ao estômago (Defesa 10). Nesse caso, é regurgitada e fica caída. A centopeia só pode manter uma criatura engolida por vez." }
+    ],
+    treasure: "Padrão."
+};
+
 export const grifo = {
     id: "grifo",
     name: "Grifo",
@@ -10818,5 +10884,5 @@ export const monsterCreatures = [
     cocatrizReal, harpiaSaqueadora, mantor, quimera,
     mimico, mimicoMenor, corcelDoDeserto, tatuMontanha,
     tigreDeHyninn, tigreDeHyninnPrimordial, warg, homemPiranhaCapitao,
-    mercenarioDeAslothia
+    mercenarioDeAslothia, escorpiaoDeCristal, centopeiaSolar
 ];

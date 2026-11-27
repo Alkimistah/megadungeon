@@ -166,13 +166,13 @@ const archipelagoBaseInitialRow = {
   }
 };
 
-// A fileira intermediária tem quatro temas ativos para três vagas. Pelo mesmo motivo, estes testes
+// A fileira intermediária tem sete temas ativos para três vagas. Pelo mesmo motivo, estes testes
 // mantêm só os três temas intermediários originais, para que as rolagens fixas continuem iguais.
 const archipelagoBaseIntermediateRow = {
   ...archipelago21to30Profile,
   archipelago: {
     ...archipelago21to30Profile.archipelago,
-    enabledThemeIds: archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => id !== "cyclopean-ruins" && id !== "sacred")
+    enabledThemeIds: archipelago21to30Profile.archipelago.enabledThemeIds.filter(id => !["cyclopean-ruins", "sacred", "crystal", "abandoned-ship"].includes(id))
   }
 };
 
@@ -334,15 +334,17 @@ test("os setores sorteiam penalidades distintas do conjunto de 16 e o código de
   for (const ids of idsSeenBySector) assert.equal(ids.size, 16);
 });
 
-test("expedições novas sorteiam posições apenas entre os dezesseis temas ativos", () => {
+test("expedições novas sorteiam posições apenas entre os dezoito temas ativos", () => {
   const { enabledThemeIds, themePools } = archipelago21to30Profile.archipelago;
-  assert.equal(enabledThemeIds.length, 16);
+  assert.equal(enabledThemeIds.length, 18);
   assert.ok(enabledThemeIds.includes("shipwrecked"));
   assert.ok(enabledThemeIds.includes("giant-kelp"));
   assert.ok(enabledThemeIds.includes("mist"));
   assert.ok(enabledThemeIds.includes("ship-graveyard"));
   assert.ok(enabledThemeIds.includes("cyclopean-ruins"));
   assert.ok(enabledThemeIds.includes("sacred"));
+  assert.ok(enabledThemeIds.includes("crystal"));
+  assert.ok(enabledThemeIds.includes("abandoned-ship"));
   const activeByRow = Object.fromEntries(Object.entries(themePools).map(([row, themes]) => [
     row, themes.map(theme => theme.id).filter(id => enabledThemeIds.includes(id))
   ]));

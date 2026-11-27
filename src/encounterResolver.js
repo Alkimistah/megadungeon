@@ -47,7 +47,10 @@ function getChallengeWeight(creature, targetChallenge) {
   return 1;
 }
 
-function getAllowedCatalog(allowedIds, profile) {
+function getAllowedCatalog(allowedIds, profile, preferAllowedVariants) {
+  if (preferAllowedVariants && allowedIds?.length) {
+    return getAutomaticCreatureCatalog(profile, allowedIds.map(getCreatureById).filter(Boolean));
+  }
   const catalog = getAutomaticCreatureCatalog(profile);
   if (!allowedIds?.length) return catalog;
 
@@ -518,6 +521,25 @@ function filterEncounterCatalog(node, catalog, ecology) {
   return requiredTag ? catalog.filter(creature => creature.ecology?.terrains?.includes(requiredTag)) : catalog;
 }
 
+function getMixedChallengePairs(catalog, targetChallenge, type, ecology) {
+  const candidates = catalog.filter(creature => typeof creature.challengeRating === "number"
+    && creature.challengeRating < targetChallenge
+    && (ecology || !type || creature.type === type));
+  const weight = creature => ecology
+    ? getCreatureEcologyWeight(creature, ecology.context, ecology.rules, type)
+      * getEcologyGroupWeight(creature, 1)
+    : 1;
+
+  return candidates.flatMap((first, index) => candidates.slice(index + 1).flatMap(second => {
+    if (first.challengeRating === second.challengeRating) return [];
+    const pair = [first, second];
+    const encounter = pair.map(({ challengeRating }) => ({ challengeRating, quantity: 1 }));
+    return calculateCombatND(encounter) === targetChallenge
+      ? [{ pair, weight: weight(first) * weight(second) }]
+      : [];
+  }));
+}
+
 function resolveCreatureGroup(node, rng, catalog, ecology) {
   if (!node.creature || !node.challenge || node.challenge.creatures <= 0) return [];
 
@@ -527,6 +549,13 @@ function resolveCreatureGroup(node, rng, catalog, ecology) {
   const targetChallenge = node.creature.targetChallenge ?? node.challenge.creatures;
   const terrainName = getTerrainName(node);
   const type = node.creature.type ?? null;
+  if (node.creature.allowMixedChallengePairs) {
+    const pairs = getMixedChallengePairs(catalog, targetChallenge, type, ecology);
+    if (pairs.length && rng() < 0.25) {
+      const { pair } = pickWeighted(rng, pairs);
+      return pair.map(creature => getCreatureSummary(creature, 1, rng));
+    }
+  }
   const sizeOptions = ecology
     ? getEcologicalSizeOptions(targetChallenge, catalog, type, ecology)
     : getLegacySizeOptions(targetChallenge, catalog, type);
@@ -641,7 +670,7 @@ export function rerollNodeCreatures(node, profile) {
   const challenge = calculateCombatND(original);
   const { type, allowedCreatureIds } = node.creature;
   const ecology = getNodeEcology(node, profile);
-  const catalog = filterEncounterCatalog(node, getAllowedCatalog(allowedCreatureIds, profile), ecology)
+  const catalog = filterEncounterCatalog(node, getAllowedCatalog(allowedCreatureIds, profile, node.creature.preferAllowedVariants), ecology)
     .filter(creature => ecology || !type || creature.type === type);
   if (!catalog.length || challenge <= 0) return null;
 
@@ -784,7 +813,7 @@ export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidate
     items = resolveFixedComposition(node.fixedComposition, rng);
   } else {
     const catalog = node.creature
-      ? creatureCandidates ?? getAllowedCatalog(node.creature.allowedCreatureIds, profile)
+      ? creatureCandidates ?? getAllowedCatalog(node.creature.allowedCreatureIds, profile, node.creature.preferAllowedVariants)
       : [];
     const ecology = getNodeEcology(node, profile);
     items = resolveCreatureGroup(node, rng, filterEncounterCatalog(node, catalog, ecology), ecology);

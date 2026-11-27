@@ -72,17 +72,33 @@ const islandCreatures = {
     "hipogrifo", "grifo", "coruja-gigante",
     "recruta-purista", "soldado-purista", "purificado", "sargento-mor", "capelao-de-guerra",
     "arcano-de-guerra-adepto", "capitao-baluarte", "cacador-de-impuros", "bispo-de-guerra"
+  ],
+  crystal: [
+    "escorpiao-de-cristal", "ameba-gigante", "centopeia-dragao", "gargula-de-topiaria-grande", "gorgona",
+    "besouros-facetados", "caranguejo-de-quartzo", "cocatriz-de-vidro", "ganchador-das-fendas",
+    "zangao-prismatico", "bulette-de-geodo", "geodo-vivo"
+  ],
+  "abandoned-ship": [
+    "livido", "ogro-esqueleto", "canceronte", "aparicao", "vampiro-neofito", "garra-zumbi-gigante", "ganchador",
+    "fantasma", "alma-acorrentada", "afogado", "guerreiro-perpetuo"
   ]
 };
 
 export function getIslandCreatureRules(island, objective, rules) {
   const regionalIds = islandCreatures[island.themeId];
   if (!regionalIds) return rules;
+  const crystalGallery = island.themeId === "crystal" && objective.direction === "NO";
   const allowedCreatureIds = creatureCatalog
     .filter(creature => regionalIds.includes(creature.id) &&
+      (crystalGallery || creature.id !== "escorpiao-de-cristal") &&
       (!objective.preferredType || creature.type === objective.preferredType))
     .map(creature => creature.id);
-  return { ...rules, allowedCreatureIds };
+  return {
+    ...rules,
+    allowedCreatureIds,
+    ...(island.themeId === "crystal" ? { preferAllowedVariants: true } : {}),
+    ...(crystalGallery ? { allowMixedChallengePairs: true } : {})
+  };
 }
 
 export function getIslandCreatureIds(themeId) {

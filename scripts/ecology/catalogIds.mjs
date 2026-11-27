@@ -8,6 +8,7 @@ import { monsterCreatures } from "../../src/creatureCatalog/monsters.js";
 import { spiritCreatures } from "../../src/creatureCatalog/spirits.js";
 import { undeadCreatures } from "../../src/creatureCatalog/undead.js";
 import { eventCreatures } from "../../src/creatureCatalog/events.js";
+import { getCrystalVariant } from "../../src/creatureCatalog/crystalVariants.js";
 import { bestiaryCreatures } from "../../src/creatureCatalog/bestiary.js";
 
 // As fichas existentes precedem as inclusões do Bestiário.
@@ -15,6 +16,10 @@ export function rawCreatures() {
   const seen = new Map();
   for (const list of [animalCreatures, constructCreatures, spiritCreatures, humanoidCreatures, monsterCreatures, undeadCreatures, eventCreatures, bestiaryCreatures]) {
     for (const creature of list) if (!seen.has(creature.id)) seen.set(creature.id, creature);
+  }
+  for (const creature of [...seen.values()]) {
+    const variant = getCrystalVariant(creature);
+    if (variant) seen.set(variant.id, variant);
   }
   return seen;
 }

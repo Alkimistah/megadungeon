@@ -64,7 +64,7 @@ function getIslandDisplayStatus(island, revealed) {
 
 function getIslandModalCopy(island, unknownPaths) {
   if (isIslandRevealed(island, unknownPaths)) {
-    return island.narrative || island.objectives[island.objectives.length - 1]?.description || "";
+    return island.victoryNarrative || island.narrative || island.objectives[island.objectives.length - 1]?.description || "";
   }
 
   if (!island.available) return "Esta ilha ainda não está acessível.";

@@ -1,7 +1,7 @@
 import { createForestTacticalLayout } from "./forestTacticalLayouts.js";
 import { getForestTrapPresentation } from "./forestTrapPresentation.js";
 import { createRng, randomInt } from "./random.js";
-import { TERRAIN_BASE_TYPES, TERRAIN_ITEM_TYPES } from "./tacticalTerrain.js";
+import { SOLAR_FOCUS_LABELS, TERRAIN_BASE_TYPES, TERRAIN_ITEM_TYPES } from "./tacticalTerrain.js";
 import { createTacticalScene, readLegacyTacticalScene } from "./tacticalScene.js";
 import { getTacticalEncounterUnits, getTacticalPartyPieces, placeTacticalEncounterUnits } from "./tacticalScenePieces.js";
 
@@ -12,6 +12,7 @@ const DEFAULT_PARTY_POSITIONS = [[2, 10], [3, 10], [2, 11], [3, 11]];
 const MAX_VISIBLE_ENEMIES = 12;
 
 const WALKABLE_CELLS = new Set([
+  ...Object.keys(SOLAR_FOCUS_LABELS),
   "deep-water", "dunes", "frozen-river", "gentle-slope", "ice", "pebbles", "steep-slope",
   "advantage",
   "canopy",
@@ -21,11 +22,13 @@ const WALKABLE_CELLS = new Set([
   "deck",
   "bridge",
   "difficult",
+  "crystal-shards",
   "floor",
   "foliage",
   "hidden",
   "objective",
   "party",
+  "polished-crystal",
   "enemy",
   "boss",
   "slope",
@@ -356,6 +359,7 @@ function findObjectivePosition(cells, rng) {
 }
 
 const FEATURE_TILES = {
+  ...Object.fromEntries(Object.keys(SOLAR_FOCUS_LABELS).map(type => [type, type])),
   canopy: "canopy",
   concealment: "concealment",
   current: "current",
@@ -566,7 +570,13 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
     .flatMap(feature => feature.indices));
   const canOccupy = index => WALKABLE_CELLS.has(sceneTerrain[index]) && !blockingFeatures.has(index);
   const enemyTiles = layout?.enemyTiles;
+  const preferredArea = layout?.keepFootprintsInEnemyArea ? layout.enemyArea : null;
   const canPrefer = index => {
+    if (preferredArea) {
+      const x = index % WIDTH;
+      const y = Math.floor(index / WIDTH);
+      if (x < preferredArea.minX || x > preferredArea.maxX || y < preferredArea.minY || y > preferredArea.maxY) return false;
+    }
     const tile = sceneTerrain[index];
     const legacyTile = beforeTrap[index];
     return canOccupy(index) && (!enemyTiles || enemyTiles.includes(tile)

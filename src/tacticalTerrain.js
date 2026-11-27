@@ -1,3 +1,10 @@
+export const SOLAR_FOCUS_LABELS = {
+  "solar-focus": "Foco solar",
+  "solar-focus-a": "Foco solar A",
+  "solar-focus-b": "Foco solar B",
+  "solar-focus-c": "Foco solar C"
+};
+
 export const TACTICAL_TERRAIN_LABELS = {
   floor: "Chão",
   water: "Água rasa",
@@ -23,6 +30,8 @@ export const TACTICAL_TERRAIN_LABELS = {
   bridge: "Ponte",
   canopy: "Toldo da popa",
   ice: "Gelo",
+  "polished-crystal": "Placa polida",
+  "crystal-shards": "Campo de farpas",
   "frozen-river": "Rio congelado",
   abyss: "Abismo",
   escarpment: "Paredão",
@@ -33,6 +42,7 @@ export const TACTICAL_TERRAIN_LABELS = {
 };
 
 export const TACTICAL_FEATURE_LABELS = {
+  ...SOLAR_FOCUS_LABELS,
   web: "Teia/casulo",
   wind: "Vento forte",
   concealment: "Visibilidade reduzida",
