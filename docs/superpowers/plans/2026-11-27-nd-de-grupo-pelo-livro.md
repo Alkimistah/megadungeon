@@ -22,6 +22,10 @@ Decisão do PO (27/11/2026, prévia do Iceberg): corrigir o cálculo de ND de en
 - **Ruling:** `ENCOUNTER_RESOLUTION_VERSION` não muda. Encontros já gravados em sessões salvas mantêm as criaturas que a mesa já viu. Só encontros novos usam a regra nova. *Custo se estiver errado:* um encontro misto antigo continua com a composição antiga, que pelo livro vale menos que o ND da cena.
 - **Ruling:** conteúdo das ilhas (elencos, tipos preferidos) não muda nesta correção sem aviso ao PO. Se um setor deixar de fechar o ND ou uma ficha perder cobertura, o implementador para e reporta; o gerente leva a decisão ao PO.
 
+- **Ruling:** todas as ameaças abaixo de ND 1 formam um único grupo, que pode empatar com outros grupos. Empates são reagrupados contando os grupos como ameaças. *Custo se estiver errado:* meio ponto de diferença em encontros raros com criaturas abaixo de ND 1.
+- **Ruling:** quando o alvo de criaturas é 1 ou mais e fracionário (resto de armadilha incidental), as criaturas fecham `Math.floor(alvo)`. O diálogo continua mostrando o ND da cena. *Custo se estiver errado:* o mestre vê, por exemplo, 2¾ ao lado de um grupo de ND 2. A divisão linear entre criaturas e armadilha vai para a discussão da floresta.
+- **Ruling:** a rerrolagem mira o orçamento de criaturas da cena, e não o ND do grupo gravado. *Custo se estiver errado:* nenhum para encontros novos. Encontros antigos voltam ao orçamento ao serem rerrolados.
+
 ## Tarefas
 
 ### Tarefa 1 · Cálculo pelo livro

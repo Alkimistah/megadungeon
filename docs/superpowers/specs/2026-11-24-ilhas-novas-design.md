@@ -152,7 +152,7 @@ Cada ilha inicial ou intermediária deve ter pelo menos doze fichas observadas n
 - Ordem das iniciais: Náufragos, Algas Gigantes, Névoa e Cemitério de Navios.
 - **Guardiões exclusivos (27/11/2026).** O guardião é uma criatura forte, que faz sentido como guardião da ilha e é única nela. Ele não aparece nos combates de setor da própria ilha, mas pode aparecer como criatura comum em ilhas mais à frente. Ajudantes ficam só quando o conceito pede, como um conjurador com os corpos que ele levanta ou a evolução de uma unidade (a Companhia Blindada em relação ao Soldado Blindado). Para fechar o ND, prefira uma versão de guardião da ficha, elevada pela tabela solo do livro como o Corgann das Duas Marés, a acrescentar capangas.
 - **ND de grupo pelo livro (27/11/2026).** O ND de encontros com ameaças de NDs diferentes segue Ameaças de Arton p. 9 (plano `docs/superpowers/plans/2026-11-27-nd-de-grupo-pelo-livro.md`). Onze composições de guardião foram refeitas com o princípio acima.
-- **Revisão pendente nos pontos de controle.** Treze guardiões já fecham o ND, mas usam criaturas que também saem nos setores da própria ilha. Cada um será revisto pelo princípio dos guardiões exclusivos no ponto de controle da sua fileira:
+- **Revisão pendente nos pontos de controle.** Catorze guardiões já fecham o ND, mas usam criaturas que também saem nos setores da própria ilha. Cada um será revisto pelo princípio dos guardiões exclusivos no ponto de controle da sua fileira:
   - Atol: Predadores da Lagoa.
   - Costa do Coral: o primeiro guardião (Chefe Elfo-do-Mar e Selako-Tigre).
   - Náufragos: O Senhor dos Acendedores.
