@@ -34,6 +34,31 @@ Adaptar quem dependia da média:
 - Conferir `archipelagoBoatAmbush.js`, `archipelagoPilot.js` e `missions/archipelagoMissionEncounter.js`, que comparam com `calculateCombatND`.
 Testes: composições sorteadas fecham o ND alvo pela regra nova nas três faixas; a busca continua rápida nas suítes.
 
+### Tarefa 5 · Guardiões refeitos (aprovado pelo PO em 27/11/2026)
+Princípio do PO: o guardião é uma criatura forte e única na ilha. Ajudantes ficam só quando o conceito pede. Veja "Guardiões exclusivos" em `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`.
+
+| Ilha | Guardião | Nova composição | ND |
+|---|---|---|---|
+| Costa do Coral | Lula e Pliorex (índice 1) | **Lula-Rainha do Recife**, versão de guardião da Lula-Gigante | 8 |
+| Manguezal | Capitão Homem-Piranha (índice 2) | **Raagoran** (ficha oficial) | 8 |
+| Ruínas Ciclópicas | A Senhora das Estátuas | **Senhora das Estátuas**, versão de guardião da Górgona | 9 |
+| Névoa | O Sineiro | **O Sineiro**, versão de guardião do Fantasma | 8 |
+| Névoa | O Mestre dos Ouvintes | Necromante, 3 Falsos Videntes e 2 Zumbis Fantasmagóricos | 8 |
+| Cemitério | O Capitão dos Ossos | **O Capitão dos Ossos**, versão de guardião do Amálgama Esqueleto | 8 |
+| Cemitério | O Caçador de Cabeças | Gnoll Caçador de Cabeças sozinho | 8 |
+| Náufragos | O Primeiro Náufrago | **O Primeiro Náufrago**, versão de guardião do Afogado | 8 |
+| Piratas | Capitão do Leilão | **Capitão do Leilão**, versão de guardião do Capitão do Conclave Pirata | 9 |
+| Piratas | Ogro da Quilha | **Ogro da Quilha**, versão de guardião do Ogro das Sanguinárias | 9 |
+| Vulcânica | Regente das Brasas | **Regente das Brasas**, versão de guardião da Salamandra Nobre | 9 |
+
+**Versões de guardião.** Seguem o modelo do Corgann das Duas Marés em `src/creatureCatalog/spirits.js`: `regionalVariantOf`, `role: "solo"`, `roleSource: "adaptacao-nd"`, `source: { book: "Masmorra de Práxis" }` e uma descrição que credita a ficha base com livro e página. As habilidades se mantêm. Os números sobem até os da tabela solo do livro (`getThreatParameters("solo", nd)` em `src/threatCreationRules.js`) nos pontos em que a base estiver abaixo: PV, Defesa, resistências, bônus de ataque, dano médio e CD das habilidades. Nada é reduzido. As fichas ficam fora do sorteio global, como as variantes regionais.
+
+**Textos de abertura.** Ajuste o `briefing` de cada composição alterada para a cena nova, com frases curtas e sem citar o nome da arena. Mantenha o `id` e o `name` de cada composição, para não mudar o sorteio de expedições salvas.
+
+**Elencos.** Se uma ficha da lista da ilha (`islandCreatures`) deixar de aparecer em algum combate da ilha, retire-a da lista. Isso vale para o Capitão Pirata e o Amálgama Esqueleto no Cemitério e para o Fantasma na Névoa. Antes, fixe a origem anterior em `existingOriginByCreatureId`, para não mudar a escolta de caçadas já salvas. `npm run test:archipelago-rosters` precisa passar.
+
+**Testes.** Os nove testes de guardião que estavam falhando voltam a passar, com o ND novo pela regra do livro. Cada versão de guardião ganha um teste que confere o ND, o papel, o vínculo com a ficha base, os valores mínimos da tabela solo e as habilidades preservadas.
+
 ### Tarefa 3 · Suítes e elencos
 Rodar todas as suítes (`test:floors-1-10`, `test:floors-11-20`, `test:archipelago`, `test:archipelago-rosters`, `test:archipelago-missions`, `test:ecology`, `test:ranges`, `test:missions`, `test:treasure`). Atualizar expectativas de teste que só refletiam a fórmula antiga. Para cada ilha, comparar a cobertura de fichas antes e depois e reportar perdas sem mexer no elenco.
 
@@ -46,6 +71,7 @@ Registrar a regra e a decisão no design das ilhas (seção "Onde paramos" e "De
 |---|---|---|
 | 1 | `opus` | `opus` |
 | 2 | `opus` | `opus` |
+| 5 | `opus` | `opus` |
 | 3 | `sonnet` | `sonnet` |
 | 4 | `haiku` | `sonnet` |
 | Revisão final | — | `opus` |

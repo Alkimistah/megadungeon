@@ -58,7 +58,7 @@ O PO pediu que o trabalho ande **de pouco em pouco**, com qualidade máxima em c
 | 11 | Avançada | Ilha de Sal e Ossos (`salt-and-bones`) | Pendente |
 | 12 | Avançada | Ilha Elemental (`elemental`) | Pendente |
 | 13 | Avançada | Ilha Viva (`living`) | Pendente |
-| — | Ponto de controle final | | Pendente |
+| — | Ponto de controle final | | Pendente (inclui Flutuante e Tempestades no formato novo e a revisão dos guardiões) |
 
 O PO definiu a ordem das iniciais. A ordem das demais fileiras fica para o ponto de controle anterior a cada uma.
 
@@ -148,6 +148,22 @@ Cada ilha inicial ou intermediária deve ter pelo menos doze fichas observadas n
 - Os 13 temas viram ilhas completas, no mesmo nível das 10 atuais.
 - Uma ilha por etapa, com mais de 3 etapas se preciso, para garantir qualidade.
 - Ordem das iniciais: Náufragos, Algas Gigantes, Névoa e Cemitério de Navios.
+- **Guardiões exclusivos (27/11/2026).** O guardião é uma criatura forte, que faz sentido como guardião da ilha e é única nela. Ele não aparece nos combates de setor da própria ilha, mas pode aparecer como criatura comum em ilhas mais à frente. Ajudantes ficam só quando o conceito pede, como um conjurador com os corpos que ele levanta ou a evolução de uma unidade (a Companhia Blindada em relação ao Soldado Blindado). Para fechar o ND, prefira uma versão de guardião da ficha, elevada pela tabela solo do livro como o Corgann das Duas Marés, a acrescentar capangas.
+- **ND de grupo pelo livro (27/11/2026).** O ND de encontros com ameaças de NDs diferentes segue Ameaças de Arton p. 9 (plano `docs/superpowers/plans/2026-11-27-nd-de-grupo-pelo-livro.md`). Onze composições de guardião foram refeitas com o princípio acima.
+- **Revisão pendente nos pontos de controle.** Treze guardiões já fecham o ND, mas usam criaturas que também saem nos setores da própria ilha. Cada um será revisto pelo princípio dos guardiões exclusivos no ponto de controle da sua fileira:
+  - Atol: Predadores da Lagoa.
+  - Costa do Coral: o primeiro guardião (Chefe Elfo-do-Mar e Selako-Tigre).
+  - Náufragos: O Senhor dos Acendedores.
+  - Algas Gigantes: A Isca do Coração, A Maré Urticante e O Pastor das Frondes.
+  - Névoa: Os Rostos Emprestados.
+  - Cemitério: O Tesouro que Morde.
+  - Navio Abandonado: O Capitão e o Vigia.
+  - Ruínas: O Golem Religado.
+  - Cavernas Marinhas: Capitão do Poço.
+  - Piratas: Dono do Fortim.
+  - Sagrada: O Protetor da Ilha.
+  - Flutuante: Vigia dos Arcos.
+  - Flutuante e Tempestades também passam para o formato novo das avançadas no ponto de controle final.
 
 ## Decisões do gerente (o PO pode corrigir)
 
