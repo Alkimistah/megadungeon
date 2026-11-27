@@ -69,8 +69,8 @@ export const volcanicExploration = {
     },
     {
       id: "sentinela-da-caldeira", name: "Sentinela da Caldeira",
-      briefing: "O gigante se levanta atrás de uma coluna de basalto e toma posição na plataforma central.",
-      creatures: [{ id: "gigante-das-rochas", quantity: 1 }]
+      briefing: "A crosta de basalto se rompe junto ao pedestal. Um ber-baram emerge da fenda e baixa os chifres, deixando veios de lava à mostra.",
+      creatures: [{ id: "ber-baram-da-caldeira", quantity: 1 }]
     },
     {
       id: "corte-das-brasas", name: "Regente das Brasas",

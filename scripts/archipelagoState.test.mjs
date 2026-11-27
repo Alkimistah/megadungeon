@@ -9,7 +9,7 @@ import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
 import { calculateCombatND } from "../src/challenge.js";
 import { creatureCatalog, getCreatureById } from "../src/creatureCatalog/index.js";
 import { withCreatureHealthChange } from "../src/encounterCreatureHealth.js";
-import { createIslandGuardian, createIslandSector, createIslandSectorCombat, reopenIslandSector } from "../src/archipelagoPilot.js";
+import { createIslandGuardian, createIslandPilotScene, createIslandSector, createIslandSectorCombat, reopenIslandSector } from "../src/archipelagoPilot.js";
 import { canRerollBoatAmbush, createBoatAmbush, getBoatAmbushRules } from "../src/archipelagoBoatAmbush.js";
 
 const archipelago21to30Profile = {
@@ -561,6 +561,31 @@ test("composição sorteada do guardião pode ser inspecionada e fica estável a
   assert.deepEqual(island(restored).guardian.preview, preview);
   assert.ok(restored.startGuardian(floor));
   assert.deepEqual(island(restored).guardian.scene, preview);
+});
+
+test("o sorteio vulcânico usa as doze fichas regionais em encontros ND 7", () => {
+  const island = { themeId: "volcanic", objectives: [{ id: "setor", type: "combate", challenge: 7 }] };
+  const seen = new Set();
+  for (let roll = 0; roll < 300; roll++) {
+    const scene = createIslandPilotScene(island, productionProfile, `vulcanica-revisao-${roll}`);
+    assert.equal(calculateCombatND(scene.resolvedEncounter?.items), 7);
+    for (const item of scene.resolvedEncounter.items) seen.add(item.creatureId);
+  }
+  assert.deepEqual(seen, new Set([
+    "cao-do-inferno", "diabrete-explosivo", "soldado-mecanico", "salamandra-plebeia", "salamandra-guerreira",
+    "uraghian-jovem", "dracomante", "mashin-samurai", "ninhada-de-dragoes-filhotes", "ganchador",
+    "centopeia-dragao", "bulette"
+  ]));
+});
+
+test("a Sentinela da Caldeira usa a variante solo de ND 9 do Ber-baram", () => {
+  const state = createArchipelagoState(archipelago21to30Profile, () => 0.99);
+  const island = state.getSnapshot().islands.find(item => item.themeId === "volcanic");
+  const scene = createIslandGuardian(island, "sentinela-da-caldeira", productionProfile, "caldeira");
+  const items = scene.resolvedEncounter.items;
+  assert.deepEqual(items.map(({ creatureId, quantity }) => [creatureId, quantity]), [["ber-baram-da-caldeira", 1]]);
+  assert.equal(calculateCombatND(items), 9);
+  assert.equal(getCreatureById("ber-baram").challengeRating, 8);
 });
 
 test("a Ilha Vulcânica só libera o guardião ND 9 após seis resultados e concede um fragmento", () => {

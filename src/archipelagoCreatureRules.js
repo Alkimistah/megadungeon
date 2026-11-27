@@ -19,8 +19,11 @@ const islandCreatures = {
     "ogro-cacador", "capitao-baluarte", "chefe-bandido", "chefe-bandido-livro-basico"],
   "sea-caves": [...coastAnimals, ...coastalHumanoids, "aquinne", "lacedon", "lula-gigante",
     "homem-piranha-capitao", "sahuagin-predador"],
-  volcanic: ["salamandra-plebeia", "salamandra-guerreira", "gargula-assassina", "gargula",
-    "gargula-livro-basico", "cao-do-inferno", "centopeia-dragao", "kobold-veterano", "patrulha-kobold", "kobold-xama"],
+  volcanic: [
+    "cao-do-inferno", "diabrete-explosivo", "soldado-mecanico", "salamandra-plebeia", "salamandra-guerreira",
+    "uraghian-jovem", "dracomante", "mashin-samurai", "ninhada-de-dragoes-filhotes", "ganchador",
+    "centopeia-dragao", "bulette"
+  ],
   "coral-coast": [...coastAnimals, ...coastalHumanoids, "naiade", "aquinne", "lacedon"],
   atoll: [...coastAnimals, ...coastalHumanoids, "bando-pirata", "pirata", "naiade", "aquinne", "lacedon"],
   mangrove: [
@@ -97,7 +100,7 @@ export function getIslandCreatureRules(island, objective, rules) {
     ...rules,
     allowedCreatureIds,
     ...(island.themeId === "crystal" ? { preferAllowedVariants: true } : {}),
-    ...(crystalGallery ? { allowMixedChallengePairs: true } : {})
+    ...(crystalGallery || island.themeId === "volcanic" ? { allowMixedChallengePairs: true } : {})
   };
 }
 
@@ -117,11 +120,21 @@ export function getOutOfPlaceCreatureIds(themeId) {
   return [...new Set([...otherIds, ...dinosaurIds])].filter(id => !own.has(id));
 }
 
-// Elenco de origem de uma criatura: o primeiro tema que a contém ou, sem tema,
-// as composições dos dinossauros. Serve à caçada de um alvo fora do lugar.
+// Estas fichas já tinham origem antes de entrar no elenco vulcânico.
+const existingOriginByCreatureId = new Map([
+  ["soldado-mecanico", "cyclopean-ruins"],
+  ["ganchador", "ship-graveyard"]
+]);
+
+function findCreatureOriginThemeId(creatureId) {
+  return existingOriginByCreatureId.get(creatureId) ??
+    Object.keys(islandCreatures).find(themeId => islandCreatures[themeId].includes(creatureId));
+}
+
+// A origem serve à caçada de um alvo fora do lugar.
 export function getCreatureOriginIds(creatureId) {
-  const themeIds = Object.values(islandCreatures).find(ids => ids.includes(creatureId));
-  if (themeIds) return [...themeIds];
+  const themeId = findCreatureOriginThemeId(creatureId);
+  if (themeId) return getIslandCreatureIds(themeId);
   const dinosaurIds = [...new Set(Object.values(dinosaurExploration.sectorCompositions)
     .flat(2)
     .map(entry => entry.id))];
@@ -129,7 +142,6 @@ export function getCreatureOriginIds(creatureId) {
 }
 
 export function getCreatureOriginThemeId(creatureId) {
-  const entry = Object.entries(islandCreatures).find(([, ids]) => ids.includes(creatureId));
-  if (entry) return entry[0];
-  return getCreatureOriginIds(creatureId).length ? "dinosaurs" : null;
+  return findCreatureOriginThemeId(creatureId) ??
+    (getCreatureOriginIds(creatureId).length ? "dinosaurs" : null);
 }

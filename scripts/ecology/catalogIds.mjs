@@ -9,6 +9,7 @@ import { spiritCreatures } from "../../src/creatureCatalog/spirits.js";
 import { undeadCreatures } from "../../src/creatureCatalog/undead.js";
 import { eventCreatures } from "../../src/creatureCatalog/events.js";
 import { getCrystalVariant } from "../../src/creatureCatalog/crystalVariants.js";
+import { getVolcanicVariant } from "../../src/creatureCatalog/volcanicVariants.js";
 import { bestiaryCreatures } from "../../src/creatureCatalog/bestiary.js";
 
 // As fichas existentes precedem as inclusões do Bestiário.
@@ -18,8 +19,9 @@ export function rawCreatures() {
     for (const creature of list) if (!seen.has(creature.id)) seen.set(creature.id, creature);
   }
   for (const creature of [...seen.values()]) {
-    const variant = getCrystalVariant(creature);
-    if (variant) seen.set(variant.id, variant);
+    for (const variant of [getCrystalVariant(creature), getVolcanicVariant(creature)]) {
+      if (variant) seen.set(variant.id, variant);
+    }
   }
   return seen;
 }

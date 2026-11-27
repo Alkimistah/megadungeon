@@ -8,6 +8,7 @@ import { eventCreatures } from "./events.js";
 import { bestiaryCreatures } from "./bestiary.js";
 import { basicBookRoleByCreatureId, sourceByCreatureId, threatsBookRoleByCreatureId } from "./sources.js";
 import { getCrystalVariant } from "./crystalVariants.js";
+import { getVolcanicVariant } from "./volcanicVariants.js";
 import { ecologyByCreatureId } from "./ecology.js";
 import { NEUTRAL_ECOLOGY, validateEcology } from "./ecologyVocabulary.js";
 import { inferThreatRole, getThreatRole } from "../threatCreationRules.js";
@@ -117,7 +118,8 @@ export const creaturesByType = Object.fromEntries(
     const catalog = dedupeById([...creatures, ...(bestiaryByType.get(type) ?? [])])
       .map(withCreatureSources).map(withThreatRoleMetadata);
     const crystalVariants = catalog.map(getCrystalVariant).filter(Boolean);
-    return [type, [...catalog, ...crystalVariants].map(withEcology)];
+    const volcanicVariants = catalog.map(getVolcanicVariant).filter(Boolean);
+    return [type, [...catalog, ...crystalVariants, ...volcanicVariants].map(withEcology)];
   })
 );
 

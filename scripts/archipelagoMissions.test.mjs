@@ -372,15 +372,16 @@ test("caçada sem criatura viável ainda abre", () => {
 
 test("alvo fora do lugar não recebe escolta da fauna local mesmo com elencos sobrepostos", () => {
   const base = sampleHunts(1)[0];
-  const local = new Set(getIslandCreatureIds("tropical"));
+  const themeId = "cyclopean-ruins";
+  const local = new Set(getIslandCreatureIds(themeId));
   const origin = getCreatureOriginIds("centopeia-dragao");
   assert.ok(origin.some(id => local.has(id)), "caso de teste precisa de sobreposição");
   for (let i = 0; i < 20; i++) {
     const mission = {
       ...base,
       id: `fora-do-lugar-${i}`,
-      themeId: "tropical",
-      destination: { ...base.destination, floor: 25, targetId: "tropical" },
+      themeId,
+      destination: { ...base.destination, floor: 25, targetId: themeId },
       objective: { ...base.objective, targetId: "centopeia-dragao", outOfPlace: true }
     };
     const enc = createArchipelagoHuntEncounter(mission, profile);
