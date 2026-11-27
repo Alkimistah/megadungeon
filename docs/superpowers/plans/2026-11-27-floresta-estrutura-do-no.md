@@ -10,6 +10,12 @@
 
 **Design.** [Estrutura do nó da floresta](../specs/2026-11-27-floresta-estrutura-do-no-design.md).
 
+## Retomada
+
+- Tarefas 1 a 3 concluídas e aprovadas em revisão. Cabeçalho e QA em `723f863` e `ffcacff`, modos e combate normal em `6c15e2c`, escoltas e validação tática em `003a289` e `b1aed5b`.
+- O PO aprovou os 35 modos dos [cartões](../specs/2026-11-27-floresta-armadilhas-cartoes.md). A amostra preliminar registrou 912 armadilhas incidentais em 4.452 combates normais (20,49%). A amostra após a correção de encaixe registrou 2.045 nós de armadilha com uma ficha válida.
+- Retomar na tarefa 4. A implementação inicial e o teste dos elites estão preservados na árvore de trabalho, sem commit. Falta medir o custo da busca em grades restritas, amostrar as cinco faixas de ND nos ambientes, ampliar os casos de conversão e rerrolagem, verificar a precedência da missão fixa e concluir as suítes e a revisão. A tarefa 5 ainda inclui missões, restauração, ativação da v5 e QA final. A geração de novas expedições continua na versão 4.
+
 ## Restrições gerais
 
 - A versão 5 vale para novas expedições dos andares 11 a 20. Ativar somente na última tarefa. Preservar o formato de expedição e a versão dos encontros já resolvidos.
@@ -41,34 +47,34 @@
 
 **Interface.** Nó v5 tem `node.generationVersion = 5`. `getForestChallengeParts(node)` em `src/challenge.js` retorna `{ environment, creatures, trap }` ou `null` para nó legado ou cena com ND próprio ainda sem parcelas aplicáveis. `updateForestChallengeTotal(node, rules)` soma as parcelas planejadas e aplica os limites do perfil, preservando o cálculo das cenas próprias. `challenge.creatures` é o alvo de composição, enquanto o leitor das parcelas usa os itens quando resolvidos.
 
-- [ ] Em `scripts/forestNodeChallenge.test.mjs`, testar `{ environment: 0.5, creatures: 3, trap: 1 }` e total `4.5`. Adicionar grupo resolvido de ND 2 sobre alvo 3, composição fixa com duas armadilhas e falso descanso antes e depois da emboscada. Confirmar que um nó legado retorna `null`.
-- [ ] Executar `node --test scripts/forestNodeChallenge.test.mjs` e confirmar falha por interface ausente.
-- [ ] Implementar as interfaces. Preservar clima e terreno como campos individuais. No `setNodeDialogMeta`, mostrar as três parcelas quando reveladas e disponíveis, usando a formatação de ND e XP existente. Usar a apresentação anterior nas cenas com ND próprio e em nós legados. Preservar zeros nas parcelas ausentes e o comportamento de valores especiais.
-- [ ] Em `scripts/qaForestMvp.mjs`, preparar o cenário v5 de cabeçalho da tarefa 5 com asserções para `500 XP`, `3.000 XP` e `1.000 XP`, ausência de frase condicional, e nó oculto que ainda não exibe parcelas.
-- [ ] Rodar o teste unitário e `npm run test:ecology`. Registrar a primeira entrega e mostrar o resultado ao PO.
-- [ ] Commit `feat: separa as parcelas de desafio da floresta`.
+- [x] Em `scripts/forestNodeChallenge.test.mjs`, testar `{ environment: 0.5, creatures: 3, trap: 1 }` e total `4.5`. Adicionar grupo resolvido de ND 2 sobre alvo 3, composição fixa com duas armadilhas e falso descanso antes e depois da emboscada. Confirmar que um nó legado retorna `null`.
+- [x] Executar `node --test scripts/forestNodeChallenge.test.mjs` e confirmar falha por interface ausente.
+- [x] Implementar as interfaces. Preservar clima e terreno como campos individuais. No `setNodeDialogMeta`, mostrar as três parcelas quando reveladas e disponíveis, usando a formatação de ND e XP existente. Usar a apresentação anterior nas cenas com ND próprio e em nós legados. Preservar zeros nas parcelas ausentes e o comportamento de valores especiais.
+- [x] Em `scripts/qaForestMvp.mjs`, preparar o cenário v5 de cabeçalho da tarefa 5 com asserções para `500 XP`, `3.000 XP` e `1.000 XP`, ausência de frase condicional, e nó oculto que ainda não exibe parcelas.
+- [x] Rodar o teste unitário e `npm run test:ecology`. Registrar a primeira entrega e mostrar o resultado ao PO.
+- [x] Commit `feat: separa as parcelas de desafio da floresta`.
 
 ### Tarefa 2 · Modos de armadilha e combate normal
 
 **Interface.** Cada entrada de `trapCatalog` ganha `mode: "standalone" | "requiresEscort"`. `getEligibleForestTraps(profile, { maximumChallenge, mode })` em `src/traps.js` filtra por fonte, teto de ND e modo opcional; sem candidatos retorna `[]`. `assignForestNormalTrap(node, profile, rng)` atribui um item incidental e atualiza a parcela de armadilha; mantém `challenge.creatures` igual ao alvo do andar.
 
-- [ ] Preparar os 35 cartões de revisão a partir de `src/traps.js`, com fonte e página, ND, efeito decisivo, modo e justificativa. Identificar casos mistos pelo efeito que sustenta o desafio. Submeter os cartões ao PO e incorporar suas decisões antes de gravar os modos.
-- [ ] Em `scripts/forestNodeTraps.test.mjs`, testar 35 modos, rede ND ¼ como `requiresEscort`, fosso camuflado como `standalone`, sorteios nos extremos do limiar de 20%, rede incidental, ausência de candidato e alvo da criatura igual ao ND do andar de 1 a 5.
-- [ ] Rodar `node --test scripts/forestNodeTraps.test.mjs` e confirmar a falha nova.
-- [ ] Cadastrar os modos aprovados. Em `forest11to20.js`, registrar chance `0.2` e o teto `Math.max(0.25, floorTarget - 1)` para armadilha normal. Em `traps.js`, reutilizar seleção ponderada por proximidade entre candidatos elegíveis. No fluxo v5 do gerador, marcar o nó antes de atribuir parcelas e aplicar a regra normal ao tipo efetivo. Atualizar a descrição da armadilha incidental v5 para acompanhar a regra nova.
-- [ ] Rodar `node --test scripts/forestNodeTraps.test.mjs scripts/trapReroll.test.mjs` e `npm run test:floors-11-20`. Medir a incidência em sementes fixas na tarefa 5.
-- [ ] Commit `feat: classifica armadilhas e preserva o ND do combate normal`.
+- [x] Preparar os 35 cartões de revisão a partir de `src/traps.js`, com fonte e página, ND, efeito decisivo, modo e justificativa. Identificar casos mistos pelo efeito que sustenta o desafio. Submeter os cartões ao PO e incorporar suas decisões antes de gravar os modos.
+- [x] Em `scripts/forestNodeTraps.test.mjs`, testar 35 modos, rede ND ¼ como `requiresEscort`, fosso camuflado como `standalone`, sorteios nos extremos do limiar de 20%, rede incidental, ausência de candidato e alvo da criatura igual ao ND do andar de 1 a 5.
+- [x] Rodar `node --test scripts/forestNodeTraps.test.mjs` e confirmar a falha nova.
+- [x] Cadastrar os modos aprovados. Em `forest11to20.js`, registrar chance `0.2` e o teto `Math.max(0.25, floorTarget - 1)` para armadilha normal. Em `traps.js`, reutilizar seleção ponderada por proximidade entre candidatos elegíveis. No fluxo v5 do gerador, marcar o nó antes de atribuir parcelas e aplicar a regra normal ao tipo efetivo. Atualizar a descrição da armadilha incidental v5 para acompanhar a regra nova.
+- [x] Rodar `node --test scripts/forestNodeTraps.test.mjs scripts/trapReroll.test.mjs` e `npm run test:floors-11-20`. Medir a incidência em sementes fixas na tarefa 5.
+- [x] Commit `feat: classifica armadilhas e preserva o ND do combate normal`.
 
 ### Tarefa 3 · Nó de armadilha e escolta humanoide
 
 **Interface.** `getForestEscortTarget(trapChallenge)` em `src/traps.js` retorna `0` para ND ¼ e os demais alvos da tabela do design. Em `src/encounterResolver.js`, `resolveForestTrapNode(node, profile, { seed, tacticalLayout })` retorna `{ trap, items, creatureTarget }`, usando o sorteio do catálogo da tarefa 2. `items` contém as criaturas escolhidas e `trap` contém a armadilha principal com seu papel. `rerollNodeTrap` recebe um terceiro argumento opcional `{ tacticalLayout }`, mantendo o retorno existente.
 
-- [ ] Em `scripts/forestNodeTraps.test.mjs`, testar a tabela completa da escolta e os cenários com armadilha ND 3 e grupo humanoide ND 1, armadilha ND ¼ com escolta impossível, escolta obrigatória sem criatura compatível, e escolta opcional inviável. Verificar que um nó solitário rejeita na rerrolagem armadilha que exige escolta, e que a falta de espaço após a troca preserva o resultado anterior.
-- [ ] Rodar o teste e confirmar falhas nas regras de escolta.
-- [ ] Implementar seleção por ND real da armadilha, com chance de escolta de `0.25` para as autônomas elegíveis. Tentar combinações em ordem ponderada e reproduzível, sem repetir candidatas inviáveis. Quando a escolta opcional falhar, conservar a armadilha. Quando a obrigatória falhar, avançar no sorteio de armadilhas, mantendo o teto.
-- [ ] Aproveitar o filtro ecológico e a verificação de grade do resolvedor com a armadilha proposta e as criaturas. Bloquear a rerrolagem que não cabe ou que muda o papel, ND ou exigência de escolta do encontro. Usar a composição viável na atribuição do nó v5 e conservar sua identidade para reaplicar as regras na resolução e rerrolagem.
-- [ ] Rodar `node --test scripts/forestNodeTraps.test.mjs scripts/trapReroll.test.mjs scripts/forestTacticalLayouts.test.mjs`.
-- [ ] Commit `feat: gera escolta humanoide nos nós de armadilha`.
+- [x] Em `scripts/forestNodeTraps.test.mjs`, testar a tabela completa da escolta e os cenários com armadilha ND 3 e grupo humanoide ND 1, armadilha ND ¼ com escolta impossível, escolta obrigatória sem criatura compatível, e escolta opcional inviável. Verificar que um nó solitário rejeita na rerrolagem armadilha que exige escolta, e que a falta de espaço após a troca preserva o resultado anterior.
+- [x] Rodar o teste e confirmar falhas nas regras de escolta.
+- [x] Implementar seleção por ND real da armadilha, com chance de escolta de `0.25` para as autônomas elegíveis. Tentar combinações em ordem ponderada e reproduzível, sem repetir candidatas inviáveis. Quando a escolta opcional falhar, conservar a armadilha. Quando a obrigatória falhar, avançar no sorteio de armadilhas, mantendo o teto.
+- [x] Aproveitar o filtro ecológico e a verificação de grade do resolvedor com a armadilha proposta e as criaturas. Bloquear a rerrolagem que não cabe ou que muda o papel, ND ou exigência de escolta do encontro. Usar a composição viável na atribuição do nó v5 e conservar sua identidade para reaplicar as regras na resolução e rerrolagem.
+- [x] Rodar `node --test scripts/forestNodeTraps.test.mjs scripts/trapReroll.test.mjs scripts/forestTacticalLayouts.test.mjs`.
+- [x] Commit `feat: gera escolta humanoide nos nós de armadilha`.
 
 ### Tarefa 4 · Elite com criatura principal
 
