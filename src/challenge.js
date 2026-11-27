@@ -114,6 +114,7 @@ export function calculateCombatND(items) {
     Array(quantity).fill(challengeRating)
   );
   const count = allCRs.length;
+  if (count === 0) return 0;
   const specials = allCRs.filter(isSpecialChallengeRating);
   if (specials.length) {
     // Sem regra de soma para ND especial: sem ND domina, depois o maior entre S+ e S.
@@ -138,8 +139,8 @@ export function calculateCombatND(items) {
   const [base, ...others] = groups;
   const total = others.reduce((sum, value) => sum + getLowerGroupBonus(base - value), base);
 
-  // Com base 1 ou mais, o resultado é arredondado para baixo.
-  return base >= 1 ? Math.floor(total) : roundToQuarter(total);
+  // Aqui a base é sempre 1 ou mais: o resultado é arredondado para baixo.
+  return Math.floor(total);
 }
 
 export function assignChallengeRating(node, floor, profile) {

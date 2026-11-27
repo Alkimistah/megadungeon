@@ -10,6 +10,11 @@ test("lista vazia vale ND 0", () => {
   assert.equal(calculateCombatND(undefined), 0);
 });
 
+test("encontro só com quantidades 0 vale ND 0", () => {
+  assert.equal(calculateCombatND([{ challengeRating: 5, quantity: 0 }]), 0);
+  assert.equal(calculateCombatND([{ challengeRating: 0.25, quantity: 0 }]), 0);
+});
+
 test("tabela do plano segue o livro", () => {
   assert.equal(nd([[7], [6], [5], [3]]), 8, "exemplo do livro: 7 + 1 + 1/2 = 8,5 → 8");
   assert.equal(nd([[9], [5, 3]]), 9, "Kallyanach e 3 Acólitos: 9 e 7 → 9,5 → 9");
@@ -41,6 +46,11 @@ test("diferenças pela tabela de +1, +1/2, +1/4 e nada", () => {
   assert.equal(nd([[8], [6], [5]]), 8, "8 + 1/2 + 1/4 = 8,75 → 8");
   assert.equal(nd([[8], [7], [6], [5]]), 9, "8 + 1 + 1/2 + 1/4 = 9,75 → 9");
   assert.equal(nd([[8], [7], [6]]), 9, "8 + 1 + 1/2 = 9,5 → 9");
+});
+
+test("diferença fracionária cai na faixa de cima", () => {
+  // Base 2 e ND 1/2: diferença 1,5 está entre 1 e 2, conta +1/2 → 2,5 → 2.
+  assert.equal(nd([[2], [0.5]]), 2);
 });
 
 test("ameaças abaixo de ND 1 sozinhas mantêm a regra em duas fases", () => {
