@@ -328,36 +328,14 @@ function homogeneousGroupMatchesTarget(targetChallenge, totalCount, creatureChal
   return roundToQuarter(actualChallenge) === roundToQuarter(targetChallenge);
 }
 
-// Returns what CR a single added creature must have to bring the group's T20 ND
-// to exactly targetChallenge. Returns null if the math yields no valid CR.
+// ND de grupo pela regra do livro (Ameaças de Arton p. 9): em vez de inverter uma
+// fórmula, testa cada ND candidato acrescentado ao grupo com calculateCombatND.
 // Note: all-sub-1 groups with targetChallenge >= 1 use bulk-add in refineEncounterGroup instead.
-function getRequiredAdditionCR(items, targetChallenge) {
-  const allCRs = items.flatMap(i => Array(i.quantity).fill(i.challengeRating));
-  const N = allCRs.length;
-  const S = allCRs.reduce((a, b) => a + b, 0);
-  const allSubOne = allCRs.every(cr => cr < 1);
-  const newN = N + 1;
-  const newDoublings = Math.floor(Math.log2(newN));
-
-  if (allSubOne) {
-    if (targetChallenge < 1) {
-      // Linear sub-1: S + x = target, x must keep total < 1
-      const x = roundToQuarter(targetChallenge - S);
-      return (x >= 0.25 && S + x < 1) ? x : null;
-    }
-    // target >= 1 with all-sub-1 group: try adding CR ≥ 1 (switches to averaging formula)
-    const newAvgNeeded = targetChallenge - 2 * newDoublings;
-    if (newAvgNeeded <= 0) return null;
-    const xAvg = roundToQuarter(newAvgNeeded * newN - S);
-    return xAvg >= 1 ? xAvg : null;
-  }
-
-  // Has CR ≥ 1: averaging formula
-  // (S + x) / newN + 2*newDoublings = target → x = (target - 2*newDoublings)*newN - S
-  const newAvgNeeded = targetChallenge - 2 * newDoublings;
-  if (newAvgNeeded <= 0) return null;
-  const x = roundToQuarter(newAvgNeeded * newN - S);
-  return x >= 0.25 ? x : null;
+function getClosingAdditionCRs(items, targetChallenge, candidateCRs) {
+  return [...new Set(candidateCRs)]
+    .filter(cr => typeof cr === "number" && cr < targetChallenge)
+    .sort((left, right) => left - right)
+    .filter(cr => calculateCombatND([...items, { challengeRating: cr, quantity: 1 }]) === targetChallenge);
 }
 
 function removeLeastCR(current) {
@@ -374,7 +352,7 @@ function removeLeastCR(current) {
 // Post-generation validation: adjust the group iteratively until its actual T20 ND
 // matches targetChallenge. Adds creatures to fill a deficit; removes the lowest-CR
 // creature to fix an excess or when addition is mathematically impossible.
-function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, catalog, ecology) {
+export function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, catalog, ecology) {
   if (items.length === 0) return items;
   const MAX_ITER = 10;
   const current = items.map(i => ({ ...i }));
@@ -402,48 +380,42 @@ function refineEncounterGroup(items, targetChallenge, type, terrainName, rng, ca
         continue;
       }
 
-      const neededCR = getRequiredAdditionCR(current, targetChallenge);
-      // Refuse to add a creature whose CR alone would already constitute the full
-      // encounter (CR ≥ targetChallenge). That produces encounters where one creature
-      // dominates while companions are just filler — remove the weakest instead.
-      if (neededCR !== null && neededCR < targetChallenge) {
-        // Allow picking creatures already in the group so quantity++ is possible —
-        // sometimes the right fix is more of the lead creature, not a new species.
-        const added = pickCreatureForChallenge({
+      // Allow picking creatures already in the group so quantity++ is possible —
+      // sometimes the right fix is more of the lead creature, not a new species.
+      // Only CRs below targetChallenge: one creature must not be the whole encounter.
+      const addable = ecology
+        ? catalog.filter(creature => canUseEcologyQuantity(creature, 2) || !current.some(item => item.creatureId === creature.id))
+        : catalog;
+      const closingCRs = getClosingAdditionCRs(current, targetChallenge, addable.map(creature => creature.challengeRating));
+      if (closingCRs.length) {
+        const fitting = addable.filter(creature => closingCRs.includes(creature.challengeRating));
+        const typed = !ecology && type ? fitting.filter(creature => creature.type === type) : [];
+        const added = chooseCandidate(typed.length ? typed : fitting, {
           type,
-          targetChallenge: neededCR,
+          targetChallenge: closingCRs.at(-1),
           terrainName,
           rng,
-          excludedIds: new Set(),
           preferredSubtype: leadCreature?.subtype ?? null,
-          catalog: ecology
-            ? catalog.filter(creature => canUseEcologyQuantity(creature, 2) || !current.some(item => item.creatureId === creature.id))
-            : catalog,
           ecology,
         });
-
-        // Use the catalog creature only if it's reasonably close to the needed CR;
-        // a large gap (> 0.5) means a catalog gap — fall through to elite generation.
-        const catalogFits = added && (neededCR - added.challengeRating) <= 0.5;
-        if (catalogFits) {
-          const existing = current.find(i => i.creatureId === added.id);
-          if (existing) {
-            existing.quantity++;
-          } else {
-            current.push(getCreatureSummary(added, 1, rng));
-          }
-          continue;
+        const existing = current.find(i => i.creatureId === added.id);
+        if (existing) {
+          existing.quantity++;
+        } else {
+          current.push(getCreatureSummary(added, 1, rng));
         }
+        continue;
+      }
 
-        // Catalog gap: generate a scaled elite variant of the lead creature.
-        // Only for CR ≥ 1 targets where the base creature is genuinely weaker.
-        if (leadCreature && neededCR >= 1 && neededCR > leadCreature.challengeRating + 0.5
-          && (!ecology || canUseEcologyQuantity(leadCreature, 2))) {
-          const elite = createEliteVariant(leadCreature, neededCR);
-          if (elite) {
-            current.push(getEliteCreatureSummary(elite, 1, rng));
-            continue;
-          }
+      // Catalog gap: generate a scaled elite variant of the lead creature at a CR
+      // that closes the target. Only CR ≥ 1 above the lead (elites scale up).
+      if (leadCreature && (!ecology || canUseEcologyQuantity(leadCreature, 2))) {
+        const eliteCRs = getClosingAdditionCRs(current, targetChallenge, THREAT_CHALLENGE_ORDER
+          .filter(cr => cr >= 1 && cr > leadCreature.challengeRating + 0.5));
+        const elite = eliteCRs.length ? createEliteVariant(leadCreature, eliteCRs[0]) : null;
+        if (elite) {
+          current.push(getEliteCreatureSummary(elite, 1, rng));
+          continue;
         }
       }
 

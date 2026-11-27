@@ -10,38 +10,35 @@ function shuffleCounts(rng, values) {
   return values;
 }
 
-function selectRatings(buckets, count, target, rng) {
+// O ND de grupo do livro depende de quais ND foram escolhidos, não da soma:
+// a memória usa o multiconjunto ordenado. Acrescentar ameaça nunca reduz o ND,
+// então um prefixo acima do alvo é descartado sem testar os complementos.
+export function selectRatings(buckets, count, target, rng) {
   const ratings = [...buckets.keys()].sort((left, right) => left - right);
   const viable = new Map();
-  const chosen = [];
-  // Para uma mesma quantidade, o cálculo depende da soma e de haver ND ≥ 1.
-  const canComplete = (remaining, total, hasRatingAtLeastOne) => {
-    if (remaining === 0) return calculateCombatND(chosen.map(challengeRating => ({ challengeRating, quantity: 1 }))) === target;
-    const key = `${remaining}:${total}:${hasRatingAtLeastOne}`;
+  const groupND = multiset => calculateCombatND(multiset.map(challengeRating => ({ challengeRating, quantity: 1 })));
+  const withRating = (multiset, rating) => {
+    const index = multiset.findIndex(value => value > rating);
+    return index === -1 ? [...multiset, rating] : [...multiset.slice(0, index), rating, ...multiset.slice(index)];
+  };
+  const canComplete = multiset => {
+    const key = multiset.join(",");
     if (viable.has(key)) return viable.get(key);
-    const result = ratings.some(rating => {
-      chosen.push(rating);
-      const fits = canComplete(remaining - 1, total + rating, hasRatingAtLeastOne || rating >= 1);
-      chosen.pop();
-      return fits;
-    });
+    const challenge = groupND(multiset);
+    const result = multiset.length === count
+      ? challenge === target
+      : challenge <= target && ratings.some(rating => canComplete(withRating(multiset, rating)));
     viable.set(key, result);
     return result;
   };
-  let total = 0;
-  let hasRatingAtLeastOne = false;
+  const chosen = [];
+  let multiset = [];
   while (chosen.length < count) {
-    const options = ratings.filter(rating => {
-      chosen.push(rating);
-      const fits = canComplete(count - chosen.length, total + rating, hasRatingAtLeastOne || rating >= 1);
-      chosen.pop();
-      return fits;
-    });
+    const options = ratings.filter(rating => canComplete(withRating(multiset, rating)));
     if (options.length === 0) return null;
     const rating = pick(rng, options);
     chosen.push(rating);
-    total += rating;
-    hasRatingAtLeastOne ||= rating >= 1;
+    multiset = withRating(multiset, rating);
   }
   return chosen;
 }
