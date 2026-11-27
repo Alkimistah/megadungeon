@@ -151,7 +151,30 @@ const layoutsByTheme = {
     center: layout("Mesa do leilão", "A mesa do leilão fica no convés do Galeão da Caveira, entre duas fileiras de barricas.", 14, 5, [
       ["advantage", 12, 3, 5, 5], ["obstacle", 9, 4, 1, 3], ["obstacle", 17, 4, 1, 3],
       ["wall", 7, 0, 1, 4], ["difficult", 8, 8, 4, 2]
-    ])
+    ]),
+    byTask: {
+      "Recuperar o manifesto": {
+        ...layout("Estojo do manifesto", "Os engradados protegem o acesso ao estojo na extremidade do cais.", 9, 8, [
+          ["water", 0, 0, 20, 6], ["deck", 6, 2, 7, 8], ["obstacle", 6, 6, 2, 2], ["obstacle", 12, 8, 3, 2]
+        ]),
+        enemyTiles: ["deck", "floor"]
+      },
+      "Cruzar pela viga externa": layout("Patamar da viga", "A viga contorna a paliçada e desemboca no patamar.", 10, 7, [
+        ["wall", 6, 0, 2, 6], ["wall", 6, 8, 2, 6], ["bridge", 4, 6, 7, 2], ["advantage", 9, 6, 4, 3]
+      ]),
+      "Retirar o livro de contas": layout("Armário do livro de contas", "O armário fica entre duas fileiras de caixas de saque.", 9, 7, [
+        ["obstacle", 5, 2, 5, 2], ["obstacle", 6, 8, 2, 4], ["obstacle", 11, 4, 2, 3], ["difficult", 8, 9, 4, 2]
+      ]),
+      "Subir pelo lado cego": layout("Patamar externo da torre", "A escada externa sobe pelo trecho sem janelas.", 10, 8, [
+        ["wall", 7, 0, 2, 6], ["slope", 6, 7, 3, 4], ["advantage", 9, 6, 4, 4], ["obstacle", 14, 3, 2, 3]
+      ]),
+      "Retirar o amuleto": layout("Suporte de oferendas", "O amuleto pende entre as velas, ao lado da quilha.", 9, 6, [
+        ["wall", 5, 0, 1, 5], ["obstacle", 7, 4, 2, 2], ["deck", 8, 5, 6, 4], ["obstacle", 11, 8, 2, 2]
+      ]),
+      "Cortar o vínculo do talismã": layout("Suporte do talismã", "O suporte está do lado interno do balcão, entre duas entradas.", 10, 7, [
+        ["wall", 7, 0, 1, 4], ["wall", 7, 9, 1, 5], ["obstacle", 8, 5, 3, 1], ["deck", 9, 6, 7, 4]
+      ])
+    }
   },
   "sea-caves": {
     NO: layout("Cabo do desembarque", "A linha permite encontrar o caminho de volta na vazante.", 8, 9, [

@@ -13,6 +13,7 @@
     "test:sw": "node --test scripts/swPrecache.test.mjs",
     "test:ranges": "node --test scripts/floorRanges.test.mjs",
     "test:archipelago": "node --test scripts/archipelagoState.test.mjs scripts/archipelagoShipwrecked.test.mjs scripts/archipelagoGiantKelp.test.mjs scripts/archipelagoMist.test.mjs scripts/archipelagoShipGraveyard.test.mjs scripts/archipelagoCyclopeanRuins.test.mjs scripts/archipelagoSacred.test.mjs scripts/archipelagoCrystal.test.mjs scripts/archipelagoCrystalContent.test.mjs scripts/archipelagoCrystalMaps.test.mjs scripts/crystalCreatures.test.mjs scripts/archipelagoAbandonedShip.test.mjs scripts/archipelagoAbandonedShipContent.test.mjs scripts/archipelagoAbandonedShipMaps.test.mjs scripts/navioAbandonadoCreatures.test.mjs scripts/archipelagoImpossibleTide.test.mjs scripts/tacticalEnemyArea.test.mjs",
+    "test:archipelago-rosters": "node scripts/validateArchipelagoRosters.mjs",
     "test:archipelago-missions": "node --test scripts/archipelagoMissions.test.mjs",
     "test:treasure": "node scripts/treasure.test.mjs",
     "test:ecology": "node --test scripts/ecology.test.mjs scripts/encounterEcology.test.mjs scripts/manualEncounterCatalog.test.mjs",

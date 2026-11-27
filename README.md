@@ -1,6 +1,6 @@
 # Mega Dungeon
 
-Gerador procedural de exploração e encontros para Tormenta20. Os andares 1 a 10 usam exploração estendida, com eventos d100 e encontros finais curados. Os andares 11 a 20 usam um mapa em grafo com rotas ramificadas. Os andares 21 a 30 usam um mapa de arquipélago, com as quatro ilhas iniciais jogáveis do desembarque à conquista do fragmento.
+Gerador procedural de exploração e encontros para Tormenta20. Os andares 1 a 10 usam exploração estendida, com eventos d100 e encontros finais curados. Os andares 11 a 20 usam um mapa em grafo com rotas ramificadas. Os andares 21 a 30 usam um mapa de arquipélago, com ilhas jogáveis do desembarque à conquista do fragmento.
 
 ## O que o app faz
 
@@ -82,7 +82,7 @@ Os perfis atuais são:
 
 - `dungeon1to10`: exploração estendida dos andares 1 a 10, com ações por andar, tabela d100, efeitos mecânicos, mapas táticos, encontros finais e chefe do andar 10.
 - `forest11to20`: mapa em nodos dos andares 11 a 20, usado como representação de uma área maior com rotas pré-geradas.
-- `archipelago-21-30`: arquipélago com dez ilhas e progressão por fragmentos. As nove ilhas e a ilha final têm exploração completa, e as nove têm missões por tema. Outros 5 temas estão desligados até receberem setores e pacote de missões.
+- `archipelago-21-30`: arquipélago com dez ilhas e progressão por fragmentos. As nove ilhas e a ilha final têm exploração completa, e as nove têm missões por tema. Há oito temas iniciais, oito intermediários e dois avançados ativos, além da ilha final. Os quatro temas avançados restantes serão preparados nesta ordem: Iceberg, Ilha de Sal e Ossos, Ilha Elemental e Ilha Viva.
 
 Para adicionar uma nova faixa de andares:
 

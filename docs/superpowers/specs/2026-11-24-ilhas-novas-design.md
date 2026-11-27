@@ -50,11 +50,14 @@ O PO pediu que o trabalho ande **de pouco em pouco**, com qualidade máxima em c
 | — | Ponto de controle das iniciais | | Concluído (25/11/2026) |
 | 5 | Intermediária | Ilha das Ruínas Ciclópicas (`cyclopean-ruins`) | Concluída e publicada (25/11/2026) |
 | 6 | Intermediária | Ilha Sagrada (`sacred`) | Concluída e publicada (25/11/2026) |
-| 7 | Intermediária | Ilha de Cristal (`crystal`) | Implementada e validada no app em 26/11/2026 |
-| 8 | Intermediária | Navio Abandonado (`abandoned-ship`) | Implementado e validado no app em 27/11/2026 |
+| 7 | Intermediária | Ilha de Cristal (`crystal`) | Publicada |
+| 8 | Intermediária | Navio Abandonado (`abandoned-ship`) | Publicado |
 | 9 | Intermediária | Ilha de Maré Impossível (`impossible-tide`) | Publicada em 27/11/2026 |
-| — | Ponto de controle das intermediárias | | Pendente |
-| 10–13 | Avançada | Iceberg, Ilha Viva, Sal e Ossos, Ilha Elemental (ordem definida no ponto de controle) | Pendente |
+| — | Ponto de controle das intermediárias | | Revisão concluída |
+| 10 | Avançada | Iceberg (`iceberg`) | Prévia pendente |
+| 11 | Avançada | Ilha de Sal e Ossos (`salt-and-bones`) | Pendente |
+| 12 | Avançada | Ilha Elemental (`elemental`) | Pendente |
+| 13 | Avançada | Ilha Viva (`living`) | Pendente |
 | — | Ponto de controle final | | Pendente |
 
 O PO definiu a ordem das iniciais. A ordem das demais fileiras fica para o ponto de controle anterior a cada uma.
@@ -76,13 +79,17 @@ A etapa 5 (Ruínas Ciclópicas) foi concluída e publicada em 25/11/2026. Foi a 
 
 A etapa 6 (Ilha Sagrada) foi concluída e publicada em 25/11/2026. É uma ilha dividida: os espíritos antigos a oeste e uma cruzada da Supremacia Purista a leste, como releitura do Atlas de Arton. O Centro é o "Altar da Trilha Branca", e dois dos três guardiões são solo (Companhia Blindada e Forjador Litúrgico). Na mesma etapa, o motor passou a tentar toda a `enemyArea` antes de colocar uma peça grande fora dela (`src/nodeTacticalMap.js`, teste `scripts/tacticalEnemyArea.test.mjs`).
 
-A etapa 7 (Ilha de Cristal) foi implementada localmente a partir da prévia aprovada. Os setores sorteiam combates de ND 7 e permitem rerrolagem. Nas Galerias sob o Piso, o sorteio também pode combinar criaturas de NDs diferentes para incluir o Escorpião de Cristal de ND 4. No Centro, o Prisma da Maré percorre três zonas solares marcadas no mapa conforme a rodada da mesa. O Golem de Espelhos, o Tausideros e a Centopeia Solar são as três opções de ND 9. O Tausideros usa a ficha original, com a petrificação descrita como cristalização.
+A etapa 7 (Ilha de Cristal) foi publicada, com a revisão do Tausideros no commit `68037ba`. Os setores sorteiam combates de ND 7 e permitem rerrolagem. Nas Galerias sob o Piso, o sorteio também pode combinar criaturas de NDs diferentes para incluir o Escorpião de Cristal de ND 4. No Centro, o Prisma da Maré percorre três zonas solares marcadas no mapa conforme a rodada da mesa. O Golem de Espelhos, o Tausideros e a Centopeia Solar são as três opções de ND 9. O Tausideros usa a ficha original, com a petrificação descrita como cristalização.
 
-A etapa 8 (Navio Abandonado) foi implementada localmente conforme a prévia aprovada. Os seis setores mostram os últimos momentos da tripulação. O caixão guarda o fragmento e sustenta a noite eterna. A vitória na Cabine do Capitão faz o sol romper a escuridão e abrir o caixão, encerrando a maldição.
+A etapa 8 (Navio Abandonado) foi publicada, com a entrada do Mastim-das-Sombras no commit `68037ba`. Os seis setores mostram os últimos momentos da tripulação. O caixão guarda o fragmento e sustenta a noite eterna. A vitória na Cabine do Capitão faz o sol romper a escuridão e abrir o caixão, encerrando a maldição.
 
 A etapa 9 (Ilha de Maré Impossível) foi concluída e publicada em 27/11/2026. O Poço das Duas Marés usa três fases de corrente aplicadas pelo mestre, e o Corgann das Duas Marés é uma opção solo de ND 9. Os seis setores compartilham doze fichas para o sorteio de ND 7.
 
-**Próximo passo:** revisar a fileira intermediária e definir a ordem das quatro ilhas avançadas. Os NDs confirmados por faixa estão em `REQUISITOS_ANDARES_21_A_30.md`.
+A revisão intermediária foi concluída com a atualização da Ilha Tomada por Piratas. As oito ilhas têm seis setores, duas plantas de combate por setor, um teste estendido por setor, pelo menos doze fichas observadas no sorteio e três composições de guardião. A auditoria das dezesseis ilhas confirmou cobertura de todas as fichas regionais nos setores ou no Centro.
+
+**Ponto de controle das intermediárias.** A ordem de trabalho das avançadas começa pelo Iceberg. Gelo, água fria e rotas de fratura podem usar os recursos atuais da grade. Sal e Ossos vem em seguida, com recifes e carcaças que oferecem rotas e cobertura. A Ilha Elemental combina terrenos e efeitos de várias regiões. A Ilha Viva fica por último, porque ainda precisa de um contexto de ecologia e de uma regra para as reações do terreno.
+
+**Próximo passo:** preparar a prévia do Iceberg. Os NDs confirmados por faixa estão em `REQUISITOS_ANDARES_21_A_30.md`.
 
 **Lições das etapas 3 e 4.**
 
@@ -120,7 +127,11 @@ Os números abaixo seguem as ilhas atuais da mesma fileira. São a referência d
 - Os 4 primeiros setores aplicam as penalidades sorteadas. Os 2 últimos (SO e SL) removem um bônus do guardião (`defaultGuardianBuff`), como na Vulcânica.
 - Guardião: 3 composições ND 9.
 
-**Avançadas (Centro ND 10):** o formato é o de Flutuante e Tempestades (8 setores, 3 variantes, combate ND 8, quatro setores de penalidade e quatro de bônus). Ele será detalhado no ponto de controle das intermediárias.
+**Avançadas (Centro ND 10):** o formato é o de Flutuante e Tempestades (8 setores, 3 variantes, combate ND 8, quatro setores de penalidade e quatro de bônus). O detalhamento será feito na prévia do Iceberg.
+
+## Cobertura do elenco regional
+
+Cada ilha inicial ou intermediária deve ter pelo menos doze fichas observadas nos setores. Toda ficha cadastrada precisa aparecer em um combate da própria ilha, nos setores ou em uma composição do Centro. O comando `npm run test:archipelago-rosters` verifica essa cobertura, os NDs de cada faixa e a quantidade mínima de variantes.
 
 ## Restrições
 

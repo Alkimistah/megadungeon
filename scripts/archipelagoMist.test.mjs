@@ -111,11 +111,11 @@ test("névoa tem terreno, ecologia e nome do Centro", () => {
 
 const originsBefore = {
   lacedon: "storm", "zumbi-fantasmagorico": "shipwrecked", aparicao: "mangrove", imediato: "pirate-held",
-  "capitao-pirata": "pirate-held", "come-sonhos": "tropical", pirata: "pirate-held",
+  "come-sonhos": "tropical", pirata: "pirate-held",
   "harpia-saqueadora": "storm", "coruja-gigante": "storm"
 };
-const newOrigin = ["livido", "fantasma", "alma-acorrentada", "silfide-travessa", "duende-menor", "duende-maior",
-  "vestigio-da-encruzilhada", "mastim-das-sombras", "corcel-das-trevas", "duplo", "falso-vidente", "bruxo-rural",
+const newOrigin = ["livido", "fantasma", "silfide-travessa", "duende-menor", "duende-maior",
+  "vestigio-da-encruzilhada", "corcel-das-trevas", "duplo", "falso-vidente", "bruxo-rural",
   "necromante", "estirge", "enxame-estirge"];
 
 test("a origem das criaturas compartilhadas não passa para a névoa", () => {

@@ -16,7 +16,8 @@ const islandCreatures = {
     "gargula-assassina", "harpia-saqueadora", "abelha-grifo", "manticora", "manticora-ameacas-de-arton",
     "anciao-das-rochas", "defensor-rochoso"],
   "pirate-held": ["pirata", "bando-pirata", "capitao-pirata", "imediato", "galokk-capanga",
-    "ogro-cacador", "capitao-baluarte", "chefe-bandido", "chefe-bandido-livro-basico"],
+    "ogro-cacador", "capitao-baluarte", "chefe-bandido", "gnoll-filibusteiro", "capanga-minotauro",
+    "harpia-saqueadora", "tengu-bandoleiro"],
   "sea-caves": [...coastAnimals, ...coastalHumanoids, "aquinne", "lacedon", "lula-gigante",
     "homem-piranha-capitao", "sahuagin-predador", "tabrachi-campeao", "afogado"],
   volcanic: [
@@ -29,16 +30,16 @@ const islandCreatures = {
   mangrove: [
     "lagarto-perseguidor", "crocodilo", "fobossuco", "hipopotamo", "pantera",
     "elemental-do-veneno-pequeno", "aquinne", "naiade",
-    "nagah-guardiao", "nagah-dormente", "nagah-mistica", "nagah-mistica-ameacas-de-arton",
+    "nagah-guardiao", "nagah-dormente", "nagah-mistica",
     "nagah-sacerdotisa", "tabrachi-campeao", "homem-piranha", "homem-piranha-imediato",
-    "sapo-atroz", "alghari", "tempestade-de-lagartos", "otyugh", "otyugh-ameacas-de-arton", "troll",
+    "sapo-atroz", "alghari", "tempestade-de-lagartos", "otyugh", "troll",
     "esqueleto", "esqueleto-de-elite", "lacedon", "turba-zumbi", "aparicao", "empalhado-guardiao-ofidico"
   ],
   tropical: [
     "lagarto-perseguidor", "leao", "pantera", "tigre", "crocodilo", "deinonico", "abelha-grifo", "fobossuco",
-    "gargula", "gargula-livro-basico", "gargula-assassina", "gargula-de-topiaria-media", "gargula-de-topiaria-grande",
-    "espada-da-floresta", "galhada-macho", "galhada-femea", "guardiao-de-palha",
-    "kobold-veterano", "patrulha-kobold", "kobold-xama", "tendriculo", "cipo-assassino", "come-sonhos"
+    "gargula", "gargula-assassina", "gargula-de-topiaria-media", "gargula-de-topiaria-grande",
+    "espada-da-floresta", "galhada-macho", "galhada-femea", "guardiao-de-palha", "golem-de-nor-medio",
+    "kobold-veterano", "patrulha-kobold", "kobold-xama", "kobold-explosivo", "naja", "tendriculo", "cipo-assassino", "come-sonhos"
   ],
   shipwrecked: [
     "canceronte", "tumarkhan", "selako", "pliorex", "fobossuco", "crocodilo", "bando-pirata", "chefe-de-quadrilha",
@@ -52,29 +53,29 @@ const islandCreatures = {
     "homem-piranha", "homem-piranha-imediato", "alghari", "cipo-assassino", "tendriculo", "naiade", "aquinne"
   ],
   mist: [
-    "lacedon", "livido", "zumbi-fantasmagorico", "aparicao", "imediato", "capitao-pirata", "fantasma", "alma-acorrentada",
-    "come-sonhos", "silfide-travessa", "duende-menor", "duende-maior", "vestigio-da-encruzilhada", "mastim-das-sombras", "corcel-das-trevas",
+    "lacedon", "livido", "zumbi-fantasmagorico", "aparicao", "imediato", "fantasma",
+    "come-sonhos", "silfide-travessa", "duende-menor", "duende-maior", "vestigio-da-encruzilhada", "corcel-das-trevas",
     "duplo", "falso-vidente", "bruxo-rural", "necromante", "pirata",
     "harpia-saqueadora", "coruja-gigante", "estirge", "enxame-estirge"
   ],
   "ship-graveyard": [
-    "canceronte", "selako", "crocodilo", "rato-gigante", "lula-gigante", "aranhas-filhotes",
-    "aranha-gigante", "aranha-matriarca", "mimico-menor", "mimico", "otyugh", "ameba-gigante", "ganchador",
+    "canceronte", "selako", "crocodilo", "rato-gigante", "aranhas-filhotes",
+    "aranha-gigante", "aranha-matriarca", "mimico-menor", "mimico", "otyugh", "ganchador",
     "gnoll-capanga", "gnoll-saqueador", "gnoll-filibusteiro", "gnoll-lider-de-alcateia", "gnoll-xama-de-megalokk", "gnoll-cacador-de-cabecas",
     "esqueleto", "esqueleto-de-elite", "lacedon", "imediato", "capitao-pirata", "amalgama-esqueleto"
   ],
   "cyclopean-ruins": [
     "canceronte", "selako", "selako-tigre", "pliorex", "lula-gigante", "crocodilo",
-    "soldado-mecanico", "gargula-assassina", "cariatide-mecanica", "carrasco-oco", "instrumento-divino",
+    "soldado-mecanico", "gargula", "gargula-assassina", "cariatide-mecanica", "carrasco-oco", "instrumento-divino",
     "cocatriz", "basilisco", "gorgona", "cocatriz-real", "grifo", "serpe",
     "esqueleto", "esqueleto-de-elite", "ogro-esqueleto", "gigante-esqueleto",
     "capanga", "jagunco", "lider-mercenario-de-aslothia", "gigante-das-colinas", "necromante"
   ],
   sacred: [
     "pegaso", "unicornio", "dragonete", "ninfa", "protetor", "eiradaan-guardiao", "shiradi",
-    "hipogrifo", "grifo", "coruja-gigante",
+    "hipogrifo", "grifo", "coruja-gigante", "harpia-saqueadora",
     "recruta-purista", "soldado-purista", "purificado", "sargento-mor", "capelao-de-guerra",
-    "arcano-de-guerra-adepto", "capitao-baluarte", "cacador-de-impuros", "bispo-de-guerra", "soldado-blindado"
+    "arcano-de-guerra-adepto", "capitao-baluarte", "soldado-blindado"
   ],
   crystal: [
     "escorpiao-de-cristal", "ameba-gigante", "centopeia-dragao", "gargula-de-topiaria-grande", "gorgona",
@@ -130,7 +131,8 @@ const existingOriginByCreatureId = new Map([
   ["soldado-mecanico", "cyclopean-ruins"],
   ["ganchador", "ship-graveyard"],
   ["tabrachi-campeao", "mangrove"],
-  ["afogado", "abandoned-ship"]
+  ["afogado", "abandoned-ship"],
+  ["gnoll-filibusteiro", "ship-graveyard"]
 ]);
 
 function findCreatureOriginThemeId(creatureId) {

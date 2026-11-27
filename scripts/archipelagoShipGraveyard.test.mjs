@@ -108,11 +108,11 @@ test("cemitério tem terreno, ecologia e nome do Centro", () => {
 });
 
 const originsBefore = {
-  canceronte: "sea-caves", selako: "sea-caves", crocodilo: "mangrove", "lula-gigante": "sea-caves", otyugh: "mangrove",
+  canceronte: "sea-caves", selako: "sea-caves", crocodilo: "mangrove", otyugh: "mangrove",
   esqueleto: "mangrove", "esqueleto-de-elite": "mangrove", lacedon: "storm", imediato: "pirate-held", "capitao-pirata": "pirate-held"
 };
 const newOrigin = ["rato-gigante", "aranhas-filhotes", "aranha-gigante", "aranha-matriarca", "mimico-menor", "mimico",
-  "ameba-gigante", "ganchador", "gnoll-capanga", "gnoll-saqueador", "gnoll-filibusteiro", "gnoll-lider-de-alcateia",
+  "ganchador", "gnoll-capanga", "gnoll-saqueador", "gnoll-filibusteiro", "gnoll-lider-de-alcateia",
   "gnoll-xama-de-megalokk", "gnoll-cacador-de-cabecas", "amalgama-esqueleto"];
 
 test("a origem das criaturas compartilhadas não passa para o cemitério", () => {

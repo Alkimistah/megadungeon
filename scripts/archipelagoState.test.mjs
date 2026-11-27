@@ -832,6 +832,36 @@ test("a Ilha-Labirinto conserva seis resultados até o Centro ND 9 e concede um 
   }
 });
 
+test("o fortim pirata sorteia as doze fichas em doze plantas próprias de combate ND 7", () => {
+  const island = { floor: 25, themeId: "pirate-held" };
+  const maps = new Set();
+  const seen = new Set();
+  for (let index = 0; index < 6; index++) {
+    assert.match(createIslandSector(island, index, 0, 24).description, /3 sucessos antes de 2 falhas/);
+    for (const variant of [1, 2]) {
+      const objective = createIslandSector(island, index, variant, 24);
+      assert.equal(objective.type, "combate");
+      for (let roll = 0; roll < 60; roll++) {
+        const scene = createIslandSectorCombat(island, objective, productionProfile, `fortim-revisao-${roll}`);
+        const items = scene.resolvedEncounter?.items;
+        assert.equal(calculateCombatND(items), 7);
+        for (const item of items) seen.add(item.creatureId);
+        if (roll === 0) {
+          assert.equal(calculateCombatND(rerollNodeCreatures(scene, productionProfile)?.items), 7);
+          const tactical = withIslandTacticalLayout(scene, island.themeId, objective);
+          assert.ok(createNodeTacticalMap(tactical).landmark);
+          maps.add(JSON.stringify(tactical.tacticalLayout.zones));
+        }
+      }
+    }
+  }
+  assert.equal(maps.size, 12);
+  assert.deepEqual(seen, new Set([
+    "pirata", "bando-pirata", "capitao-pirata", "imediato", "galokk-capanga", "ogro-cacador",
+    "capitao-baluarte", "chefe-bandido", "gnoll-filibusteiro", "capanga-minotauro", "harpia-saqueadora", "tengu-bandoleiro"
+  ]));
+});
+
 test("o fortim pirata tem seis setores, guarda as proteções sorteadas e concede um fragmento", () => {
   const profile = archipelagoBaseIntermediateRow;
   const leaders = ["capitao-do-conclave-pirata", "capitao-pirata", "ogro-das-sanguinarias"];

@@ -135,7 +135,7 @@ function hydrateSessionIslands(profile, { islands: sessionIslands, visitedFloors
             return { ...savedObjective, guardianBuffId: current.guardianBuffId, guardianBuff: current.guardianBuff, effect: current.effect };
           }
           // A revisão mudou as variantes 0 e 1; expedições importadas conservam a tarefa sorteada.
-          if (["volcanic", "sea-caves"].includes(island.themeId) && !island.outcomes?.[objective.id] &&
+          if (["volcanic", "sea-caves", "pirate-held"].includes(island.themeId) && !island.outcomes?.[objective.id] &&
               objective.title && objective.variant !== 2) {
             return { ...current, ...objective };
           }

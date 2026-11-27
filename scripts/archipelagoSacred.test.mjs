@@ -138,8 +138,7 @@ test("Ilha Sagrada tem terreno, ecologia e nome do Centro", () => {
 
 const originsBefore = { grifo: "floating", "coruja-gigante": "storm", "capitao-baluarte": "pirate-held" };
 const newOrigin = ["pegaso", "unicornio", "dragonete", "ninfa", "protetor", "eiradaan-guardiao", "hipogrifo",
-  "recruta-purista", "soldado-purista", "purificado", "sargento-mor", "capelao-de-guerra", "arcano-de-guerra-adepto",
-  "cacador-de-impuros", "bispo-de-guerra"];
+  "recruta-purista", "soldado-purista", "purificado", "sargento-mor", "capelao-de-guerra", "arcano-de-guerra-adepto"];
 
 test("a origem das criaturas compartilhadas não passa para a Ilha Sagrada", () => {
   for (const [id, origin] of Object.entries(originsBefore)) {
