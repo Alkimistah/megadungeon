@@ -300,7 +300,9 @@ function placeEnemies(cells, node, rng) {
     const nextPosition = firstPosition + (item.quantity || 1);
     const placements = positions.slice(firstPosition, nextPosition);
     const isBoss = node.type === "boss" && (!node.bossCreatureId || item.creatureId === node.bossCreatureId);
-    placeFormation(cells, placements, isBoss ? "boss" : "enemy", placements.length);
+    if (!node.tacticalLayout?.enemySurfaceByCreatureId) {
+      placeFormation(cells, placements, isBoss ? "boss" : "enemy", placements.length);
+    }
     firstPosition = nextPosition;
     return placements.map(([x, y]) => ({ index: y * WIDTH + x, creatureId: item.creatureId }));
   });
@@ -570,20 +572,31 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
     .flatMap(feature => feature.indices));
   const canOccupy = index => WALKABLE_CELLS.has(sceneTerrain[index]) && !blockingFeatures.has(index);
   const enemyTiles = layout?.enemyTiles;
+  const enemySurfaces = layout?.enemySurfaceByCreatureId;
   const preferredArea = layout?.keepFootprintsInEnemyArea ? layout.enemyArea : null;
-  const canPrefer = index => {
+  const canPrefer = (index, unit) => {
     if (preferredArea) {
       const x = index % WIDTH;
       const y = Math.floor(index / WIDTH);
       if (x < preferredArea.minX || x > preferredArea.maxX || y < preferredArea.minY || y > preferredArea.maxY) return false;
     }
     const tile = sceneTerrain[index];
+    if (enemySurfaces) {
+      const surface = enemySurfaces[unit.creatureId];
+      return canOccupy(index) && (surface === "any" || surface === tile);
+    }
     const legacyTile = beforeTrap[index];
     return canOccupy(index) && (!enemyTiles || enemyTiles.includes(tile)
       || enemyTiles.includes("water") && tile === "deep-water" || enemyTiles.includes(legacyTile));
   };
-  const enemyPieces = placeTacticalEncounterUnits(getNodeUnits(node), enemies.map(({ index }) =>
-    [index % WIDTH, Math.floor(index / WIDTH)]), [...enemyAreaCandidates, ...fallback], size, party, { canOccupy, canPrefer });
+  const units = getNodeUnits(node);
+  if (enemySurfaces) units.sort((left, right) =>
+    Number(enemySurfaces[left.creatureId] === "any") - Number(enemySurfaces[right.creatureId] === "any") ||
+    right.width * right.height - left.width * left.height);
+  const enemyPieces = placeTacticalEncounterUnits(units, enemies.map(({ index }) =>
+    [index % WIDTH, Math.floor(index / WIDTH)]), [...enemyAreaCandidates, ...fallback], size, party,
+  { canOccupy, canPrefer, strict: Boolean(enemySurfaces) });
+  if (enemySurfaces) placeFormation(cells, enemyPieces.map(({ x, y }) => [x, y]), "enemy", enemyPieces.length);
   const objectiveMarkers = objectives.flatMap(objective => {
     if (objective.targetType === "creature") {
       for (const piece of enemyPieces.filter(piece => piece.creatureId === objective.targetId)) {

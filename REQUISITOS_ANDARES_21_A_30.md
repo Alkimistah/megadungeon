@@ -273,9 +273,11 @@ O grupo pode sofrer uma emboscada noturna no barco. A rolagem ocorre uma vez ao 
 | 7–8 | 50%–55% | 8 |
 | 9 | 60% | 9 |
 
-Cada ND tem composições curadas de criaturas aquáticas, voadoras e piratas. O mapa mostra a liburna de cima, cercada de água. O convés estreito tem proa afilada, mastro da vela quadrada e toldo na popa. A liburna também é o ícone dourado do botão de descanso. Criaturas aquáticas começam na água, e piratas e voadores entram pelo convés. O mestre registra quando o encontro termina. Só então o descanso zera o tempo, libera a próxima exploração e aplica as regras normais de progresso dos setores. O código de sessão guarda a noite e a emboscada em andamento, inclusive a composição e os ajustes de combate.
+A emboscada sorteia uma categoria entre aquáticos, voadores, piratas e criaturas da última ilha visitada, onde a liburna está ancorada. A quarta opção depende de haver elenco local. O mesmo sorteador dos setores gera a composição no ND da noite. Se uma categoria não consegue montar um grupo válido para aquele ND e mapa, o sorteio tenta as demais. Clima normal, neblina, vento forte ou chuva é sorteado para a cena e exibido no painel e no mapa.
 
-Antes de registrar dano ou ajustar o combate, o mestre pode rerrolar as criaturas no rodapé da lista. A rerrolagem sorteia outra composição de mesmo ND, atualiza o mapa e mantém a mesma noite.
+O mapa mostra o convés estreito com proa afilada, mastro da vela quadrada e toldo na popa. Inimigos que dependem de água começam junto ao casco, os que precisam de chão entram no convés e voadores podem começar nas duas superfícies. O sorteio confere se todas as peças cabem na área inicial. O mestre conclui a emboscada para zerar o tempo do dia, liberar a próxima exploração e aplicar as regras normais de progresso dos setores.
+
+Antes de registrar dano ou ajustar o combate, o mestre pode rerrolar as criaturas no rodapé da lista. A rerrolagem gera outro grupo no mesmo ND e mantém o clima e a ilha de ancoragem. O código de sessão guarda a noite, a composição e os ajustes de combate.
 
 A viagem entre ilhas pode ser simples ou mecânica.
 

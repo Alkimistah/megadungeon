@@ -1,29 +1,28 @@
+import { getIslandCreatureIds } from "./archipelagoCreatureRules.js";
+import { dinosaurExploration } from "./archipelagoFinalBoss.js";
+import { calculateCombatND } from "./challenge.js";
+import { getCreatureById } from "./creatureCatalog/index.js";
+import { CLIMATE_NORMAL } from "./environment.js";
+import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { resolveNodeEncounter } from "./encounterResolver.js";
 import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
 import { createRng, pick } from "./random.js";
 
-const compositions = {
-  6: [
-    { kind: "aquatic", creatures: [{ id: "selako-tigre", quantity: 1 }] },
-    { kind: "flying", creatures: [{ id: "harpia-saqueadora", quantity: 2 }] },
-    { kind: "pirates", creatures: [{ id: "bando-pirata", quantity: 1 }] }
-  ],
-  7: [
-    { kind: "aquatic", creatures: [{ id: "lula-gigante", quantity: 1 }] },
-    { kind: "flying", creatures: [{ id: "serpe-ameacas-de-arton", quantity: 2 }] },
-    { kind: "pirates", creatures: [{ id: "capitao-pirata", quantity: 1 }] }
-  ],
-  8: [
-    { kind: "aquatic", creatures: [{ id: "agua-viva-gigante", quantity: 1 }] },
-    { kind: "flying", creatures: [{ id: "manticora-ameacas-de-arton", quantity: 2 }] },
-    { kind: "pirates", creatures: [{ id: "capitao-do-conclave-pirata", quantity: 1 }] }
-  ],
-  9: [
-    { kind: "aquatic", creatures: [{ id: "lula-gigante", quantity: 2 }] },
-    { kind: "flying", creatures: [{ id: "hipogrifo-abissal", quantity: 2 }] },
-    { kind: "pirates", creatures: [{ id: "capitao-pirata", quantity: 2 }] }
-  ]
+const boatCreatureIds = {
+  aquatic: ["selako", "selako-tigre", "canceronte", "pliorex", "lula-gigante", "agua-viva-gigante",
+    "enxame-de-aguas-vivas", "peixe-recife", "cardume-de-selakos", "aquinne", "lacedon"],
+  flying: ["coruja-gigante", "grifo", "harpia-saqueadora", "serpe", "manticora", "hipogrifo-abissal",
+    "grifo-celestial", "tengu-bandoleiro"],
+  pirates: ["pirata", "bando-pirata", "imediato", "capitao-pirata", "capitao-do-conclave-pirata",
+    "galokk-capanga", "gnoll-filibusteiro", "capanga-minotauro", "chefe-bandido", "ogro-cacador"]
 };
+
+const weather = [
+  CLIMATE_NORMAL,
+  { name: "Neblina", effect: "A neblina marítima concede camuflagem." },
+  { name: "Vento forte", effect: "-2 em ataques à distância. A cada rodada, 50% de chance de apagar chamas ou dissipar névoas." },
+  { name: "Chuva", effect: "-5 em testes de Percepção. Também aplica os efeitos de vento forte (-2 em ataques à distância e 50% de chance por rodada de apagar chamas ou dissipar névoas)." }
+];
 
 const briefings = {
   aquatic: "A água se agita junto ao casco. As criaturas avançam pelas laterais do barco enquanto o grupo desperta no convés.",
@@ -58,10 +57,26 @@ const tacticalLayout = {
   enemyArea: { minX: 1, maxX: 9, minY: 2, maxY: 11 }
 };
 
+function spawnSurface(creatureId) {
+  const speed = getCreatureById(creatureId)?.stats?.speedText ?? "";
+  if (/\bvoo\b/i.test(speed)) return "any";
+  if (/^\s*natação/i.test(speed)) return "deep-water";
+  return "deck";
+}
+
 export function applyLiburnaLayout(scene) {
-  const aquatic = scene.tacticalLayout.enemyTiles.includes("water");
   scene.environment = { ...scene.environment, terrain: deck };
-  scene.tacticalLayout = { ...tacticalLayout, enemyTiles: [aquatic ? "water" : "deck"] };
+  if (scene.boatAmbushKind) {
+    const ids = scene.creature.allowedCreatureIds;
+    scene.tacticalLayout = {
+      ...tacticalLayout,
+      keepFootprintsInEnemyArea: true,
+      enemySurfaceByCreatureId: Object.fromEntries(ids.map(id => [id, spawnSurface(id)]))
+    };
+  } else {
+    const aquatic = scene.tacticalLayout?.enemyTiles?.includes("water");
+    scene.tacticalLayout = { ...tacticalLayout, enemyTiles: [aquatic ? "water" : "deck"] };
+  }
 }
 
 export function getBoatAmbushRules(fragments) {
@@ -69,10 +84,69 @@ export function getBoatAmbushRules(fragments) {
   return { chance: 15 + fragments * 5, challenge };
 }
 
-export function createBoatAmbush(fragments, night, profile, mapSeed, rng) {
+function getBoatAmbushPools(island) {
+  const pools = Object.entries(boatCreatureIds);
+  const localIds = island?.themeId === "dinosaurs"
+    ? [...new Set(Object.values(dinosaurExploration.sectorCompositions).flat(2).map(({ id }) => id))]
+    : getIslandCreatureIds(island?.themeId);
+  if (localIds.length) pools.push(["island", localIds]);
+  return pools;
+}
+
+function compositionKey(items) {
+  return items.map(({ creatureId, quantity }) => `${creatureId}:${quantity}`).sort().join("|");
+}
+
+function generateBoatAmbush({ id, challenge, profile, seed, climate, island, previous, firstPool }) {
+  const rng = createRng(`${seed}:categoria`);
+  const pools = getBoatAmbushPools(island);
+  const preferred = firstPool ?? pick(rng, pools);
+  const alternatives = pools.filter(([kind]) => kind !== preferred[0]);
+  const order = [preferred];
+  while (alternatives.length) {
+    const pool = pick(rng, alternatives);
+    order.push(...alternatives.splice(alternatives.indexOf(pool), 1));
+  }
+
+  for (const [kind, ids] of order) {
+    const briefing = kind === "island"
+      ? `Criaturas da costa de ${island.name} chegam à liburna e atacam durante o descanso.`
+      : briefings[kind];
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const scene = {
+        id,
+        type: "normal",
+        boatAmbushKind: kind,
+        ...(island ? { boatAmbushIsland: island } : {}),
+        briefing,
+        environment: { terrain: deck, climate },
+        challenge: { total: challenge, encounter: challenge, creatures: challenge, trap: 0 },
+        creature: { targetChallenge: challenge, allowedCreatureIds: ids, preferAllowedVariants: true }
+      };
+      applyLiburnaLayout(scene);
+      const encounter = resolveNodeEncounter(scene, { profile, mapSeed: `${seed}:${kind}:${attempt}` });
+      const items = encounter?.items;
+      if (calculateCombatND(items) !== challenge || items.some(item => !ids.includes(item.creatureId)) ||
+          compositionKey(items) === previous) continue;
+      const count = items.reduce((sum, item) => sum + item.quantity, 0);
+      if (count > 12) continue;
+      const map = createNodeTacticalMap(scene);
+      if (map.scene.pieces.filter(piece => piece.side === "enemy").length === count) return scene;
+    }
+  }
+  return null;
+}
+
+export function createBoatAmbush(fragments, night, profile, mapSeed, rng, island) {
   const { chance, challenge } = getBoatAmbushRules(fragments);
   if (rng() * 100 >= chance) return null;
-  return createBoatAmbushScene(`emboscada-barco-${night}`, challenge, pick(rng, compositions[challenge]), profile, mapSeed);
+  const id = `emboscada-barco-${night}`;
+  const seed = `${mapSeed}:${id}`;
+  return generateBoatAmbush({
+    id, challenge, profile, seed, island,
+    climate: [pick(createRng(`${seed}:clima`), weather)],
+    firstPool: pick(rng, getBoatAmbushPools(island))
+  });
 }
 
 export function canRerollBoatAmbush(scene) {
@@ -80,30 +154,18 @@ export function canRerollBoatAmbush(scene) {
     !hasEncounterAdjustments(scene.resolvedEncounter));
 }
 
-export function rerollBoatAmbush(scene, profile, mapSeed) {
+export function rerollBoatAmbush(scene, profile, mapSeed, island = scene?.boatAmbushIsland) {
   if (!canRerollBoatAmbush(scene)) return false;
 
-  const challenge = scene.challenge.creatures;
-  const currentId = scene.resolvedEncounter.items[0].creatureId;
-  const alternatives = compositions[challenge].filter(composition => composition.creatures[0].id !== currentId);
   const rerolls = (scene.rerolls ?? 0) + 1;
-  const rng = createRng(`${mapSeed}:${scene.id}:rerrolagem-${rerolls}`);
-  const updated = createBoatAmbushScene(scene.id, challenge, pick(rng, alternatives), profile, mapSeed);
+  const seed = `${mapSeed}:${scene.id}:rerrolagem-${rerolls}`;
+  const climate = scene.environment.climate?.length ? scene.environment.climate : [pick(createRng(`${seed}:clima`), weather)];
+  const updated = generateBoatAmbush({
+    id: scene.id, challenge: scene.challenge.creatures, profile, seed, island, climate,
+    previous: compositionKey(scene.resolvedEncounter.items)
+  });
+  if (!updated) return false;
+  delete scene.fixedComposition;
   Object.assign(scene, updated, { rerolls });
   return true;
-}
-
-function createBoatAmbushScene(id, challenge, { kind, creatures }, profile, mapSeed) {
-  const scene = {
-    id,
-    type: "normal",
-    briefing: briefings[kind],
-    environment: { terrain: deck, climate: [] },
-    tacticalLayout: { enemyTiles: [kind === "aquatic" ? "water" : "deck"] },
-    challenge: { total: challenge, encounter: challenge, creatures: challenge, trap: 0 },
-    fixedComposition: { creatures, useWeaponVariation: false }
-  };
-  applyLiburnaLayout(scene);
-  resolveNodeEncounter(scene, { mapSeed, profile });
-  return scene;
 }

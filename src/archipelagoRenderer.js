@@ -790,7 +790,14 @@ export function createArchipelagoRenderer({
     const briefing = document.createElement("p");
     briefing.className = "archipelago-encounter-briefing";
     briefing.textContent = scene.briefing;
-    detail.append(briefing, createIslandEncounter(scene, onEncounterAdjusted, {
+    detail.append(briefing);
+    for (const climate of scene.environment.climate ?? []) {
+      const weather = document.createElement("p");
+      weather.className = "archipelago-encounter-briefing";
+      weather.textContent = [climate.name, climate.effect].filter(Boolean).join(" · ");
+      detail.append(weather);
+    }
+    detail.append(createIslandEncounter(scene, onEncounterAdjusted, {
       canReroll: canRerollBoatAmbush,
       onReroll: () => {
         if (!onRerollBoatAmbush()) return false;

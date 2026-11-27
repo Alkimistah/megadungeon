@@ -385,12 +385,17 @@ export function createArchipelagoState(profile, rng = Math.random) {
     return true;
   }
 
+  function getAnchoredIsland() {
+    const island = islands[[...visitedFloors].at(-1)];
+    return island && { themeId: island.themeId, name: island.name };
+  }
+
   function restAtBoat({ mapSeed = activeExploration?.mapSeed, rng } = {}) {
     if (boatAmbush || activeExploration?.guardianScene) return false;
     if (daySpent && !completedFloors.has(30)) {
       nightsAtBoat += 1;
       const roll = rng ?? createRng(`${mapSeed}:barco:noite-${nightsAtBoat}`);
-      boatAmbush = createBoatAmbush(getFragments(), nightsAtBoat, activeProfile, mapSeed, roll);
+      boatAmbush = createBoatAmbush(getFragments(), nightsAtBoat, activeProfile, mapSeed, roll, getAnchoredIsland());
       if (boatAmbush) {
         log = ["Emboscada no barco. O descanso foi interrompido.", ...log].slice(0, 8);
         return true;
@@ -526,7 +531,8 @@ export function createArchipelagoState(profile, rng = Math.random) {
       log
     }),
     finishBoatAmbush,
-    rerollBoatAmbush: mapSeed => rerollBoatAmbush(boatAmbush, activeProfile, mapSeed),
+    rerollBoatAmbush: mapSeed => rerollBoatAmbush(boatAmbush, activeProfile, mapSeed,
+      boatAmbush?.boatAmbushIsland ?? getAnchoredIsland()),
     getElapsedMinutes: () => elapsedMinutes,
     getSnapshot,
     initialize,

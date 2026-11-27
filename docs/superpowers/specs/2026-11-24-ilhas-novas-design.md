@@ -89,7 +89,9 @@ A revisão intermediária foi concluída com a atualização da Ilha Tomada por 
 
 **Ponto de controle das intermediárias.** A ordem de trabalho das avançadas começa pelo Iceberg. Gelo, água fria e rotas de fratura podem usar os recursos atuais da grade. Sal e Ossos vem em seguida, com recifes e carcaças que oferecem rotas e cobertura. A Ilha Elemental combina terrenos e efeitos de várias regiões. A Ilha Viva fica por último, porque ainda precisa de um contexto de ecologia e de uma regra para as reações do terreno.
 
-**Próximo passo:** preparar a prévia do Iceberg. Os NDs confirmados por faixa estão em `REQUISITOS_ANDARES_21_A_30.md`.
+**Liburna.** As emboscadas passaram a usar o sorteador compartilhado em quatro categorias: criaturas aquáticas, voadoras, piratas ou da ilha de ancoragem. O mapa verifica a superfície inicial de cada criatura. Clima normal, neblina, vento forte e chuva variam entre cenas e permanecem na rerrolagem. A chance e o ND continuam ligados aos fragmentos.
+
+**Próximo passo:** preparar a prévia do Iceberg, com oito setores, combates de ND 8, pelo menos doze fichas sorteáveis e três opções de guardião de ND 10. Depois seguem Ilha de Sal e Ossos, Ilha Elemental e Ilha Viva.
 
 **Lições das etapas 3 e 4.**
 

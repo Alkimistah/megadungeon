@@ -30,7 +30,7 @@ export function getTacticalPartyPieces(positions) {
 
 export function placeTacticalEncounterUnits(
   units, preferredPositions, fallbackPositions, size, occupiedPieces = [],
-  { canOccupy = () => true, canPrefer = canOccupy } = {}
+  { canOccupy = () => true, canPrefer = canOccupy, strict = false } = {}
 ) {
   const occupied = new Set();
   const occupy = ({ x, y, width, height }) => {
@@ -49,7 +49,7 @@ export function placeTacticalEncounterUnits(
     }
     return true;
   };
-  return units.map((unit, index) => {
+  return units.flatMap((unit, index) => {
     const start = preferredPositions[index];
     const clampedStart = start && [
       Math.min(start[0], size.width - unit.width),
@@ -57,12 +57,14 @@ export function placeTacticalEncounterUnits(
     ];
     const inBounds = ([x, y]) => x >= 0 && y >= 0 && x + unit.width <= size.width && y + unit.height <= size.height;
     const valid = [clampedStart, ...candidates].filter(position => position && inBounds(position));
-    const findPosition = (accepts, avoidPieces) =>
-      valid.find(([x, y]) => fits(x, y, unit.width, unit.height, accepts, avoidPieces));
-    const [x, y] = findPosition(canPrefer, true) ?? findPosition(canOccupy, true)
+    const findPosition = (accepts, avoidPieces) => valid.find(([x, y]) =>
+      fits(x, y, unit.width, unit.height, tile => accepts(tile, unit), avoidPieces));
+    const preferred = findPosition(canPrefer, true);
+    if (strict && !preferred) return [];
+    const [x, y] = preferred ?? findPosition(canOccupy, true)
       ?? findPosition(canPrefer, false) ?? findPosition(canOccupy, false) ?? valid[0] ?? [0, 0];
     const piece = { ...unit, x, y };
     occupy(piece);
-    return piece;
+    return [piece];
   });
 }

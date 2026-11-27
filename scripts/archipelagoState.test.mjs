@@ -2,12 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { archipelago21to30Profile as productionProfile } from "../src/floorProfiles/archipelago21to30.js";
 import { createArchipelagoState } from "../src/archipelagoState.js";
+import { getIslandCreatureIds } from "../src/archipelagoCreatureRules.js";
 import { createRng } from "../src/random.js";
 import { guardianPenalties } from "../src/archipelagoGuardianPenalties.js";
 import { withIslandTacticalLayout } from "../src/archipelagoTacticalMap.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
 import { calculateCombatND } from "../src/challenge.js";
-import { rerollNodeCreatures } from "../src/encounterResolver.js";
+import { rerollNodeCreatures, resolveNodeEncounter } from "../src/encounterResolver.js";
 import { creatureCatalog, getCreatureById } from "../src/creatureCatalog/index.js";
 import { withCreatureHealthChange } from "../src/encounterCreatureHealth.js";
 import { createIslandGuardian, createIslandPilotScene, createIslandSector, createIslandSectorCombat, reopenIslandSector } from "../src/archipelagoPilot.js";
@@ -33,6 +34,8 @@ test("a chance da emboscada sobe 5 pontos por fragmento e o ND acompanha a exped
       const rolls = [(chance - 1) / 100, compositionRoll];
       const scene = createBoatAmbush(fragments, 1, profile, "convés", () => rolls.shift());
       assert.equal(scene.resolvedEncounter.budget.creatures, challenge);
+      assert.equal(calculateCombatND(scene.resolvedEncounter.items), challenge);
+      assert.equal(scene.fixedComposition, undefined);
       const map = createNodeTacticalMap(scene);
       assert.equal(map.terrain.name, "Convés da liburna");
       assert.equal(map.cells[0], "water");
@@ -49,6 +52,8 @@ test("a chance da emboscada sobe 5 pontos por fragmento e o ND acompanha a exped
         for (let y = piece.y; y < piece.y + piece.height; y++) {
           for (let x = piece.x; x < piece.x + piece.width; x++) {
             assert.ok(!sternMast.indices.includes(y * map.width + x), `peça ${piece.id} sobre o mastro do toldo`);
+            const surface = scene.tacticalLayout.enemySurfaceByCreatureId[piece.creatureId];
+            if (surface && surface !== "any") assert.equal(map.scene.terrain[y * map.width + x], surface);
           }
         }
       }
@@ -58,17 +63,9 @@ test("a chance da emboscada sobe 5 pontos por fragmento e o ND acompanha a exped
       assert.equal(map.cells.filter(tile => tile === "party").length, 4);
       assert.equal(map.cells[6 * map.width + 15], "canopy");
       assert.equal(map.cells[7 * map.width + 13], "party");
-      if (compositionRoll !== 0) assert.equal(map.cells[8 * map.width + 1], "water");
       assert.equal(map.cells[6 * map.width + 18], "deck");
       const enemyPositions = map.cells.flatMap((tile, index) => tile === "enemy" ? [index] : []);
       assert.equal(enemyPositions.length, map.enemyCount);
-      for (const index of enemyPositions) {
-        const x = index % map.width;
-        const y = Math.floor(index / map.width);
-        const onDeck = y >= 6 && y <= 7 && x >= 1 && x <= 18 ||
-          y >= 5 && y <= 8 && x >= 3 && x <= 18 || y >= 4 && y <= 9 && x >= 6 && x <= 16;
-        assert.equal(onDeck, compositionRoll !== 0);
-      }
     }
   }
 });
@@ -88,13 +85,14 @@ test("a emboscada só rola depois da exploração e o descanso aguarda sua concl
   assert.equal(state.restAtBoat({ rng: noRoll }), false);
   assert.equal(state.resolveObjective(island.floor, island.objectives[1].id, "success"), false);
   const ambush = state.getSnapshot().boatAmbush;
-  const initialCreature = ambush.resolvedEncounter.items[0].creatureId;
+  const initialComposition = ambush.resolvedEncounter.items.map(({ creatureId, quantity }) => [creatureId, quantity]).sort();
+  const climate = ambush.environment.climate;
   assert.ok(canRerollBoatAmbush(ambush));
   assert.ok(state.rerollBoatAmbush("noite"));
   assert.equal(state.getSnapshot().boatAmbush, ambush);
-  assert.notEqual(ambush.resolvedEncounter.items[0].creatureId, initialCreature);
+  assert.notDeepEqual(ambush.resolvedEncounter.items.map(({ creatureId, quantity }) => [creatureId, quantity]).sort(), initialComposition);
   assert.equal(ambush.resolvedEncounter.budget.creatures, 6);
-  assert.deepEqual(ambush.tacticalLayout.enemyTiles, ["deck"]);
+  assert.deepEqual(ambush.environment.climate, climate);
   assert.equal(ambush.rerolls, 1);
   assert.equal(state.getElapsedMinutes(), 480);
   ambush.resolvedEncounter = withCreatureHealthChange(ambush.resolvedEncounter, ambush.resolvedEncounter.items[0], 0, 5);
@@ -112,6 +110,73 @@ test("a emboscada só rola depois da exploração e o descanso aguarda sua concl
   assert.equal(state.getSnapshot().islands[0].objectives[0].outcome, "success");
   assert.equal(state.exportSessionState().nightsAtBoat, 1);
   assert.equal(state.finishBoatAmbush(), false);
+});
+
+test("a liburna usa o elenco da última ilha visitada após concluir o Centro", () => {
+  const state = createArchipelagoState(archipelago21to30Profile, createRng("ancoragem-local"));
+  const island = state.getSnapshot().islands[0];
+  assert.ok(state.exploreIsland(island.floor, { mapSeed: "ancoragem-local" }));
+  for (const objective of island.objectives) assert.ok(state.resolveObjective(island.floor, objective.id, "success"));
+  assert.ok(state.startGuardian(island.floor));
+  assert.ok(state.completeIsland(island.floor));
+  const rolls = [0, 0.99];
+  assert.ok(state.restAtBoat({ mapSeed: "ancoragem-local", rng: () => rolls.shift() }));
+  const scene = state.getSnapshot().boatAmbush;
+  assert.equal(scene.boatAmbushKind, "island");
+  assert.equal(scene.boatAmbushIsland.themeId, island.themeId);
+  const regional = getIslandCreatureIds(island.themeId);
+  assert.ok(scene.resolvedEncounter.items.every(item => regional.includes(item.creatureId)));
+  assert.equal(calculateCombatND(scene.resolvedEncounter.items), 6);
+});
+
+test("o código de sessão preserva uma emboscada antiga e permite rerrolar pelo elenco novo", () => {
+  const state = createArchipelagoState(productionProfile, createRng("barco-legado"));
+  const saved = state.exportSessionState();
+  const oldScene = {
+    id: "emboscada-barco-1",
+    type: "normal",
+    environment: { climate: [] },
+    challenge: { total: 6, encounter: 6, creatures: 6, trap: 0 },
+    tacticalLayout: { enemyTiles: ["water"] },
+    fixedComposition: { creatures: [{ id: "selako-tigre", quantity: 1 }], useWeaponVariation: false }
+  };
+  resolveNodeEncounter(oldScene, { profile: productionProfile, mapSeed: "barco-legado" });
+  const expectedEncounter = JSON.parse(JSON.stringify(oldScene.resolvedEncounter));
+  saved.boatAmbush = oldScene;
+  state.initialize(productionProfile, createRng("barco-legado"), JSON.parse(JSON.stringify(saved)));
+  const { boatAmbush } = state.getSnapshot();
+  assert.deepEqual(boatAmbush.resolvedEncounter, expectedEncounter);
+  assert.deepEqual(boatAmbush.tacticalLayout.enemyTiles, ["water"]);
+  assert.ok(state.rerollBoatAmbush("barco-legado"));
+  assert.equal(boatAmbush.fixedComposition, undefined);
+  assert.equal(calculateCombatND(boatAmbush.resolvedEncounter.items), 6);
+  assert.ok(boatAmbush.environment.climate.length);
+});
+
+test("as quatro categorias geram composições variadas e clima com o ND da noite", () => {
+  const island = { themeId: "sea-caves", name: "Ilha-Labirinto de Cavernas Marinhas" };
+  const weather = new Set();
+  for (const fragments of [0, 4, 7, 9]) {
+    for (const [categoryRoll, kind] of [[0, "aquatic"], [0.3, "flying"], [0.6, "pirates"], [0.9, "island"]]) {
+      const compositions = new Set();
+      for (let sample = 0; sample < 12; sample++) {
+        const rolls = [0, categoryRoll];
+        const scene = createBoatAmbush(fragments, sample + 1, productionProfile, "emboscada-variada", () => rolls.shift(), island);
+        assert.ok(scene);
+        assert.equal(scene.boatAmbushKind, kind);
+        const items = scene.resolvedEncounter.items;
+        assert.equal(calculateCombatND(items), getBoatAmbushRules(fragments).challenge);
+        assert.ok(items.every(item => scene.creature.allowedCreatureIds.includes(item.creatureId)));
+        const map = createNodeTacticalMap(scene);
+        assert.equal(map.scene.pieces.filter(piece => piece.side === "enemy").length,
+          items.reduce((count, item) => count + item.quantity, 0));
+        weather.add(scene.environment.climate[0].name);
+        compositions.add(items.map(({ creatureId, quantity }) => `${creatureId}:${quantity}`).sort().join("|"));
+      }
+      assert.ok(compositions.size > 1, `${fragments} fragmentos · ${kind}`);
+    }
+  }
+  assert.deepEqual(weather, new Set(["Clima normal", "Neblina", "Vento forte", "Chuva"]));
 });
 
 test("as variantes das quatro ilhas têm combates ND 6 temáticos e mapas com pontos de interação", () => {
