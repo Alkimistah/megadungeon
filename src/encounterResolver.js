@@ -338,6 +338,13 @@ function getClosingAdditionCRs(items, targetChallenge, candidateCRs) {
     .filter(cr => calculateCombatND([...items, { challengeRating: cr, quantity: 1 }]) === targetChallenge);
 }
 
+// Com base de ND 1 ou mais o ND de grupo do livro é inteiro (Ameaças de Arton p. 9):
+// orçamento de criaturas fracionário a partir de 1 mira o inteiro abaixo. O ND da
+// cena (clima e terreno) não muda.
+function getCreatureGroupTarget(value) {
+  return typeof value === "number" && value >= 1 ? Math.floor(value) : value;
+}
+
 function removeLeastCR(current) {
   const lowest = current.reduce((min, i) =>
     i.challengeRating < min.challengeRating ? i : min
@@ -374,10 +381,12 @@ export function refineEncounterGroup(items, targetChallenge, type, terrainName, 
         const k = Math.floor((targetChallenge - 1) / 2);
         const minTotal = Math.pow(2, k);
         const deficit = minTotal - S;
-        if (deficit <= 0) break; // already at this tier; can't improve (even target unreachable)
-        const leadItem = current[0];
-        leadItem.quantity += Math.ceil(deficit / leadItem.challengeRating);
-        continue;
+        if (deficit > 0) {
+          const leadItem = current[0];
+          leadItem.quantity += Math.ceil(deficit / leadItem.challengeRating);
+          continue;
+        }
+        // Already at this tier (even target): copies cannot close it, try the catalog.
       }
 
       // Allow picking creatures already in the group so quantity++ is possible —
@@ -425,7 +434,8 @@ export function refineEncounterGroup(items, targetChallenge, type, terrainName, 
         const solo = getCreatureById(current[0].creatureId) ?? current[0].creatureData ?? null;
         if (solo && targetChallenge > solo.challengeRating + 0.5) {
           const elite = createEliteVariant(solo, targetChallenge);
-          if (elite) {
+          // The elite snaps up to a valid CR; never let the upgrade exceed the target.
+          if (elite && elite.challengeRating <= targetChallenge) {
             current[0] = getEliteCreatureSummary(elite, 1, rng);
             continue;
           }
@@ -533,7 +543,7 @@ function resolveCreatureGroup(node, rng, catalog, ecology, { profileId, seed, co
   const specificCreatureItems = resolveSpecificCreature(node, rng);
   if (specificCreatureItems.length > 0) return specificCreatureItems;
 
-  const targetChallenge = node.creature.targetChallenge ?? node.challenge.creatures;
+  const targetChallenge = getCreatureGroupTarget(node.creature.targetChallenge ?? node.challenge.creatures);
   const terrainName = getTerrainName(node);
   const type = node.creature.type ?? null;
   if (["dungeon-1-10", "forest-11-20", "archipelago-21-30"].includes(profileId) &&
@@ -790,11 +800,12 @@ export function resolveForestAmbush(node, profile, { mapSeed } = {}) {
   const ecology = getNodeEcology(ambushNode, profile);
   const catalog = filterEncounterCatalog(ambushNode, getAllowedCatalog(ambushNode.creature?.allowedCreatureIds, profile), ecology);
   const items = resolveCreatureGroup(ambushNode, rng, catalog, ecology, { profileId: profile.id, seed });
-  if (items.length && calculateCombatND(items) === target) return createResolvedEncounter(ambushNode, items, seed);
+  const groupTarget = getCreatureGroupTarget(target);
+  if (items.length && calculateCombatND(items) === groupTarget) return createResolvedEncounter(ambushNode, items, seed);
 
   const creature = pickExactCreatureForChallenge({
     type: ambushNode.creature.type,
-    targetChallenge: target,
+    targetChallenge: groupTarget,
     terrainName: getTerrainName(node),
     rng,
     catalog,

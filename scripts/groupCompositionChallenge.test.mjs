@@ -88,6 +88,21 @@ test("refinamento acrescenta só ND que fecham o alvo", () => {
   }
 });
 
+test("refinamento segue para o catálogo quando cópias abaixo de ND 1 não fecham alvo par", () => {
+  const creature = challengeRating => ({
+    id: `teste-nd-${challengeRating}`, name: `Teste ND ${challengeRating}`, challengeRating, type: "monster", role: "solo"
+  });
+  const catalog = [creature(0.5), creature(2), creature(3)];
+  for (let seed = 0; seed < 4; seed++) {
+    const lead = catalog[0];
+    const items = [{ kind: "creature", creatureId: lead.id, creatureData: lead, challengeRating: 0.5, quantity: 1 }];
+    const result = refineEncounterGroup(items, 4, "monster", null, createRng(`refino-par-${seed}`), catalog, null);
+    // 4× ND 1/2 (grupo 3) e um ND 2 → 4. Só as cópias davam 3.
+    assert.equal(calculateCombatND(result), 4, `seed ${seed}`);
+    assert.deepEqual(result.map(item => [item.challengeRating, item.quantity]), [[0.5, 4], [2, 1]], `seed ${seed}`);
+  }
+});
+
 function categoryChallenges() {
   const { categories, tiers } = dungeon1to10Profile.extendedExploration;
   return { categories, tiers };
@@ -120,24 +135,28 @@ test("andares 1–10: encontros sorteados fecham o ND alvo", () => {
 test("andares 11–20: encontros sorteados fecham o ND alvo", () => {
   const profile = forest11to20Profile;
   let checked = 0;
-  for (let floor = 11; floor <= 19; floor++) {
-    for (let sample = 0; sample < 12; sample++) {
+  let fractional = 0;
+  for (let floor = 11; floor <= 20; floor++) {
+    for (let sample = 0; sample < 30; sample++) {
       const seed = `nd-grupo-floresta-${floor}-${sample}`;
       const levels = generateMapData(5, profile.recommendations.baseDcByFloor[floor], profile, floor, createRng(seed), { version: 2 });
       for (const node of levels.flat()) {
         if (!node.creature || node.fixedComposition || node.creature.creatureId) continue;
         const target = node.creature.targetChallenge ?? node.challenge.creatures;
-        // Orçamentos fracionários a partir de 1 não têm grupo pela regra do livro.
-        if (target >= 1 && !Number.isInteger(target)) continue;
+        if (!(target > 0)) continue;
+        // Com base 1 ou mais o ND do livro é inteiro: alvo fracionário mira o inteiro abaixo.
+        const expected = target >= 1 ? Math.floor(target) : target;
         const encounter = resolveNodeEncounter(node, { mapSeed: seed, profile });
         const creatures = (encounter?.items || []).filter(item => item.kind === "creature");
-        if (!creatures.length) continue;
-        assert.equal(calculateCombatND(creatures), target, `${seed} ${node.id}`);
+        assert.ok(creatures.length, `${seed} ${node.id}: encontro vazio (alvo ${target})`);
+        assert.equal(calculateCombatND(creatures), expected, `${seed} ${node.id} (alvo ${target})`);
+        if (expected !== target) fractional++;
         checked++;
       }
     }
   }
   assert.ok(checked > 300);
+  assert.ok(fractional > 10, "a amostra precisa ter alvos fracionários");
 });
 
 test("setores do arquipélago: combates sorteados fecham o ND alvo", () => {
