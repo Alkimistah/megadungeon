@@ -10,9 +10,9 @@ Decisão do PO (27/11/2026, prévia do Iceberg): corrigir o cálculo de ND de en
 
 | Grupo | ND pelo livro | ND antigo do app |
 |---|---|---|
-| 7, 6, 5 e 3 (exemplo do livro) | 8 | 7 |
+| 7, 6, 5 e 3 (exemplo do livro) | 8 | 9¼ |
 | 9, 5, 5 e 5 (Kallyanach e 3 Acólitos) | 9 | 10 |
-| 9 e 8 × ND 2 | 10 | 5 |
+| 9 e 8 × ND 2 | 10 | 8¾ |
 | 6 e 4 | 6 | 7 |
 | 5, 5, 3 e 3 | 7 | 8 |
 | 3 e 3 | 5 | 5 |
