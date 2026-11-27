@@ -1,4 +1,4 @@
-import { formatChallengeRating, roundToQuarter } from "./challenge.js";
+import { formatChallengeRating, roundToQuarter, updateForestChallengeTotal } from "./challenge.js";
 import { pick, pickWeighted } from "./random.js";
 
 export const TRAP_SOURCES = {
@@ -34,6 +34,7 @@ function source(sourceId, pdfPage, bookPage) {
 function trap({
   id,
   name,
+  mode,
   challengeRating,
   effect,
   category = "mechanical",
@@ -50,6 +51,7 @@ function trap({
   return {
     id,
     name,
+    mode,
     challengeRating,
     challengeLabel: formatChallengeRating(challengeRating),
     category,
@@ -70,6 +72,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "agulha-envenenada",
     name: "Agulha Envenenada",
+    mode: "standalone",
     challengeRating: 0.25,
     effect: "Causa 1 ponto de dano de perfuração e a vítima perde 1d12 PV por veneno.",
     damageTypes: ["piercing"],
@@ -83,6 +86,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "arame-farpado",
     name: "Arame Farpado",
+    mode: "standalone",
     challengeRating: 0.25,
     effect: "Conta como terreno difícil e causa 1d6+2 pontos de dano de corte em quem atravessá-lo.",
     damageTypes: ["slashing"],
@@ -96,6 +100,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "fosso-camuflado",
     name: "Fosso Camuflado",
+    mode: "standalone",
     challengeRating: 0.25,
     effect: "Queda de 3m causa 2d6 pontos de dano de impacto.",
     damageTypes: ["bludgeoning"],
@@ -112,6 +117,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "rede",
     name: "Rede",
+    mode: "requiresEscort",
     challengeRating: 0.25,
     effect: "A criatura fica agarrada.",
     category: "control",
@@ -128,6 +134,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "virote",
     name: "Virote",
+    mode: "standalone",
     challengeRating: 0.25,
     effect: "Causa 1d10+2 pontos de dano de perfuração.",
     damageTypes: ["piercing"],
@@ -141,6 +148,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "fosso-profundo",
     name: "Fosso Profundo",
+    mode: "standalone",
     challengeRating: 0.5,
     effect: "Queda de 6m causa 4d6 pontos de dano de impacto.",
     damageTypes: ["bludgeoning"],
@@ -157,6 +165,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "lamina-na-parede",
     name: "Lâmina na Parede",
+    mode: "standalone",
     challengeRating: 0.5,
     effect: "Causa 2d6+5 pontos de dano de corte.",
     damageTypes: ["slashing"],
@@ -170,6 +179,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "bloco-de-pedra",
     name: "Bloco de Pedra",
+    mode: "standalone",
     challengeRating: 1,
     effect: "Causa 6d6 pontos de dano de impacto.",
     damageTypes: ["bludgeoning"],
@@ -183,6 +193,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "pendulo-de-teto",
     name: "Pêndulo de Teto",
+    mode: "standalone",
     challengeRating: 1,
     effect: "Causa 1d12+10 pontos de dano de corte.",
     damageTypes: ["slashing"],
@@ -196,6 +207,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "fosso-com-estacas",
     name: "Fosso com Estacas",
+    mode: "standalone",
     challengeRating: 2,
     effect: "Queda de 9m causa 6d6 pontos de dano de impacto, e as estacas causam 2d4+5 pontos de dano de perfuração.",
     damageTypes: ["bludgeoning", "piercing"],
@@ -212,6 +224,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "runa-de-protecao",
     name: "Runa de Proteção",
+    mode: "standalone",
     challengeRating: 2,
     effect: "Causa 6d6 pontos de dano de fogo (ou ácido, eletricidade, frio, luz ou trevas) em todas as criaturas a até 3m.",
     category: "magical",
@@ -227,6 +240,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "simbolo-do-medo",
     name: "Símbolo do Medo",
+    mode: "requiresEscort",
     challengeRating: 2,
     effect: "Criaturas em alcance curto ficam abaladas até o fim da cena.",
     category: "magical",
@@ -241,6 +255,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "estatua-executora",
     name: "Estátua Executora",
+    mode: "standalone",
     challengeRating: 3,
     effect: "Causa dois danos de 1d12+10 pontos de corte.",
     damageTypes: ["slashing"],
@@ -255,6 +270,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "gas-venenoso",
     name: "Gás Venenoso",
+    mode: "standalone",
     challengeRating: 3,
     effect: "A vítima perde 1d12 PV por veneno por rodada durante 2d4 rodadas.",
     category: "gas",
@@ -268,6 +284,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "simbolo-do-sono",
     name: "Símbolo do Sono",
+    mode: "requiresEscort",
     challengeRating: 3,
     effect: "Criaturas em alcance curto com 8 níveis ou menos caem inconscientes, como na magia Sono.",
     category: "magical",
@@ -282,6 +299,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "parede-instavel",
     name: "Parede Instável",
+    mode: "standalone",
     challengeRating: 4,
     effect: "Causa 8d6 pontos de dano de impacto num quadrado de 3m de lado.",
     damageTypes: ["bludgeoning"],
@@ -295,6 +313,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "simbolo-da-dor",
     name: "Símbolo da Dor",
+    mode: "requiresEscort",
     challengeRating: 4,
     effect: "Criaturas em alcance curto sofrem dores terríveis, que impõem –5 em todos os testes até o fim da cena.",
     category: "magical",
@@ -309,6 +328,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "bruma-da-insanidade",
     name: "Bruma da Insanidade",
+    mode: "requiresEscort",
     challengeRating: 5,
     effect: "Criaturas em um cubo de 6m de lado ficam confusas até o fim da cena.",
     category: "magical",
@@ -322,6 +342,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "simbolo-do-atordoamento",
     name: "Símbolo do Atordoamento",
+    mode: "requiresEscort",
     challengeRating: 5,
     effect: "Criaturas em alcance curto ficam atordoadas por 1d6 rodadas.",
     category: "magical",
@@ -336,6 +357,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "desabamento-do-teto",
     name: "Desabamento do Teto",
+    mode: "standalone",
     challengeRating: 6,
     effect: "Causa 15d6 pontos de dano de impacto em todas as criaturas num quadrado de 6m de lado.",
     damageTypes: ["bludgeoning"],
@@ -349,6 +371,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "simbolo-da-insanidade",
     name: "Símbolo da Insanidade",
+    mode: "standalone",
     challengeRating: 6,
     effect: "Criaturas em alcance curto ficam confusas permanentemente.",
     category: "magical",
@@ -363,6 +386,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "abismo-da-morte",
     name: "Abismo da Morte",
+    mode: "standalone",
     challengeRating: 8,
     effect: "Um quadrado de 6m de lado no chão se abre para uma queda de 30m sobre estacas, causando 20d6 pontos de dano de impacto e 2d8+10 pontos de dano de perfuração.",
     damageTypes: ["bludgeoning", "piercing"],
@@ -379,6 +403,7 @@ export const BASIC_BOOK_TRAPS = [
   trap({
     id: "simbolo-da-morte",
     name: "Símbolo da Morte",
+    mode: "standalone",
     challengeRating: 8,
     effect: "Criaturas em alcance curto são reduzidas a –1 PV.",
     category: "magical",
@@ -396,6 +421,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "armadilha-de-gaiola",
     name: "Armadilha de Gaiola",
+    mode: "requiresEscort",
     challengeRating: 0.5,
     effect: "Barras de ferro cercam um quadrado de 1,5m, prendendo uma criatura em seu interior.",
     category: "control",
@@ -412,6 +438,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "runa-de-aceleracao",
     name: "Runa de Aceleração",
+    mode: "standalone",
     challengeRating: 1,
     effect: "Uma criatura em alcance curto é arremessada 9m na direção em que estava se movendo. Se atingir uma parede ou outro objeto sólido, sofre 1d6 pontos de dano de impacto para cada 1,5m que percorreu.",
     category: "magical",
@@ -427,6 +454,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "gas-putrido",
     name: "Gás Pútrido",
+    mode: "requiresEscort",
     challengeRating: 2,
     effect: "Criaturas em alcance curto ficam enjoadas por uma cena.",
     category: "gas",
@@ -440,6 +468,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "piso-eletrificado",
     name: "Piso Eletrificado",
+    mode: "standalone",
     challengeRating: 2,
     effect: "Causa 6d6 pontos de dano de eletricidade em todas as criaturas em um quadrado de 3m.",
     damageTypes: ["electricity"],
@@ -454,6 +483,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "jato-de-chamas",
     name: "Jato de Chamas",
+    mode: "standalone",
     challengeRating: 3,
     effect: "Causa 6d6 pontos de dano de fogo e deixa em chamas todas as criaturas em uma linha de 6m.",
     damageTypes: ["fire"],
@@ -467,6 +497,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "extrato-de-oxxdon",
     name: "Extrato de Oxxdon",
+    mode: "standalone",
     challengeRating: 5,
     effect: "Objetos de metal em uma nuvem de 3m de raio oxidam e são destruídos. Construtos de metal perdem 4d12 PV e ficam exaustos até serem reparados.",
     category: "alchemy",
@@ -484,6 +515,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "mina-terrestre",
     name: "Mina Terrestre",
+    mode: "standalone",
     challengeRating: 5,
     effect: "Causa 12d6 pontos de dano de impacto em todas as criaturas em uma esfera de 3m.",
     damageTypes: ["bludgeoning"],
@@ -497,6 +529,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "runa-de-teletransporte",
     name: "Runa de Teletransporte",
+    mode: "requiresEscort",
     challengeRating: 5,
     effect: "Uma criatura em até 3m é transportada para uma superfície sólida desocupada em alcance médio, geralmente uma prisão ou armadilha.",
     category: "magical",
@@ -511,6 +544,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "simbolo-da-anulacao",
     name: "Símbolo da Anulação",
+    mode: "standalone",
     challengeRating: 5,
     effect: "Magias em alcance curto são dissipadas e itens mágicos nesse alcance se tornam mundanos por 1d6 rodadas.",
     category: "magical",
@@ -525,6 +559,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "estatua-de-gorgona",
     name: "Estátua de Górgona",
+    mode: "standalone",
     challengeRating: 9,
     effect: "Criaturas em um cone de 9m à frente da estátua são petrificadas.",
     category: "magical",
@@ -538,6 +573,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "runa-de-desintegracao",
     name: "Runa de Desintegração",
+    mode: "standalone",
     challengeRating: 10,
     effect: "Uma criatura em alcance curto sofre 10d12 pontos de dano de essência. Se seus PV forem reduzidos a 0 ou menos, ela é completamente desintegrada.",
     category: "magical",
@@ -553,6 +589,7 @@ export const AMEACAS_ARTON_TRAPS = [
   trap({
     id: "sussurro-de-sszzaas",
     name: "Sussurro de Sszzaas",
+    mode: "standalone",
     challengeRating: 13,
     effect: "Uma criatura em alcance curto tem a mente manipulada, passa a ver todos como inimigos e deve gastar suas ações realizando ações hostis contra seus aliados.",
     category: "magical",
@@ -627,6 +664,15 @@ function getTrapWeight(trapEntry, targetChallenge) {
   return 1;
 }
 
+function pickWeightedTrap(candidates, targetChallenge, rng) {
+  if (!candidates.length) return null;
+
+  return pickWeighted(rng, candidates.map(trapEntry => ({
+    trap: trapEntry,
+    weight: getTrapWeight(trapEntry, targetChallenge)
+  }))).trap;
+}
+
 function pickTrapForChallenge(targetChallenge, rules, rng) {
   const allowedSources = rules.sources || Object.keys(TRAP_SOURCES);
   const maximumChallenge = rules.maximumChallenge ?? targetChallenge;
@@ -639,13 +685,18 @@ function pickTrapForChallenge(targetChallenge, rules, rng) {
     trapEntry.challengeRating <= maximumChallenge &&
     allowedSources.includes(trapEntry.source.id)
   );
-  const options = (candidates.length > 0 ? candidates : fallbackCandidates)
-    .map((trapEntry) => ({
-      trap: trapEntry,
-      weight: getTrapWeight(trapEntry, targetChallenge)
-    }));
+  return pickWeightedTrap(candidates.length > 0 ? candidates : fallbackCandidates, targetChallenge, rng);
+}
 
-  return options.length > 0 ? pickWeighted(rng, options).trap : null;
+export function getEligibleForestTraps(profile, { maximumChallenge = Infinity, mode } = {}) {
+  const rules = getTrapRules(profile);
+  const allowedSources = rules.sources ?? Object.keys(TRAP_SOURCES);
+  const ceiling = Math.min(maximumChallenge, rules.maximumChallenge ?? Infinity);
+  return trapCatalog.filter(trapEntry =>
+    allowedSources.includes(trapEntry.source.id) &&
+    trapEntry.challengeRating <= ceiling &&
+    (mode == null || trapEntry.mode === mode)
+  );
 }
 
 export function getTrapById(id) {
@@ -690,6 +741,30 @@ export function syncRerolledTrapProfile(node) {
   if (trapEntry) {
     node.trap = withTrapRole(trapEntry, item.role, node.trap?.targetChallenge ?? item.challengeRating);
   }
+}
+
+export function assignForestNormalTrap(node, profile, rng) {
+  const { chance, maximumChallenge } = profile.trapRules.normalV5;
+  const { challenge } = node;
+  const ceiling = maximumChallenge(challenge.encounter);
+  let selectedTrap = null;
+
+  if (rng() < chance) {
+    const candidates = getEligibleForestTraps(profile, { maximumChallenge: ceiling });
+    selectedTrap = pickWeightedTrap(candidates, ceiling, rng);
+  }
+
+  node.trap = selectedTrap ? withTrapRole(selectedTrap, "incidental", ceiling) : null;
+  if (node.trap) {
+    node.trap.roleDescription = "A armadilha acompanha o combate normal, que mantém o ND das criaturas do andar.";
+  }
+
+  challenge.creatures = challenge.encounter;
+  challenge.trap = selectedTrap?.challengeRating ?? 0;
+  challenge.encounterBudgetLabel = challenge.trap
+    ? `ND ${formatChallengeRating(challenge.creatures)} em criaturas + ND ${formatChallengeRating(challenge.trap)} em armadilha`
+    : `ND ${formatChallengeRating(challenge.creatures)} para criaturas`;
+  updateForestChallengeTotal(node, profile.challengeRules);
 }
 
 export function assignTrapProfile(node, profile, rng) {

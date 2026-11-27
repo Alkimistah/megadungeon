@@ -1,8 +1,8 @@
 # Cartões de revisão das armadilhas da floresta
 
-Propostas para revisão do PO. A ficha autônoma sustenta o desafio com efeitos próprios. A ficha com escolta depende de inimigos aproveitando o efeito. Os cartões cobrem todo o catálogo, inclusive fichas acima do ND que a geração atual da floresta sorteia.
+Os 35 modos foram aprovados integralmente pelo PO em 27/11/2026. A ficha autônoma sustenta o desafio com efeitos próprios. A ficha com escolta depende de inimigos aproveitando o efeito. Os cartões cobrem todo o catálogo, inclusive fichas acima do ND que a geração atual da floresta sorteia.
 
-Na decisão, basta indicar os números ou nomes dos cartões cujo modo deve mudar. A rede de ND ¼ pode entrar como incidental em combate normal. No nó de armadilha principal, a escolta precisaria ter ND inferior a ¼.
+A rede de ND ¼ pode entrar como incidental em combate normal. No nó de armadilha principal, a escolta precisaria ter ND inferior a ¼.
 
 ### 1. Agulha Envenenada
 

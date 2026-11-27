@@ -56,6 +56,10 @@ export const forest11to20Profile = {
     sources: ["livroBasico", "ameacasArton"],
     minimumChallenge: 0.25,
     incidentalChallengeOffset: 1,
+    normalV5: {
+      chance: 0.2,
+      maximumChallenge: floorTarget => Math.max(0.25, floorTarget - 1)
+    },
     incidentalChanceByRoomType: {
       normal: 0.06,
       elite: 0.1,

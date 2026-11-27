@@ -1,6 +1,6 @@
 import { assignChallengeRating } from "./challenge.js";
 import { assignCreatureProfile } from "./creatures.js";
-import { assignTrapProfile } from "./traps.js";
+import { assignForestNormalTrap, assignTrapProfile } from "./traps.js";
 import { generateEnvironmentContext } from "./environment.js";
 import { createForestBossEncounter } from "./forestBossEncounter.js";
 import { assignForestEnvironments } from "./forestEnvironment.js";
@@ -105,7 +105,11 @@ function assignChallengeRatings(levels, profile, floor) {
 
 function assignTrapProfiles(levels, profile, rng) {
   levels.flat().forEach((node) => {
-    assignTrapProfile(node, profile, rng);
+    if (node.generationVersion === 5 && node.type === "normal") {
+      assignForestNormalTrap(node, profile, rng);
+    } else {
+      assignTrapProfile(node, profile, rng);
+    }
   });
 }
 
@@ -501,6 +505,7 @@ export function generateMapData(depth, baseDC, floorProfile, floor, rng = Math.r
       }
       node.type = node.contentType;
       node.requiresCompletion = true;
+      if (version === 5 && profile.id === "forest-11-20") node.generationVersion = version;
     });
   }
   if (version >= 4 && profile.id === "forest-11-20") {
