@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { calculateCombatND } from "../src/challenge.js";
 import { selectRatings } from "../src/encounterGroupComposition.js";
-import { refineEncounterGroup, resolveNodeEncounter } from "../src/encounterResolver.js";
+import { refineEncounterGroup, rerollNodeCreatures, resolveNodeEncounter } from "../src/encounterResolver.js";
+import { getCreatureById } from "../src/creatureCatalog/index.js";
 import { assignCreatureProfile } from "../src/creatures.js";
 import { generateMapData } from "../src/generator.js";
 import { createIslandPilot, createIslandSectorCombat } from "../src/archipelagoPilot.js";
@@ -101,6 +102,40 @@ test("refinamento segue para o catálogo quando cópias abaixo de ND 1 não fech
     assert.equal(calculateCombatND(result), 4, `seed ${seed}`);
     assert.deepEqual(result.map(item => [item.challengeRating, item.quantity]), [[0.5, 4], [2, 1]], `seed ${seed}`);
   }
+});
+
+test("rerrolagem de encontro antigo mira o orçamento de criaturas da cena", () => {
+  const floor = 9;
+  const allowed = dungeon1to10Profile.creatureRules.allowedCreatureIdsByFloor[floor].map(getCreatureById);
+  const byRating = rating => allowed.find(creature => creature.challengeRating === rating);
+  // Grupos gravados com a média: pelo livro [1, 3] vale 3 e [¼, 3, 3] vale 5.
+  const oldGroups = [[byRating(1), byRating(3)], [byRating(0.25), byRating(3), byRating(3)]];
+  let rerolled = 0;
+  for (const [index, group] of oldGroups.entries()) {
+    for (let sample = 0; sample < 6; sample++) {
+      const seed = `rerrolagem-antiga-${index}-${sample}`;
+      const node = {
+        id: seed, encounterSeed: seed, type: "normal", level: floor,
+        environment: { terrain: { name: "Covil aracnídeo", features: [] }, climate: [] },
+        challenge: { climate: 0, creatures: 4, encounter: 4, terrain: 0, total: 4, trap: 0 },
+        creature: null, trap: null, resolvedEncounter: null
+      };
+      assignCreatureProfile(node, dungeon1to10Profile, createRng(`${seed}-profile`));
+      node.creature.type = null;
+      const encounter = resolveNodeEncounter(node, { mapSeed: seed, profile: dungeon1to10Profile });
+      const counts = new Map();
+      for (const creature of group) counts.set(creature, (counts.get(creature) ?? 0) + 1);
+      encounter.items = [...counts].map(([creature, quantity]) => ({
+        kind: "creature", creatureId: creature.id, name: creature.name, challengeRating: creature.challengeRating, quantity
+      }));
+      assert.notEqual(calculateCombatND(encounter.items), 4);
+      const next = rerollNodeCreatures(node, dungeon1to10Profile);
+      if (!next) continue;
+      rerolled++;
+      assert.equal(calculateCombatND(next.items.filter(item => item.kind === "creature")), 4, seed);
+    }
+  }
+  assert.ok(rerolled >= 8);
 });
 
 function categoryChallenges() {

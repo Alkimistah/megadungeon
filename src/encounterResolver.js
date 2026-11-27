@@ -677,15 +677,19 @@ export function rerollNodeCreatures(node, profile, { tacticalLayout } = {}) {
   const encounter = node.resolvedEncounter;
   const original = encounter.items.filter(item => item.kind === "creature");
   const originalComposition = getCreatureComposition(original);
-  const challenge = calculateCombatND(original);
+  // Com orçamento de criaturas, mira o mesmo alvo de resolveCreatureGroup: um grupo
+  // gravado antes do ND de grupo do livro pode valer outro ND. Sem orçamento, mira
+  // o ND do grupo efetivamente encontrado.
+  const challenge = node.challenge?.creatures > 0
+    ? getCreatureGroupTarget(node.creature.targetChallenge ?? node.challenge.creatures)
+    : calculateCombatND(original);
   const { type, allowedCreatureIds } = node.creature;
   const ecology = getNodeEcology(node, profile);
   const catalog = filterEncounterCatalog(node, getAllowedCatalog(allowedCreatureIds, profile, node.creature.preferAllowedVariants), ecology)
     .filter(creature => ecology || !type || creature.type === type);
   if (!catalog.length || challenge <= 0) return null;
 
-  // A rerrolagem usa o ND do grupo efetivamente encontrado. O orçamento e a
-  // identidade da cena continuam sendo os do encontro original.
+  // O orçamento e a identidade da cena continuam sendo os do encontro original.
   const searchNode = {
     ...node,
     creature: { ...node.creature, type: type || null, targetChallenge: challenge }
