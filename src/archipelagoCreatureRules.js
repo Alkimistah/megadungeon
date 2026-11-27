@@ -84,6 +84,11 @@ const islandCreatures = {
   "abandoned-ship": [
     "livido", "ogro-esqueleto", "canceronte", "aparicao", "vampiro-neofito", "garra-zumbi-gigante", "ganchador",
     "fantasma", "alma-acorrentada", "afogado", "guerreiro-perpetuo"
+  ],
+  "impossible-tide": [
+    "canceronte", "sahuagin-metamorfo", "naiade", "nagah-guardiao", "homem-piranha-imediato",
+    "selako-tigre", "elfo-do-mar-chefe", "pliorex", "nagah-sacerdotisa", "lula-gigante",
+    "homem-piranha-capitao", "nagah-defensor"
   ]
 };
 
@@ -100,7 +105,7 @@ export function getIslandCreatureRules(island, objective, rules) {
     ...rules,
     allowedCreatureIds,
     ...(island.themeId === "crystal" ? { preferAllowedVariants: true } : {}),
-    ...(crystalGallery || island.themeId === "volcanic" ? { allowMixedChallengePairs: true } : {})
+    ...(crystalGallery || ["volcanic", "impossible-tide"].includes(island.themeId) ? { allowMixedChallengePairs: true } : {})
   };
 }
 

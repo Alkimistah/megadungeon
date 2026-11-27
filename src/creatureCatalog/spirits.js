@@ -352,6 +352,22 @@ export const corgann = {
     "roleSource": "pdf-review"
 };
 
+const corgannDasDuasMares = {
+    ...corgann,
+    id: "corgann-das-duas-mares",
+    name: "Corgann das Duas Marés",
+    regionalVariantOf: corgann.id,
+    challengeRating: 9,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "Um elemental da água que guarda o poço onde duas correntes se encontram.",
+        "Adaptação do Corgann, de Ameaças de Arton, p. 89–90."
+    ],
+    stats: { ...corgann.stats, hitPoints: 360, defense: 34, reflex: 21 }
+};
+
 export const namasqall = {
     "id": "namasqall",
     "name": "Namasqall",
@@ -7402,7 +7418,7 @@ export const spiritCreatures = [
     hellHound, aquinne, terrier, pamgra,
     guerreiroDeCHifres, akaOni, daitengu, dragaoCelestialAdulto,
     dragaoCelestialJovem, dragaoCelestialVeneravel, kappaBrigao, kappaYokozuna,
-    tenguBandoleiro, rhandomm, corgann, namasqall,
+    tenguBandoleiro, rhandomm, corgann, corgannDasDuasMares, namasqall,
     tPeel, rarvnaak, hallusTir, pakk,
     berBaram, serpentaar, bandoDePamgras, tanaloom,
     elementalCorrompido, oni, stagh, unicornio,

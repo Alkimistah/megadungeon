@@ -52,7 +52,7 @@ O PO pediu que o trabalho ande **de pouco em pouco**, com qualidade máxima em c
 | 6 | Intermediária | Ilha Sagrada (`sacred`) | Concluída e publicada (25/11/2026) |
 | 7 | Intermediária | Ilha de Cristal (`crystal`) | Implementada e validada no app em 26/11/2026 |
 | 8 | Intermediária | Navio Abandonado (`abandoned-ship`) | Implementado e validado no app em 27/11/2026 |
-| 9 | Intermediária | Ilha de Maré Impossível (`impossible-tide`) | Pendente |
+| 9 | Intermediária | Ilha de Maré Impossível (`impossible-tide`) | Publicada em 27/11/2026 |
 | — | Ponto de controle das intermediárias | | Pendente |
 | 10–13 | Avançada | Iceberg, Ilha Viva, Sal e Ossos, Ilha Elemental (ordem definida no ponto de controle) | Pendente |
 | — | Ponto de controle final | | Pendente |
@@ -80,7 +80,9 @@ A etapa 7 (Ilha de Cristal) foi implementada localmente a partir da prévia apro
 
 A etapa 8 (Navio Abandonado) foi implementada localmente conforme a prévia aprovada. Os seis setores mostram os últimos momentos da tripulação. O caixão guarda o fragmento e sustenta a noite eterna. A vitória na Cabine do Capitão faz o sol romper a escuridão e abrir o caixão, encerrando a maldição.
 
-**Próximo passo:** a etapa 9 começa pela prévia da Ilha de Maré Impossível. Depois dela, revisar a fileira intermediária e definir a ordem das quatro ilhas avançadas. Os NDs confirmados por faixa estão em `REQUISITOS_ANDARES_21_A_30.md`.
+A etapa 9 (Ilha de Maré Impossível) foi concluída e publicada em 27/11/2026. O Poço das Duas Marés usa três fases de corrente aplicadas pelo mestre, e o Corgann das Duas Marés é uma opção solo de ND 9. Os seis setores compartilham doze fichas para o sorteio de ND 7.
+
+**Próximo passo:** revisar a fileira intermediária e definir a ordem das quatro ilhas avançadas. Os NDs confirmados por faixa estão em `REQUISITOS_ANDARES_21_A_30.md`.
 
 **Lições das etapas 3 e 4.**
 

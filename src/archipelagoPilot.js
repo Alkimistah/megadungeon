@@ -14,6 +14,7 @@ import { cyclopeanRuinsExploration } from "./archipelagoCyclopeanRuins.js";
 import { sacredExploration } from "./archipelagoSacred.js";
 import { crystalExploration } from "./archipelagoCrystal.js";
 import { abandonedShipExploration } from "./archipelagoAbandonedShip.js";
+import { impossibleTideExploration } from "./archipelagoImpossibleTide.js";
 import { getEligibleGuardianPenalties, getGuardianPenalty } from "./archipelagoGuardianPenalties.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getIslandCreatureRules } from "./archipelagoCreatureRules.js";
@@ -206,6 +207,7 @@ const SECTOR_ISLANDS = {
   sacred: sacredExploration,
   crystal: crystalExploration,
   "abandoned-ship": abandonedShipExploration,
+  "impossible-tide": impossibleTideExploration,
   mangrove: { pilot: "mangrove-sectors", sectors: MANGROVE_SECTORS, guardians: GUARDIAN_COMPOSITIONS },
   tropical: {
     pilot: "tropical-sectors",

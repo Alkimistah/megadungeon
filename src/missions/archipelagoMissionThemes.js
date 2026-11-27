@@ -291,6 +291,30 @@ export const ARCHIPELAGO_MISSION_THEMES = {
     }
   },
 
+  "impossible-tide": {
+    pools: {
+      locations: ["o cais onde a água sobe", "a escada do canal suspenso", "a gruta do refluxo", "a borda seca da comporta"],
+      materials: ["sal dos bancos expostos", "lodo de uma vala de descarga", "lascas das estacas do cais", "areia presa às engrenagens"],
+      objects: ["a sonda de chumbo presa à comporta", "uma boia sem a linha", "uma tábua com seis marcas", "a manivela de uma válvula"],
+      mementos: ["um anel na amarra", "uma carta protegida num tubo", "uma fita de medição rasgada", "um medalhão preso à baliza"],
+      clues: ["marcas d'água acima da escada", "sondas arrancadas em sentidos opostos", "duas setas na pedra do espigão", "um diagrama da comporta"],
+      challenges: ["prever a próxima inversão", "atravessar o banco antes da enchente", "firmar as amarras", "destravar o volante"],
+      phenomena: ["uma corrente que sobe a encosta", "duas correntes em sentidos opostos", "um banco de areia que reaparece na enchente", "uma calmaria súbita entre inversões"]
+    },
+    featured: {
+      category: "investigation",
+      title: "A Última Marca da Água",
+      targetName: "a causa da inversão da maré",
+      lead: "Siga as seis marcas deixadas onde a água deveria ter baixado",
+      condition: "Resolver os seis setores, vencer o guardião e recolher o fragmento para encerrar a inversão",
+      proofType: "Recolher o fragmento e relatar o fim da inversão."
+    },
+    map: {
+      markers: ["water", "current", "obstacle", "slope"],
+      landmark: { name: "Sonda da comporta", effect: "A sonda de chumbo está presa em terra firme junto à borda do canal." }
+    }
+  },
+
   volcanic: {
     pools: {
       locations: ["uma praia de cinzas negras", "uma encosta cortada por rios de lava", "o topo de uma encosta de cinzas", "um túnel de lava endurecida"],

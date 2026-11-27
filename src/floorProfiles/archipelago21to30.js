@@ -132,7 +132,7 @@ export const archipelago21to30Profile = {
     },
     enabledThemeIds: [
       "tropical", "mangrove", "atoll", "coral-coast", "shipwrecked", "giant-kelp", "mist", "ship-graveyard",
-      "volcanic", "sea-caves", "pirate-held", "cyclopean-ruins", "sacred", "crystal", "abandoned-ship",
+      "volcanic", "sea-caves", "pirate-held", "cyclopean-ruins", "sacred", "crystal", "abandoned-ship", "impossible-tide",
       "floating", "storm", "dinosaurs"
     ],
     themePools: {
@@ -159,7 +159,13 @@ export const archipelago21to30Profile = {
         { id: "sea-caves", name: "Ilha-Labirinto de Cavernas Marinhas", arenaName: "Câmara da Maré", icon: "/assets/icons/islands/ilha-labirinto-de-cavernas-marinhas.webp", narrative: "A costa é furada como queijo, cheia de bocas escuras onde a maré entra cantando baixo.", objective: "Navegar túneis inundados, bolsões de ar e passagens que somem com a maré." },
         { id: "pirate-held", name: "Ilha Tomada por Piratas", arenaName: "Galeão da Caveira", icon: "/assets/icons/islands/ilha-tomada-por-piratas.webp", narrative: "Dá para ver paliçadas, bandeiras rasgadas e gente armada nas pedras antes mesmo de ancorar.", objective: "Romper um fortim costeiro e recuperar o fragmento antes que ele seja vendido." },
         { id: "sacred", name: "Ilha Sagrada", arenaName: "Altar da Trilha Branca", icon: "/assets/icons/islands/ilha-sagrada.webp", narrative: "Ela parece calma demais, com pilares antigos, aves em círculo e uma sensação clara de que não fomos convidados.", objective: "Cumprir tabus, provações ou negociações com guardiões espirituais." },
-        { id: "impossible-tide", name: "Ilha de Maré Impossível", icon: "/assets/icons/islands/ilha-de-mare-impossivel.webp", narrative: "A água sobe, desce e corre contra si mesma, revelando caminhos que somem antes da gente terminar de apontar.", objective: "Resolver o objetivo enquanto caminhos, armadilhas e salas mudam com o ciclo da maré." },
+        {
+          id: "impossible-tide", name: "Ilha de Maré Impossível", arenaName: "Poço das Duas Marés",
+          icon: "/assets/icons/islands/ilha-de-mare-impossivel.webp",
+          narrative: "A água sobe, desce e corre contra si mesma. Seis marcos de uma expedição anterior indicam as passagens que reaparecem entre as inversões.",
+          objective: "Siga as seis marcas e recupere o fragmento que prende as correntes em sentidos opostos.",
+          victoryNarrative: "Ao retirar o fragmento, a corrente perde força. A água baixa pelas encostas e volta ao mar."
+        },
         { id: "crystal", name: "Ilha de Cristal", arenaName: "Prisma da Maré", icon: "/assets/icons/islands/ilha-de-cristal.webp", narrative: "Brilha como uma joia quebrada no sol, cheia de torres translúcidas e reflexos que mostram coisas que não estão lá.", objective: "Atravessar cavernas brilhantes, ilusões naturais e formações cortantes." }
       ],
       advanced: [

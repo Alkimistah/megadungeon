@@ -357,7 +357,7 @@ A versão atual usa um conjunto de dezoito temas. A seed muda as posições dos 
 | Dificuldade | Andares | Temas da primeira versão |
 |---|---|---|
 | Inicial | 21–24 | Ilha Manguezal, Ilha Tropical, Atol Circular, Costa do Coral, Ilha dos Náufragos, Ilha de Algas Gigantes, Ilha de Névoa e Ilha-Cemitério de Navios (quatro sorteadas entre as oito) |
-| Intermediária | 25–27 | Ilha Vulcânica, Ilha-Labirinto de Cavernas Marinhas, Ilha Tomada por Piratas, Ilha das Ruínas Ciclópicas, Ilha Sagrada, Ilha de Cristal e Navio Abandonado (três sorteadas entre as sete) |
+| Intermediária | 25–27 | Ilha Vulcânica, Ilha-Labirinto de Cavernas Marinhas, Ilha Tomada por Piratas, Ilha das Ruínas Ciclópicas, Ilha Sagrada, Ilha de Cristal, Navio Abandonado e Ilha de Maré Impossível (três sorteadas entre as oito) |
 | Avançada | 28–29 | Ilha Flutuante e Ilha de Tempestades Eternas |
 | Final | 30 | Ilha dos Dinossauros |
 
@@ -808,6 +808,12 @@ A progressão normal começa com as quatro ilhas iniciais abertas e nenhum fragm
 
 As missões das ilhas 21 a 29 são cenas próprias de cada ilha. `src/missions/archipelagoMissionThemes.js` guarda, para cada tema ativo, as listas de alvos, uma missão em destaque escrita à mão e os marcadores e o ponto de referência do mapa tático. Um teste de cobertura falha se algum tema ativo ficar sem pacote. O gerador oferece de 1 a 8 missões, no máximo uma por ilha, e a missão em destaque aparece em cerca de um terço das ofertas. A missão não depende dos setores. O texto da missão cita só "Ilha N". O destino mostra "Ilha N - <nome>", e só "Ilha N" quando Caminhos desconhecidos está ligado. No rodapé da ficha, o acesso é o botão "Missão: <título>", no centro, entre o contador de setores e "Retornar ao barco". No celular, ele ocupa uma linha própria. Os alvos vêm das listas do tema e das listas genéricas neutras. A caçada especial tem um alvo marcado e acompanhantes do elenco da ilha. Em cerca de um quarto das caçadas, o alvo vem do ecossistema de outro tema, e os acompanhantes vêm da origem dele, nunca da fauna local. O encontro tem exatamente um alvo e ND até o ND do andar mais 1. O mapa tático usa o terreno da ilha. O extermínio não entra no arquipélago. A CD da missão segue a coluna "Efeito Padrão (CD)" da Tabela 2-3 A do Ameaças de Arton (p. 382), com o ND do encontro mais 1: CD 28 nas ilhas de ND 8, 30 nas de ND 9 e 31 nas de ND 10. A mesma regra vale para as missões das outras faixas.
 
+#### Ilha de Maré Impossível
+
+Os seis setores têm duas variantes de combate com plantas próprias e um teste estendido. Os combates compartilham doze fichas sorteáveis em ND 7, incluindo pares de NDs diferentes. Cada planta mostra a fase da maré e preserva uma rota seca.
+
+No Poço das Duas Marés, o Gigante dos Mares, o Cardume de Selakos e o Corgann das Duas Marés são opções de ND 9. O Corgann é uma adaptação solo com 360 PV e Defesa 34. O mestre aplica a corrente no fim do turno, movendo cada criatura em corredor ativo um quadrado se o destino estiver livre e transitável. A primeira rodada aponta para o poço, a segunda inverte o sentido e a terceira tem calmaria. A vitória revela o fragmento e encerra a inversão. A missão em destaque é A Última Marca da Água.
+
 #### ND dos combates por faixa
 
 O ND abaixo é o do encontro inteiro. Setores e guardiões seguem os valores atuais do perfil.
@@ -823,14 +829,14 @@ O ND abaixo é o do encontro inteiro. Setores e guardiões seguem os valores atu
 
 A grade em camadas já cobre setores, arenas, convés da liburna e mapas de missão. Os mapas-base reutilizáveis ficaram para a próxima etapa da [grade tática compartilhada](ARCHITECTURE.md#grade-tática-compartilhada).
 
-1. **Reativar os 5 temas restantes, um a um como ilhas completas, cada um com seu pacote em `archipelagoMissionThemes.js`.** A fileira inicial já está completa; na intermediária, falta apenas a Ilha de Maré Impossível, e na avançada ainda faltam quatro temas. O design está em `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`. O teste de cobertura cobra o pacote de cada tema ao ativá-lo.
+1. **Revisar a fileira intermediária e definir a ordem dos quatro temas avançados restantes.** As fileiras inicial e intermediária estão completas. Reativar cada tema avançado como ilha completa, com seu pacote em `archipelagoMissionThemes.js`. O design está em `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`. O teste de cobertura cobra o pacote de cada tema ao ativá-lo.
 2. **Validar a campanha completa em mesa.** Usar como referência o grupo chegando no nível 7 e testar os marcos de nível 8, 9 e 10 aos 4, 7 e 9 fragmentos. Conferir duração das sessões, recursos que sobram para o guardião, XP, tesouros, reaberturas e emboscadas. Testar o Rei Tirano com todos os bônus e com todos removidos, com atenção à CD 27 do Rugido Ensurdecedor e ao impacto de dois Deinonicos. Fica por último, depois que o restante estiver pronto, para que a sessão em mesa só gere ajustes pequenos.
 
 ### Pendências Conhecidas
 
 - Repetir a validação visual quando houver troca de arte, conferindo as ilhas reveladas, concluídas e bloqueadas.
 - Os fragmentos obtidos ainda são representados principalmente por contador/progresso; a exibição visual individual no barco pode evoluir.
-- Os 5 temas fora do sorteio ainda não têm pacote de missões. A fileira inicial está completa. Ao ativar cada um, o teste de cobertura exige o pacote completo. O design está em `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`.
+- Os quatro temas avançados fora do sorteio ainda não têm pacote de missões. Ao ativar cada um, o teste de cobertura exige o pacote completo. O design está em `docs/superpowers/specs/2026-11-24-ilhas-novas-design.md`.
 - Ajustes pequenos de código anotados na revisão das missões: congelar o encontro da caçada guardado em memória, unificar a janela de ND da caçada com a do gerador, criar um teste fixo que garanta as mesmas ofertas na floresta e na masmorra e agrupar os parâmetros de `renderMissionRunContent`.
 
 ### A Definir

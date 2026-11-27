@@ -1,5 +1,6 @@
 import { crystalLayouts } from "./archipelagoCrystalLayouts.js";
 import { abandonedShipLayouts } from "./archipelagoAbandonedShipLayouts.js";
+import { impossibleTideLayouts } from "./archipelagoImpossibleTideLayouts.js";
 
 const tropicalLayouts = {
   N: {
@@ -340,6 +341,7 @@ const layoutsByTheme = {
   },
   crystal: crystalLayouts,
   "abandoned-ship": abandonedShipLayouts,
+  "impossible-tide": impossibleTideLayouts,
   sacred: {
     NO: { ...layout("Pilar dos espíritos", "Um pilar antigo coberto de oferendas. Os espíritos do bosque falam por ele.", 12, 5, [["clearing", 8, 2, 9, 8], ["foliage", 0, 0, 6, 4], ["foliage", 13, 10, 7, 4], ["tree", 2, 2, 2, 2], ["tree", 5, 6, 1, 1], ["tree", 16, 1, 2, 2], ["tree", 17, 9, 2, 2], ["tree", 9, 11, 2, 2], ["difficult", 6, 8, 2, 2]]), enemyArea: { minX: 15, maxX: 19, minY: 0, maxY: 12 } },
     NL: layout("Mastro do estandarte", "O estandarte de Valkaria com as armas de Arsenal, no meio do pátio da muralha.", 12, 5, [["clearing", 7, 2, 12, 9], ["wall", 6, 0, 1, 4], ["wall", 6, 7, 1, 7], ["obstacle", 15, 2, 3, 1], ["obstacle", 15, 9, 3, 2], ["advantage", 17, 4, 3, 3], ["difficult", 9, 9, 3, 2]]),
@@ -371,7 +373,8 @@ const landmarksByTask = {
 export function withIslandTacticalLayout(scene, themeId, objective) {
   const theme = layoutsByTheme[themeId];
   const byTask = theme?.byTask?.[objective?.title];
-  const base = byTask ?? theme?.[objective?.direction ?? "center"];
+  const byGuardian = objective == null ? theme?.byGuardian?.[scene?.bossCreatureId] : null;
+  const base = byTask ?? byGuardian ?? theme?.[objective?.direction ?? "center"];
   if (!scene || !base) return scene;
   const taskLandmark = byTask ? null : landmarksByTask[objective?.title];
   const landmark = {
