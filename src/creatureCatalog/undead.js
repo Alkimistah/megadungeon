@@ -3890,6 +3890,65 @@ const vampiroPassageiroDaUltimaViagem = {
     }))
 };
 
+// Versões de guardião da Névoa, do Cemitério e dos Náufragos, elevadas pela tabela solo do livro.
+const oSineiro = {
+    ...fantasma,
+    id: "o-sineiro",
+    name: "O Sineiro",
+    regionalVariantOf: fantasma.id,
+    challengeRating: 8,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "O sineiro se afogou tentando guiar o último barco pela bruma. O sino rachado do campanário ainda o prende a este mundo.",
+        "Adaptação de Fantasma, Ameaças de Arton p. 232: ND 8, PV 320, Defesa 33, Fortitude 8, Reflexos 15, Vontade 21, toque drenante +26 (6d8+41) e CD 26."
+    ],
+    stats: { ...fantasma.stats, hitPoints: 320, defense: 33, fortitude: 8, reflex: 15, will: 21 },
+    actions: [{ name: "Corpo a Corpo", text: "Toque drenante +26 (6d8+41 trevas)." }],
+    abilities: fantasma.abilities.map(ability => ({ ...ability, text: ability.text.replaceAll("CD 24", "CD 26") }))
+};
+
+const amalgamaEsqueleto = bestiaryCreatures.find(creature => creature.id === "amalgama-esqueleto");
+
+const capitaoDosOssos = {
+    ...amalgamaEsqueleto,
+    id: "capitao-dos-ossos",
+    name: "O Capitão dos Ossos",
+    regionalVariantOf: amalgamaEsqueleto.id,
+    challengeRating: 8,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "O capitão e a tripulação da nau capitânia se fundiram num só monte de ossos. A voz dele ainda dá ordens de dentro da massa.",
+        "Adaptação de Amálgama Esqueleto, Bestiário de Arton p. 74: ND 8, PV 320, Defesa 33, Fortitude 21, Reflexos 15, Vontade 8, ataques +26, dano +17 e CD 26."
+    ],
+    stats: { ...amalgamaEsqueleto.stats, hitPoints: 320, defense: 33, fortitude: 21, reflex: 15, will: 8 },
+    actions: [
+        { name: "Corpo a Corpo", text: "Machado de batalha +26 (2d8+17, x3), espada longa +26 (1d10+17, 19) e chifres +26 (1d8+17)." }
+    ],
+    abilities: amalgamaEsqueleto.abilities.map(ability => ({ ...ability, text: ability.text.replaceAll("CD 24", "CD 26") }))
+};
+
+// O afogado é lacaio no livro. Como guardião solitário, usa a linha solo da tabela.
+const primeiroNaufrago = {
+    ...afogado,
+    id: "primeiro-naufrago",
+    name: "O Primeiro Náufrago",
+    regionalVariantOf: afogado.id,
+    challengeRating: 8,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "O primeiro homem que a ilha afogou. Ele sobe pela rocha molhada sempre que a fogueira do farol se apaga.",
+        "Adaptação de Afogado, Ameaças de Arton p. 253: ND 8, papel solo, PV 320, Defesa 33, Fortitude 21, Reflexos 15 e CD 26."
+    ],
+    stats: { ...afogado.stats, hitPoints: 320, defense: 33, fortitude: 21, reflex: 15 },
+    abilities: afogado.abilities.map(ability => ({ ...ability, text: ability.text.replaceAll("CD 24", "CD 26") }))
+};
+
 export const undeadCreatures = [
     avatarDeTenebraDeusesDeArton,
     lyuba,
@@ -3906,5 +3965,6 @@ export const undeadCreatures = [
     necrodracoLich, necrodracoZumbi, reiTiranoEsqueleto, senhorDasMumias,
     tarsoDragaoReiDosMortos, afogado, capitaoAfogado, capitaoPirata,
     imediato, alzeras, arquilichFerrenAsloth, cemiterioVivo, chacalZumbi,
-    lich, lichDeAslothia, morgueRaz, wisphago, vampiroPassageiroDaUltimaViagem
+    lich, lichDeAslothia, morgueRaz, wisphago, vampiroPassageiroDaUltimaViagem, 
+    oSineiro, capitaoDosOssos, primeiroNaufrago
 ];

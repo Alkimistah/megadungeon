@@ -1,3 +1,4 @@
+import { bestiaryCreatures } from "./bestiary.js";
 import { divineAspects } from "./divineAspects.js";
 
 export const giantRat = {
@@ -3867,6 +3868,26 @@ const ursoDasNeves = {
     "roleSource": "pdf-review"
 };
 
+const lulaGigante = bestiaryCreatures.find(creature => creature.id === "lula-gigante");
+
+// Versão de guardião da Costa do Coral, elevada pela tabela solo do livro.
+const lulaRainhaDoRecife = {
+    ...lulaGigante,
+    id: "lula-rainha-do-recife",
+    name: "Lula-Rainha do Recife",
+    regionalVariantOf: lulaGigante.id,
+    challengeRating: 8,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "A lula mais velha do recife enrola os braços no arco de coral e arrasta para o fundo quem chega ao nicho.",
+        "Adaptação de Lula-Gigante, Bestiário de Arton p. 112: ND 8, PV 320, Defesa 33, Fortitude 21, Reflexos 15, Vontade 8 e tentáculos +26."
+    ],
+    stats: { ...lulaGigante.stats, hitPoints: 320, defense: 33, fortitude: 21, reflex: 15, will: 8 },
+    actions: [{ name: "Corpo a Corpo", text: "Quatro tentáculos +26 (2d8+9)." }]
+};
+
 export const animalCreatures = [
     ...divineAspects.filter(aspect => aspect.type === "animal"),
     carcaju, mamute, ursoDasNeves,
@@ -3886,5 +3907,5 @@ export const animalCreatures = [
     ursoDasCavernas, ursoPanda, ursoPardo, armentoDeBurafontes,
     bandoDeDeinonicos, burafonte, deinonico, enxameDeGaliGali,
     galiGali, grandeBattham, raagoran, reiTirano, reiTiranoArquipelago,
-    tuntram
+    tuntram, lulaRainhaDoRecife
 ];

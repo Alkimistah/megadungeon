@@ -1,3 +1,4 @@
+import { bestiaryCreatures } from "./bestiary.js";
 import { divineAspects } from "./divineAspects.js";
 
 export const hellHound = {
@@ -7401,6 +7402,30 @@ const luminar = {
     "roleSource": "pdf-review"
 };
 
+const salamandraNobre = bestiaryCreatures.find(creature => creature.id === "salamandra-nobre");
+
+// Versão de guardião da Ilha Vulcânica, elevada pela tabela solo do livro.
+const regenteDasBrasas = {
+    ...salamandraNobre,
+    id: "regente-das-brasas",
+    name: "Regente das Brasas",
+    regionalVariantOf: salamandraNobre.id,
+    challengeRating: 9,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "A salamandra que governa a corte da caldeira. Onde ela pisa, a rocha volta a brilhar.",
+        "Adaptação de Salamandra Nobre, Bestiário de Arton p. 152: ND 9, PV 360, Defesa 34, Vontade 9, ataques +27, dano +22 e CD 28."
+    ],
+    stats: { ...salamandraNobre.stats, hitPoints: 360, defense: 34, will: 9 },
+    actions: [
+        { name: "Corpo a Corpo", text: "Tridente +27 (2d8+22, 19/x3, mais 2d6 fogo) e cauda +27 (2d6+22 mais 2d6 fogo)." },
+        { name: "À Distância", text: "Tridente +27 (2d8+22, 19/x3, mais 2d6 fogo)." }
+    ],
+    abilities: salamandraNobre.abilities.map(ability => ({ ...ability, text: ability.text.replaceAll("CD 26", "CD 28") }))
+};
+
 export const spiritCreatures = [
     luminar,
     avatarDoOceanoDeusesDeArton, avatarDeSszzaasDeusesDeArton, avatarDeTannaTohDeusesDeArton,
@@ -7423,5 +7448,5 @@ export const spiritCreatures = [
     berBaram, serpentaar, bandoDePamgras, tanaloom,
     elementalCorrompido, oni, stagh, unicornio,
     demonioDaPolvora, totemDaDivinaSerpenteAspectoDeAllihanna, totemDeSaranaAspectoDeMarah, totemDoPaiDeTudoAspectoDeAzgher,
-    totemDoReiTiranoAspectoDeMegalokk, avatarDeKallyadranochDivine
+    totemDoReiTiranoAspectoDeMegalokk, avatarDeKallyadranochDivine, regenteDasBrasas
 ];

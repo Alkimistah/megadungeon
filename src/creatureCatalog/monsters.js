@@ -10848,6 +10848,28 @@ const rivalEspelho = {
     "roleSource": "pdf-review"
 };
 
+// Versão de guardião das Ruínas Ciclópicas, elevada pela tabela solo do livro.
+const senhoraDasEstatuas = {
+    ...gorgona,
+    id: "senhora-das-estatuas",
+    name: "Senhora das Estátuas",
+    regionalVariantOf: gorgona.id,
+    challengeRating: 9,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "A górgona vive entre as estátuas do trono há séculos. Cada guardião de pedra das ruínas foi, um dia, um visitante.",
+        "Adaptação de Górgona, Ameaças de Arton p. 329–330: ND 9, PV 360, Defesa 34, Fortitude 15, Reflexos 21, Vontade 9, ataques +27, dano +31 e CD 28."
+    ],
+    stats: { ...gorgona.stats, hitPoints: 360, defense: 34, fortitude: 15, reflex: 21, will: 9 },
+    actions: [
+        { name: "Corpo a Corpo", text: "Espada curta +27 (1d6+31, 19, mais veneno)." },
+        { name: "À Distância", text: "Arco longo +27 x2 (1d12+31, x3, mais veneno)." }
+    ],
+    abilities: gorgona.abilities.map(ability => ({ ...ability, text: ability.text.replaceAll("CD 22", "CD 28") }))
+};
+
 export const monsterCreatures = [
     rivalEspelho,
     avatarDeMegalokkDeusesDeArton,
@@ -10884,5 +10906,5 @@ export const monsterCreatures = [
     cocatrizReal, harpiaSaqueadora, mantor, quimera,
     mimico, mimicoMenor, corcelDoDeserto, tatuMontanha,
     tigreDeHyninn, tigreDeHyninnPrimordial, warg, homemPiranhaCapitao,
-    mercenarioDeAslothia, escorpiaoDeCristal, centopeiaSolar
+    mercenarioDeAslothia, escorpiaoDeCristal, centopeiaSolar, senhoraDasEstatuas
 ];

@@ -1,3 +1,4 @@
+import { bestiaryCreatures } from "./bestiary.js";
 import { divineAspects } from "./divineAspects.js";
 
 export const orcCombatant = {
@@ -12569,6 +12570,50 @@ const avatarDeThworDeusesDeArton = {
     "roleSource": "pdf-review"
 };
 
+// Versões de guardião do Fortim Pirata, elevadas pela tabela solo do livro.
+const capitaoDoLeilao = {
+    ...capitaoDoConclavePirata,
+    id: "capitao-do-leilao",
+    name: "Capitão do Leilão",
+    regionalVariantOf: capitaoDoConclavePirata.id,
+    challengeRating: 9,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "O capitão que preside o leilão do fortim. Ele não entrega um lote sem lucro, e o fragmento é o lote mais caro da noite.",
+        "Adaptação de Capitão do Conclave Pirata, Ameaças de Arton p. 259: ND 9, PV 360, Defesa 34, Reflexos 21, ataques +27, cimitarra 2d6+30, pistola 2d6+28 e CD 28."
+    ],
+    stats: { ...capitaoDoConclavePirata.stats, hitPoints: 360, defense: 34, reflex: 21 },
+    actions: [
+        { name: "Corpo a Corpo", text: "Cimitarra x2 +27 (2d6+30, 14/x3)." },
+        { name: "À Distância", text: "Pistola +27 (2d6+28, 19/x3)." }
+    ],
+    abilities: capitaoDoConclavePirata.abilities.map(ability => ({ ...ability, text: ability.text.replaceAll("CD 26", "CD 28") }))
+};
+
+const ogroDasSanguinarias = bestiaryCreatures.find(creature => creature.id === "ogro-das-sanguinarias");
+
+const ogroDaQuilha = {
+    ...ogroDasSanguinarias,
+    id: "ogro-da-quilha",
+    name: "Ogro da Quilha",
+    regionalVariantOf: ogroDasSanguinarias.id,
+    challengeRating: 9,
+    role: "solo",
+    roleSource: "adaptacao-nd",
+    source: { book: "Masmorra de Práxis" },
+    description: [
+        "Um ogro das Sanguinárias dorme na quilha do galeão e guarda o relicário do fragmento como guarda a própria comida.",
+        "Adaptação de Ogro das Sanguinárias, Bestiário de Arton p. 127: ND 9, Defesa 34, Vontade 9, ataques +27 e dano +27."
+    ],
+    stats: { ...ogroDasSanguinarias.stats, defense: 34, will: 9 },
+    actions: [
+        { name: "Corpo a Corpo", text: "Machado de guerra x2 +27 (3d6+27, x3)." },
+        { name: "À Distância", text: "Azagaia x2 +27 (1d8+27)." }
+    ]
+};
+
 export const humanoidCreatures = [
     avatarDeThworDeusesDeArton,
     galokkCapanga, galokkGuardaCostas, giganteBicefalo, giganteDasColinas, giganteDoFogo, giganteDasRochas, giganteDoGelo, giganteDosMares, giganteReal, giganteMaximo,
@@ -12616,5 +12661,5 @@ export const humanoidCreatures = [
     xamaDeSarana, voracisCacadora, voracisRainha, arcanoDeGuerraAdepto,
     arcanoDeGuerraVeterano, cacadorDeImpuros, companhiaBlindadaDeElite, dancarinoDeGuerra,
     dancarinoDeGuerraVeterano, purificado, soldadoBlindado, soldadoSuperior,
-    liderMercenarioDeAslothia
+    liderMercenarioDeAslothia, capitaoDoLeilao, ogroDaQuilha
 ];
