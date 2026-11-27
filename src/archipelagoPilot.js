@@ -18,6 +18,7 @@ import { impossibleTideExploration } from "./archipelagoImpossibleTide.js";
 import { getEligibleGuardianPenalties, getGuardianPenalty } from "./archipelagoGuardianPenalties.js";
 import { getCreatureById } from "./creatureCatalog/index.js";
 import { getIslandCreatureRules } from "./archipelagoCreatureRules.js";
+import { withIslandTacticalLayout } from "./archipelagoTacticalMap.js";
 import { calculateCombatND } from "./challenge.js";
 import { createRng, pick } from "./random.js";
 import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
@@ -86,7 +87,8 @@ export function createIslandPilotScene(island, profile, mapSeed, composition) {
   if (composition) scene.fixedComposition = { ...composition, traps: [], useWeaponVariation: false };
   if (!composition) scene.creature = getIslandCreatureRules(island, objective, scene.creature);
   if (scene.creature.allowedCreatureIds?.length === 0) return scene;
-  const encounter = resolveNodeEncounter(scene, { mapSeed, profile });
+  const tacticalLayout = composition ? undefined : withIslandTacticalLayout(scene, island.themeId, objective).tacticalLayout;
+  const encounter = resolveNodeEncounter(scene, { mapSeed, profile, tacticalLayout });
   if (scene.creature.allowedCreatureIds && encounter && calculateCombatND(encounter.items) !== challenge) {
     scene.resolvedEncounter = null;
   }

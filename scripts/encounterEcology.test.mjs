@@ -153,3 +153,28 @@ test("rerrolagem aquática mantém o ND e troca um grupo terrestre salvo", () =>
   assert.equal(calculateCombatND(candidate?.items), 1);
   assert.ok(candidate.items.every(hasAquaticTag));
 });
+
+test("na floresta o mesmo tipo predomina e humanoides podem liderar grupos mistos", () => {
+  const allowed = ["lobo", "orc-combatente", "orc-chefe", "rato-gigante", "bandido",
+    "garra-zumbi", "cascavel", "infecto", "zumbi", "sucuri"];
+  const environment = { terrain: { name: "Floresta", features: [] }, climate: [] };
+  let sameType = 0;
+  let mixedWithLeader = 0;
+  for (let index = 0; index < 240; index++) {
+    const node = nodeFor(3, allowed, environment);
+    node.id = "bando-floresta";
+    const encounter = resolveNodeEncounter(node, { profile: forest11to20Profile, mapSeed: `teste-floresta-${index}` });
+    assert.equal(calculateCombatND(encounter.items), 3);
+    assert.ok(encounter.items.every(item => allowed.includes(item.creatureId)));
+    const types = new Set(encounter.items.map(item => item.type));
+    if (types.size === 1) sameType++;
+    else if (encounter.items[0].type === "humanoid") mixedWithLeader++;
+    if (index < 12) {
+      const rerolled = rerollNodeCreatures(node, forest11to20Profile);
+      assert.equal(calculateCombatND(rerolled?.items), 3);
+      assert.ok(rerolled.items.every(item => allowed.includes(item.creatureId)));
+    }
+  }
+  assert.ok(sameType > 120);
+  assert.ok(mixedWithLeader > 0);
+});

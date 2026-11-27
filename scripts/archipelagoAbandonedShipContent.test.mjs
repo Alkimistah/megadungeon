@@ -33,7 +33,8 @@ test("o Navio Abandonado tem seis setores, três variantes por setor e terreno d
 
 test("cada variante de combate sorteia e rerrola composições do elenco regional em ND 7", () => {
   const regionalIds = new Set(getIslandCreatureIds(island.themeId));
-  assert.equal(regionalIds.size, 11);
+  assert.equal(regionalIds.size, 12);
+  const observedIds = new Set();
   for (const sector of directions.keys()) {
     for (const variant of [1, 2]) {
       const objective = createIslandSector(island, sector, variant, 24);
@@ -44,9 +45,11 @@ test("cada variante de combate sorteia e rerrola composições do elenco regiona
         const items = scene.resolvedEncounter.items;
         assert.equal(calculateCombatND(items), 7, objective.title);
         assert.ok(items.every(item => regionalIds.has(item.creatureId)), objective.title);
+        for (const item of items) observedIds.add(item.creatureId);
         const rerolled = rerollNodeCreatures(scene, profile);
         assert.equal(calculateCombatND(rerolled.items), 7, objective.title);
         assert.ok(rerolled.items.every(item => regionalIds.has(item.creatureId)), objective.title);
+        for (const item of rerolled.items) observedIds.add(item.creatureId);
         const signature = entries => entries.map(({ creatureId, quantity }) => `${creatureId}:${quantity}`).sort().join(",");
         assert.notEqual(signature(items), signature(rerolled.items), objective.title);
         compositions.add(signature(items));
@@ -54,6 +57,7 @@ test("cada variante de combate sorteia e rerrola composições do elenco regiona
       assert.ok(compositions.size > 2, objective.title);
     }
   }
+  assert.deepEqual(observedIds, regionalIds);
 });
 
 test("as três composições de ND 9 incluem regras de combate e a missão do diário", () => {

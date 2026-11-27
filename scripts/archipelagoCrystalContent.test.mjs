@@ -3,6 +3,7 @@ import test from "node:test";
 import { createIslandGuardian, createIslandSector, createIslandSectorCombat, hasIslandSectors } from "../src/archipelagoPilot.js";
 import { getIslandCreatureIds } from "../src/archipelagoCreatureRules.js";
 import { calculateCombatND } from "../src/challenge.js";
+import { getCreatureById } from "../src/creatureCatalog/index.js";
 import { rerollNodeCreatures } from "../src/encounterResolver.js";
 import { archipelago21to30Profile as profile } from "../src/floorProfiles/archipelago21to30.js";
 import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionThemes.js";
@@ -51,13 +52,17 @@ test("o escorpião é uma opção sorteável e rerrolável das galerias, com ND 
 
 test("o Centro tem três composições ND 9, ciclo solar e missão da passagem", () => {
   const objectives = directionOrder.map((_, index) => createIslandSector(island, index, 0, 24));
-  for (const [index, id, quantity] of [[0, "golem-de-espelhos", 1], [1, "ameba-gigante", 2], [2, "centopeia-solar", 1]]) {
+  for (const [index, id] of [[0, "golem-de-espelhos"], [1, "tausideros"], [2, "centopeia-solar"]]) {
     const scene = createIslandGuardian({ ...island, objectives }, index, profile, "prisma");
     assert.equal(calculateCombatND(scene.resolvedEncounter.items), 9);
     assert.equal(scene.bossCreatureId, id);
-    assert.equal(scene.resolvedEncounter.items[0].quantity, quantity);
+    assert.equal(scene.resolvedEncounter.items[0].quantity, 1);
     assert.match(scene.rule, /A → B → C/);
   }
+  const savedSelection = createIslandGuardian({ ...island, objectives }, "amebas-do-prisma", profile, "prisma");
+  assert.equal(savedSelection.bossCreatureId, "tausideros");
+  assert.match(savedSelection.rule, /cristalização/);
+  assert.deepEqual(savedSelection.resolvedEncounter.items[0].creatureData.abilities, getCreatureById("tausideros").abilities);
   assert.equal(getArchipelagoMissionTheme("crystal").featured.title, "Abrir uma passagem à sombra");
 });
 

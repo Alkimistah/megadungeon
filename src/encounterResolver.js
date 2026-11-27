@@ -6,8 +6,10 @@ import {
   getEncounterEcologyContext, pickEcologyWeighted
 } from "./encounterEcology.js";
 import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
+import { pickEncounterGroupComposition } from "./encounterGroupComposition.js";
 import { applyWeaponVariation } from "./equipment/weaponVariation.js";
 import { getLegacyCandidateWeight, SUPPORT_CREATURE_IDS_BY_TYPE } from "./legacyEncounterPreferences.js";
+import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { createRng, pickWeighted } from "./random.js";
 import { createModificationPlan, getThreatParameters, THREAT_CHALLENGE_ORDER } from "./threatCreationRules.js";
 import { getTrapById, pickReplacementTrap } from "./traps.js";
@@ -540,7 +542,20 @@ function getMixedChallengePairs(catalog, targetChallenge, type, ecology) {
   }));
 }
 
-function resolveCreatureGroup(node, rng, catalog, ecology) {
+function groupFitsTacticalMap(node, layout, profileId, seed, entries, count) {
+  const items = entries.map(({ creature, quantity }) => getCreatureSummary(creature, quantity));
+  if (node.trap) items.push(getTrapSummary(node.trap));
+  const map = createNodeTacticalMap({
+    ...node, tacticalLayout: layout, resolvedEncounter: { seed, items }
+  }, undefined, { profileId });
+  const enemies = map.scene.pieces.filter(piece => piece.side === "enemy");
+  const area = layout?.enemyArea;
+  return enemies.length === count && (!area || enemies.every(piece =>
+    piece.x >= area.minX && piece.y >= area.minY &&
+    piece.x + piece.width - 1 <= area.maxX && piece.y + piece.height - 1 <= area.maxY));
+}
+
+function resolveCreatureGroup(node, rng, catalog, ecology, { profileId, seed, compositionSeed = seed, tacticalLayout } = {}) {
   if (!node.creature || !node.challenge || node.challenge.creatures <= 0) return [];
 
   const specificCreatureItems = resolveSpecificCreature(node, rng);
@@ -549,6 +564,19 @@ function resolveCreatureGroup(node, rng, catalog, ecology) {
   const targetChallenge = node.creature.targetChallenge ?? node.challenge.creatures;
   const terrainName = getTerrainName(node);
   const type = node.creature.type ?? null;
+  if (["dungeon-1-10", "forest-11-20", "archipelago-21-30"].includes(profileId) &&
+      node.creature.challengeSource !== "manual") {
+    const compositionRng = createRng(`${compositionSeed}:group-composition`);
+    if (compositionRng() < 0.45) {
+      const layout = tacticalLayout ?? node.tacticalLayout;
+      const canCheckMap = layout || profileId !== "archipelago-21-30";
+      const accepts = canCheckMap ? (entries, count) => groupFitsTacticalMap(node, layout, profileId, seed, entries, count) : null;
+      const group = pickEncounterGroupComposition({
+        catalog, target: targetChallenge, type, ecology, profileId, rng: compositionRng, accepts
+      });
+      if (group) return group.map(({ creature, quantity }) => getCreatureSummary(creature, quantity, rng));
+    }
+  }
   if (node.creature.allowMixedChallengePairs) {
     const pairs = getMixedChallengePairs(catalog, targetChallenge, type, ecology);
     if (pairs.length && rng() < 0.25) {
@@ -661,7 +689,7 @@ function getCreatureComposition(items) {
   return JSON.stringify([...counts.entries()].sort());
 }
 
-export function rerollNodeCreatures(node, profile) {
+export function rerollNodeCreatures(node, profile, { tacticalLayout } = {}) {
   if (!canRerollNodeCreatures(node)) return null;
 
   const encounter = node.resolvedEncounter;
@@ -683,7 +711,10 @@ export function rerollNodeCreatures(node, profile) {
   const reroll = (encounter.creatureRerolls || 0) + 1;
   const rng = createRng(`${encounter.seed}:creature-reroll:${reroll}`);
   for (let attempt = 0; attempt < 32; attempt++) {
-    const candidate = resolveCreatureGroup(searchNode, rng, catalog, ecology);
+    const candidate = resolveCreatureGroup(searchNode, rng, catalog, ecology, {
+      profileId: profile?.id, seed: encounter.seed, tacticalLayout,
+      compositionSeed: `${encounter.seed}:${reroll}:${attempt}`
+    });
     if (calculateCombatND(candidate) === challenge && getCreatureComposition(candidate) !== originalComposition) {
       return {
         ...encounter,
@@ -786,7 +817,7 @@ export function resolveForestAmbush(node, profile, { mapSeed } = {}) {
   assignCreatureProfile(ambushNode, profile, rng);
   const ecology = getNodeEcology(ambushNode, profile);
   const catalog = filterEncounterCatalog(ambushNode, getAllowedCatalog(ambushNode.creature?.allowedCreatureIds, profile), ecology);
-  const items = resolveCreatureGroup(ambushNode, rng, catalog, ecology);
+  const items = resolveCreatureGroup(ambushNode, rng, catalog, ecology, { profileId: profile.id, seed });
   if (items.length && calculateCombatND(items) === target) return createResolvedEncounter(ambushNode, items, seed);
 
   const creature = pickExactCreatureForChallenge({
@@ -800,7 +831,7 @@ export function resolveForestAmbush(node, profile, { mapSeed } = {}) {
   return creature ? createResolvedEncounter(ambushNode, [getCreatureSummary(creature, 1, rng)], seed) : null;
 }
 
-export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidates } = {}) {
+export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidates, tacticalLayout } = {}) {
   if (!node) return null;
   if (node.resolvedEncounter?.version === ENCOUNTER_RESOLUTION_VERSION) return node.resolvedEncounter;
   if (node.resolvedEncounter) node.resolvedEncounter = null;
@@ -816,7 +847,9 @@ export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidate
       ? creatureCandidates ?? getAllowedCatalog(node.creature.allowedCreatureIds, profile, node.creature.preferAllowedVariants)
       : [];
     const ecology = getNodeEcology(node, profile);
-    items = resolveCreatureGroup(node, rng, filterEncounterCatalog(node, catalog, ecology), ecology);
+    items = resolveCreatureGroup(node, rng, filterEncounterCatalog(node, catalog, ecology), ecology, {
+      profileId: profile?.id, seed, tacticalLayout
+    });
     if (node.trap) items.push(getTrapSummary(node.trap));
   }
   if (items.length === 0) return null;

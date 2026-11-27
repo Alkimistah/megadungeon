@@ -178,6 +178,26 @@ const layoutsByTheme = {
         ["difficult", 7, 6, 5, 2], ["obstacle", 13, 3, 2, 1]
       ]),
       enemyTiles: ["water", "current"]
+    },
+    byTask: {
+      "Recuperar as boias": layout("Boias encalhadas", "Os cabos prendem as boias à margem de pedra.", 9, 7, [
+        ["water", 0, 0, 20, 4], ["current", 5, 4, 7, 2], ["wet", 6, 6, 5, 3], ["obstacle", 8, 9, 3, 2]
+      ]),
+      "Passar pelo vão seco": layout("Marca do outro lado", "O vão mais estreito corta o espigão de pedra junto à poça.", 10, 6, [
+        ["wall", 6, 0, 2, 5], ["wall", 6, 8, 2, 6], ["water", 8, 8, 5, 4], ["obstacle", 10, 2, 3, 2]
+      ]),
+      "Instalar a linha de retorno": layout("Saliência de ancoragem", "Um banco de rocha liga as duas paredes acima do nível da água.", 9, 6, [
+        ["water", 4, 2, 7, 9], ["advantage", 4, 5, 7, 3], ["wet", 11, 5, 3, 3]
+      ]),
+      "Atravessar o refluxo": layout("Marco do refluxo", "O banco lateral cruza o canal durante o refluxo.", 10, 9, [
+        ["current", 6, 0, 4, 8], ["wet", 6, 8, 4, 3], ["water", 6, 11, 4, 3], ["wall", 10, 2, 2, 4]
+      ]),
+      "Fechar o desvio": layout("Roda auxiliar", "Um caminho de manutenção contorna o canal da roda.", 10, 6, [
+        ["current", 5, 2, 4, 7], ["wall", 10, 0, 1, 4], ["wall", 10, 8, 1, 6], ["water", 13, 0, 6, 4]
+      ]),
+      "Baixar o contrapeso": layout("Trava do contrapeso", "A trava fica na borda firme do poço, acima da água.", 9, 7, [
+        ["water", 5, 1, 7, 4], ["trench", 6, 2, 5, 2], ["advantage", 7, 5, 5, 4], ["obstacle", 8, 9, 3, 2]
+      ])
     }
   },
   volcanic: {
@@ -202,7 +222,27 @@ const layoutsByTheme = {
     center: layout("Pedestal do fragmento", "O fragmento repousa numa plataforma de basalto com dois acessos.", 15, 6, [
       ["lava", 9, 0, 3, 4], ["lava", 9, 9, 3, 5], ["advantage", 12, 4, 6, 5],
       ["obstacle", 14, 3, 2, 1], ["obstacle", 17, 9, 1, 2]
-    ])
+    ]),
+    byTask: {
+      "Recuperar os cabos": layout("Cabos soterrados", "A trilha seca passa ao sul dos bancos de cinza e chega aos cabos.", 8, 6, [
+        ["water", 0, 0, 20, 3], ["difficult", 2, 3, 5, 4], ["difficult", 9, 4, 4, 4], ["obstacle", 6, 9, 2, 2]
+      ]),
+      "Firmar a travessia": layout("Ancoragem de basalto", "Duas passagens contornam a fissura e chegam à saliência.", 10, 6, [
+        ["lava", 5, 5, 4, 4], ["lava", 6, 0, 2, 2], ["lava", 6, 12, 2, 2], ["advantage", 9, 4, 3, 4]
+      ]),
+      "Desviar o vapor": layout("Comporta de ventilação", "A comporta fica no corredor lateral, entre as zonas de vapor.", 9, 9, [
+        ["concealment", 4, 2, 5, 4], ["concealment", 6, 10, 6, 3], ["obstacle", 8, 6, 2, 2]
+      ]),
+      "Desobstruir a galeria": layout("Placa caída", "A saída fica junto à placa. As lâminas de obsidiana cortam as linhas de visão.", 9, 7, [
+        ["obstacle", 4, 0, 2, 5], ["obstacle", 7, 3, 2, 3], ["obstacle", 5, 8, 3, 4], ["obstacle", 9, 8, 2, 3]
+      ]),
+      "Resfriar a forja": layout("Válvula de resfriamento", "Duas rampas descem ao patamar da válvula.", 9, 7, [
+        ["advantage", 4, 2, 6, 3], ["slope", 5, 5, 2, 2], ["slope", 8, 5, 2, 2], ["lava", 6, 9, 5, 2]
+      ]),
+      "Acalmar o veio arcano": layout("Pedras do selo", "Dois acessos secos contornam a encosta que divide a aproximação ao veio.", 10, 8, [
+        ["steep-slope", 5, 5, 4, 4], ["lava", 9, 0, 2, 4], ["difficult", 8, 9, 4, 3]
+      ])
+    }
   },
   tropical: {
     ...tropicalLayouts,

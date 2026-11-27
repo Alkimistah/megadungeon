@@ -7,6 +7,7 @@ import { guardianPenalties } from "../src/archipelagoGuardianPenalties.js";
 import { withIslandTacticalLayout } from "../src/archipelagoTacticalMap.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
 import { calculateCombatND } from "../src/challenge.js";
+import { rerollNodeCreatures } from "../src/encounterResolver.js";
 import { creatureCatalog, getCreatureById } from "../src/creatureCatalog/index.js";
 import { withCreatureHealthChange } from "../src/encounterCreatureHealth.js";
 import { createIslandGuardian, createIslandPilotScene, createIslandSector, createIslandSectorCombat, reopenIslandSector } from "../src/archipelagoPilot.js";
@@ -562,6 +563,67 @@ test("composição sorteada do guardião pode ser inspecionada e fica estável a
   assert.deepEqual(island(restored).guardian.preview, preview);
   assert.ok(restored.startGuardian(floor));
   assert.deepEqual(island(restored).guardian.scene, preview);
+});
+
+test("a Vulcânica tem dois combates sorteáveis com plantas próprias e um teste estendido em cada setor", () => {
+  const island = { floor: 25, themeId: "volcanic" };
+  const maps = new Set();
+  for (let index = 0; index < 6; index++) {
+    const trial = createIslandSector(island, index, 0, 24);
+    assert.match(trial.description, /3 sucessos antes de 2 falhas/);
+    for (const variant of [1, 2]) {
+      const objective = createIslandSector(island, index, variant, 24);
+      assert.equal(objective.type, "combate");
+      const scene = createIslandSectorCombat(island, objective, productionProfile, "revisao-vulcanica");
+      assert.equal(calculateCombatND(scene.resolvedEncounter?.items), 7);
+      assert.equal(calculateCombatND(rerollNodeCreatures(scene, productionProfile)?.items), 7);
+      const tactical = withIslandTacticalLayout(scene, island.themeId, objective);
+      assert.ok(createNodeTacticalMap(tactical).landmark);
+      maps.add(JSON.stringify(tactical.tacticalLayout.zones));
+    }
+  }
+  assert.equal(maps.size, 12);
+});
+
+test("o Labirinto tem doze plantas de combate e ao menos doze fichas sorteáveis em ND 7", () => {
+  const island = { floor: 25, themeId: "sea-caves" };
+  const maps = new Set();
+  const seen = new Set();
+  let diverse = false;
+  let largeGroup = false;
+  for (let index = 0; index < 6; index++) {
+    const trial = createIslandSector(island, index, 0, 24);
+    assert.match(trial.description, /3 sucessos antes de 2 falhas/);
+    for (const variant of [1, 2]) {
+      const objective = createIslandSector(island, index, variant, 24);
+      assert.equal(objective.type, "combate");
+      for (let roll = 0; roll < 60; roll++) {
+        const scene = createIslandSectorCombat(island, objective, productionProfile, `revisao-labirinto-${roll}`);
+        const items = scene.resolvedEncounter?.items;
+        assert.equal(calculateCombatND(items), 7);
+        for (const item of items) seen.add(item.creatureId);
+        diverse ||= new Set(items.map(item => item.challengeRating)).size >= 3;
+        const count = items.reduce((total, item) => total + item.quantity, 0);
+        if (count > 6) {
+          largeGroup = true;
+          const map = createNodeTacticalMap(withIslandTacticalLayout(scene, island.themeId, objective));
+          assert.equal(map.scene.pieces.filter(piece => piece.side === "enemy").length, count);
+        }
+        if (roll === 0) {
+          assert.equal(calculateCombatND(rerollNodeCreatures(scene, productionProfile)?.items), 7);
+          const tactical = withIslandTacticalLayout(scene, island.themeId, objective);
+          assert.ok(createNodeTacticalMap(tactical).landmark);
+          maps.add(JSON.stringify(tactical.tacticalLayout.zones));
+        }
+      }
+    }
+  }
+  assert.equal(maps.size, 12);
+  assert.ok(diverse);
+  assert.ok(largeGroup);
+  for (const id of ["selako", "elfo-do-mar-pescador", "homem-piranha", "aquinne", "lacedon", "sahuagin-predador"]) {
+    assert.ok(seen.has(id), id);
+  }
 });
 
 test("o sorteio vulcânico usa as doze fichas regionais em encontros ND 7", () => {

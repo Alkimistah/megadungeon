@@ -1,6 +1,7 @@
 import { createArchipelagoFinalBoss } from "./archipelagoFinalBoss.js";
 import { asIslandTreasureEvent, rollIslandSectorTreasure } from "./archipelagoSectorTreasure.js";
 import { getIslandCreatureRules } from "./archipelagoCreatureRules.js";
+import { withIslandTacticalLayout } from "./archipelagoTacticalMap.js";
 import { canRerollNodeCreatures, rerollNodeCreatures } from "./encounterResolver.js";
 import { createRng, pick } from "./random.js";
 import { getGuardianPenalty, updateSavedGuardianVulnerabilities } from "./archipelagoGuardianPenalties.js";
@@ -132,6 +133,11 @@ function hydrateSessionIslands(profile, { islands: sessionIslands, visitedFloors
           if (island.outcomes?.[objective.id] && current.guardianBuff) {
             const { penaltyId, ...savedObjective } = objective;
             return { ...savedObjective, guardianBuffId: current.guardianBuffId, guardianBuff: current.guardianBuff, effect: current.effect };
+          }
+          // A revisão mudou as variantes 0 e 1; expedições importadas conservam a tarefa sorteada.
+          if (["volcanic", "sea-caves"].includes(island.themeId) && !island.outcomes?.[objective.id] &&
+              objective.title && objective.variant !== 2) {
+            return { ...current, ...objective };
           }
           return island.outcomes?.[objective.id]
             ? { ...objective, name: current.name, effect: objective.penaltyId ? getGuardianPenalty(objective.penaltyId, index).label : objective.effect }
@@ -292,7 +298,8 @@ export function createArchipelagoState(profile, rng = Math.random) {
     if (!canRerollNodeCreatures(scene)) return false;
     const creature = getIslandCreatureRules(island, objective, scene.creature);
     if (creature.allowedCreatureIds?.length === 0) return false;
-    const updated = rerollNodeCreatures({ ...scene, creature }, activeProfile);
+    const tacticalLayout = withIslandTacticalLayout(scene, island.themeId, objective).tacticalLayout;
+    const updated = rerollNodeCreatures({ ...scene, creature }, activeProfile, { tacticalLayout });
     if (!updated) return false;
     scene.resolvedEncounter = updated;
     scene.creature = creature;

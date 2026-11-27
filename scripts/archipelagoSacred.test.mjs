@@ -18,6 +18,27 @@ import { getArchipelagoMissionTheme } from "../src/missions/archipelagoMissionTh
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/archipelago-sessao-antes-sagrada.json", import.meta.url), "utf8"));
 const island = { floor: 25, themeId: "sacred" };
 const directions = ["NO", "NL", "O", "L", "SO", "SL"];
+
+test("a Ilha Sagrada sorteia ao menos doze fichas sem misturar os tipos exigidos pelas tarefas", () => {
+  const seen = new Set();
+  for (const index of directions.keys()) {
+    for (const variant of [1, 2]) {
+      const objective = createIslandSector(island, index, variant, 24);
+      for (let seed = 0; seed < 40; seed++) {
+        const scene = createIslandSectorCombat(island, objective, profile, `elenco-sagrado-${seed}`);
+        const { items } = scene.resolvedEncounter;
+        assert.equal(calculateCombatND(items), 7);
+        for (const item of items) {
+          assert.equal(item.type, objective.preferredType);
+          seen.add(item.creatureId);
+        }
+      }
+    }
+  }
+  assert.ok(seen.size >= 12);
+  for (const id of ["soldado-blindado", "shiradi", "unicornio", "dragonete", "ninfa"]) assert.ok(seen.has(id), id);
+});
+
 const ownTitles = [
   ["Cumprir o tabu do bosque", "Passar pela prova do guardião", "Defender o unicórnio ferido"],
   ["Passar pela muralha", "Derrubar o estandarte da pureza", "Abrir as gaiolas dos espíritos"],

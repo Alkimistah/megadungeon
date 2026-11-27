@@ -61,3 +61,10 @@ test("Prisma da Maré tem três focos distinguíveis, um marco e espaço para du
   assert.equal(guardians.length, 2);
   guardians.forEach(piece => assertFits(piece, layout.enemyArea));
 });
+
+test("o Tausideros começa na área dos guardiões do Prisma da Maré", () => {
+  const { layout, map } = createMap(undefined, "tausideros");
+  const guardians = map.scene.pieces.filter(piece => piece.side === "enemy");
+  assert.equal(guardians.length, 1);
+  assertFits(guardians[0], layout.enemyArea);
+});

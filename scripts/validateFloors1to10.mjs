@@ -73,6 +73,7 @@ function assertCumulativeCreatureLists() {
 
 function assertGeneratedCombatEncounters() {
   let checkedEncounters = 0;
+  let diverseGroups = 0;
 
   for (let floor = 1; floor <= 9; floor += 1) {
     const allowedIds = new Set(dungeon1to10Profile.creatureRules.allowedCreatureIdsByFloor[floor]);
@@ -85,7 +86,7 @@ function assertGeneratedCombatEncounters() {
         const node = createCombatNode(floor, categoryId, targetChallenge, seed);
 
         assignCreatureProfile(node, dungeon1to10Profile, createRng(`${seed}-profile`));
-        const encounter = resolveNodeEncounter(node, { mapSeed: seed });
+        const encounter = resolveNodeEncounter(node, { mapSeed: seed, profile: dungeon1to10Profile });
         const creatures = encounter?.items?.filter((item) => item.kind === "creature") || [];
 
         assert.ok(encounter, `Andar ${floor}, ${categoryId}, amostra ${sample}: encontro vazio`);
@@ -101,11 +102,13 @@ function assertGeneratedCombatEncounters() {
             `Andar ${floor}: criatura fora da lista ${creature.creatureId}`
           );
         });
+        if (creatures.length >= 3) diverseGroups += 1;
         checkedEncounters += 1;
       }
     }
   }
 
+  assert.ok(diverseGroups > 0, "O Labirinto precisa sortear grupos com três ou mais fichas.");
   return checkedEncounters;
 }
 

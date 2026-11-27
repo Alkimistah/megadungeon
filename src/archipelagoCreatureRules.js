@@ -18,7 +18,7 @@ const islandCreatures = {
   "pirate-held": ["pirata", "bando-pirata", "capitao-pirata", "imediato", "galokk-capanga",
     "ogro-cacador", "capitao-baluarte", "chefe-bandido", "chefe-bandido-livro-basico"],
   "sea-caves": [...coastAnimals, ...coastalHumanoids, "aquinne", "lacedon", "lula-gigante",
-    "homem-piranha-capitao", "sahuagin-predador"],
+    "homem-piranha-capitao", "sahuagin-predador", "tabrachi-campeao", "afogado"],
   volcanic: [
     "cao-do-inferno", "diabrete-explosivo", "soldado-mecanico", "salamandra-plebeia", "salamandra-guerreira",
     "uraghian-jovem", "dracomante", "mashin-samurai", "ninhada-de-dragoes-filhotes", "ganchador",
@@ -71,10 +71,10 @@ const islandCreatures = {
     "capanga", "jagunco", "lider-mercenario-de-aslothia", "gigante-das-colinas", "necromante"
   ],
   sacred: [
-    "pegaso", "unicornio", "dragonete", "ninfa", "protetor", "eiradaan-guardiao",
+    "pegaso", "unicornio", "dragonete", "ninfa", "protetor", "eiradaan-guardiao", "shiradi",
     "hipogrifo", "grifo", "coruja-gigante",
     "recruta-purista", "soldado-purista", "purificado", "sargento-mor", "capelao-de-guerra",
-    "arcano-de-guerra-adepto", "capitao-baluarte", "cacador-de-impuros", "bispo-de-guerra"
+    "arcano-de-guerra-adepto", "capitao-baluarte", "cacador-de-impuros", "bispo-de-guerra", "soldado-blindado"
   ],
   crystal: [
     "escorpiao-de-cristal", "ameba-gigante", "centopeia-dragao", "gargula-de-topiaria-grande", "gorgona",
@@ -83,7 +83,7 @@ const islandCreatures = {
   ],
   "abandoned-ship": [
     "livido", "ogro-esqueleto", "canceronte", "aparicao", "vampiro-neofito", "garra-zumbi-gigante", "ganchador",
-    "fantasma", "alma-acorrentada", "afogado", "guerreiro-perpetuo"
+    "fantasma", "alma-acorrentada", "afogado", "guerreiro-perpetuo", "mastim-das-sombras"
   ],
   "impossible-tide": [
     "canceronte", "sahuagin-metamorfo", "naiade", "nagah-guardiao", "homem-piranha-imediato",
@@ -105,7 +105,7 @@ export function getIslandCreatureRules(island, objective, rules) {
     ...rules,
     allowedCreatureIds,
     ...(island.themeId === "crystal" ? { preferAllowedVariants: true } : {}),
-    ...(crystalGallery || ["volcanic", "impossible-tide"].includes(island.themeId) ? { allowMixedChallengePairs: true } : {})
+    ...(crystalGallery || ["volcanic", "sea-caves", "sacred", "impossible-tide"].includes(island.themeId) ? { allowMixedChallengePairs: true } : {})
   };
 }
 
@@ -128,7 +128,9 @@ export function getOutOfPlaceCreatureIds(themeId) {
 // Estas fichas já tinham origem antes de entrar no elenco vulcânico.
 const existingOriginByCreatureId = new Map([
   ["soldado-mecanico", "cyclopean-ruins"],
-  ["ganchador", "ship-graveyard"]
+  ["ganchador", "ship-graveyard"],
+  ["tabrachi-campeao", "mangrove"],
+  ["afogado", "abandoned-ship"]
 ]);
 
 function findCreatureOriginThemeId(creatureId) {

@@ -74,11 +74,12 @@ export const crystalExploration = {
       creatures: [{ id: "golem-de-espelhos", quantity: 1 }]
     },
     {
+      // Expedições salvas usam este identificador para a segunda opção do Centro.
       id: "amebas-do-prisma",
-      name: "Amebas do Prisma",
-      briefing: "Duas amebas gigantes quase transparentes avançam pelos lados da passagem. As cores do chão mudam de forma e denunciam o movimento delas.",
-      rule: prismRule,
-      creatures: [{ id: "ameba-gigante", quantity: 2 }]
+      name: "Tausideros",
+      briefing: "O Tausideros raspa os cascos diante do prisma. Figuras de cristal cercam a passagem: são os intrusos que o guardião encontrou antes do grupo.",
+      rule: `${prismRule} Descreva a petrificação do Sopro Petrificante como cristalização. A condição e as formas de revertê-la seguem a ficha.`,
+      creatures: [{ id: "tausideros", quantity: 1 }]
     },
     {
       id: "centopeia-solar",
