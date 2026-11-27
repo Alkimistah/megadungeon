@@ -535,9 +535,11 @@ function encounterFitsMap(node, layout, profileId, seed, items, count, objective
     ...node, tacticalLayout: layout, resolvedEncounter: { seed, items }
   }, objectives, { profileId });
   const enemies = map.scene.pieces.filter(piece => piece.side === "enemy");
-  if (node.generationVersion === 5) {
-    const trapTiles = new Set(map.scene.markers.filter(marker =>
-      ["trap", "pit", "web", "mechanism"].includes(marker.type)).flatMap(marker => marker.indices));
+  const trapItem = items.find(item => item.kind === "trap");
+  if (node.generationVersion === 5 && trapItem) {
+    const trapTiles = new Set(map.scene.markers.filter(marker => marker.id === trapItem.trapId)
+      .flatMap(marker => marker.indices ?? []));
+    if (!trapTiles.size) return false;
     for (const enemy of enemies) {
       for (let y = enemy.y; y < enemy.y + enemy.height; y++) {
         for (let x = enemy.x; x < enemy.x + enemy.width; x++) {
@@ -598,7 +600,9 @@ export function resolveForestTrapNode(node, profile, { seed, tacticalLayout = no
         }
       }
     }
-    if (!required) return { trap, items: [], creatureTarget: 0 };
+    if (!required && encounterFitsMap({ ...node, trap }, tacticalLayout, profile.id, seed, [getTrapSummary(trap)], 0)) {
+      return { trap, items: [], creatureTarget: 0 };
+    }
   }
   return { trap: null, items: [], creatureTarget: 0 };
 }

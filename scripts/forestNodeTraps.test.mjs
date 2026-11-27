@@ -211,3 +211,30 @@ test("keeps the v5 incidental explanation after reroll and restoration", () => {
   assert.equal(node.trap.id, trap.id);
   assert.equal(node.trap.roleDescription, original);
 });
+
+const sealedArena = { zones: [{ x: 0, y: 0, width: 20, height: 14, tile: "wall" }] };
+
+test("generation rejects autonomous traps when no cell can hold the trap", () => {
+  const node = trapNode(0.25);
+  for (const tacticalLayout of [sealedArena, { ...sealedArena, landmark: { x: 2, y: 2, name: "Alavanca" } }]) {
+    assert.deepEqual(resolver.resolveForestTrapNode(node, profile, { seed: "a", tacticalLayout }),
+      { trap: null, items: [], creatureTarget: 0 });
+  }
+});
+
+test("reroll requires space for both the trap and every member of its escort", () => {
+  for (const escorted of [false, true]) {
+    const node = trapNode(escorted ? 0.5 : 0.25);
+    node.trap = { ...traps.getTrapById(escorted ? "fosso-profundo" : "fosso-camuflado"), role: "primary" };
+    const items = [{ kind: "trap", trapId: node.trap.id, role: "primary", quantity: 1 }];
+    const zones = [...sealedArena.zones];
+    if (escorted) {
+      items.unshift({ kind: "creature", creatureId: "goblin", quantity: 1 });
+      zones.push({ x: 12, y: 4, width: 1, height: 1, tile: "floor" });
+    }
+    node.resolvedEncounter = { seed: "a", items };
+    const before = structuredClone(node);
+    assert.equal(resolver.rerollNodeTrap(node, profile, { tacticalLayout: { zones } }), null);
+    assert.deepEqual(node, before);
+  }
+});

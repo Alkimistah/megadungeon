@@ -494,10 +494,10 @@ function buildEnvironmentScene(cells, node, layout, features) {
   return { terrain, terrainBase, features: features.filter(feature => feature.indices.length), markers };
 }
 
-function addChangedLayers(layers, before, cells, types, label) {
+function addChangedLayers(layers, before, cells, types, label, id) {
   const after = cells.flat();
   for (const type of types) {
-    addLayer(layers, type, after.flatMap((cell, index) => cell === type && before[index] !== type ? [index] : []), label);
+    addLayer(layers, type, after.flatMap((cell, index) => cell === type && before[index] !== type ? [index] : []), label, id);
   }
 }
 
@@ -562,11 +562,12 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
   const beforeTrap = cells.flat();
   const trapItem = node.resolvedEncounter?.items.find(item => item.kind === "trap");
   const trapLabel = getForestTrapPresentation(profileId, node, trapItem)?.name ?? node.trap?.name ?? trapItem?.name;
+  const trapMarkerId = node.generationVersion === 5 ? trapItem?.trapId : undefined;
   if (forestLayout?.trapPositions.length) {
-    addLayer(markers, "trap", forestLayout.trapPositions.map(([x, y]) => y * WIDTH + x), trapLabel);
+    addLayer(markers, "trap", forestLayout.trapPositions.map(([x, y]) => y * WIDTH + x), trapLabel, trapMarkerId);
   } else {
     placeTrapFeature(cells, node, rng);
-    addChangedLayers(markers, beforeTrap, cells, ["trap", "pit", "web", "mechanism"], trapLabel);
+    addChangedLayers(markers, beforeTrap, cells, ["trap", "pit", "web", "mechanism"], trapLabel, trapMarkerId);
   }
   const blockingFeatures = new Set(features.filter(feature => !WALKABLE_CELLS.has(feature.type))
     .flatMap(feature => feature.indices));
