@@ -143,6 +143,44 @@ export function calculateCombatND(items) {
   return Math.floor(total);
 }
 
+function getForestEnvironmentChallenge(challenge) {
+  return roundToQuarter((challenge.climate ?? 0) + (challenge.terrain ?? 0));
+}
+
+export function getForestChallengeParts(node) {
+  if (node.generationVersion !== 5 || !node.challenge) return null;
+
+  const { challenge } = node;
+  const items = node.resolvedEncounter?.items;
+  const environment = challenge.environment ?? getForestEnvironmentChallenge(challenge);
+  const creatures = items
+    ? calculateCombatND(items.filter(item => item.kind === "creature"))
+    : challenge.creatures ?? 0;
+  const trap = items
+    ? roundToQuarter(items
+      .filter(item => item.kind === "trap")
+      .reduce((total, item) => total + item.challengeRating * (item.quantity ?? 1), 0))
+    : node.trap?.challengeRating ?? challenge.trap ?? 0;
+
+  if (node.scene?.nd != null && creatures === 0 && trap === 0) return null;
+  return { environment, creatures, trap };
+}
+
+export function updateForestChallengeTotal(node, rules) {
+  if (node.generationVersion !== 5 || !node.challenge) return;
+
+  const { challenge } = node;
+  challenge.environment = getForestEnvironmentChallenge(challenge);
+  if (node.scene?.nd != null) return;
+
+  const creatures = challenge.creatures ?? 0;
+  const trap = node.trap?.challengeRating ?? challenge.trap ?? 0;
+  const special = [creatures, trap].find(isSpecialChallengeRating);
+  challenge.total = special ?? roundToQuarter(clamp(
+    challenge.environment + creatures + trap, rules.minimum, rules.maximum
+  ));
+}
+
 export function assignChallengeRating(node, floor, profile) {
   const rules = profile.challengeRules;
   const encounter = node.scene?.nd ?? getEncounterChallenge(node, floor, rules);

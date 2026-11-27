@@ -1,5 +1,5 @@
 import { DISCOVERY_MINUTES } from "./appState.js";
-import { formatChallengeRating, isSpecialChallengeRating } from "./challenge.js";
+import { formatChallengeRating, getForestChallengeParts, isSpecialChallengeRating } from "./challenge.js";
 import { createChimeraCombatControls } from "./chimeraCombatView.js";
 import { CREATURE_REINFORCEMENT_BONUSES, getCreatureReinforcement } from "./creatureReinforcement.js";
 import { createCreatureHealthControls } from "./encounterCreatureHealthView.js";
@@ -250,11 +250,30 @@ function createIconButton(className, icon, label, onClick) {
   return button;
 }
 
-function setNodeDialogMeta(element, checkText, explorationText, challengeText, challenge) {
+function formatForestChallengePart(label, challengeRating) {
+  const nd = formatChallengeRating(challengeRating)
+    .replace("1/4", "¼").replace("1/2", "½").replace("3/4", "¾");
+  const xp = Number.isFinite(challengeRating) ? ` · ${xpNumberFormat.format(challengeRating * 1000)}&nbsp;XP` : "";
+  return `<strong>${label}</strong> · ND ${nd}${xp}`;
+}
+
+function setNodeDialogMeta(element, checkText, explorationText, challenge, parts) {
+  const exploration = `<strong>Teste de descoberta:</strong> ${checkText} | <strong>Exploração:</strong> ${explorationText}`;
+  if (parts) {
+    const challengeParts = [
+      formatForestChallengePart("Ambiente", parts.environment),
+      formatForestChallengePart("Criaturas", parts.creatures),
+      formatForestChallengePart("Armadilha", parts.trap)
+    ];
+    element.innerHTML = [exploration, ...challengeParts].join(" | ");
+    return;
+  }
+
+  const challengeText = challenge ? `ND ${formatChallengeRating(challenge.total)}` : "Desconhecido";
   const xpText = challenge && Number.isFinite(challenge.encounter) && Number.isFinite(challenge.total)
     ? ` | Com clima e terreno: ${xpNumberFormat.format(challenge.total * 1000)} XP · Sem clima e terreno: ${xpNumberFormat.format(challenge.encounter * 1000)} XP`
     : "";
-  element.innerHTML = `<strong>Teste de descoberta:</strong> ${checkText} | <strong>Exploração:</strong> ${explorationText} | <strong>Desafio:</strong> ${challengeText}${xpText}`;
+  element.innerHTML = `${exploration} | <strong>Desafio:</strong> ${challengeText}${xpText}`;
 }
 
 function createDivider() {
@@ -1108,13 +1127,13 @@ export function createNodeDialogController({
       : node.skill && node.dc && !content.campUndecided ? `${node.skill} (CD ${node.dc})` : "Indisponível";
     const explorationText = `${node.investigationMinutes} min`;
     const challenge = nodeView.revealed && !content.campUndecided ? node.challenge : null;
-    const challengeText = challenge ? `ND ${formatChallengeRating(challenge.total)}` : "Desconhecido";
+    const challengeParts = challenge ? getForestChallengeParts(node) : null;
     const viewMode = getViewMode(node);
 
     currentNode = node;
     titleElement.textContent = `Encontro ${node.level}`;
     typeElement.textContent = content.label;
-    setNodeDialogMeta(metaElement, checkText, explorationText, challengeText, challenge);
+    setNodeDialogMeta(metaElement, checkText, explorationText, challenge, challengeParts);
     contentElement.innerHTML = "";
     const progress = getNodeProgressPresentation(node, nodeView);
     const progressNotice = document.createElement("p");

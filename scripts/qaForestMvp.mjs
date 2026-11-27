@@ -7,7 +7,7 @@ import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to2
 import { prepareForestExpedition, serializeForestExpedition } from "../src/forestExpedition.js";
 import { encodeSessionCode, decodeSessionCode } from "../src/sessionCode.js";
 import { formatElapsedTime } from "../src/format.js";
-import { calculateCombatND } from "../src/challenge.js";
+import { calculateCombatND, getForestChallengeParts } from "../src/challenge.js";
 import { getCreatureUnits } from "../src/encounterCreatureHealth.js";
 import { canRerollNodeCreatures, canRerollNodeTrap, resolveNodeEncounter } from "../src/encounterResolver.js";
 
@@ -197,8 +197,15 @@ async function missionFlow() {
       assert.equal(await dialog.locator("#nodeDialogMeta").innerText(), nd);
       reinforcedNodeId = node.id;
       const xp = new Intl.NumberFormat("pt-BR");
-      assert.match(await page.locator("#nodeDialogMeta").innerText(), new RegExp(`Com clima e terreno.*${xp.format(node.challenge.total * 1000)} XP`, "i"));
-      assert.match(await page.locator("#nodeDialogMeta").innerText(), new RegExp(`Sem clima e terreno.*${xp.format(node.challenge.encounter * 1000)} XP`, "i"));
+      if (node.generationVersion === 5) {
+        const encounter = resolveNodeEncounter({ ...node }, { profile, mapSeed: entry.mapSeed });
+        const parts = getForestChallengeParts({ ...node, resolvedEncounter: encounter });
+        assert.ok(nd.replaceAll("\u00a0", " ").includes(`· ${xp.format(parts.creatures * 1000)} XP`));
+        assert.doesNotMatch(nd, /(?:Com|Sem) clima e terreno/i);
+      } else {
+        assert.match(nd, new RegExp(`Com clima e terreno.*${xp.format(node.challenge.total * 1000)} XP`, "i"));
+        assert.match(nd, new RegExp(`Sem clima e terreno.*${xp.format(node.challenge.encounter * 1000)} XP`, "i"));
+      }
       await page.locator('[aria-label="Abrir mapa tático"]').click();
       assert.ok(await page.locator(".tactical-map-fullscreen .tactical-piece.is-enemy .tactical-marker.is-objective").count() > 0);
       await page.keyboard.press("Escape");
@@ -803,6 +810,45 @@ async function creatureHealthFlow() {
   console.log("PV individuais, adição, bloqueio da rerrolagem, encontro manual e restauração nos dois perfis: passaram.");
 }
 
+async function forestChallengeHeaderFlow() {
+  const expedition = prepareForestExpedition({
+    seed: "qa-forest-challenge-header", profile, startFloor: 15, depth: 5, missions: []
+  });
+  const entry = expedition.floors[0];
+  const node = entry.levels[0][0];
+  Object.assign(node, {
+    generationVersion: 5,
+    type: "unknown",
+    contentType: "normal",
+    requiresCompletion: true,
+    revealedLabel: "Encontro normal",
+    scene: null,
+    challenge: { encounter: 3, creatures: 3, trap: 1, climate: 0.25, terrain: 0.25, total: 4.5 },
+    fixedComposition: { creatures: [{ id: "naja", quantity: 2 }], traps: ["bloco-de-pedra"] },
+    resolvedEncounter: null
+  });
+  assert.equal(resolveNodeEncounter(node, { profile, mapSeed: entry.mapSeed }).items.length, 2);
+
+  const page = await pageFor(encodeSessionCode(sessionFor(expedition)));
+  const dialog = page.locator("#nodeDialog");
+  const meta = dialog.locator("#nodeDialogMeta");
+  await page.locator(".node").first().click();
+  await dialog.waitFor();
+  const hidden = await meta.innerText();
+  assert.match(hidden, /Desafio: Desconhecido/);
+  assert.doesNotMatch(hidden, /Ambiente|Criaturas|Armadilha|\bXP\b/i);
+  await dialog.locator(".route-choice").click();
+  const revealed = await meta.innerText();
+  assert.match(revealed, /Teste de descoberta:.*Exploração:/);
+  assert.match(revealed, /Ambiente · ND ½ · 500\sXP/);
+  assert.match(revealed, /Criaturas · ND 3 · 3\.000\sXP/);
+  assert.match(revealed, /Armadilha · ND 1 · 1\.000\sXP/);
+  assert.doesNotMatch(revealed, /(?:Com|Sem) clima e terreno/i);
+  assert.equal(revealed.match(/\bXP\b/g)?.length, 3);
+  await page.screenshot({ path: "tmp/forest-mvp-qa/challenge-header-v5.png", fullPage: true });
+  await page.close();
+}
+
 async function offlineFlow() {
   const page = await browser.newPage({ viewport: { width: 1024, height: 768 }, serviceWorkers: "allow" });
   page.on("pageerror", error => errors.push(error.message));
@@ -832,6 +878,7 @@ async function offlineFlow() {
 try {
   await newSelection(0);
   await newSelection(3);
+  await forestChallengeHeaderFlow();
   await missionFlow();
   await outdoorSceneFlow();
   await creatureHealthFlow();
