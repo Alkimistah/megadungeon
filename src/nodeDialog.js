@@ -995,14 +995,18 @@ export function createNodeDialogController({
     return actions;
   }
 
-  function createTacticalMapControl(node) {
-    if (!state.isNodeChosen(node)) return null;
-    const objectives = node.missionObjectives || (node.missionBindings || []).flatMap(binding => {
+  function getTacticalObjectives(node) {
+    return node.missionObjectives || (node.missionBindings || []).flatMap(binding => {
       const mission = getActiveMissions().find(item => item.id === binding.id);
       if (!mission?.objective) return [];
       const { targetType, targetId, targetName } = mission.objective;
       return [{ missionId: mission.id, targetType, targetId, targetName }];
     });
+  }
+
+  function createTacticalMapControl(node) {
+    if (!state.isNodeChosen(node)) return null;
+    const objectives = getTacticalObjectives(node);
     if (!canShowCombatPage(node) && !objectives.length) return null;
 
     return createIconButton(
@@ -1079,7 +1083,7 @@ export function createNodeDialogController({
       {
         kind: "trap",
         available: canRerollTrap(node),
-        run: onRerollTrap,
+        run: node => onRerollTrap(node, { tacticalLayout: node.tacticalLayout, objectives: getTacticalObjectives(node) }),
         label: "Rerrolar armadilha",
         success: "Armadilha atualizada com o mesmo ND.",
         failure: "Nenhuma outra armadilha com o mesmo ND foi encontrada."

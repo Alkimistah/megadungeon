@@ -12,7 +12,7 @@ import { getLegacyCandidateWeight, SUPPORT_CREATURE_IDS_BY_TYPE } from "./legacy
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { createRng, pickWeighted } from "./random.js";
 import { createModificationPlan, getThreatParameters, THREAT_CHALLENGE_ORDER } from "./threatCreationRules.js";
-import { getTrapById, pickReplacementTrap } from "./traps.js";
+import { getEligibleForestTraps, getForestEscortTarget, getTrapById, pickReplacementTrap, pickWeightedTrap, withTrapRole } from "./traps.js";
 
 const ENCOUNTER_RESOLUTION_VERSION = 9;
 
@@ -527,14 +527,80 @@ function getMixedChallengePairs(catalog, targetChallenge, type, ecology) {
 function groupFitsTacticalMap(node, layout, profileId, seed, entries, count) {
   const items = entries.map(({ creature, quantity }) => getCreatureSummary(creature, quantity));
   if (node.trap) items.push(getTrapSummary(node.trap));
+  return encounterFitsMap(node, layout, profileId, seed, items, count);
+}
+
+function encounterFitsMap(node, layout, profileId, seed, items, count, objectives) {
   const map = createNodeTacticalMap({
     ...node, tacticalLayout: layout, resolvedEncounter: { seed, items }
-  }, undefined, { profileId });
+  }, objectives, { profileId });
   const enemies = map.scene.pieces.filter(piece => piece.side === "enemy");
+  if (node.generationVersion === 5) {
+    const trapTiles = new Set(map.scene.markers.filter(marker =>
+      ["trap", "pit", "web", "mechanism"].includes(marker.type)).flatMap(marker => marker.indices));
+    for (const enemy of enemies) {
+      for (let y = enemy.y; y < enemy.y + enemy.height; y++) {
+        for (let x = enemy.x; x < enemy.x + enemy.width; x++) {
+          if (trapTiles.has(y * map.scene.width + x)) return false;
+        }
+      }
+    }
+  }
   const area = layout?.enemyArea;
   return enemies.length === count && (!area || enemies.every(piece =>
     piece.x >= area.minX && piece.y >= area.minY &&
     piece.x + piece.width - 1 <= area.maxX && piece.y + piece.height - 1 <= area.maxY));
+}
+
+function getEscortGroups(catalog, target, ecology) {
+  const groups = catalog.flatMap(creature => {
+    const options = [];
+    for (let quantity = 1; quantity <= 12; quantity++) {
+      const item = getCreatureSummary(creature, quantity);
+      const rating = calculateCombatND([item]);
+      if (rating > target) break;
+      if (rating !== target || !canUseEcologyQuantity(creature, quantity)) continue;
+      const weight = ecology ? getCreatureEcologyWeight(creature, ecology.context, ecology.rules, "humanoid")
+        * getEcologyGroupWeight(creature, quantity) : 1;
+      options.push({ items: [item], count: quantity, weight });
+    }
+    return options;
+  });
+  for (const { pair, weight } of getMixedChallengePairs(catalog, target, "humanoid", ecology)) {
+    groups.push({ items: pair.map(creature => getCreatureSummary(creature, 1)), count: 2, weight });
+  }
+  return groups;
+}
+
+export function resolveForestTrapNode(node, profile, { seed, tacticalLayout = node.tacticalLayout }) {
+  const rng = createRng(seed);
+  const maximumChallenge = node.challenge.encounter;
+  const candidates = getEligibleForestTraps(profile, { maximumChallenge });
+  const ecology = getNodeEcology(node, profile);
+  const rules = profile.creatureRules;
+  const catalog = filterEncounterCatalog(node, getAllowedCatalog(
+    rules.allowedCreatureIdsByFloor?.[node.level] ?? rules.allowedCreatureIds, profile
+  ), ecology).filter(creature => creature.type === "humanoid");
+  while (candidates.length) {
+    const selected = pickWeightedTrap(candidates, maximumChallenge, rng);
+    candidates.splice(candidates.indexOf(selected), 1);
+    const trap = withTrapRole(selected, "primary", maximumChallenge);
+    const required = trap.mode === "requiresEscort";
+    const target = getForestEscortTarget(trap.challengeRating);
+    if (target && (required || rng() < 0.25)) {
+      const groups = getEscortGroups(catalog, target, ecology);
+      while (groups.length) {
+        const group = pickEcologyWeighted(rng, groups);
+        groups.splice(groups.indexOf(group), 1);
+        const items = [...group.items, getTrapSummary(trap)];
+        if (encounterFitsMap({ ...node, trap }, tacticalLayout, profile.id, seed, items, group.count)) {
+          return { trap, items: group.items, creatureTarget: target };
+        }
+      }
+    }
+    if (!required) return { trap, items: [], creatureTarget: 0 };
+  }
+  return { trap: null, items: [], creatureTarget: 0 };
 }
 
 function resolveCreatureGroup(node, rng, catalog, ecology, { profileId, seed, compositionSeed = seed, tacticalLayout } = {}) {
@@ -646,7 +712,8 @@ function resolveCreatureGroup(node, rng, catalog, ecology, { profileId, seed, co
   return refineEncounterGroup(rawItems, targetChallenge, type, terrainName, rng, catalog, ecology);
 }
 
-function getEncounterSeed(node, mapSeed) {
+export function getEncounterSeed(node, mapSeed) {
+  if (node.generationVersion === 5 && node.forestComposition?.seed) return node.forestComposition.seed;
   return `${mapSeed || "map"}:${node.encounterSeed || node.id}:encounter-v${ENCOUNTER_RESOLUTION_VERSION}`;
 }
 
@@ -724,12 +791,29 @@ export function canRerollNodeTrap(node) {
     && !node.fixedTacticalMap);
 }
 
-export function rerollNodeTrap(node, profile) {
+export function rerollNodeTrap(node, profile, { tacticalLayout = node?.tacticalLayout, objectives } = {}) {
   if (!canRerollNodeTrap(node)) return null;
 
   const current = node.resolvedEncounter;
   const trapRerolls = (current.trapRerolls || 0) + 1;
   const rng = createRng(`${current.seed}:trap-reroll:${trapRerolls}`);
+  if (node.generationVersion === 5 && profile.id === "forest-11-20") {
+    const count = current.items.filter(item => item.kind === "creature").reduce((sum, item) => sum + item.quantity, 0);
+    const mode = count ? undefined : "standalone";
+    const candidates = getEligibleForestTraps(profile, { maximumChallenge: node.trap.challengeRating, mode })
+      .filter(candidate => candidate.challengeRating === node.trap.challengeRating && candidate.id !== node.trap.id);
+    while (candidates.length) {
+      const candidate = pickWeightedTrap(candidates, node.trap.challengeRating, rng);
+      candidates.splice(candidates.indexOf(candidate), 1);
+      const trap = withTrapRole(candidate, node.trap.role, node.trap.targetChallenge ?? node.trap.challengeRating);
+      trap.roleDescription = node.trap.roleDescription ?? trap.roleDescription;
+      const items = current.items.map(item => isNodeTrap(item, node.trap) ? getTrapSummary(trap) : item);
+      if (encounterFitsMap({ ...node, trap }, tacticalLayout, profile.id, current.seed, items, count, objectives)) {
+        return { trap, encounter: { ...current, trapRerolls, items } };
+      }
+    }
+    return null;
+  }
   const trap = pickReplacementTrap(node.trap, profile, rng);
   if (!trap) return null;
 
@@ -829,6 +913,9 @@ export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidate
   let items;
   if (node.fixedComposition) {
     items = resolveFixedComposition(node.fixedComposition, rng);
+  } else if (node.generationVersion === 5 && node.forestComposition && node.creature?.challengeSource !== "manual") {
+    items = resolveFixedComposition(node.forestComposition, rng);
+    if (node.trap) items.push(getTrapSummary(node.trap));
   } else {
     const catalog = node.creature
       ? creatureCandidates ?? getAllowedCatalog(node.creature.allowedCreatureIds, profile, node.creature.preferAllowedVariants)

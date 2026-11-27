@@ -664,7 +664,7 @@ function getTrapWeight(trapEntry, targetChallenge) {
   return 1;
 }
 
-function pickWeightedTrap(candidates, targetChallenge, rng) {
+export function pickWeightedTrap(candidates, targetChallenge, rng) {
   if (!candidates.length) return null;
 
   return pickWeighted(rng, candidates.map(trapEntry => ({
@@ -686,6 +686,10 @@ function pickTrapForChallenge(targetChallenge, rules, rng) {
     allowedSources.includes(trapEntry.source.id)
   );
   return pickWeightedTrap(candidates.length > 0 ? candidates : fallbackCandidates, targetChallenge, rng);
+}
+
+export function getForestEscortTarget(challenge) {
+  return ({ 0.5: 0.25, 0.75: 0.25, 1: 0.5, 2: 1, 3: 1, 4: 2, 5: 3 })[challenge] ?? 0;
 }
 
 export function getEligibleForestTraps(profile, { maximumChallenge = Infinity, mode } = {}) {
@@ -722,7 +726,7 @@ export function pickReplacementTrap(trapEntry, profile, rng) {
     : null;
 }
 
-function withTrapRole(trapEntry, role, targetChallenge) {
+export function withTrapRole(trapEntry, role, targetChallenge) {
   return {
     ...trapEntry,
     role,
@@ -733,6 +737,8 @@ function withTrapRole(trapEntry, role, targetChallenge) {
   };
 }
 
+const forestIncidentalDescription = "A armadilha acompanha o combate normal, que mantém o ND das criaturas do andar.";
+
 export function syncRerolledTrapProfile(node) {
   if (!node.resolvedEncounter?.trapRerolls) return;
   const item = node.resolvedEncounter.items.find(entry =>
@@ -740,6 +746,9 @@ export function syncRerolledTrapProfile(node) {
   const trapEntry = item && getTrapById(item.trapId);
   if (trapEntry) {
     node.trap = withTrapRole(trapEntry, item.role, node.trap?.targetChallenge ?? item.challengeRating);
+    if (node.generationVersion === 5 && item.role === "incidental" && (node.contentType ?? node.type) === "normal") {
+      node.trap.roleDescription = forestIncidentalDescription;
+    }
   }
 }
 
@@ -756,7 +765,7 @@ export function assignForestNormalTrap(node, profile, rng) {
 
   node.trap = selectedTrap ? withTrapRole(selectedTrap, "incidental", ceiling) : null;
   if (node.trap) {
-    node.trap.roleDescription = "A armadilha acompanha o combate normal, que mantém o ND das criaturas do andar.";
+    node.trap.roleDescription = forestIncidentalDescription;
   }
 
   challenge.creatures = challenge.encounter;

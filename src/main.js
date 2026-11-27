@@ -357,9 +357,9 @@ const nodeDialogController = createNodeDialogController({
     refreshExplorationDisplay();
     return true;
   },
-  onRerollTrap: (node) => {
+  onRerollTrap: (node, context) => {
     if (!isPendingForestEncounter(node)) return false;
-    const updated = rerollNodeTrap(node, activeFloorRange);
+    const updated = rerollNodeTrap(node, activeFloorRange, context);
     if (!updated) return false;
     node.trap = updated.trap;
     node.resolvedEncounter = updated.encounter;

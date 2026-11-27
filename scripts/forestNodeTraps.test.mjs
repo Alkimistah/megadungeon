@@ -1,6 +1,7 @@
+import * as resolver from "../src/encounterResolver.js";
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getForestChallengeParts } from "../src/challenge.js";
+import { calculateCombatND, getForestChallengeParts } from "../src/challenge.js";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { generateMapData } from "../src/generator.js";
 import { createRng } from "../src/random.js";
@@ -89,4 +90,124 @@ test("uses the v5 marker only when that version is requested for a forest", () =
   }
   const otherProfile = { ...profile, id: "other-profile" };
   assert.ok(generate(otherProfile, 11, { version: 5 }).every(node => node.generationVersion === undefined));
+});
+
+
+const trapNode = encounter => ({
+  id: "T", encounterSeed: "11:T", type: "trap", generationVersion: 5,
+  challenge: { encounter }, environment: { terrain: { name: "Floresta" } }
+});
+
+test("targets the escort from the selected trap rating", () => {
+  assert.deepEqual([0.25, 0.5, 0.75, 1, 2, 3, 4, 5].map(traps.getForestEscortTarget),
+    [0, 0.25, 0.25, 0.5, 1, 1, 2, 3]);
+});
+
+test("resolves a reproducible ND 1 humanoid escort for an ND 3 trap", () => {
+  const node = trapNode(3);
+  for (let i = 0; i < 128; i++) {
+    const options = { seed: String(i) };
+    const result = resolver.resolveForestTrapNode(node, profile, options);
+    if (result.trap.challengeRating !== 3 || !result.items.length) continue;
+    assert.equal(calculateCombatND(result.items), 1);
+    assert.ok(result.items.every(item => item.type === "humanoid"));
+    assert.deepEqual(result, resolver.resolveForestTrapNode(node, profile, options));
+    return;
+  }
+  assert.fail("faltou armadilha ND 3 escoltada");
+});
+
+test("without eligible escorts, mandatory traps are replaced and optional traps remain alone", () => {
+  const restricted = { ...profile, creatureRules: { ...profile.creatureRules, allowedCreatureIds: ["missing"] } };
+  for (const [seed, mode] of [["1", "requiresEscort"], ["6", "standalone"]]) {
+    const original = resolver.resolveForestTrapNode(trapNode(3), profile, { seed });
+    assert.equal(original.trap.mode, mode);
+    assert.ok(original.items.length);
+    const fallback = resolver.resolveForestTrapNode(trapNode(3), restricted, { seed });
+    assert.equal(fallback.items.length, 0);
+    assert.equal(fallback.trap.id === original.trap.id, mode === "standalone");
+  }
+  for (const target of [0.25, 3]) {
+    for (let i = 0; i < 32; i++) {
+      const result = resolver.resolveForestTrapNode(trapNode(target), restricted, { seed: String(i) });
+      assert.equal(result.trap.mode, "standalone");
+      assert.ok(result.trap.challengeRating <= target);
+      assert.equal(result.creatureTarget, 0);
+      assert.deepEqual(result.items, []);
+    }
+  }
+});
+
+test("reroll keeps solitary traps autonomous and rejects a replacement when its escort cannot fit", () => {
+  const node = trapNode(0.25);
+  node.trap = { ...traps.getTrapById("fosso-camuflado"), role: "primary" };
+  node.resolvedEncounter = { seed: "reroll", items: [{ kind: "trap", role: "primary", trapId: node.trap.id }] };
+  const result = resolver.rerollNodeTrap(node, profile);
+  assert.ok(!result || result.trap.mode === "standalone");
+  const cageOnly = { ...profile, trapRules: { sources: ["ameacasArton"] } };
+  const solitary = trapNode(0.5);
+  solitary.trap = { ...traps.getTrapById("fosso-profundo"), role: "primary" };
+  solitary.resolvedEncounter = { seed: "solitary", items: [{ kind: "trap", role: "primary", trapId: solitary.trap.id }] };
+  assert.equal(resolver.rerollNodeTrap(solitary, cageOnly), null);
+  node.resolvedEncounter.items.push({ kind: "creature", creatureId: "goblin", quantity: 10 });
+  const before = structuredClone(node);
+  const tacticalLayout = { zones: [], enemyArea: { minX: 12, maxX: 12, minY: 4, maxY: 4 } };
+  assert.equal(resolver.rerollNodeTrap(node, profile, { tacticalLayout }), null);
+  assert.deepEqual(node, before);
+});
+
+test("keeps an existing escort when switching a cage to an autonomous trap", () => {
+  const node = trapNode(0.5);
+  node.trap = { ...traps.getTrapById("armadilha-de-gaiola"), role: "primary" };
+  node.resolvedEncounter = { seed: "cage", items: [
+    { kind: "creature", creatureId: "goblin", quantity: 1 },
+    { kind: "trap", trapId: node.trap.id, role: "primary" }
+  ] };
+  const result = resolver.rerollNodeTrap(node, profile);
+  assert.equal(result.trap.mode, "standalone");
+  assert.deepEqual(result.encounter.items[0], node.resolvedEncounter.items[0]);
+});
+
+test("preserves the encounter when both replacement traps occupy the crossing held by creatures", () => {
+  const node = trapNode(1);
+  node.encounterSeed = "14";
+  node.environment = { terrain: { name: "Colinas", features: [{ name: "Penhasco" }] } };
+  node.trap = { ...traps.getTrapById("runa-de-aceleracao"), role: "primary" };
+  node.resolvedEncounter = { seed: "14", items: [
+    { kind: "creature", creatureId: "jiboia", quantity: 8 },
+    { kind: "trap", trapId: node.trap.id, role: "primary", quantity: 1 }
+  ] };
+  const before = structuredClone(node);
+  assert.equal(resolver.rerollNodeTrap(node, profile), null);
+  assert.deepEqual(node, before);
+});
+
+test("resolves the stored procedural escort with the seed validated during generation", () => {
+  const nodes = generateMapData(8, 20, profile, 15, createRng("identity0"), { version: 5, mapSeed: "identity0" }).flat();
+  const node = nodes.find(node => node.contentType === "trap" && node.forestComposition?.creatures.length);
+  assert.ok(node);
+  const restored = structuredClone(node);
+  const encounter = resolver.resolveNodeEncounter(restored, { profile, mapSeed: "other" });
+  assert.equal(encounter.seed, node.forestComposition.seed);
+  assert.ok(node.encounterSeed.startsWith("15:"));
+  const creatures = encounter.items.filter(item => item.kind === "creature");
+  assert.equal(calculateCombatND(creatures), node.creature.targetChallenge);
+  assert.deepEqual(creatures.map(item => ({ id: item.creatureId, quantity: item.quantity })), node.forestComposition.creatures);
+  assert.equal(node.fixedComposition, undefined);
+});
+
+test("keeps the v5 incidental explanation after reroll and restoration", () => {
+  const node = normalNode();
+  traps.assignForestNormalTrap(node, profile, () => 0);
+  const original = node.trap.roleDescription;
+  node.resolvedEncounter = { seed: "incidental", items: [
+    { kind: "trap", role: "incidental", trapId: node.trap.id, quantity: 1 },
+    { kind: "creature", creatureId: "goblin", quantity: 1 }
+  ] };
+  const { trap, encounter } = resolver.rerollNodeTrap(node, profile);
+  assert.equal(trap.roleDescription, original);
+  node.resolvedEncounter = encounter;
+  traps.syncRerolledTrapProfile(node);
+  assert.equal(node.trap.id, trap.id);
+  assert.equal(node.trap.roleDescription, original);
 });

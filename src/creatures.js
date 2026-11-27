@@ -48,6 +48,7 @@ const NON_CREATURE_ROOM_TYPES = new Set(["camp", "trap", "treasure"]);
 const NON_CREATURE_UNKNOWN_LABELS = new Set(["Acampamento", "Armadilha", "Tesouro"]);
 
 function hasCreatureProfile(node) {
+  if (node.generationVersion === 5 && node.forestComposition?.variant === "trap") return node.challenge.creatures > 0;
   if (NON_CREATURE_ROOM_TYPES.has(node.type)) return false;
   if (node.type === "unknown" && NON_CREATURE_UNKNOWN_LABELS.has(node.revealedLabel)) return false;
   if (node.challenge?.creatures === 0) return false;
@@ -125,7 +126,8 @@ export function assignCreatureProfile(node, profile, rng) {
 
   const rules = getCreatureRules(profile);
   const specificCreature = getSpecificCreature(node, rules);
-  const typeOption = specificCreature ? { type: specificCreature.type } : pickWeighted(rng, getWeightedCreatureTypes(node, rules));
+  const prescribedType = specificCreature?.type ?? (node.forestComposition?.variant === "trap" ? "humanoid" : null);
+  const typeOption = prescribedType ? { type: prescribedType } : pickWeighted(rng, getWeightedCreatureTypes(node, rules));
   const type = CREATURE_TYPES[typeOption.type] || CREATURE_TYPES.monster;
   const targetChallenge = specificCreature?.challengeRating ?? getChallengeSource(node, rules);
   const allowedCreatureIds = getAllowedCreatureIds(node, rules);

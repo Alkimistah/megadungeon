@@ -1,4 +1,5 @@
-import { assignChallengeRating } from "./challenge.js";
+import { getEncounterSeed, resolveForestTrapNode } from "./encounterResolver.js";
+import { assignChallengeRating, formatChallengeRating, updateForestChallengeTotal } from "./challenge.js";
 import { assignCreatureProfile } from "./creatures.js";
 import { assignForestNormalTrap, assignTrapProfile } from "./traps.js";
 import { generateEnvironmentContext } from "./environment.js";
@@ -103,10 +104,23 @@ function assignChallengeRatings(levels, profile, floor) {
   });
 }
 
-function assignTrapProfiles(levels, profile, rng) {
+function assignTrapProfiles(levels, profile, rng, mapSeed) {
   levels.flat().forEach((node) => {
     if (node.generationVersion === 5 && node.type === "normal") {
       assignForestNormalTrap(node, profile, rng);
+    } else if (node.generationVersion === 5 && node.type === "trap") {
+      const seed = getEncounterSeed(node, mapSeed ?? String(rng()));
+      const { trap, items, creatureTarget } = resolveForestTrapNode(node, profile, { seed });
+      node.trap = trap;
+      node.forestComposition = {
+        variant: "trap", seed, creatures: items.map(({ creatureId, quantity }) => ({ id: creatureId, quantity }))
+      };
+      node.challenge.trap = trap?.challengeRating ?? 0;
+      node.challenge.creatures = creatureTarget;
+      const parts = [`ND ${formatChallengeRating(node.challenge.trap)} em armadilha`];
+      if (creatureTarget) parts.push(`ND ${formatChallengeRating(creatureTarget)} em criaturas`);
+      node.challenge.encounterBudgetLabel = parts.join(" + ");
+      updateForestChallengeTotal(node, profile.challengeRules);
     } else {
       assignTrapProfile(node, profile, rng);
     }
@@ -471,7 +485,7 @@ function convertMergedPathsToUnknown(levels) {
   }
 }
 
-export function generateMapData(depth, baseDC, floorProfile, floor, rng = Math.random, { version = 1 } = {}) {
+export function generateMapData(depth, baseDC, floorProfile, floor, rng = Math.random, { version = 1, mapSeed } = {}) {
   const weights = version >= 3 ? floorProfile.encounterRules.expeditionRoomTypeWeights : null;
   const profile = weights ? {
     ...floorProfile,
@@ -505,7 +519,10 @@ export function generateMapData(depth, baseDC, floorProfile, floor, rng = Math.r
       }
       node.type = node.contentType;
       node.requiresCompletion = true;
-      if (version === 5 && profile.id === "forest-11-20") node.generationVersion = version;
+      if (version === 5 && profile.id === "forest-11-20") {
+        node.generationVersion = version;
+        node.encounterSeed = `${floor}:${node.encounterSeed}`;
+      }
     });
   }
   if (version >= 4 && profile.id === "forest-11-20") {
@@ -520,7 +537,7 @@ export function generateMapData(depth, baseDC, floorProfile, floor, rng = Math.r
     }
   }
   assignChallengeRatings(levels, profile, floor);
-  assignTrapProfiles(levels, profile, rng);
+  assignTrapProfiles(levels, profile, rng, mapSeed);
   assignCreatureProfiles(levels, profile, rng);
   assignDiscoveryChecks(levels, baseDC, rng);
   assignInvestigationTimes(levels, profile, version);
