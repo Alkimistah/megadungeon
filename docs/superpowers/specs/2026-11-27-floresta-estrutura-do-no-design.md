@@ -1,6 +1,6 @@
 # Floresta (11–20): estrutura do nó — rascunho
 
-Situação: em brainstorming com o PO, ainda não aprovado. É o primeiro de quatro trabalhos da floresta, na ordem que o PO aprovou: (1) estrutura do nó, (2) harmonia dos animais, (3) cenas de tesouro, (4) outros tipos de criatura.
+Situação: o PO escolheu a abordagem A em 27/11/2026. Falta escrever o design completo a partir deste rascunho, passar pela revisão de um construtor e pedir a aprovação do PO antes do plano. É o primeiro de quatro trabalhos da floresta, na ordem que o PO aprovou: (1) estrutura do nó, (2) harmonia dos animais, (3) cenas de tesouro, (4) outros tipos de criatura.
 
 ## Decisões do PO (27/11/2026)
 - **Três fontes de ND/XP separadas no cabeçalho do nó: ambiente (terreno e clima), criaturas e armadilha.** Hoje o cabeçalho mostra duas. O ambiente não consome o orçamento das criaturas. Ele dá XP a mais quando pesou no desafio.
@@ -10,7 +10,7 @@ Situação: em brainstorming com o PO, ainda não aprovado. É o primeiro de qua
 - **Combate normal com armadilha:** acontece em alguns combates, perto de 1 em 5 (proposta do gerente; hoje é 6%). A armadilha tem ND reduzido e **não consome** o ND das criaturas. Qualquer criatura pode estar na cena, porque o caçador pode ter deixado a armadilha e ido embora, ou o chão da toca cede.
 - Aprovado o fim da subtração linear (encontro − armadilha) que gerava os ND fracionários.
 
-## Abordagem proposta (aguarda escolha do PO)
+## Abordagem escolhida pelo PO: A
 **A (recomendada).** Evoluir o pipeline atual:
 - `challenge` ganha três parcelas;
 - `assignTrapProfile` deixa de subtrair;
@@ -21,7 +21,7 @@ Situação: em brainstorming com o PO, ainda não aprovado. É o primeiro de qua
 
 **B.** Uma camada nova de "receita do nó" só para a floresta. É mais limpa, porém com mais código e mais risco.
 
-O PO perguntou se a A é simples. Resposta: é média, com umas 5 tarefas. Na próxima sessão, confirmar a abordagem, escrever o design completo e passar ao plano.
+A A é um trabalho médio, de umas 5 tarefas: as três parcelas do ND com o cabeçalho, o modo das armadilhas com a revisão em cartões, o nó de armadilha com inimigos, a armadilha no combate normal e o elite com criatura forte. Na próxima sessão, escrever o design completo e seguir para o plano.
 
 ## Contexto medido (27/11/2026)
 - **ND fracionários:** vinham da armadilha incidental subtraída das criaturas, e não do clima.
