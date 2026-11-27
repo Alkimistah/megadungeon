@@ -85,7 +85,7 @@ test("combates de setor dos náufragos fecham ND 6 só com o elenco da ilha", ()
 test("guardiões dos náufragos somam ND 8 e a criatura principal tem penalidades suficientes", () => {
   const objectives = [0, 1, 2, 3].map(sector => createIslandSector(island, sector, 0, 22));
   const full = { ...island, baseChallenge: 8, objectives, outcomes: Object.fromEntries(objectives.map(({ id }) => [id, "failure"])) };
-  const mains = ["legionario-insano", "cavaleiro-desonrado", "afogado"];
+  const mains = ["legionario-insano", "cavaleiro-desonrado", "primeiro-naufrago"];
   for (const index of [0, 1, 2]) {
     const guardian = createIslandGuardian(full, index, profile, "centro");
     assert.equal(guardian.resolvedEncounter.budget.creatures, 8, `guardião ${index}`);
@@ -194,7 +194,7 @@ test("o acampamento tem dois combates", () => {
   assert.deepEqual(titles, ["Romper o cerco às barracas", "Libertar os cativos da paliçada"]);
 });
 
-const lensRule = "Lente do farol: uma personagem adjacente à lente pode gastar uma ação padrão para apontar o facho para a aparição, se ela estiver em linha de visão. Até o fim do próximo turno da aparição, ela conta como exposta à luz do dia e fica debilitada (Vulnerabilidade à Luz do Dia). A ação pode ser repetida nas rodadas seguintes.";
+const lensRule = "Lente do farol: uma personagem adjacente à lente pode gastar uma ação padrão para apontar o facho para o náufrago, se ele estiver em linha de visão. Até o fim do próximo turno dele, a luz que faltou na noite do naufrágio o deixa debilitado. A ação pode ser repetida nas rodadas seguintes.";
 
 function fullIsland(base) {
   const objectives = [0, 1, 2, 3].map(sector => createIslandSector(base, sector, 0, 22));

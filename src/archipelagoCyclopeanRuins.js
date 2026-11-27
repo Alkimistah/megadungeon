@@ -63,7 +63,7 @@ export const cyclopeanRuinsExploration = {
   ],
   guardians: [
     { id: "gigante-do-trono", name: "O Gigante do Trono", briefing: "Sentado no trono do centro, um gigante dos mares bebe de um barril do tamanho de um bote. Ele se levanta devagar, irritado com a visita, e a água escorre da barba até os joelhos.", creatures: [{ id: "gigante-dos-mares", quantity: 1 }] },
-    { id: "senhora-das-estatuas", name: "A Senhora das Estátuas", briefing: "As estátuas do centro olham todas para o mesmo ponto. Uma górgona sai de trás do trono, e o maior dos guardiões de pedra dá o primeiro passo em séculos.", creatures: [{ id: "gorgona", quantity: 1 }, { id: "defensor-rochoso", quantity: 1 }] },
+    { id: "senhora-das-estatuas", name: "A Senhora das Estátuas", briefing: "As estátuas olham todas para o mesmo ponto. A górgona sai de trás da maior delas com o arco já armado.", creatures: [{ id: "senhora-das-estatuas", quantity: 1 }] },
     { id: "golem-religado", name: "O Golem Religado", briefing: "Os mercenários de Aslothia chegaram primeiro. O líder ergue o cristal de comando, e um golem de bronze das ruínas range e marcha na direção do grupo.", creatures: [{ id: "golem-de-bronze", quantity: 1 }, { id: "lider-mercenario-de-aslothia", quantity: 1 }] }
   ]
 };

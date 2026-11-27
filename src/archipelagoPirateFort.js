@@ -64,8 +64,8 @@ export const pirateFortExploration = {
   guardians: [
     {
       id: "capitao-do-leilao", name: "Capitão do Leilão",
-      briefing: "No convés do galeão, o capitão cobre o fragmento com um pano e chama o bando que vigiava a prancha de embarque.",
-      creatures: [{ id: "capitao-do-conclave-pirata", quantity: 1 }, { id: "bando-pirata", quantity: 1 }]
+      briefing: "No convés, o capitão cobre o fragmento com um pano. Ele saca a pistola e anuncia o último lance da noite.",
+      creatures: [{ id: "capitao-do-leilao", quantity: 1 }]
     },
     {
       id: "dono-do-fortim", name: "Dono do Fortim",
@@ -74,8 +74,8 @@ export const pirateFortExploration = {
     },
     {
       id: "ogro-da-quilha", name: "Ogro da Quilha",
-      briefing: "O ogro agarra o relicário do fragmento. Um capanga galokk bloqueia a passagem para a popa.",
-      creatures: [{ id: "ogro-das-sanguinarias", quantity: 1 }, { id: "galokk-capanga", quantity: 1 }]
+      briefing: "O ogro agarra o relicário do fragmento. Ele rosna e ergue o machado sobre a amurada.",
+      creatures: [{ id: "ogro-da-quilha", quantity: 1 }]
     }
   ]
 };

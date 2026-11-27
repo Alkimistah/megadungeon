@@ -53,7 +53,7 @@ const islandCreatures = {
     "homem-piranha", "homem-piranha-imediato", "alghari", "cipo-assassino", "tendriculo", "naiade", "aquinne"
   ],
   mist: [
-    "lacedon", "livido", "zumbi-fantasmagorico", "aparicao", "imediato", "fantasma",
+    "lacedon", "livido", "zumbi-fantasmagorico", "aparicao", "imediato",
     "come-sonhos", "silfide-travessa", "duende-menor", "duende-maior", "vestigio-da-encruzilhada", "corcel-das-trevas",
     "duplo", "falso-vidente", "bruxo-rural", "necromante", "pirata",
     "harpia-saqueadora", "coruja-gigante", "estirge", "enxame-estirge"
@@ -62,7 +62,7 @@ const islandCreatures = {
     "canceronte", "selako", "crocodilo", "rato-gigante", "aranhas-filhotes",
     "aranha-gigante", "aranha-matriarca", "mimico-menor", "mimico", "otyugh", "ganchador",
     "gnoll-capanga", "gnoll-saqueador", "gnoll-filibusteiro", "gnoll-lider-de-alcateia", "gnoll-xama-de-megalokk", "gnoll-cacador-de-cabecas",
-    "esqueleto", "esqueleto-de-elite", "lacedon", "imediato", "capitao-pirata", "amalgama-esqueleto"
+    "esqueleto", "esqueleto-de-elite", "lacedon", "imediato"
   ],
   "cyclopean-ruins": [
     "canceronte", "selako", "selako-tigre", "pliorex", "lula-gigante", "crocodilo",
@@ -132,7 +132,10 @@ const existingOriginByCreatureId = new Map([
   ["ganchador", "ship-graveyard"],
   ["tabrachi-campeao", "mangrove"],
   ["afogado", "abandoned-ship"],
-  ["gnoll-filibusteiro", "ship-graveyard"]
+  ["gnoll-filibusteiro", "ship-graveyard"],
+  // Saíram do elenco quando os guardiões ganharam versões próprias.
+  ["fantasma", "mist"],
+  ["amalgama-esqueleto", "ship-graveyard"]
 ]);
 
 function findCreatureOriginThemeId(creatureId) {

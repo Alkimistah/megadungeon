@@ -93,7 +93,7 @@ test("combates das ruínas fecham ND 7 só com o elenco da ilha", () => {
 test("guardiões das ruínas somam ND 9 e a criatura principal tem penalidades suficientes", () => {
   const objectives = [0, 1, 2, 3, 4, 5].map(sector => createIslandSector(island, sector, 0, 28));
   const full = { ...island, baseChallenge: 9, objectives, outcomes: Object.fromEntries(objectives.map(({ id }) => [id, "failure"])) };
-  const mains = ["gigante-dos-mares", "gorgona", "golem-de-bronze"];
+  const mains = ["gigante-dos-mares", "senhora-das-estatuas", "golem-de-bronze"];
   for (const index of [0, 1, 2]) {
     const guardian = createIslandGuardian(full, index, profile, "centro");
     assert.equal(guardian.resolvedEncounter.budget.creatures, 9, `guardião ${index}`);

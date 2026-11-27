@@ -41,8 +41,8 @@ export const shipGraveyardExploration = {
     }
   ],
   guardians: [
-    { id: "capitao-dos-ossos", name: "O Capitão dos Ossos", briefing: "No convés da nau capitânia, o capitão ainda dá ordens a uma tripulação de ossos. Os marinheiros mortos se fundiram num monte que anda, e o contramestre ergue o sabre ao lado dele.", creatures: [{ id: "capitao-pirata", quantity: 1 }, { id: "amalgama-esqueleto", quantity: 1 }, { id: "esqueleto-de-elite", quantity: 1 }] },
+    { id: "capitao-dos-ossos", name: "O Capitão dos Ossos", briefing: "O capitão e a tripulação se fundiram num só monte de ossos. A voz dele ainda grita ordens de dentro da massa, e o monte avança pelo convés.", creatures: [{ id: "capitao-dos-ossos", quantity: 1 }] },
     { id: "tesouro-que-morde", name: "O Tesouro que Morde", briefing: "A cabine do almirante está cheia de ouro velho e de dois baús ainda trancados. Quando o grupo se aproxima, as tampas se abrem sozinhas e mostram dentes.", creatures: [{ id: "mimico", quantity: 2 }] },
-    { id: "cacador-de-cabecas", name: "O Caçador de Cabeças", briefing: "O chefe dos Desmanchadores espera no convés mais alto, com os troféus pendurados no mastro. O líder da alcateia e a xamã de Megalokk fecham o caminho de volta.", creatures: [{ id: "gnoll-cacador-de-cabecas", quantity: 1 }, { id: "gnoll-lider-de-alcateia", quantity: 1 }, { id: "gnoll-xama-de-megalokk", quantity: 1 }] }
+    { id: "cacador-de-cabecas", name: "O Caçador de Cabeças", briefing: "O chefe dos Desmanchadores espera sozinho no convés mais alto. Os troféus pendurados no mastro batem ao vento.", creatures: [{ id: "gnoll-cacador-de-cabecas", quantity: 1 }] }
   ]
 };

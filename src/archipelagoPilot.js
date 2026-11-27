@@ -140,9 +140,7 @@ const MANGROVE_SECTORS = [
 const GUARDIAN_COMPOSITIONS = [
   { briefing: "A água ferve em volta do altar. Uma catóblepa sai do canal e se arrasta por cima das raízes, na direção do grupo.", creatures: [{ id: "catoblepa", quantity: 1 }] },
   { briefing: "Uma névoa venenosa escorre das oferendas e se adensa sobre o altar até ganhar forma.", creatures: [{ id: "elemental-do-veneno-medio", quantity: 1 }] },
-  { briefing: "O capitão homem-piranha bloqueia o acesso ao altar. Uma massa de lagartos se espalha pela margem quando ele ergue a arma.", creatures: [
-    { id: "homem-piranha-capitao", quantity: 1 }, { id: "tempestade-de-lagartos", quantity: 1 }
-  ] }
+  { briefing: "A lama junto às oferendas se ergue. Um raagoran sacode o lodo da carapaça e avança de garras abertas.", creatures: [{ id: "raagoran", quantity: 1 }] }
 ];
 
 const TROPICAL_SECTORS = [

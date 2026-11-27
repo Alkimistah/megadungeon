@@ -42,7 +42,7 @@ export const coralCoastExploration = {
   ],
   guardians: [
     { briefing: "O chefe dos elfos-do-mar faz guarda sob o arco de coral. Ao assobio dele, um selako-tigre emerge de trás da parede do recife.", creatures: [{ id: "elfo-do-mar-chefe", quantity: 1 }, { id: "selako-tigre", quantity: 1 }] },
-    { briefing: "A lula enrola os braços no arco de coral. Do canal fundo, um pliorex sobe em direção ao movimento na água.", creatures: [{ id: "lula-gigante", quantity: 1 }, { id: "pliorex", quantity: 1 }] },
+    { briefing: "A lula-rainha enrola os braços nas colunas do recife. Os outros tentáculos varrem a água à procura do grupo.", creatures: [{ id: "lula-rainha-do-recife", quantity: 1 }] },
     { name: "Reishid do Recife", briefing: "O coral junto ao nicho tem manchas rubras. Um reishid se agarra ao arco acima da água e acompanha a aproximação do grupo.", creatures: [{ id: "reishid", quantity: 1 }] }
   ]
 };

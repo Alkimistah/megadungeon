@@ -88,7 +88,7 @@ const sineiroRule = "Memento do sineiro: o sino rachado é o que prende o fantas
 test("guardiões da névoa somam ND 8 e a criatura principal tem penalidades suficientes", () => {
   const objectives = [0, 1, 2, 3].map(sector => createIslandSector(island, sector, 0, 22));
   const full = { ...island, baseChallenge: 8, objectives, outcomes: Object.fromEntries(objectives.map(({ id }) => [id, "failure"])) };
-  const mains = ["fantasma", "duplo", "necromante"];
+  const mains = ["o-sineiro", "duplo", "necromante"];
   for (const index of [0, 1, 2]) {
     const guardian = createIslandGuardian(full, index, profile, "centro");
     assert.equal(guardian.resolvedEncounter.budget.creatures, 8, `guardião ${index}`);
@@ -114,7 +114,7 @@ const originsBefore = {
   "come-sonhos": "tropical", pirata: "pirate-held",
   "harpia-saqueadora": "storm", "coruja-gigante": "storm"
 };
-const newOrigin = ["livido", "fantasma", "silfide-travessa", "duende-menor", "duende-maior",
+const newOrigin = ["livido", "silfide-travessa", "duende-menor", "duende-maior",
   "vestigio-da-encruzilhada", "corcel-das-trevas", "duplo", "falso-vidente", "bruxo-rural",
   "necromante", "estirge", "enxame-estirge"];
 
@@ -127,6 +127,9 @@ test("a origem das criaturas compartilhadas não passa para a névoa", () => {
     assert.ok(getIslandCreatureIds("mist").includes(id), id);
     assert.equal(getCreatureOriginThemeId(id), "mist", id);
   }
+  // O fantasma saiu da lista com o Sineiro próprio, mas as caçadas salvas mantêm a origem.
+  assert.ok(!getIslandCreatureIds("mist").includes("fantasma"));
+  assert.equal(getCreatureOriginThemeId("fantasma"), "mist");
 });
 
 const combatLandmarks = {

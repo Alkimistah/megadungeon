@@ -74,8 +74,8 @@ export const volcanicExploration = {
     },
     {
       id: "corte-das-brasas", name: "Regente das Brasas",
-      briefing: "A regente salamandra espera junto ao fragmento com sua guarda de lança em punho.",
-      creatures: [{ id: "salamandra-nobre", quantity: 1 }, { id: "salamandra-guerreira", quantity: 1 }]
+      briefing: "A regente salamandra espera junto ao fragmento. A rocha brilha sob os pés dela quando ela ergue o tridente.",
+      creatures: [{ id: "regente-das-brasas", quantity: 1 }]
     }
   ]
 };

@@ -334,7 +334,7 @@ test("combates da Tropical respeitam o tipo da cena e mostram seus mecanismos no
 
 test("a Costa do Coral restaura as quatro cenas e tem três composições de combate ND 8", () => {
   const profile = archipelagoBaseInitialRow;
-  const guards = [[0, "elfo-do-mar-chefe"], [0.5, "lula-gigante"], [0.99, "reishid"]];
+  const guards = [[0, "elfo-do-mar-chefe"], [0.5, "lula-rainha-do-recife"], [0.99, "reishid"]];
   for (const [roll, creatureId] of guards) {
     const rng = () => roll;
     const state = createArchipelagoState(profile, rng);
@@ -562,7 +562,7 @@ test("tarefas sem combate pagam menos que o combate e saves antigos recebem a ca
   assert.equal(objectives[0].rewardEarned, true);
 });
 
-test("quatro sucessos ajustam a ficha do capitão e preservam a ficha da Tempestade de Lagartos", () => {
+test("quatro sucessos ajustam a ficha do Raagoran, guardião único do terceiro Centro", () => {
   const { profile, state, floor, island } = setupPilot();
   const save = JSON.parse(JSON.stringify(state.exportSessionState()));
   for (const objective of save.islands[floor].objectives) delete objective.penaltyId;
@@ -570,11 +570,11 @@ test("quatro sucessos ajustam a ficha do capitão e preservam a ficha da Tempest
   assert.ok(state.exploreIsland(floor));
   for (const objective of island().objectives) state.resolveObjective(floor, objective.id, "success");
   assert.ok(state.startGuardian(floor));
-  const [leader, support] = island().guardian.scene.resolvedEncounter.items;
+  const [leader, ...support] = island().guardian.scene.resolvedEncounter.items;
   const { hitPoints, defense, initiative, perception, fortitude, reflex, will } = leader.creatureData.stats;
-  assert.deepEqual([hitPoints, defense, initiative, perception, fortitude, reflex, will], [247, 27, 8, 8, 18, 13, 8]);
-  assert.equal(support.creatureId, "tempestade-de-lagartos");
-  assert.equal(support.creatureData, undefined);
+  assert.equal(leader.creatureId, "raagoran");
+  assert.deepEqual([hitPoints, defense, initiative, perception, fortitude, reflex, will], [272, 31, 3, 9, 20, 14, 7]);
+  assert.deepEqual(support, []);
 });
 
 test("Manguezal prepara o combate ao abrir um setor ativo e calibra a recuperação", () => {
@@ -732,7 +732,7 @@ test("a Ilha Vulcânica só libera o guardião ND 9 após seis resultados e conc
   const statsFor = outcomes => createIslandGuardian(
     { ...volcanic(), objectives: legacyObjectives, outcomes }, volcanic().guardianComposition, profile, "caldeira"
   ).resolvedEncounter.items[0].creatureData.stats;
-  const original = getCreatureById("salamandra-nobre").stats;
+  const original = getCreatureById("regente-das-brasas").stats;
   const boosted = statsFor({ [forge.id]: "failure" });
   assert.equal(boosted.defense, original.defense + 2);
   assert.equal(boosted.hitPoints, Math.ceil(original.hitPoints * 1.15));
@@ -929,7 +929,7 @@ test("o fortim pirata sorteia as doze fichas em doze plantas próprias de combat
 
 test("o fortim pirata tem seis setores, guarda as proteções sorteadas e concede um fragmento", () => {
   const profile = archipelagoBaseIntermediateRow;
-  const leaders = ["capitao-do-conclave-pirata", "capitao-pirata", "ogro-das-sanguinarias"];
+  const leaders = ["capitao-do-leilao", "capitao-pirata", "ogro-da-quilha"];
   for (const [index, roll] of [0, 0.5, 0.99].entries()) {
     const rng = () => roll;
     const state = createArchipelagoState(profile, rng);

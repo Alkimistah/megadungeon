@@ -86,7 +86,7 @@ test("combates de setor do cemitério fecham ND 6 só com o elenco da ilha", () 
 test("guardiões do cemitério somam ND 8 e a criatura principal tem penalidades suficientes", () => {
   const objectives = [0, 1, 2, 3].map(sector => createIslandSector(island, sector, 0, 22));
   const full = { ...island, baseChallenge: 8, objectives, outcomes: Object.fromEntries(objectives.map(({ id }) => [id, "failure"])) };
-  const mains = ["capitao-pirata", "mimico", "gnoll-cacador-de-cabecas"];
+  const mains = ["capitao-dos-ossos", "mimico", "gnoll-cacador-de-cabecas"];
   for (const index of [0, 1, 2]) {
     const guardian = createIslandGuardian(full, index, profile, "centro");
     assert.equal(guardian.resolvedEncounter.budget.creatures, 8, `guardião ${index}`);
@@ -109,11 +109,11 @@ test("cemitério tem terreno, ecologia e nome do Centro", () => {
 
 const originsBefore = {
   canceronte: "sea-caves", selako: "sea-caves", crocodilo: "mangrove", otyugh: "mangrove",
-  esqueleto: "mangrove", "esqueleto-de-elite": "mangrove", lacedon: "storm", imediato: "pirate-held", "capitao-pirata": "pirate-held"
+  esqueleto: "mangrove", "esqueleto-de-elite": "mangrove", lacedon: "storm", imediato: "pirate-held"
 };
 const newOrigin = ["rato-gigante", "aranhas-filhotes", "aranha-gigante", "aranha-matriarca", "mimico-menor", "mimico",
   "ganchador", "gnoll-capanga", "gnoll-saqueador", "gnoll-filibusteiro", "gnoll-lider-de-alcateia",
-  "gnoll-xama-de-megalokk", "gnoll-cacador-de-cabecas", "amalgama-esqueleto"];
+  "gnoll-xama-de-megalokk", "gnoll-cacador-de-cabecas"];
 
 test("a origem das criaturas compartilhadas não passa para o cemitério", () => {
   for (const [id, origin] of Object.entries(originsBefore)) {
@@ -123,6 +123,11 @@ test("a origem das criaturas compartilhadas não passa para o cemitério", () =>
   for (const id of newOrigin) {
     assert.ok(getIslandCreatureIds("ship-graveyard").includes(id), id);
     assert.equal(getCreatureOriginThemeId(id), "ship-graveyard", id);
+  }
+  // Saíram da lista com o Capitão dos Ossos próprio, mas as caçadas salvas mantêm a origem.
+  for (const [id, origin] of [["capitao-pirata", "pirate-held"], ["amalgama-esqueleto", "ship-graveyard"]]) {
+    assert.ok(!getIslandCreatureIds("ship-graveyard").includes(id), id);
+    assert.equal(getCreatureOriginThemeId(id), origin, id);
   }
 });
 
