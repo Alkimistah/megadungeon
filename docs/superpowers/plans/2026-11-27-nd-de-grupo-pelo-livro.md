@@ -75,3 +75,11 @@ Registrar a regra e a decisão no design das ilhas (seção "Onde paramos" e "De
 | 3 | `sonnet` | `sonnet` |
 | 4 | `haiku` | `sonnet` |
 | Revisão final | — | `opus` |
+
+## Situação
+
+- Tarefas 1, 2, 3 e 5 concluídas (commits d631119 a b37a262).
+- Alvos fracionários de 1 ou mais na floresta: as criaturas fecham `Math.floor(alvo)`, e o ND da cena continua o mesmo.
+- Onze guardiões refeitos e oito versões de guardião criadas.
+- O PO manteve o Primeiro Náufrago com a Aura de Afogamento, por ser temático. A morte nas ilhas reinicia a ilha, e a mesa pode usar um mapa maior.
+- O PO quer repensar a geração de encontros da floresta (11–20). O tema está em discussão separada.

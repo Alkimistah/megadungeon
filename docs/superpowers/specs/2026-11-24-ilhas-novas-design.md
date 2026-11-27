@@ -91,7 +91,9 @@ A revisão intermediária foi concluída com a atualização da Ilha Tomada por 
 
 **Liburna.** As emboscadas passaram a usar o sorteador compartilhado em quatro categorias: criaturas aquáticas, voadoras, piratas ou da ilha de ancoragem. O mapa verifica a superfície inicial de cada criatura. Clima normal, neblina, vento forte e chuva variam entre cenas e permanecem na rerrolagem. A chance e o ND continuam ligados aos fragmentos.
 
-**Próximo passo:** preparar a prévia do Iceberg, com oito setores, combates de ND 8, pelo menos doze fichas sorteáveis e três opções de guardião de ND 10. Depois seguem Ilha de Sal e Ossos, Ilha Elemental e Ilha Viva.
+**ND de grupo (27/11/2026).** O ND de encontros com ameaças de NDs diferentes passou a seguir Ameaças de Arton p. 9. Onze guardiões foram refeitos pelo princípio dos guardiões exclusivos. O próximo passo das ilhas continua sendo a prévia do Iceberg, já na 2ª versão em `tmp/previas/ilha-iceberg/`.
+
+**Próximo passo:** antes do plano do Iceberg, cadastrar os trolls variantes (Ghillanin, Glacioll e Vrakoll, Livro Básico p. 309) e os dragões do gelo (filhote e jovem, com sopro de frio que deixa o alvo lento). Depois, o plano do Iceberg, com oito setores, combates de ND 8, pelo menos doze fichas sorteáveis e três opções de guardião de ND 10. Depois seguem Ilha de Sal e Ossos, Ilha Elemental e Ilha Viva.
 
 **Lições das etapas 3 e 4.**
 
