@@ -577,6 +577,20 @@ test("quatro sucessos ajustam a ficha do Raagoran, guardião único do terceiro 
   assert.deepEqual(support, []);
 });
 
+test("as penalidades alteram só a criatura principal e a escolta do Mestre dos Ouvintes fica intacta", () => {
+  const base = { floor: 21, themeId: "mist", baseChallenge: 8 };
+  const objectives = [0, 1, 2, 3].map(sector => createIslandSector(base, sector, 0, 22));
+  const outcomes = Object.fromEntries(objectives.map(({ id }) => [id, "success"]));
+  const guardian = createIslandGuardian({ ...base, objectives, outcomes }, "mestre-dos-ouvintes", productionProfile, "centro");
+  const [leader, ...escort] = guardian.resolvedEncounter.items;
+  assert.equal(leader.creatureId, "necromante");
+  const { hitPoints, defense, initiative, fortitude, reflex, will } = leader.creatureData.stats;
+  assert.deepEqual([hitPoints, defense, initiative, fortitude, reflex, will], [153, 21, 5, 6, 13, 19]);
+  assert.equal(getCreatureById("necromante").stats.hitPoints, 180);
+  assert.deepEqual(escort.map(({ creatureId, quantity }) => [creatureId, quantity]), [["falso-vidente", 3], ["zumbi-fantasmagorico", 2]]);
+  for (const item of escort) assert.equal(item.creatureData, undefined, item.creatureId);
+});
+
 test("Manguezal prepara o combate ao abrir um setor ativo e calibra a recuperação", () => {
   const { profile, state, floor, island } = setupPilot();
   const save = JSON.parse(JSON.stringify(state.exportSessionState()));

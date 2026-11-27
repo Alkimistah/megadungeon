@@ -3965,6 +3965,6 @@ export const undeadCreatures = [
     necrodracoLich, necrodracoZumbi, reiTiranoEsqueleto, senhorDasMumias,
     tarsoDragaoReiDosMortos, afogado, capitaoAfogado, capitaoPirata,
     imediato, alzeras, arquilichFerrenAsloth, cemiterioVivo, chacalZumbi,
-    lich, lichDeAslothia, morgueRaz, wisphago, vampiroPassageiroDaUltimaViagem, 
+    lich, lichDeAslothia, morgueRaz, wisphago, vampiroPassageiroDaUltimaViagem,
     oSineiro, capitaoDosOssos, primeiroNaufrago
 ];
