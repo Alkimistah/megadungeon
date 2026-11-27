@@ -827,9 +827,21 @@ async function forestChallengeHeaderFlow() {
     fixedComposition: { creatures: [{ id: "naja", quantity: 2 }], traps: ["bloco-de-pedra"] },
     resolvedEncounter: null
   });
-  assert.equal(resolveNodeEncounter(node, { profile, mapSeed: entry.mapSeed }).items.length, 2);
+  const encounter = resolveNodeEncounter(node, { profile, mapSeed: entry.mapSeed });
+  assert.equal(encounter.items.length, 2);
 
-  const page = await pageFor(encodeSessionCode(sessionFor(expedition)));
+  const session = sessionFor(expedition);
+  session.state.resolvedEncounters = [[node.id, encounter]];
+  const page = await pageFor(encodeSessionCode(session));
+  const restored = decodeSessionCode(await exportSession(page));
+  assert.deepEqual(restored.state.chosenByLevel, []);
+  assert.deepEqual(
+    new Map(restored.state.resolvedEncounters).get(node.id),
+    JSON.parse(JSON.stringify(encounter)),
+    "O encontro resolvido deve estar no estado importado antes de abrir o nodo."
+  );
+  const settings = page.locator("#settingsToggle[aria-expanded=true]");
+  if (await settings.isVisible()) await settings.click();
   const dialog = page.locator("#nodeDialog");
   const meta = dialog.locator("#nodeDialogMeta");
   await page.locator(".node").first().click();
