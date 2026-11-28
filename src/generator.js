@@ -109,7 +109,7 @@ function assignTrapProfiles(levels, profile, rng, mapSeed, visibleTypes, floor) 
     if (node.generationVersion === 5 && node.type === "normal") {
       assignForestNormalTrap(node, profile, rng);
     } else if (node.generationVersion === 5 && ["trap", "elite"].includes(node.type)) {
-      const seed = getEncounterSeed(node, mapSeed ?? String(rng()));
+      const seed = getEncounterSeed(node, mapSeed ?? "map");
       const resolve = node.type === "elite" ? resolveForestElite : resolveForestTrapNode;
       const { trap, items, creatureTarget, variant = "trap", effectiveType } = resolve(node, profile, { seed });
       if (effectiveType === "normal") {
@@ -141,6 +141,8 @@ function assignTrapProfiles(levels, profile, rng, mapSeed, visibleTypes, floor) 
       if (node.generationVersion === 5 && ["treasure", "camp"].includes(node.contentType ?? node.type)) {
         node.challenge.creatures = 0;
         node.challenge.trap = 0;
+        node.challenge.encounterBudgetLabel = "";
+        updateForestChallengeTotal(node, profile.challengeRules);
       }
     }
   });

@@ -88,3 +88,19 @@ test("retorna null para um nó legado", () => {
   delete node.generationVersion;
   assert.equal(getForestChallengeParts(node), null);
 });
+
+test("tesouro e acampamento v5 somam só o ambiente no agregado", async () => {
+  const { generateMapData } = await import("../src/generator.js");
+  const { createRng } = await import("../src/random.js");
+  const nodes = generateMapData(8, 20, forest11to20Profile, 15, createRng("agg"), { version: 5, mapSeed: "agg" }).flat();
+  const quiet = nodes.filter(node => ["treasure", "camp"].includes(node.contentType ?? node.type));
+  assert.ok(quiet.length);
+  for (const node of quiet) {
+    if (node.scene?.nd != null) continue;
+    const parts = getForestChallengeParts(node);
+    assert.equal(parts.creatures, 0);
+    assert.equal(parts.trap, 0);
+    assert.equal(node.challenge.total, Math.max(parts.environment, challengeRules.minimum));
+    assert.ok(!node.challenge.encounterBudgetLabel);
+  }
+});

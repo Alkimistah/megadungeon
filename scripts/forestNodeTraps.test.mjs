@@ -238,3 +238,24 @@ test("reroll requires space for both the trap and every member of its escort", (
     assert.deepEqual(node, before);
   }
 });
+
+test("after a required escort fails, falls back to a standalone trap", () => {
+  const restricted = {
+    ...profile,
+    creatureRules: { ...profile.creatureRules, allowedCreatureIds: ["minotauro-da-manada"], allowedCreatureIdsByFloor: undefined }
+  };
+  for (const seed of ["22", "159", "182", "195"]) {
+    const result = resolver.resolveForestTrapNode(trapNode(5), restricted, { seed });
+    assert.equal(result.trap.mode, "standalone", seed);
+  }
+});
+
+test("does not consume the map rng for the encounter seed when no mapSeed is given", () => {
+  const count = options => {
+    let calls = 0;
+    const rng = createRng("seed-count");
+    generateMapData(8, 20, profile, 15, () => (calls++, rng()), { version: 5, ...options });
+    return calls;
+  };
+  assert.equal(count({}), count({ mapSeed: "x" }));
+});

@@ -583,7 +583,12 @@ export function resolveForestTrapNode(node, profile, { seed, tacticalLayout = no
   const catalog = filterEncounterCatalog(node, getAllowedCatalog(
     rules.allowedCreatureIdsByFloor?.[node.level] ?? rules.allowedCreatureIds, profile
   ), ecology).filter(creature => creature.type === "humanoid");
+  let escortFailed = false;
   while (candidates.length) {
+    if (escortFailed && candidates.some(candidate => candidate.mode === "standalone")) {
+      // Escolta obrigatória falhou: a saída garantida é uma armadilha avulsa.
+      candidates.splice(0, candidates.length, ...candidates.filter(candidate => candidate.mode === "standalone"));
+    }
     const selected = pickWeightedTrap(candidates, maximumChallenge, rng);
     candidates.splice(candidates.indexOf(selected), 1);
     const trap = withTrapRole(selected, "primary", maximumChallenge);
@@ -603,6 +608,7 @@ export function resolveForestTrapNode(node, profile, { seed, tacticalLayout = no
     if (!required && encounterFitsMap({ ...node, trap }, tacticalLayout, profile.id, seed, [getTrapSummary(trap)], 0)) {
       return { trap, items: [], creatureTarget: 0 };
     }
+    if (required) escortFailed = true;
   }
   return { trap: null, items: [], creatureTarget: 0 };
 }
