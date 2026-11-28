@@ -19,7 +19,7 @@ import { createMissionDialogController } from "./missions/missionDialog.js";
 import { createMissionGenerationContext, generateMissionOffers } from "./missions/missionGenerator.js";
 import { materializeMissionsForCurrentContent } from "./missions/missionProfileAdapters.js";
 import { createMissionState } from "./missions/missionState.js";
-import { canRerollNodeCreatures, canRerollNodeTrap, rerollNodeCreatures, rerollNodeTrap, resolveForestAmbush, resolveNodeEncounter } from "./encounterResolver.js";
+import { canRerollNodeCreatures, canRerollNodeEscort, canRerollNodeTrap, rerollNodeCreatures, rerollNodeEscort, rerollNodeTrap, resolveForestAmbush, resolveNodeEncounter } from "./encounterResolver.js";
 import { creatureCatalog } from "./creatureCatalog/index.js";
 import { withCreatureReinforcement } from "./creatureReinforcement.js";
 import { createNodeDialogController } from "./nodeDialog.js";
@@ -305,6 +305,7 @@ function advanceNodeMapFloor() {
 const nodeDialogController = createNodeDialogController({
   canReinforceCreatures,
   canRerollCreatures,
+  canRerollEscort: node => isPendingForestEncounter(node) && canRerollNodeEscort(node),
   canRerollTrap: node => isPendingForestEncounter(node) && canRerollNodeTrap(node),
   contentElement: elements.nodeDialogContent,
   dialogElement: elements.nodeDialog,
@@ -352,6 +353,14 @@ const nodeDialogController = createNodeDialogController({
   onRerollCreatures: (node) => {
     if (!canRerollCreatures(node)) return false;
     const encounter = rerollNodeCreatures(node, activeFloorRange);
+    if (!encounter) return false;
+    node.resolvedEncounter = encounter;
+    refreshExplorationDisplay();
+    return true;
+  },
+  onRerollEscort: (node, context) => {
+    if (!isPendingForestEncounter(node)) return false;
+    const encounter = rerollNodeEscort(node, activeFloorRange, context);
     if (!encounter) return false;
     node.resolvedEncounter = encounter;
     refreshExplorationDisplay();

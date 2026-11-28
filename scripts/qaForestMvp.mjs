@@ -9,7 +9,7 @@ import { encodeSessionCode, decodeSessionCode } from "../src/sessionCode.js";
 import { formatElapsedTime } from "../src/format.js";
 import { calculateCombatND, getForestChallengeParts } from "../src/challenge.js";
 import { getCreatureUnits } from "../src/encounterCreatureHealth.js";
-import { canRerollNodeCreatures, canRerollNodeTrap, resolveNodeEncounter } from "../src/encounterResolver.js";
+import { canRerollNodeCreatures, canRerollNodeEscort, canRerollNodeTrap, resolveNodeEncounter } from "../src/encounterResolver.js";
 
 const production = process.argv.includes("--production");
 const url = process.env.QA_APP_URL || (production ? "http://localhost:4173/megadungeon/" : "http://localhost:5173/megadungeon/");
@@ -512,7 +512,9 @@ async function trapRerollFlow(role) {
     node = entry.levels[0].find(candidate => {
       if (candidate.trap?.role !== role) return false;
       resolveNodeEncounter(candidate, { profile, mapSeed: entry.mapSeed });
-      return canRerollNodeTrap(candidate) && (role === "primary" || canRerollNodeCreatures(candidate));
+      return canRerollNodeTrap(candidate) && (role === "primary"
+        ? candidate.resolvedEncounter.items.some(item => item.kind === "creature")
+        : canRerollNodeCreatures(candidate));
     });
   }
   assert.ok(node);
@@ -528,12 +530,22 @@ async function trapRerollFlow(role) {
     const dialog = page.locator("#nodeDialog");
     await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
     const rerollTrap = dialog.getByRole("button", { name: "Rerrolar armadilha" });
+    const tabs = dialog.getByRole("tablist").getByRole("tab");
     if (role === "incidental") {
-      const rerollCreatures = dialog.getByRole("button", { name: "Rerrolar criaturas" });
+      assert.match(await tabs.nth(0).innerText(), /^Inimigos \(\d+\)$/);
+      assert.match(await tabs.nth(1).innerText(), /^Armadilhas? \(\d+\)$/);
+      const rerollCreatures = dialog.getByRole("button", { name: "Rerrolar inimigos" });
       await rerollCreatures.waitFor();
-      assert.equal(await rerollTrap.getAttribute("class"), await rerollCreatures.getAttribute("class"));
-      assert.equal(await dialog.locator(".encounter-reroll-actions button").count(), 2);
+      assert.equal(await dialog.locator(".encounter-reroll-actions button").count(), 1);
+      assert.equal(await rerollTrap.count(), 0);
+      await tabs.nth(1).click();
+      assert.equal(await rerollCreatures.count(), 0);
+    } else {
+      assert.match(await tabs.nth(0).innerText(), /^Armadilhas? \(1\)$/);
+      assert.match(await tabs.nth(1).innerText(), /^Escolta \(\d+\)$/);
     }
+    await rerollTrap.waitFor();
+    assert.equal(await dialog.locator(".encounter-reroll-actions button").count(), 1);
     await rerollTrap.click();
     await dialog.getByRole("status").getByText("Armadilha atualizada com o mesmo ND.").waitFor();
     await dialog.getByRole("button", { name: "Abrir mapa tático" }).click();
@@ -553,6 +565,7 @@ async function trapRerollFlow(role) {
     try {
       await restored.locator(".node").nth(index).click();
       await restored.locator("#nodeDialog").getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+      await restored.locator("#nodeDialog").getByRole("tab", { name: /^Armadilhas?/ }).click();
       await restored.locator("#nodeDialog").getByRole("button", { name: "Rerrolar armadilha" }).waitFor();
     } finally {
       await restored.close();
@@ -561,6 +574,101 @@ async function trapRerollFlow(role) {
     await page.close();
   }
   console.log(`Rerrolagem de armadilha (${role}) e retomada da sessão: passaram.`);
+}
+
+async function escortRerollFlow() {
+  let expedition;
+  let entry;
+  let node;
+  for (let attempt = 0; attempt < 48 && !node; attempt++) {
+    expedition = prepareForestExpedition({ seed: `qa-escort-reroll-${attempt}`, profile, startFloor: 12, missions: [] });
+    entry = expedition.floors[0];
+    node = entry.levels[0].find(candidate => {
+      if (candidate.trap?.role !== "primary") return false;
+      resolveNodeEncounter(candidate, { profile, mapSeed: entry.mapSeed });
+      return canRerollNodeEscort(candidate);
+    });
+  }
+  assert.ok(node);
+  const index = entry.levels.flat().indexOf(node);
+  const session = sessionFor(expedition);
+  session.state.chosenByLevel = [[node.level, node.id]];
+  session.state.resolvedEncounters = [[node.id, node.resolvedEncounter]];
+  const original = new Map(decodeSessionCode(encodeSessionCode(session)).state.resolvedEncounters).get(node.id);
+  const page = await pageFor(encodeSessionCode(session));
+  try {
+    await page.locator(".node").nth(index).click();
+    const dialog = page.locator("#nodeDialog");
+    await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+    const tabs = dialog.getByRole("tablist").getByRole("tab");
+    assert.equal(await tabs.count(), 2);
+    assert.match(await tabs.nth(0).innerText(), /^Armadilhas? \(1\)$/);
+    assert.match(await tabs.nth(1).innerText(), /^Escolta \(\d+\)$/);
+    await tabs.nth(1).click();
+    assert.equal(await tabs.nth(1).getAttribute("aria-selected"), "true");
+    assert.equal(await dialog.locator(".encounter-reroll-actions button").count(), 1);
+    await dialog.getByRole("button", { name: "Rerrolar escolta" }).click();
+    await dialog.getByRole("status").getByText("Escolta atualizada com o mesmo ND.").waitFor();
+    assert.equal(await tabs.nth(1).getAttribute("aria-selected"), "true");
+    await dialog.getByRole("button", { name: "Rerrolar escolta" }).waitFor();
+    const rerolledNames = await dialog.locator(".encounter-list-item.is-creature").allInnerTexts();
+    await page.locator("#nodeDialogClose").click();
+    const save = decodeSessionCode(await exportSession(page));
+    const updated = new Map(save.state.resolvedEncounters).get(node.id);
+    assert.equal(updated.escortRerolls, 1);
+    assert.deepEqual(updated.items.filter(item => item.kind === "trap"), original.items.filter(item => item.kind === "trap"));
+    assert.notDeepEqual(updated.items.filter(item => item.kind === "creature"), original.items.filter(item => item.kind === "creature"));
+    const restored = await pageFor(encodeSessionCode(save));
+    try {
+      await restored.locator(".node").nth(index).click();
+      const restoredDialog = restored.locator("#nodeDialog");
+      await restoredDialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+      await restoredDialog.getByRole("tab", { name: /^Escolta/ }).click();
+      await restoredDialog.getByRole("button", { name: "Rerrolar escolta" }).waitFor();
+      assert.deepEqual(await restoredDialog.locator(".encounter-list-item.is-creature").allInnerTexts(), rerolledNames);
+    } finally {
+      await restored.close();
+    }
+  } finally {
+    await page.close();
+  }
+  console.log("Abas e rerrolagem da escolta do nó de armadilha, com retomada da sessão: passaram.");
+}
+
+async function singleTabFlow() {
+  const found = {};
+  for (let attempt = 0; attempt < 80 && !(found.creature && found.trap); attempt++) {
+    const expedition = prepareForestExpedition({ seed: `qa-single-tab-${attempt}`, profile, startFloor: 12, missions: [] });
+    const entry = expedition.floors[0];
+    for (const candidate of entry.levels.flat()) {
+      resolveNodeEncounter(candidate, { profile, mapSeed: entry.mapSeed });
+      const items = candidate.resolvedEncounter?.items || [];
+      if (!items.length) continue;
+      const kinds = new Set(items.map(item => item.kind));
+      if (kinds.size !== 1) continue;
+      const kind = [...kinds][0];
+      if (!found[kind]) found[kind] = { expedition, entry, node: candidate };
+    }
+  }
+  for (const kind of ["creature", "trap"]) {
+    if (!found[kind]) { console.log(`Aba única (${kind}): nenhum nó encontrado nas sementes do QA, ignorada.`); continue; }
+    const { expedition, entry, node } = found[kind];
+    const session = sessionFor(expedition);
+    session.state.chosenByLevel = [[node.level, node.id]];
+    session.state.resolvedEncounters = [[node.id, node.resolvedEncounter]];
+    const page = await pageFor(encodeSessionCode(session));
+    try {
+      await page.locator(".node").nth(entry.levels.flat().indexOf(node)).click();
+      const dialog = page.locator("#nodeDialog");
+      await dialog.getByRole("button", { name: "Mostrar criaturas e armadilhas" }).click();
+      assert.equal(await dialog.getByRole("tablist").count(), 0);
+      assert.equal(await dialog.locator(".encounter-list-panel h3").innerText(),
+        kind === "creature" ? "Inimigos" : "Armadilha");
+    } finally {
+      await page.close();
+    }
+  }
+  console.log("Painel sem barra de abas quando há um só tipo: passou.");
 }
 
 async function creatureHealthFlow() {
@@ -624,7 +732,7 @@ async function creatureHealthFlow() {
   assert.equal(await content.evaluate(element => element.scrollTop), 0);
   await page.setViewportSize({ width: 768, height: 1024 });
   assert.equal(await dialog.locator(".encounter-detail-card").evaluate(card => getComputedStyle(card).maxHeight), "none");
-  const reroll = dialog.getByRole("button", { name: "Rerrolar criaturas" });
+  const reroll = dialog.getByRole("button", { name: "Rerrolar inimigos" });
   const units = dialog.getByRole("combobox", { name: "Criatura para registrar PV" });
   const amount = dialog.getByRole("spinbutton", { name: "Quantidade de PV" });
   assert.equal(await reroll.count(), 1);
@@ -896,6 +1004,8 @@ try {
   await creatureHealthFlow();
   await trapRerollFlow("primary");
   await trapRerollFlow("incidental");
+  await escortRerollFlow();
+  await singleTabFlow();
   await bossFlow();
   await configurationFailure();
   await futureAndLegacyFlow();

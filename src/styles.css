@@ -2421,6 +2421,45 @@ button.tactical-piece.is-dragging {
   gap: 0.5rem;
 }
 
+.encounter-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.encounter-tab {
+  margin-bottom: -1px;
+  padding: 7px 12px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: #cfe0d2;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.encounter-tab:hover {
+  background: rgba(63, 129, 84, 0.25);
+}
+
+.encounter-tab.is-selected {
+  border-color: var(--border-soft);
+  background: rgba(18, 27, 19, 0.95);
+  color: #fff7e8;
+}
+
+.encounter-tab.is-trap.is-selected {
+  border-color: rgba(203, 119, 59, 0.7);
+  color: #f3c49b;
+}
+
+.encounter-tab-count {
+  margin-left: 4px;
+  font-weight: normal;
+  opacity: 0.75;
+}
+
 .encounter-list-panel h3 {
   margin: 0;
   color: #f1d6a8;
@@ -4605,28 +4644,6 @@ details.mission-run-guidance p {
 .archipelago-result-actions {
   justify-content: center;
   margin-block: 1rem;
-}
-
-.encounter-list-panel:has(> .archipelago-reroll-footer) {
-  display: flex;
-  flex-direction: column;
-}
-
-.archipelago-reroll-footer {
-  display: grid;
-  justify-items: center;
-  gap: .5rem;
-  margin-block-start: auto;
-  padding-top: .25rem;
-}
-
-.archipelago-reroll-footer [role="status"] {
-  text-align: center;
-  margin: 0;
-}
-
-.archipelago-reroll-footer [role="status"]:empty {
-  display: none;
 }
 
 .archipelago-encounter-footer button,

@@ -5,6 +5,7 @@ import { CREATURE_REINFORCEMENT_BONUSES, getCreatureReinforcement } from "./crea
 import { createCreatureHealthControls } from "./encounterCreatureHealthView.js";
 import { formatCreatureCatalogName, getCreatureById } from "./creatureCatalog/index.js";
 import { getDamageType } from "./damageTypes.js";
+import { getEncounterRerollLabel, getEncounterTabs } from "./encounterTabs.js";
 import { getForestTrapPresentation } from "./forestTrapPresentation.js";
 import { getWeaponVariationLabel } from "./equipment/weaponVariation.js";
 import { GENERAL_CREATURE_ABILITIES, getSharedSubtypeRules } from "./generalCreatureAbilities.js";
@@ -441,16 +442,70 @@ export function createEncounterMissionPanel(matches, onAdjustMissionProgress = n
   return panel;
 }
 
-function createEncounterList(node, selectedKey, onSelect, missions, trapPresentations) {
+function createEncounterTabBar(tabs, activeKind, onSelectKind) {
+  const bar = document.createElement("div");
+
+  bar.className = "encounter-tabs";
+  bar.setAttribute("role", "tablist");
+  tabs.forEach((tab) => {
+    const button = document.createElement("button");
+    const count = document.createElement("span");
+    const selected = tab.kind === activeKind;
+
+    button.type = "button";
+    button.className = `encounter-tab is-${tab.kind}${selected ? " is-selected" : ""}`;
+    button.setAttribute("role", "tab");
+    button.setAttribute("aria-selected", String(selected));
+    button.append(tab.label);
+    count.className = "encounter-tab-count";
+    count.textContent = `(${tab.count})`;
+    button.append(" ", count);
+    button.addEventListener("click", () => onSelectKind(tab.kind));
+    bar.appendChild(button);
+  });
+
+  return bar;
+}
+
+function createEncounterRerollControls(node, activeKind, reroll, onRerolled) {
+  const action = reroll?.[activeKind];
+  if (!action) return null;
+
+  const actions = document.createElement("div");
+  const button = document.createElement("button");
+  const status = document.createElement("p");
+
+  actions.className = "encounter-reroll-actions";
+  button.type = "button";
+  button.className = "extended-action is-compact";
+  button.dataset.encounterReroll = activeKind;
+  button.textContent = getEncounterRerollLabel(node, activeKind);
+  status.className = "node-dialog-meta encounter-reroll-status";
+  status.setAttribute("role", "status");
+  status.textContent = reroll.status || "";
+  button.addEventListener("click", () => {
+    if (action.run()) onRerolled?.(activeKind);
+    else status.textContent = action.failure;
+  });
+  actions.appendChild(button);
+
+  return [actions, status];
+}
+
+function createEncounterList(node, selectedKey, onSelect, missions, trapPresentations, reroll = null) {
   const panel = document.createElement("section");
   const heading = document.createElement("h3");
   const list = document.createElement("div");
+  const items = node.resolvedEncounter.items;
+  const tabs = getEncounterTabs(node);
+  const selectedIndex = items.findIndex((item, index) => getEncounterItemKey(item, index) === selectedKey);
+  const activeKind = items[selectedIndex]?.kind ?? tabs[0]?.kind;
 
   panel.className = "encounter-list-panel";
-  heading.textContent = "Combate";
   list.className = "encounter-list";
 
-  node.resolvedEncounter.items.forEach((item, index) => {
+  items.forEach((item, index) => {
+    if (item.kind !== activeKind) return;
     const key = getEncounterItemKey(item, index);
     const button = document.createElement("button");
     const name = document.createElement("strong");
@@ -472,9 +527,19 @@ function createEncounterList(node, selectedKey, onSelect, missions, trapPresenta
     list.appendChild(button);
   });
 
-  panel.appendChild(heading);
+  if (tabs.length > 1) {
+    panel.appendChild(createEncounterTabBar(tabs, activeKind, (kind) => {
+      const first = items.findIndex(item => item.kind === kind);
+      onSelect(getEncounterItemKey(items[first], first));
+    }));
+  } else {
+    heading.textContent = tabs[0]?.label ?? "Combate";
+    panel.appendChild(heading);
+  }
   panel.appendChild(createEncounterBudget(node));
   panel.appendChild(list);
+  const rerollControls = createEncounterRerollControls(node, activeKind, reroll, kind => reroll.onRerolled?.(kind));
+  if (rerollControls) panel.append(...rerollControls);
 
   return panel;
 }
@@ -814,9 +879,10 @@ function createEncounterDetail(node, selectedKey, missions, onAdjustMissionProgr
 }
 
 function getFirstEncounterItemKey(node) {
-  return node.resolvedEncounter?.items?.[0]
-    ? getEncounterItemKey(node.resolvedEncounter.items[0], 0)
-    : null;
+  const items = node.resolvedEncounter?.items || [];
+  const kind = getEncounterTabs(node)[0]?.kind;
+  const index = items.findIndex(item => item.kind === kind);
+  return index === -1 ? null : getEncounterItemKey(items[index], index);
 }
 
 function createCombatPage(node, selectedKey, onSelect, missions, onAdjustMissionProgress, options = {}) {
@@ -827,7 +893,7 @@ function createCombatPage(node, selectedKey, onSelect, missions, onAdjustMission
   ));
 
   page.className = "combat-page";
-  page.appendChild(createEncounterList(node, currentSelectedKey, onSelect, missions, trapPresentations));
+  page.appendChild(createEncounterList(node, currentSelectedKey, onSelect, missions, trapPresentations, options.reroll));
   page.appendChild(createEncounterDetail(node, currentSelectedKey, missions, onAdjustMissionProgress, trapPresentations, options));
 
   return page;
@@ -853,6 +919,7 @@ function createCombatUnavailableNotice() {
 export function createNodeDialogController({
   canReinforceCreatures = () => false,
   canRerollCreatures = () => false,
+  canRerollEscort = () => false,
   canRerollTrap = () => false,
   contentElement,
   dialogElement,
@@ -869,6 +936,7 @@ export function createNodeDialogController({
   onAdjustMissionProgress = null,
   onOpenMission = () => {},
   onRerollCreatures = () => false,
+  onRerollEscort = () => false,
   onRerollTrap = () => false,
   onSetCreatureReinforcement = () => false,
   onRest,
@@ -879,6 +947,7 @@ export function createNodeDialogController({
   let currentNode = null;
   const selectedEncounterItemByNode = new Map();
   const viewModeByNode = new Map();
+  let pendingRerollStatus = "";
 
   function createAttemptControl(node) {
     const attempted = state.isNodeAttempted(node);
@@ -1028,9 +1097,7 @@ export function createNodeDialogController({
 
     if (selectedExists) return selectedKey;
 
-    const fallbackKey = node.resolvedEncounter?.items?.[0]
-      ? getEncounterItemKey(node.resolvedEncounter.items[0], 0)
-      : null;
+    const fallbackKey = getFirstEncounterItemKey(node);
 
     if (fallbackKey) selectedEncounterItemByNode.set(node.id, fallbackKey);
     return fallbackKey;
@@ -1053,14 +1120,58 @@ export function createNodeDialogController({
 
     const selectedKey = getSelectedEncounterItemKey(node);
 
+    const selectNodeItem = (key) => {
+      selectedEncounterItemByNode.set(node.id, key);
+    };
+    const rerollMessages = {
+      creature: {
+        success: "Criaturas atualizadas com o mesmo ND.",
+        failure: "Nenhuma outra composição compatível foi encontrada."
+      },
+      escort: {
+        success: "Escolta atualizada com o mesmo ND.",
+        failure: "Nenhuma outra escolta compatível foi encontrada."
+      },
+      trap: {
+        success: "Armadilha atualizada com o mesmo ND.",
+        failure: "Nenhuma outra armadilha com o mesmo ND foi encontrada."
+      }
+    };
+    const escortMode = canRerollEscort(node);
+    const creatureMessages = rerollMessages[escortMode ? "escort" : "creature"];
+    const reroll = { status: pendingRerollStatus, onRerolled: (kind) => {
+      const items = node.resolvedEncounter.items;
+      const index = items.findIndex(item => item.kind === kind);
+      if (index !== -1) selectNodeItem(getEncounterItemKey(items[index], index));
+      pendingRerollStatus = (kind === "trap" ? rerollMessages.trap : creatureMessages).success;
+      render(node);
+      contentElement.querySelector(`[data-encounter-reroll="${kind}"]`)?.focus();
+    } };
+    pendingRerollStatus = "";
+    if (escortMode || canRerollCreatures(node)) {
+      reroll.creature = {
+        run: () => escortMode
+          ? onRerollEscort(node, { tacticalLayout: node.tacticalLayout, objectives: getTacticalObjectives(node) })
+          : onRerollCreatures(node),
+        failure: creatureMessages.failure
+      };
+    }
+    if (canRerollTrap(node)) {
+      reroll.trap = {
+        run: () => onRerollTrap(node, { tacticalLayout: node.tacticalLayout, objectives: getTacticalObjectives(node) }),
+        failure: rerollMessages.trap.failure
+      };
+    }
+
     const page = createCombatPage(node, selectedKey, (nextSelectedKey) => {
-      selectedEncounterItemByNode.set(node.id, nextSelectedKey);
+      selectNodeItem(nextSelectedKey);
       render(node);
     }, getActiveMissions(), (missionId, delta, eventKey) => {
       onAdjustMissionProgress?.(missionId, delta, eventKey);
       render(node);
     }, {
       profileId: getProfileId(),
+      reroll,
       onEncounterAdjusted: !state.isNodeCompleted(node) && (() => {
         onEncounterAdjusted();
         render(node);
@@ -1071,53 +1182,6 @@ export function createNodeDialogController({
         contentElement.querySelector(`[data-creature-reinforcement="${stat}"]`)?.focus();
       })
     });
-    const rerollActions = [
-      {
-        kind: "creature",
-        available: canRerollCreatures(node),
-        run: onRerollCreatures,
-        label: "Rerrolar criaturas",
-        success: "Criaturas atualizadas com o mesmo ND.",
-        failure: "Nenhuma outra composição compatível foi encontrada."
-      },
-      {
-        kind: "trap",
-        available: canRerollTrap(node),
-        run: node => onRerollTrap(node, { tacticalLayout: node.tacticalLayout, objectives: getTacticalObjectives(node) }),
-        label: "Rerrolar armadilha",
-        success: "Armadilha atualizada com o mesmo ND.",
-        failure: "Nenhuma outra armadilha com o mesmo ND foi encontrada."
-      }
-    ].filter(action => action.available);
-    if (rerollActions.length) {
-      const actions = document.createElement("div");
-      actions.className = "encounter-reroll-actions";
-      const status = document.createElement("p");
-      status.className = "node-dialog-meta encounter-reroll-status";
-      status.setAttribute("role", "status");
-      for (const action of rerollActions) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "extended-action is-compact";
-        button.dataset.encounterReroll = action.kind;
-        button.textContent = action.label;
-        button.addEventListener("click", () => {
-          if (!action.run(node)) {
-            status.textContent = action.failure;
-            return;
-          }
-          const items = node.resolvedEncounter.items;
-          const index = items.findIndex(item => item.kind === action.kind);
-          if (index !== -1) selectedEncounterItemByNode.set(node.id, getEncounterItemKey(items[index], index));
-          render(node);
-          const replacement = contentElement.querySelector(".encounter-reroll-status");
-          if (replacement) replacement.textContent = action.success;
-          contentElement.querySelector(`[data-encounter-reroll="${action.kind}"]`)?.focus();
-        });
-        actions.append(button);
-      }
-      page.firstElementChild.append(actions, status);
-    }
     contentElement.appendChild(page);
   }
 

@@ -117,36 +117,26 @@ function createIslandEncounter(scene, onEncounterAdjusted = () => {}, {
     return sheet;
   }
 
-  function showSheet(selectedKey, rerolled = false) {
-    const page = createEncounterCombatPage(scene, selectedKey, showSheet, [], null, {
+  function showSheet(selectedKey, status = "") {
+    const reroll = onReroll && canReroll(scene) ? {
+      creature: {
+        run: () => onReroll(),
+        failure: "Nenhuma outra composição compatível foi encontrada."
+      },
+      status,
+      onRerolled: () => {
+        showSheet(undefined, "Criaturas atualizadas com o mesmo ND.");
+        sheet.querySelector("[data-encounter-reroll]")?.focus();
+      }
+    } : undefined;
+    sheet.replaceChildren(createEncounterCombatPage(scene, selectedKey, key => showSheet(key), [], null, {
       readOnly,
+      reroll,
       onEncounterAdjusted: () => {
         onEncounterAdjusted();
         showSheet(selectedKey);
       }
-    });
-    sheet.replaceChildren(page);
-    if (onReroll && canReroll(scene)) {
-      const rerollControls = document.createElement("div");
-      rerollControls.className = "archipelago-reroll-footer";
-      const status = document.createElement("p");
-      status.className = "node-dialog-meta";
-      status.setAttribute("role", "status");
-      const button = createButton({
-        className: "extended-action is-compact",
-        label: "Rerrolar criaturas",
-        onClick: () => {
-          if (onReroll()) showSheet(undefined, true);
-          else status.textContent = "Nenhuma outra composição compatível foi encontrada.";
-        }
-      });
-      rerollControls.append(button, status);
-      page.querySelector(".encounter-list-panel").appendChild(rerollControls);
-      if (rerolled) {
-        status.textContent = "Criaturas atualizadas com o mesmo ND.";
-        button.focus();
-      }
-    }
+    }));
   }
   showSheet();
   return sheet;

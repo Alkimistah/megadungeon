@@ -8,7 +8,7 @@ import { encodeSessionCode } from "../src/sessionCode.js";
 
 const url = process.env.QA_APP_URL || "http://localhost:5173/megadungeon/";
 const browser = await chromium.launch({ executablePath: process.env.QA_CHROME || "/usr/bin/google-chrome", args: ["--no-sandbox"] });
-const seed = "grade-tatica-qa-arquipelago";
+const seed = "a";
 const state = createArchipelagoState(profile, createRng(seed));
 const worldDraft = { islands: state.getSnapshot().islands };
 const island = worldDraft.islands.find(item => item.available && item.objectives.some(objective => objective.type === "combate"));
@@ -61,6 +61,9 @@ try {
   await load();
   await openIsland();
   await islandDialog.locator(`[data-direction="${sector.direction}"]`).click();
+  assert.equal(await encounter.getByRole("button", { name: "Rerrolar criaturas" }).count(), 0);
+  await encounter.getByRole("button", { name: "Rerrolar inimigos" }).waitFor();
+  assert.equal(await encounter.locator(".encounter-reroll-actions button").count(), 1);
   await openBoard();
   const player = board.getByRole("button", { name: "Jogador 1", exact: true });
   const original = await position(player);
