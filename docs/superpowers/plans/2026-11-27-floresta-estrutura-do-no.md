@@ -12,7 +12,8 @@
 
 ## Retomada
 
-- As cinco tarefas estão implementadas e as suítes e o QA passaram. Falta a revisão final de todo o conjunto da branch.
+- Plano concluído. As cinco tarefas passaram em revisão, e a revisão final do conjunto (`46b5e92..677769d`) não teve achados críticos ou importantes. A onda de correção final (`e08db4d`) ajustou o agregado de tesouro e acampamento, a preferência por armadilha autônoma após falha de escolta e a semente sem `mapSeed`.
+- Backlog: rerrolar a escolta de um nó de armadilha (fora do spec).
 - O PO aprovou os 35 modos dos [cartões](../specs/2026-11-27-floresta-armadilhas-cartoes.md). Amostra final da tarefa 5, com sementes fixas: 642 armadilhas incidentais em 3.356 combates normais procedurais (19,13%, diferença de -0,87 ponto frente aos 20% de tentativa).
 - A geração de novas expedições da floresta usa a versão 5; expedições salvas anteriores seguem restauradas como estão.
 
