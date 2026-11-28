@@ -10,6 +10,15 @@
 
 **Spec.** [Harmonia dos animais da floresta](../specs/2026-11-28-floresta-harmonia-dos-animais-design.md).
 
+## Retomada
+
+- Tasks 1 e 2 concluídas e aprovadas em revisão (`747277d`, `aea5030`, `ddb79b8`, `71d26c1`). A geração 6 existe, mas `GENERATION_VERSION` continua 5 e nenhuma expedição usa a regra nova.
+- O PO aceitou a escolha preguiçosa do grupo, que gera mais variedade entre os animais.
+- Ruling registrado: na v6, animais em combates de outros tipos também precisam ser de uma comunidade do terreno do nó.
+- A Task 3 foi interrompida a pedido do PO, por falta de tokens. Recomeçar pelo brief, conferindo antes se ficou rascunho parcial em `recursos/ecologia/harmonia-rascunho.json` ou em `tmp/previas/harmonia-animais/`.
+- Depois da Task 3, parar para as decisões do PO nos cartões. Em seguida vêm as Tasks 4 e 5.
+- Na Task 5, conferir com os dados reais a frequência de elites com animal principal (com dados de teste caiu de 33/291 para 8/291).
+
 ## Restrições gerais
 
 - A regra vale para novas expedições da floresta, sob `generationVersion` 6. A versão 6 herda todo o comportamento da 5: as checagens `generationVersion === 5` passam a `>= 5`, e o comportamento novo fica atrás de `>= 6`. Expedições v5 e encontros já resolvidos não mudam.
