@@ -574,15 +574,20 @@ function getEscortGroups(catalog, target, ecology) {
   return groups;
 }
 
-export function resolveForestTrapNode(node, profile, { seed, tacticalLayout = node.tacticalLayout }) {
-  const rng = createRng(seed);
-  const maximumChallenge = node.challenge.encounter;
-  const candidates = getEligibleForestTraps(profile, { maximumChallenge });
+function getForestEscortCatalog(node, profile) {
   const ecology = getNodeEcology(node, profile);
   const rules = profile.creatureRules;
   const catalog = filterEncounterCatalog(node, getAllowedCatalog(
     rules.allowedCreatureIdsByFloor?.[node.level] ?? rules.allowedCreatureIds, profile
   ), ecology).filter(creature => creature.type === "humanoid");
+  return { catalog, ecology };
+}
+
+export function resolveForestTrapNode(node, profile, { seed, tacticalLayout = node.tacticalLayout }) {
+  const rng = createRng(seed);
+  const maximumChallenge = node.challenge.encounter;
+  const candidates = getEligibleForestTraps(profile, { maximumChallenge });
+  const { catalog, ecology } = getForestEscortCatalog(node, profile);
   let escortFailed = false;
   while (candidates.length) {
     if (escortFailed && candidates.some(candidate => candidate.mode === "standalone")) {
@@ -854,6 +859,42 @@ export function rerollNodeCreatures(node, profile, { tacticalLayout } = {}) {
         creatureRerolls: reroll,
         items: [...candidate, ...encounter.items.filter(item => item.kind !== "creature")]
       };
+    }
+  }
+  return null;
+}
+
+export function canRerollNodeEscort(node) {
+  return Boolean(node?.trap
+    && (node.contentType || node.type) === "trap"
+    && node.generationVersion === 5
+    && getForestEscortTarget(node.trap.challengeRating) > 0
+    && !node.missionBindings?.length
+    && !node.missionObjectives?.length
+    && !node.fixedComposition
+    && !node.fixedTacticalMap
+    && !hasEncounterAdjustments(node.resolvedEncounter)
+    && node.resolvedEncounter?.items.some(item => item.kind === "creature"));
+}
+
+export function rerollNodeEscort(node, profile, { tacticalLayout = node?.tacticalLayout, objectives } = {}) {
+  if (!canRerollNodeEscort(node)) return null;
+
+  const encounter = node.resolvedEncounter;
+  const target = getForestEscortTarget(node.trap.challengeRating);
+  const originalComposition = getCreatureComposition(encounter.items.filter(item => item.kind === "creature"));
+  const escortRerolls = (encounter.escortRerolls || 0) + 1;
+  const rng = createRng(`${encounter.seed}:escort-reroll:${escortRerolls}`);
+  const { catalog, ecology } = getForestEscortCatalog(node, profile);
+  const groups = getEscortGroups(catalog, target, ecology)
+    .filter(group => getCreatureComposition(group.items) !== originalComposition);
+  while (groups.length) {
+    const group = pickEcologyWeighted(rng, groups);
+    groups.splice(groups.indexOf(group), 1);
+    if (encounterFitsMap(node, tacticalLayout, profile.id, encounter.seed,
+      [...group.items, getTrapSummary(node.trap)], group.count, objectives)) {
+      return { ...encounter, escortRerolls,
+        items: [...group.items, ...encounter.items.filter(item => item.kind !== "creature")] };
     }
   }
   return null;
