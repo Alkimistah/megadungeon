@@ -43,6 +43,38 @@ export function selectRatings(buckets, count, target, rng) {
   return chosen;
 }
 
+// Auxiliares de um elite: grupos com a principal que fecham o alvo por calculateCombatND.
+// Os candidatos chegam ordenados do maior para o menor ND. O ND do grupo depende só do
+// multiconjunto de ND, e um sufixo da lista nunca alcança o que a lista inteira não
+// alcançou; por isso um estado sem saída é lembrado pelo multiconjunto e pelo índice.
+// Principais do mesmo ND podem compartilhar `dead` quando recebem a mesma lista.
+export function* eliteAuxiliaries(candidates, leader, target, dead = new Map()) {
+  function* search(start, helpers, ratings) {
+    const key = ratings.join(",");
+    if (dead.get(key) <= start) return;
+    let found = false;
+    for (let index = start; index < candidates.length; index++) {
+      const creature = candidates[index];
+      for (let quantity = 1; ratings.length + quantity <= 12 && canUseEcologyQuantity(creature, quantity); quantity++) {
+        const entries = [...helpers, { creature, quantity }];
+        const next = [...ratings, ...Array(quantity).fill(creature.challengeRating)].sort((a, b) => a - b);
+        const rating = calculateCombatND(next.map(challengeRating => ({ challengeRating, quantity: 1 })));
+        if (rating === target) {
+          found = true;
+          yield entries;
+        }
+        if (rating >= target) break;
+        for (const group of search(index + 1, entries, next)) {
+          found = true;
+          yield group;
+        }
+      }
+    }
+    if (!found) dead.set(key, Math.min(dead.get(key) ?? Infinity, start));
+  }
+  yield* search(0, [], [leader.creature.challengeRating]);
+}
+
 function forestPool(catalog, type, rng) {
   const roll = rng();
   if (roll >= 0.9) return catalog;

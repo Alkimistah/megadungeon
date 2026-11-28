@@ -6,7 +6,7 @@ import {
   getEncounterEcologyContext, pickEcologyWeighted
 } from "./encounterEcology.js";
 import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
-import { pickEncounterGroupComposition } from "./encounterGroupComposition.js";
+import { eliteAuxiliaries, pickEncounterGroupComposition } from "./encounterGroupComposition.js";
 import { applyWeaponVariation } from "./equipment/weaponVariation.js";
 import { getLegacyCandidateWeight, SUPPORT_CREATURE_IDS_BY_TYPE } from "./legacyEncounterPreferences.js";
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
@@ -607,6 +607,58 @@ export function resolveForestTrapNode(node, profile, { seed, tacticalLayout = no
   return { trap: null, items: [], creatureTarget: 0 };
 }
 
+const ELITE_FIT_ATTEMPTS = 8;
+
+export function resolveForestElite(node, profile, {
+  seed, tacticalLayout = node.tacticalLayout, rng = createRng(seed), variant, originalComposition
+}) {
+  const ecology = getNodeEcology(node, profile);
+  const rules = profile.creatureRules;
+  const catalog = filterEncounterCatalog(node, getAllowedCatalog(
+    rules.allowedCreatureIdsByFloor?.[node.level] ?? rules.allowedCreatureIds, profile
+  ), ecology).map(creature => ({
+    creature,
+    order: -Math.log(1 - rng()) / (ecology ? getCreatureEcologyWeight(creature, ecology.context, ecology.rules) : 1)
+  })).sort((a, b) => a.order - b.order).map(entry => entry.creature);
+  const variants = variant ? [variant] : rng() < 0.1
+    ? ["eliteTrap", "eliteGroup", "eliteSingle"] : ["eliteGroup", "eliteTrap", "eliteSingle"];
+  const traps = variant ? [node.trap].filter(Boolean) : getEligibleForestTraps(profile, { maximumChallenge: 1, mode: "standalone" })
+    .filter(trap => trap.challengeRating === 1).map(trap => withTrapRole(trap, "incidental", 1));
+  const target = variant ? node.challenge.creatures + (variant === "eliteTrap" ? 1 : 0) : node.challenge.encounter;
+  const minimum = variant ? target : target - 1;
+  for (let rating = target; rating >= minimum; rating--) {
+    for (const recipe of variants) {
+      const principalND = recipe === "eliteSingle" ? rating : rating - 1;
+      const auxiliaries = catalog.filter(c => c.challengeRating > 0 && c.challengeRating < principalND)
+        .sort((a, b) => b.challengeRating - a.challengeRating);
+      const dead = new Map();
+      for (const principal of catalog.filter(c => c.challengeRating === principalND)) {
+        const leader = { creature: principal, quantity: 1 };
+        const helpers = recipe === "eliteGroup" ? eliteAuxiliaries(auxiliaries, leader, rating, dead) : [[]];
+        // Limita as conferências de grade por principal; a próxima principal recomeça.
+        let attempts = 0;
+        for (const group of helpers) {
+          if (attempts >= ELITE_FIT_ATTEMPTS) break;
+          const items = [leader, ...group].map(({ creature, quantity }) => getCreatureSummary(creature, quantity));
+          if (originalComposition && getCreatureComposition(items) === originalComposition) continue;
+          attempts++;
+          for (const trap of recipe === "eliteTrap" ? traps : [null]) {
+            const all = trap ? [...items, getTrapSummary(trap)] : items;
+            const count = items.reduce((sum, item) => sum + item.quantity, 0);
+            if (encounterFitsMap({ ...node, trap }, tacticalLayout, profile.id, seed, all, count)) {
+              // A variação de armas vale para a rerrolagem; a geração grava só as fichas.
+              const varied = [leader, ...group].map(({ creature, quantity }) => getCreatureSummary(creature, quantity, rng));
+              return { items: varied, trap, creatureTarget: calculateCombatND(items), effectiveType: "elite", variant: recipe };
+            }
+          }
+        }
+      }
+    }
+  }
+  // Sem elite viável: o gerador converte o nó e usa a busca normal com o alvo do andar.
+  return { items: [], trap: null, creatureTarget: 0, effectiveType: "normal", variant: "normal" };
+}
+
 function resolveCreatureGroup(node, rng, catalog, ecology, { profileId, seed, compositionSeed = seed, tacticalLayout } = {}) {
   if (!node.creature || !node.challenge || node.challenge.creatures <= 0) return [];
 
@@ -748,6 +800,17 @@ export function rerollNodeCreatures(node, profile, { tacticalLayout } = {}) {
   const encounter = node.resolvedEncounter;
   const original = encounter.items.filter(item => item.kind === "creature");
   const originalComposition = getCreatureComposition(original);
+  const variant = node.forestComposition?.variant;
+  if (node.generationVersion === 5 && variant?.startsWith("elite")) {
+    const reroll = (encounter.creatureRerolls || 0) + 1;
+    const result = resolveForestElite(node, profile, {
+      seed: encounter.seed, tacticalLayout, variant, originalComposition,
+      rng: createRng(`${encounter.seed}:creature-reroll:${reroll}`)
+    });
+    if (result.variant !== variant) return null;
+    return { ...encounter, creatureRerolls: reroll,
+      items: [...result.items, ...encounter.items.filter(item => item.kind !== "creature")] };
+  }
   // Com orçamento de criaturas, mira o mesmo alvo de resolveCreatureGroup: um grupo
   // gravado antes do ND de grupo do livro pode valer outro ND. Sem orçamento, mira
   // o ND do grupo efetivamente encontrado.
@@ -803,7 +866,7 @@ export function rerollNodeTrap(node, profile, { tacticalLayout = node?.tacticalL
   const rng = createRng(`${current.seed}:trap-reroll:${trapRerolls}`);
   if (node.generationVersion === 5 && profile.id === "forest-11-20") {
     const count = current.items.filter(item => item.kind === "creature").reduce((sum, item) => sum + item.quantity, 0);
-    const mode = count ? undefined : "standalone";
+    const mode = count && node.forestComposition?.variant !== "eliteTrap" ? undefined : "standalone";
     const candidates = getEligibleForestTraps(profile, { maximumChallenge: node.trap.challengeRating, mode })
       .filter(candidate => candidate.challengeRating === node.trap.challengeRating && candidate.id !== node.trap.id);
     while (candidates.length) {
