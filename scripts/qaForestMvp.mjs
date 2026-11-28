@@ -197,7 +197,7 @@ async function missionFlow() {
       assert.equal(await dialog.locator("#nodeDialogMeta").innerText(), nd);
       reinforcedNodeId = node.id;
       const xp = new Intl.NumberFormat("pt-BR");
-      if (node.generationVersion === 5) {
+      if (node.generationVersion >= 5) {
         const encounter = resolveNodeEncounter({ ...node }, { profile, mapSeed: entry.mapSeed });
         const parts = getForestChallengeParts({ ...node, resolvedEncounter: encounter });
         assert.ok(nd.replaceAll("\u00a0", " ").includes(`· ${xp.format(parts.creatures * 1000)} XP`));

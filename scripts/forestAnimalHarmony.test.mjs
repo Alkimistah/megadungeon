@@ -228,6 +228,40 @@ test("v6 animal elites take the principal and auxiliaries from one community", (
   }
 });
 
+const singleEliteProfile = withCommunities({
+  Floresta: [{ id: "tigre", name: "Tigre", families: ["grande-felino"], maxSheets: 1, weight: 1 }]
+}, { allowedCreatureIds: ["tigre", "naiade"] });
+
+function resolveSingleElite(id, animalCommunityId) {
+  const node = eliteScene(eliteNode(3), {
+    variant: "eliteSingle", creatureTarget: 3, trap: null, animalCommunityId,
+    composition: [{ id, quantity: 1 }]
+  }, "elite-de-uma-ficha");
+  resolveNodeEncounter(node, { profile: singleEliteProfile });
+  return node;
+}
+
+test("v6 resolved elite records the community from its map composition", () => {
+  const node = resolveSingleElite("tigre", "tigre");
+  assert.equal(node.resolvedEncounter.animalCommunityId, "tigre");
+});
+
+test("v6 animal elite cannot reroll out of the map community if it has no alternative", () => {
+  const node = resolveSingleElite("tigre", "tigre");
+  delete node.resolvedEncounter.animalCommunityId; // Salvamento com a comunidade só no mapa.
+  assert.equal(rerollNodeCreatures(node, singleEliteProfile), null);
+});
+
+test("v6 elite rerolled to an animal persists its community for the next reroll", () => {
+  const node = resolveSingleElite("naiade");
+  const rerolled = rerollNodeCreatures(node, singleEliteProfile);
+  assert.deepEqual(creaturesOf(rerolled).map(item => item.creatureId), ["tigre"]);
+  assert.equal(rerolled.animalCommunityId, "tigre");
+  node.resolvedEncounter = JSON.parse(JSON.stringify(rerolled));
+  assert.equal(node.forestComposition.animalCommunityId, undefined);
+  assert.equal(rerollNodeCreatures(node, singleEliteProfile), null);
+});
+
 test("rerolling a v6 animal combat keeps the community and changes the composition", () => {
   let rerolled = 0;
   for (const { node, mapSeed } of v6Nodes()) {

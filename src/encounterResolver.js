@@ -730,7 +730,7 @@ export function resolveForestElite(node, profile, {
   const principalsFor = principalND => {
     if (!communityContext) return catalog.filter(c => c.challengeRating === principalND);
     return catalog.flatMap(c => {
-      if (c.type !== "animal") return c.challengeRating === principalND ? [c] : [];
+      if (c.type !== "animal") return !animalCommunityId && c.challengeRating === principalND ? [c] : [];
       if (!inCommunity.has(c.id) || !(c.challengeRating > 0)) return [];
       if (c.challengeRating === principalND) return [c];
       return c.challengeRating < principalND ? [upgradeOf(c, principalND)].filter(Boolean) : [];
@@ -956,12 +956,15 @@ export function rerollNodeCreatures(node, profile, { tacticalLayout } = {}) {
     const reroll = (encounter.creatureRerolls || 0) + 1;
     const result = resolveForestElite(node, profile, {
       seed: encounter.seed, tacticalLayout, variant, originalComposition,
-      animalCommunityId: node.forestComposition.animalCommunityId,
+      animalCommunityId: node.generationVersion >= 6
+        ? encounter.animalCommunityId ?? node.forestComposition.animalCommunityId
+        : undefined,
       rng: createRng(`${encounter.seed}:creature-reroll:${reroll}`)
     });
     if (result.variant !== variant) return null;
     return { ...encounter, creatureRerolls: reroll,
-      items: [...result.items, ...encounter.items.filter(item => item.kind !== "creature")] };
+      items: [...result.items, ...encounter.items.filter(item => item.kind !== "creature")],
+      ...(result.animalCommunityId ? { animalCommunityId: result.animalCommunityId } : {}) };
   }
   const animalCommunities = getNodeAnimalCommunityContext(node, profile);
   if (animalCommunities && encounter.animalCommunityId) {
@@ -1219,6 +1222,7 @@ export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidate
   } else if (node.generationVersion >= 5 && node.forestComposition && node.creature?.challengeSource !== "manual") {
     items = resolveFixedComposition(node.forestComposition, rng);
     if (node.trap) items.push(getTrapSummary(node.trap));
+    if (node.generationVersion >= 6) result.animalCommunityId = node.forestComposition.animalCommunityId;
   } else {
     const { catalog, ecology } = getNodeCreatureCatalog(node, profile, creatureCandidates);
     items = resolveCreatureGroup(node, rng, catalog, ecology, {

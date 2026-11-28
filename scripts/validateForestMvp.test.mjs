@@ -2246,9 +2246,9 @@ test("inclinações simultâneas e seixos preservam as regras distintas", () => 
   assert.ok(pebbles.indices.every(index => map.scene.terrain[index] === "steep-slope"));
 });
 
-// ---- Tarefa 5: ativação da versão 5, missões, reabertura e incidência ----
+// ---- Ativação da geração 6, compatibilidade, missões e armadilhas ----
 
-const v5Nodes = expedition => expedition.floors.flatMap(entry => entry.levels.flat().map(node => ({ entry, node })));
+const expeditionNodes = expedition => expedition.floors.flatMap(entry => entry.levels.flat().map(node => ({ entry, node })));
 const roundTrip = expedition => expeditionModule.restoreForestExpedition(
   JSON.parse(JSON.stringify(expeditionModule.serializeForestExpedition(expedition))));
 
@@ -2272,28 +2272,141 @@ test("expedição anterior à versão 5 preserva nó, alvo e encontro resolvido 
   assert.deepEqual(serializeForestExpedition(restored), saved);
 });
 
-test("novas expedições nascem na versão 5 e zeram parcelas ausentes em tesouro e acampamento", () => {
+test("novas expedições zeram parcelas ausentes em tesouro e acampamento", () => {
   const expedition = expeditionModule.prepareForestExpedition({ seed: "ativacao-v5", profile, missions: [] });
-  assert.equal(expedition.generationVersion, 5);
-  const nodes = v5Nodes(expedition);
-  assert.ok(nodes.every(({ node }) => node.generationVersion === 5));
+  const nodes = expeditionNodes(expedition);
   const empties = nodes.filter(({ node }) => ["treasure", "camp"].includes(node.contentType));
   assert.ok(empties.length > 0);
   for (const { node } of empties) {
     assert.equal(node.challenge.creatures, 0, `${node.contentType} sem criaturas`);
     assert.equal(node.challenge.trap, 0, `${node.contentType} sem armadilha`);
   }
-  assert.equal(roundTrip(expedition).generationVersion, 5);
 });
 
-test("missão de caça em nó v5 troca criaturas, remove a armadilha e mantém o alvo coerente", () => {
+test("o salvamento de uma nova expedição preserva a geração 6", () => {
+  const expedition = expeditionModule.prepareForestExpedition({ seed: "ativacao-v6", profile, missions: [] });
+  const restored = roundTrip(expedition);
+  assert.equal(restored.generationVersion, 6);
+  assert.ok(expeditionNodes(restored).every(({ node }) => node.generationVersion === 6));
+});
+
+test("o catálogo real gera combates de animais da comunidade e do terreno na geração 6", () => {
+  const sheetsByCount = new Map([[1, 0], [2, 0], [3, 0]]);
+  const terrainCounts = new Map();
+  let upgradedSheets = 0;
+  let eliteCombats = 0;
+  let animalElites = 0;
+  for (const index of [0, 1, 2, 3, 4, 5, 13, 16]) {
+    const seed = `harmonia-amostra-${index}`;
+    const expedition = expeditionModule.prepareForestExpedition({ seed, profile, missions: [] });
+    assert.equal(expedition.generationVersion, 6, seed);
+    for (const { entry, node } of expeditionNodes(expedition)) {
+      assert.equal(node.generationVersion, 6, `${entry.mapSeed}/${node.id}`);
+      if (!node.creature || node.fixedComposition || node.scene) continue;
+      const encounter = resolveNodeEncounter(node, { mapSeed: entry.mapSeed, profile });
+      const items = encounter?.items.filter(item => item.kind === "creature") ?? [];
+      if (!items.length) continue;
+      const creatures = items.map(item => getCreatureById(item.creatureData?.baseCreatureId ?? item.creatureId));
+      const animals = creatures.filter(creature => creature.type === "animal");
+      const isAnimalElite = node.contentType === "elite" && creatures[0].type === "animal";
+      if (node.contentType === "elite") eliteCombats++;
+      if (isAnimalElite) animalElites++;
+      if (!animals.length) continue;
+
+      const terrain = node.environment.terrain.name;
+      const [terrainTag] = profile.creatureRules.ecology.terrainTagsByName[terrain];
+      const communities = profile.creatureRules.animalCommunities[terrain];
+      const communityId = encounter.animalCommunityId ?? node.forestComposition?.animalCommunityId;
+      const context = `${entry.mapSeed}/${node.id} em ${terrain}`;
+      for (const { id, ecology } of animals) {
+        assert.ok((ecology.forestTerrains ?? ecology.terrains).includes(terrainTag), `${id} fora do terreno: ${context}`);
+        assert.ok(communities.some(community => community.families.includes(ecology.family)), `${id} fora das comunidades: ${context}`);
+      }
+      if (isAnimalElite || node.contentType === "normal" && node.creature.type === "animal") {
+        assert.ok(communityId, `combate de animais sem comunidade gravada: ${context}`);
+      }
+      if (!communityId) continue;
+
+      const community = communities.find(candidate => candidate.id === communityId);
+      assert.ok(community, `${communityId} fora do terreno: ${context}`);
+      assert.equal(animals.length, items.length, `grupo misto em ${communityId}: ${context}`);
+      for (const { id, ecology } of animals) {
+        assert.ok(community.families.includes(ecology.family), `${id} fora de ${communityId}: ${context}`);
+      }
+      const sheets = new Set(animals.map(animal => animal.id)).size;
+      assert.ok(sheets <= community.maxSheets, `${sheets} fichas em ${communityId}: ${context}`);
+      sheetsByCount.set(sheets, sheetsByCount.get(sheets) + 1);
+      terrainCounts.set(terrain, (terrainCounts.get(terrain) ?? 0) + 1);
+      upgradedSheets += items.filter(item => item.generated).length;
+    }
+  }
+  if (process.env.FOREST_SAMPLE === "1") {
+    console.log("Harmonia dos animais:", JSON.stringify({
+      terrenos: Object.fromEntries([...terrainCounts].sort()),
+      gruposPorFichas: Object.fromEntries(sheetsByCount),
+      fichasMelhoradas: upgradedSheets,
+      elitesComPrincipalAnimal: animalElites,
+      elites: eliteCombats
+    }));
+  }
+  for (const [sheets, count] of sheetsByCount) assert.ok(count > 0, `nenhum grupo com ${sheets} fichas`);
+  assert.ok(upgradedSheets > 0, "nenhuma ficha melhorada");
+  for (const terrain of ["Pântano", "Colinas"]) assert.ok(terrainCounts.get(terrain) > 0, `nenhum combate de animais em ${terrain}`);
+});
+
+test("um salvamento da geração 5 preserva combates de animais abertos e ainda não abertos", () => {
+  // Recorte do JSON exportado com o código em 7db91d7: nós 7–9 do andar 20.
+  const mapSeed = "harmonia-compatibilidade-v5:forest:20:0";
+  const animal = { type: "animal", targetChallenge: 5, challengeSource: "creatures" };
+  const saved = {
+    version: 1, generationVersion: 5, profileId: "forest-11-20", seed: "harmonia-compatibilidade-v5", startFloor: 20,
+    floors: [{ floor: 20, depth: 6, baseDc: 23, mapSeed, levels: [[
+      { id: 7, encounterSeed: "20:N7", level: 2, type: "normal", contentType: "normal", generationVersion: 5,
+        environment: { terrain: { name: "Floresta", features: [{ name: "Folhagens" }, { name: "Inclinação suave" }] } },
+        challenge: { encounter: 5, creatures: 5, trap: 0, total: 5.75 }, creature: animal, trap: null,
+        resolvedEncounter: null, links: [] },
+      { id: 8, encounterSeed: "20:N8", level: 2, type: "unknown", contentType: "normal", generationVersion: 5,
+        environment: { terrain: { name: "Floresta", features: [{ name: "Inclinação suave" }] } },
+        challenge: { encounter: 5, creatures: 5, trap: 0, total: 5.5 }, creature: animal, trap: null, links: [9],
+        resolvedEncounter: {
+          version: 9, seed: "harmonia-compatibilidade-v5:forest:20:0:20:N8:encounter-v9",
+          budget: { creatures: 5, creaturesLabel: "5", total: 5.5, totalLabel: "5 1/2", trap: 0, trapLabel: "0" },
+          items: [{ kind: "creature", creatureId: "pliorex", name: "Pliorex", challengeRating: 5, challengeLabel: "5",
+            quantity: 1, role: "solo", roleLabel: "Solo", type: "animal", typeLabel: "Animal" }]
+        } }
+    ], [
+      { id: 9, encounterSeed: "20:N9", level: 3, type: "normal", contentType: "normal", generationVersion: 5,
+        environment: { terrain: { name: "Aquático", features: [{ name: "Água parada" }, { name: "Água corrente" }] } },
+        challenge: { encounter: 5, creatures: 5, trap: 0, total: 6.75 }, creature: animal, trap: null,
+        resolvedEncounter: null, links: [] }
+    ]] }]
+  };
+  const restored = expeditionModule.restoreForestExpedition(JSON.parse(JSON.stringify(saved)));
+  assert.equal(restored.generationVersion, 5);
+  const [unopened, opened, aquatic] = restored.floors[0].levels.flat();
+  assert.equal(unopened.resolvedEncounter, null);
+  assert.equal(opened.links[0], aquatic);
+  assert.deepEqual(resolveNodeEncounter(opened, { mapSeed, profile }), saved.floors[0].levels[0][1].resolvedEncounter);
+  const outcomes = [unopened, aquatic].map(node => {
+    assert.equal(node.generationVersion, 5);
+    const encounter = resolveNodeEncounter(node, { mapSeed, profile });
+    assert.equal(encounter.animalCommunityId, undefined);
+    return encounter.items.map(({ creatureId, quantity, challengeRating }) => [creatureId, quantity, challengeRating]);
+  });
+  assert.deepEqual(outcomes, [[
+    ["enxame-de-gali-gali", 1, 1], ["jiboia", 1, 0.5], ["urso-pardo", 1, 3],
+    ["tumarkhan", 1, 4], ["chacal", 1, 0.25], ["cavalo-de-namalkah", 1, 2]
+  ], [["pliorex", 1, 5]]]);
+});
+
+test("missão de caça em nó v6 troca criaturas, remove a armadilha e mantém o alvo coerente", () => {
   const expedition = expeditionModule.prepareForestExpedition({ seed: "snapshot", profile, missions: [mission("specialHunt")] });
   const binding = expedition.missions[0].integration.bindings[0];
   const entry = expedition.floors.find(item => item.floor === binding.floor);
   const node = entry.levels.flat().find(item => item.id === binding.nodeId);
   const creature = getCreatureById("sucuri");
   const actual = calculateCombatND([{ challengeRating: creature.challengeRating, quantity: binding.quantity }]);
-  assert.equal(node.generationVersion, 5);
+  assert.equal(node.generationVersion, 6);
   assert.equal(node.forestComposition, undefined);
   assert.equal(node.trap, null);
   assert.equal(node.challenge.trap, 0);
@@ -2320,18 +2433,18 @@ test("capacidade de missão v5 usa a parcela de criaturas e não o ND do encontr
   assert.doesNotThrow(() => materialize({ floor: 15, levels: legacy, missions: [hunt] }));
 });
 
-test("armadilha rerrolada em nó v5 sobrevive ao salvamento sem mexer na composição nem no mapa", () => {
+test("armadilha rerrolada em nó v6 sobrevive ao salvamento sem mexer na composição nem no mapa", () => {
   let found = null;
   for (let i = 0; i < 40 && !found; i++) {
     const expedition = expeditionModule.prepareForestExpedition({ seed: `rerrolagem-${i}`, profile, missions: [] });
-    for (const { entry, node } of v5Nodes(expedition)) {
+    for (const { entry, node } of expeditionNodes(expedition)) {
       if (!node.trap || !["primary", "incidental"].includes(node.trap.role) || node.fixedComposition) continue;
       resolveNodeEncounter(node, { mapSeed: entry.mapSeed, profile });
       const updated = rerollNodeTrap(node, profile);
       if (updated) { found = { expedition, entry, node, updated }; break; }
     }
   }
-  assert.ok(found, "alguma armadilha v5 deve admitir rerrolagem");
+  assert.ok(found, "alguma armadilha v6 deve admitir rerrolagem");
   const { expedition, entry, node, updated } = found;
   const composition = structuredClone(node.forestComposition);
   const partsBefore = getForestChallengeParts(node);
@@ -2346,14 +2459,14 @@ test("armadilha rerrolada em nó v5 sobrevive ao salvamento sem mexer na composi
   assert.equal(restoredNode.trap.id, updated.trap.id);
   assert.equal(restoredNode.trap.challengeRating, partsBefore.trap);
   assert.deepEqual(getForestChallengeParts(restoredNode), partsBefore);
-  assert.equal(restoredNode.generationVersion, 5);
+  assert.equal(restoredNode.generationVersion, 6);
 });
 
 test("incidência da armadilha incidental em combates normais procedurais, com sementes fixas", () => {
   const rows = [];
   for (let i = 0; i < 30; i++) {
     const expedition = expeditionModule.prepareForestExpedition({ seed: `incidencia-${i}`, profile, missions: [] });
-    for (const { entry, node } of v5Nodes(expedition)) {
+    for (const { entry, node } of expeditionNodes(expedition)) {
       if ((node.contentType ?? node.type) !== "normal" || node.scene || node.fixedComposition || node.missionBindings?.length) continue;
       rows.push({ floor: entry.floor, terrain: node.environment.terrain.name, trap: Boolean(node.trap) });
     }

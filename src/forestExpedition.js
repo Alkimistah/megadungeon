@@ -5,7 +5,7 @@ import { generateMapData } from "./generator.js";
 import { createRng } from "./random.js";
 import { materializeForestFloorMissions } from "./missions/forestMissionIntegration.js";
 
-const GENERATION_VERSION = 5;
+const GENERATION_VERSION = 6;
 
 /** Prepara a faixa inteira antes de aceitar a seleção: cada vínculo aponta para
  * um mapa real. Os mapas futuros são salvos, não reinterpretados por outra seed. */
