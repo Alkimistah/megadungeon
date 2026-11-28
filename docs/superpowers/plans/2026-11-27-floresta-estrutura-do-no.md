@@ -12,9 +12,9 @@
 
 ## Retomada
 
-- Tarefas 1 a 3 concluídas e aprovadas em revisão. Cabeçalho e QA em `723f863` e `ffcacff`, modos e combate normal em `6c15e2c`, escoltas e validação tática em `003a289` e `b1aed5b`.
-- O PO aprovou os 35 modos dos [cartões](../specs/2026-11-27-floresta-armadilhas-cartoes.md). A amostra preliminar registrou 912 armadilhas incidentais em 4.452 combates normais (20,49%). A amostra após a correção de encaixe registrou 2.045 nós de armadilha com uma ficha válida.
-- Retomar na tarefa 4. A implementação inicial e o teste dos elites estão preservados na árvore de trabalho, sem commit. Falta medir o custo da busca em grades restritas, amostrar as cinco faixas de ND nos ambientes, ampliar os casos de conversão e rerrolagem, verificar a precedência da missão fixa e concluir as suítes e a revisão. A tarefa 5 ainda inclui missões, restauração, ativação da v5 e QA final. A geração de novas expedições continua na versão 4.
+- As cinco tarefas estão implementadas e as suítes e o QA passaram. Falta a revisão final de todo o conjunto da branch.
+- O PO aprovou os 35 modos dos [cartões](../specs/2026-11-27-floresta-armadilhas-cartoes.md). Amostra final da tarefa 5, com sementes fixas: 642 armadilhas incidentais em 3.356 combates normais procedurais (19,13%, diferença de -0,87 ponto frente aos 20% de tentativa).
+- A geração de novas expedições da floresta usa a versão 5; expedições salvas anteriores seguem restauradas como estão.
 
 ## Restrições gerais
 
@@ -80,20 +80,20 @@
 
 **Interface.** `resolveForestElite(node, profile, { seed, tacticalLayout })` em `src/encounterResolver.js` retorna `{ items, trap, creatureTarget, effectiveType }` para composições viáveis. O gerador grava a variante e os alvos efetivos, usados pelo resolvedor e pela rerrolagem. Os dois resolvedores procedurais recebem uma semente derivada da geração do mapa e do nó para evitar repetir a composição entre mapas que compartilham o mesmo ID local. A busca normal continua disponível como saída para nós convertidos.
 
-- [ ] Em `scripts/forestElite.test.mjs`, testar para E = 7 os grupos `6 + 5` e `6 + armadilha 1`, a saída de principal única ND 7, a preferência por ND viável abaixo de 7 e a conversão para normal em cenário sem elite viável. Testar única principal com o maior ND individual, teto de ND e rerrolagens dentro da variante, inclusive armadilha sempre autônoma.
-- [ ] Rodar `node --test scripts/forestElite.test.mjs` e confirmar a falha por função ausente.
-- [ ] Implementar a busca partindo de principal E−1, com chance de `0.1` de tentar primeiro a variante de armadilha. A outra variante usa auxiliares cujo grupo fecha E por `calculateCombatND`. Se ambas falharem, testar principal única E e descer até a melhor composição viável. Reaproveitar o filtro de ecologia, os candidatos de grupo e a grade. Respeitar a apresentação de desconhecido e mostrar o tipo efetivo normal quando a saída mudar a composição.
-- [ ] Reaplicar a mesma variante e o orçamento na rerrolagem, inclusive ao avaliar o espaço conjunto com a armadilha existente. Conservar a composição quando não houver alternativa. Verificar as cinco faixas de alvos de elite, de 3 a 7, em uma amostra determinística por ambiente e registrar as saídas utilizadas.
-- [ ] Rodar `node --test scripts/forestElite.test.mjs scripts/groupCompositionChallenge.test.mjs scripts/tacticalEnemyArea.test.mjs` e `npm run test:ecology`.
-- [ ] Commit `feat: compõe elites da floresta com uma criatura principal`.
+- [x] Em `scripts/forestElite.test.mjs`, testar para E = 7 os grupos `6 + 5` e `6 + armadilha 1`, a saída de principal única ND 7, a preferência por ND viável abaixo de 7 e a conversão para normal em cenário sem elite viável. Testar única principal com o maior ND individual, teto de ND e rerrolagens dentro da variante, inclusive armadilha sempre autônoma.
+- [x] Rodar `node --test scripts/forestElite.test.mjs` e confirmar a falha por função ausente.
+- [x] Implementar a busca partindo de principal E−1, com chance de `0.1` de tentar primeiro a variante de armadilha. A outra variante usa auxiliares cujo grupo fecha E por `calculateCombatND`. Se ambas falharem, testar principal única E e descer até a melhor composição viável. Reaproveitar o filtro de ecologia, os candidatos de grupo e a grade. Respeitar a apresentação de desconhecido e mostrar o tipo efetivo normal quando a saída mudar a composição.
+- [x] Reaplicar a mesma variante e o orçamento na rerrolagem, inclusive ao avaliar o espaço conjunto com a armadilha existente. Conservar a composição quando não houver alternativa. Verificar as cinco faixas de alvos de elite, de 3 a 7, em uma amostra determinística por ambiente e registrar as saídas utilizadas.
+- [x] Rodar `node --test scripts/forestElite.test.mjs scripts/groupCompositionChallenge.test.mjs scripts/tacticalEnemyArea.test.mjs` e `npm run test:ecology`.
+- [x] Commit `feat: compõe elites da floresta com uma criatura principal`.
 
 ### Tarefa 5 · Missões, reabertura e ativação da versão 5
 
 **Interface.** `prepareForestExpedition` cria novas expedições com `generationVersion: 5`. `restoreForestExpedition` conserva o mapa serializado. Missões de combate testam capacidade contra `challenge.creatures` nos nós v5 e mantêm a leitura anterior em mapas legados.
 
-- [ ] Em `scripts/validateForestMvp.test.mjs`, acrescentar uma expedição anterior à versão 5 e verificar que a restauração preserva nó, alvo e encontro resolvido. Acrescentar um ciclo v5 com missão que substitui criaturas e remove armadilha, outro ciclo com armadilha rerrolada, e sementes fixas para medir incidência. A incidência conta somente combates normais procedurais, inclusive revelações de desconhecidos, e informa numerador, denominador e diferença frente aos 20% de tentativa.
-- [ ] Rodar `npm run test:floors-11-20` e confirmar a falha das novas expectativas de ativação.
-- [ ] Em `forestMissionIntegration.js`, usar a parcela de criaturas v5 na elegibilidade e capacidade e atualizar o agregado ao fixar a composição. Confirmar que a restauração e `syncRerolledTrapProfile` leem a variante e as parcelas do nó salvo. Passar o contexto tático na rerrolagem pelo ponto de entrada em `main.js` se a grade disponível no diálogo exigir esse contexto.
-- [ ] Ativar `GENERATION_VERSION = 5`. Verificar a amostra por faixa e ambiente, campos ocultos e expedições com missões e guardiões. Evitar depender de sorte durante os testes usando sementes fixas.
-- [ ] Rodar `npm run test:floors-11-20`, `npm run test:floors-1-10`, `npm run test:missions`, `npm run test:ecology`, os três testes novos e `npm run build`. Rodar `npm run qa:floors-11-20` sobre `npm run dev`, com `QA_APP_URL=http://localhost:5173/megadungeon/` quando a porta padrão estiver disponível. Conferir as novas asserções de cabeçalho e mistério da tarefa 1.
-- [ ] Commit `feat: ativa a geração v5 nas novas expedições da floresta`. Solicitar revisão final de todo o conjunto e verificar novamente as alterações decorrentes da revisão.
+- [x] Em `scripts/validateForestMvp.test.mjs`, acrescentar uma expedição anterior à versão 5 e verificar que a restauração preserva nó, alvo e encontro resolvido. Acrescentar um ciclo v5 com missão que substitui criaturas e remove armadilha, outro ciclo com armadilha rerrolada, e sementes fixas para medir incidência. A incidência conta somente combates normais procedurais, inclusive revelações de desconhecidos, e informa numerador, denominador e diferença frente aos 20% de tentativa.
+- [x] Rodar `npm run test:floors-11-20` e confirmar a falha das novas expectativas de ativação.
+- [x] Em `forestMissionIntegration.js`, usar a parcela de criaturas v5 na elegibilidade e capacidade e atualizar o agregado ao fixar a composição. Confirmar que a restauração e `syncRerolledTrapProfile` leem a variante e as parcelas do nó salvo. Passar o contexto tático na rerrolagem pelo ponto de entrada em `main.js` se a grade disponível no diálogo exigir esse contexto.
+- [x] Ativar `GENERATION_VERSION = 5`. Verificar a amostra por faixa e ambiente, campos ocultos e expedições com missões e guardiões. Evitar depender de sorte durante os testes usando sementes fixas.
+- [x] Rodar `npm run test:floors-11-20`, `npm run test:floors-1-10`, `npm run test:missions`, `npm run test:ecology`, os três testes novos e `npm run build`. Rodar `npm run qa:floors-11-20` sobre `npm run dev`, com `QA_APP_URL=http://localhost:5173/megadungeon/` quando a porta padrão estiver disponível. Conferir as novas asserções de cabeçalho e mistério da tarefa 1.
+- [x] Commit `feat: ativa a geração v5 nas novas expedições da floresta`. Solicitar revisão final de todo o conjunto e verificar novamente as alterações decorrentes da revisão.

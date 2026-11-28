@@ -5,7 +5,7 @@ import { generateMapData } from "./generator.js";
 import { createRng } from "./random.js";
 import { materializeForestFloorMissions } from "./missions/forestMissionIntegration.js";
 
-const GENERATION_VERSION = 4;
+const GENERATION_VERSION = 5;
 
 /** Prepara a faixa inteira antes de aceitar a seleção: cada vínculo aponta para
  * um mapa real. Os mapas futuros são salvos, não reinterpretados por outra seed. */
@@ -28,7 +28,7 @@ export function prepareForestExpedition({ seed, profile, missions, startFloor = 
         if (node.generationVersion !== 5) node.encounterSeed = `${floor}:${node.encounterSeed}`;
       }
       try {
-        const nextMissions = materializeForestFloorMissions({ floor, levels, missions: preparedMissions });
+        const nextMissions = materializeForestFloorMissions({ floor, levels, missions: preparedMissions, profile });
         prepared = { floor, depth: floorDepth, baseDc: floorDc, mapSeed, levels };
         preparedMissions = nextMissions;
       } catch (error) {

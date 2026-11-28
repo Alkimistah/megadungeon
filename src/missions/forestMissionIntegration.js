@@ -1,13 +1,18 @@
-import { calculateCombatND, formatChallengeRating, roundToQuarter } from "../challenge.js";
+import { calculateCombatND, formatChallengeRating, roundToQuarter, updateForestChallengeTotal } from "../challenge.js";
 import { getCreatureById } from "../creatureCatalog/index.js";
 import { createForestMissionObjective, isForestMissionEnvironmentCompatible } from "./forestMissionScenes.js";
+
+// Nos mapas v5 a capacidade vem da parcela de criaturas; mapas legados leem o ND do encontro.
+function getCreatureBudget(node) {
+  return node.generationVersion === 5 ? node.challenge.creatures ?? 0 : node.challenge.encounter;
+}
 
 function isEligible(node, mission) {
   if (["boss", "camp", "scene"].includes(node.contentType || node.type)) return false;
   if (mission.objective?.targetType === "creature") {
     const creature = getCreatureById(mission.objective.targetId);
     return ["normal", "elite"].includes(node.contentType || node.type)
-      && creature && creature.challengeRating <= node.challenge.encounter;
+      && creature && creature.challengeRating <= getCreatureBudget(node);
   }
   return isForestMissionEnvironmentCompatible(node, mission);
 }
@@ -23,7 +28,7 @@ function capacity(node, mission, remaining) {
   const creature = getCreatureById(mission.objective.targetId);
   let quantity = 0;
   for (let count = 1; count <= remaining; count++) {
-    if (calculateCombatND([{ challengeRating: creature.challengeRating, quantity: count }]) <= node.challenge.encounter) quantity = count;
+    if (calculateCombatND([{ challengeRating: creature.challengeRating, quantity: count }]) <= getCreatureBudget(node)) quantity = count;
   }
   return quantity;
 }
@@ -75,10 +80,12 @@ function findRoute(levels, localMissions, exterminations, remaining) {
     .sort((left, right) => right.score - left.score)[0] || null;
 }
 
-function applyCombat(node, mission, quantity) {
+function applyCombat(node, mission, quantity, rules) {
   const creature = getCreatureById(mission.objective.targetId);
   const actual = calculateCombatND([{ challengeRating: creature.challengeRating, quantity }]);
   node.fixedComposition = { creatures: [{ id: creature.id, quantity }], traps: [] };
+  // A composição da missão prevalece e apaga o registro procedural substituído.
+  delete node.forestComposition;
   node.trap = null;
   node.resolvedEncounter = null;
   node.creature = {
@@ -89,10 +96,15 @@ function applyCombat(node, mission, quantity) {
     ...node.challenge, encounter: actual, creatures: actual, trap: 0,
     total: Math.min(8, roundToQuarter(actual + node.challenge.climate + node.challenge.terrain))
   };
+  if (node.generationVersion === 5) {
+    node.challenge.encounterBudgetLabel = `ND ${formatChallengeRating(actual)} para criaturas`;
+    updateForestChallengeTotal(node, rules);
+  }
 }
 
 /** Materializa uma rota compatível de objetivos; falha antes de qualquer mutação. */
-export function materializeForestFloorMissions({ floor, levels, missions }) {
+export function materializeForestFloorMissions({ floor, levels, missions, profile }) {
+  const rules = profile?.challengeRules ?? { minimum: 0.25, maximum: 8 };
   const active = missions.filter(m => m.status !== "completed");
   const local = active.filter(m => m.category !== "extermination" && m.destination?.floor === floor);
   const exterminations = active.filter(m => m.category === "extermination"
@@ -103,7 +115,7 @@ export function materializeForestFloorMissions({ floor, levels, missions }) {
 
   const updated = new Map();
   for (const { node, mission, quantity } of route.placements) {
-    if (mission.objective.targetType === "creature") applyCombat(node, mission, quantity);
+    if (mission.objective.targetType === "creature") applyCombat(node, mission, quantity, rules);
     const objective = createForestMissionObjective(mission, node, quantity);
     const binding = {
       kind: "node", floor, nodeId: node.id, quantity,

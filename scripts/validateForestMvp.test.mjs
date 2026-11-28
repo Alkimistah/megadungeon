@@ -3,12 +3,13 @@ import test from "node:test";
 import { generateMapData } from "../src/generator.js";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { createRng } from "../src/random.js";
-import { canRerollNodeCreatures, rerollNodeCreatures, resolveForestAmbush, resolveNodeEncounter } from "../src/encounterResolver.js";
+import { rerollNodeTrap, canRerollNodeCreatures, rerollNodeCreatures, resolveForestAmbush, resolveNodeEncounter } from "../src/encounterResolver.js";
 import { creatureCatalog, getCreatureById, getAutomaticCreatureCatalog, formatCreatureCatalogName } from "../src/creatureCatalog/index.js";
 import { createNodeTacticalMap } from "../src/nodeTacticalMap.js";
-import { calculateCombatND } from "../src/challenge.js";
+import { calculateCombatND, getForestChallengeParts } from "../src/challenge.js";
 import { createMissionGenerationContext, generateMissionOffers } from "../src/missions/missionGenerator.js";
 import { createExplorationState } from "../src/appState.js";
+import { syncRerolledTrapProfile } from "../src/traps.js";
 import { createMissionState } from "../src/missions/missionState.js";
 import { getEncounterMissionMatches } from "../src/missions/missionEncounterIntegration.js";
 import { decodeSessionCode, encodeSessionCode } from "../src/sessionCode.js";
@@ -2243,4 +2244,134 @@ test("inclinações simultâneas e seixos preservam as regras distintas", () => 
   assert.ok(map.scene.terrain.includes("steep-slope"));
   const pebbles = map.scene.features.find(feature => feature.type === "pebbles");
   assert.ok(pebbles.indices.every(index => map.scene.terrain[index] === "steep-slope"));
+});
+
+// ---- Tarefa 5: ativação da versão 5, missões, reabertura e incidência ----
+
+const v5Nodes = expedition => expedition.floors.flatMap(entry => entry.levels.flat().map(node => ({ entry, node })));
+const roundTrip = expedition => expeditionModule.restoreForestExpedition(
+  JSON.parse(JSON.stringify(expeditionModule.serializeForestExpedition(expedition))));
+
+test("expedição anterior à versão 5 preserva nó, alvo e encontro resolvido na restauração", () => {
+  const { serializeForestExpedition, restoreForestExpedition } = expeditionModule;
+  const mapSeed = "legado:forest:15:0";
+  const levels = generateMapData(6, profile.recommendations.baseDcByFloor[15], profile, 15, createRng(mapSeed), { version: 4, mapSeed });
+  assert.ok(levels.flat().every(node => node.generationVersion === undefined));
+  const target = levels.flat().find(node => node.contentType === "normal" && node.creature);
+  resolveNodeEncounter(target, { mapSeed, profile });
+  const legacy = { version: 1, generationVersion: 4, profileId: profile.id, seed: "legado", startFloor: 15, missions: [],
+    floors: [{ floor: 15, depth: 6, baseDc: profile.recommendations.baseDcByFloor[15], mapSeed, levels }] };
+  const saved = JSON.parse(JSON.stringify(serializeForestExpedition(legacy)));
+  const restored = restoreForestExpedition(saved);
+  assert.equal(restored.generationVersion, 4);
+  const node = restored.floors[0].levels.flat().find(item => item.id === target.id);
+  assert.equal(node.generationVersion, undefined);
+  assert.deepEqual(node.challenge, target.challenge);
+  assert.deepEqual(node.creature, target.creature);
+  assert.deepEqual(node.resolvedEncounter, JSON.parse(JSON.stringify(target.resolvedEncounter)));
+  assert.deepEqual(serializeForestExpedition(restored), saved);
+});
+
+test("novas expedições nascem na versão 5 e zeram parcelas ausentes em tesouro e acampamento", () => {
+  const expedition = expeditionModule.prepareForestExpedition({ seed: "ativacao-v5", profile, missions: [] });
+  assert.equal(expedition.generationVersion, 5);
+  const nodes = v5Nodes(expedition);
+  assert.ok(nodes.every(({ node }) => node.generationVersion === 5));
+  const empties = nodes.filter(({ node }) => ["treasure", "camp"].includes(node.contentType));
+  assert.ok(empties.length > 0);
+  for (const { node } of empties) {
+    assert.equal(node.challenge.creatures, 0, `${node.contentType} sem criaturas`);
+    assert.equal(node.challenge.trap, 0, `${node.contentType} sem armadilha`);
+  }
+  assert.equal(roundTrip(expedition).generationVersion, 5);
+});
+
+test("missão de caça em nó v5 troca criaturas, remove a armadilha e mantém o alvo coerente", () => {
+  const expedition = expeditionModule.prepareForestExpedition({ seed: "snapshot", profile, missions: [mission("specialHunt")] });
+  const binding = expedition.missions[0].integration.bindings[0];
+  const entry = expedition.floors.find(item => item.floor === binding.floor);
+  const node = entry.levels.flat().find(item => item.id === binding.nodeId);
+  const creature = getCreatureById("sucuri");
+  const actual = calculateCombatND([{ challengeRating: creature.challengeRating, quantity: binding.quantity }]);
+  assert.equal(node.generationVersion, 5);
+  assert.equal(node.forestComposition, undefined);
+  assert.equal(node.trap, null);
+  assert.equal(node.challenge.trap, 0);
+  assert.equal(node.challenge.creatures, actual);
+  assert.equal(node.challenge.total, Math.min(8, Math.max(0.25, Math.round((actual + node.challenge.climate + node.challenge.terrain) * 4) / 4)));
+  const encounter = resolveNodeEncounter(node, { mapSeed: entry.mapSeed, profile });
+  assert.ok(encounter.items.every(item => item.kind === "creature"));
+  assert.deepEqual(getForestChallengeParts(node), { environment: node.challenge.environment, creatures: actual, trap: 0 });
+  const restored = roundTrip(expedition).floors.find(item => item.floor === entry.floor).levels.flat().find(item => item.id === node.id);
+  assert.equal(restored.forestComposition, undefined);
+  assert.deepEqual(restored.resolvedEncounter, JSON.parse(JSON.stringify(node.resolvedEncounter)));
+  assert.deepEqual(getForestChallengeParts(restored), getForestChallengeParts(node));
+});
+
+test("capacidade de missão v5 usa a parcela de criaturas e não o ND do encontro", () => {
+  const [row] = chain([6]);
+  const [node] = row;
+  node.generationVersion = 5;
+  node.challenge = { encounter: 6, creatures: 1, trap: 0, total: 7, terrain: 0.25, climate: 0 };
+  const hunt = mission("specialHunt", { floor: 15, targetId: "sucuri" });
+  assert.ok(getCreatureById("sucuri").challengeRating > 1);
+  assert.throws(() => materialize({ floor: 15, levels: [row], missions: [hunt] }), /rota compatível/);
+  const legacy = chain([6]);
+  assert.doesNotThrow(() => materialize({ floor: 15, levels: legacy, missions: [hunt] }));
+});
+
+test("armadilha rerrolada em nó v5 sobrevive ao salvamento sem mexer na composição nem no mapa", () => {
+  let found = null;
+  for (let i = 0; i < 40 && !found; i++) {
+    const expedition = expeditionModule.prepareForestExpedition({ seed: `rerrolagem-${i}`, profile, missions: [] });
+    for (const { entry, node } of v5Nodes(expedition)) {
+      if (!node.trap || !["primary", "incidental"].includes(node.trap.role) || node.fixedComposition) continue;
+      resolveNodeEncounter(node, { mapSeed: entry.mapSeed, profile });
+      const updated = rerollNodeTrap(node, profile);
+      if (updated) { found = { expedition, entry, node, updated }; break; }
+    }
+  }
+  assert.ok(found, "alguma armadilha v5 deve admitir rerrolagem");
+  const { expedition, entry, node, updated } = found;
+  const composition = structuredClone(node.forestComposition);
+  const partsBefore = getForestChallengeParts(node);
+  node.trap = updated.trap;
+  node.resolvedEncounter = updated.encounter;
+  assert.equal(updated.encounter.trapRerolls, 1);
+  const restoredNode = roundTrip(expedition).floors.find(item => item.floor === entry.floor).levels.flat().find(item => item.id === node.id);
+  assert.deepEqual(restoredNode.forestComposition, composition);
+  assert.deepEqual(restoredNode.resolvedEncounter, JSON.parse(JSON.stringify(updated.encounter)));
+  assert.deepEqual(restoredNode.challenge, node.challenge);
+  syncRerolledTrapProfile(restoredNode);
+  assert.equal(restoredNode.trap.id, updated.trap.id);
+  assert.equal(restoredNode.trap.challengeRating, partsBefore.trap);
+  assert.deepEqual(getForestChallengeParts(restoredNode), partsBefore);
+  assert.equal(restoredNode.generationVersion, 5);
+});
+
+test("incidência da armadilha incidental em combates normais procedurais, com sementes fixas", () => {
+  const rows = [];
+  for (let i = 0; i < 30; i++) {
+    const expedition = expeditionModule.prepareForestExpedition({ seed: `incidencia-${i}`, profile, missions: [] });
+    for (const { entry, node } of v5Nodes(expedition)) {
+      if ((node.contentType ?? node.type) !== "normal" || node.scene || node.fixedComposition || node.missionBindings?.length) continue;
+      rows.push({ floor: entry.floor, terrain: node.environment.terrain.name, trap: Boolean(node.trap) });
+    }
+  }
+  const rate = list => list.filter(row => row.trap).length / list.length;
+  const attempt = profile.trapRules.normalV5.chance;
+  const numerator = rows.filter(row => row.trap).length;
+  console.log(`incidência: ${numerator}/${rows.length} (${(rate(rows) * 100).toFixed(2)}%), diferença vs ${attempt * 100}%: ${((rate(rows) - attempt) * 100).toFixed(2)} pp`);
+  assert.ok(rows.length >= 1500);
+  assert.ok(Math.abs(rate(rows) - attempt) < 0.03, "incidência global dentro de 3 pp da tentativa");
+  const groups = new Map();
+  for (const row of rows) {
+    for (const key of [`faixa ${Math.floor((row.floor - 11) / 2) * 2 + 11}-${Math.floor((row.floor - 11) / 2) * 2 + 12}`, `ambiente ${row.terrain}`]) {
+      groups.set(key, [...(groups.get(key) || []), row]);
+    }
+  }
+  for (const [key, list] of [...groups].sort()) {
+    console.log(`  ${key}: ${list.filter(row => row.trap).length}/${list.length} (${(rate(list) * 100).toFixed(1)}%)`);
+    if (list.length >= 150) assert.ok(Math.abs(rate(list) - attempt) < 0.08, `${key} fora de 8 pp`);
+  }
 });

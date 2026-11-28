@@ -137,6 +137,11 @@ function assignTrapProfiles(levels, profile, rng, mapSeed, visibleTypes, floor) 
       updateForestChallengeTotal(node, profile.challengeRules);
     } else {
       assignTrapProfile(node, profile, rng);
+      // Tesouro e acampamento v5 não têm ficha nem armadilha: zera as parcelas.
+      if (node.generationVersion === 5 && ["treasure", "camp"].includes(node.contentType ?? node.type)) {
+        node.challenge.creatures = 0;
+        node.challenge.trap = 0;
+      }
     }
   });
 }
