@@ -16,7 +16,7 @@
     "test:archipelago-rosters": "node scripts/validateArchipelagoRosters.mjs",
     "test:archipelago-missions": "node --test scripts/archipelagoMissions.test.mjs",
     "test:treasure": "node scripts/treasure.test.mjs",
-    "test:ecology": "node --test scripts/ecology.test.mjs scripts/encounterEcology.test.mjs scripts/manualEncounterCatalog.test.mjs scripts/combatChallenge.test.mjs scripts/groupCompositionChallenge.test.mjs",
+    "test:ecology": "node --test scripts/ecology.test.mjs scripts/encounterEcology.test.mjs scripts/manualEncounterCatalog.test.mjs scripts/combatChallenge.test.mjs scripts/groupCompositionChallenge.test.mjs scripts/encounterTabs.test.mjs",
     "ecology:draft": "node scripts/ecology/draft.mjs",
     "ecology:batches": "node scripts/ecology/batches.mjs",
     "ecology:apply": "node scripts/ecology/apply.mjs",
