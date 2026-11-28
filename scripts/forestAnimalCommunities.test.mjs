@@ -157,3 +157,40 @@ test("accepts que sempre recusa e composição excluída anulam o grupo", () => 
     catalog, target: 1, terrainTag: "floresta", communities: [insects], rng: createRng("unica"), excludeComposition: composition(only.entries)
   }), null);
 });
+
+test("comunidade com peso 0 fica desligada", () => {
+  const off = { ...swamp, id: "desligada", weight: 0 };
+  for (let seed = 0; seed < 20; seed++) {
+    assert.equal(composeAnimalCommunityGroup({
+      catalog, target: 5, terrainTag: "pantano", communities: [off], rng: createRng(`peso-${seed}`), upgrade: eliteStub()
+    }), null);
+    const group = composeAnimalCommunityGroup({
+      catalog, target: 5, terrainTag: "pantano", communities: [off, { ...swamp, id: "ligada" }], rng: createRng(`peso-${seed}`)
+    });
+    assert.equal(group.communityId, "ligada");
+  }
+  assert.equal(canComposeAnimalCommunity({ catalog, target: 5, terrainTag: "pantano", communities: [off], upgrade: eliteStub() }), false);
+});
+
+test("comunidade grande de ND baixo com alvo alto termina rápido", () => {
+  const ratings = [0.25, 0.5, 1, 2];
+  const groups = ["bando", "horda", "dupla", "solitaria"];
+  const weak = Array.from({ length: 20 }, (_, index) => animal(`fraco-${index}`, ratings[index % 4], "inseto", ["mata"], groups[index % 4]));
+  const swarm = { id: "fracos", name: "Fracos", families: ["inseto"], maxSheets: 3, weight: 1 };
+  const elapsed = run => {
+    const start = performance.now();
+    const result = run();
+    return { result, time: performance.now() - start };
+  };
+  const check = elapsed(() => canComposeAnimalCommunity({ catalog: weak, target: 12, terrainTag: "mata", communities: [swarm], upgrade: eliteStub() }));
+  assert.equal(check.result, true);
+  assert.ok(check.time < 250, `canComposeAnimalCommunity levou ${check.time.toFixed(0)} ms`);
+  for (let seed = 0; seed < 5; seed++) {
+    const group = elapsed(() => composeAnimalCommunityGroup({
+      catalog: weak, target: 12, terrainTag: "mata", communities: [swarm], rng: createRng(`rapido-${seed}`), upgrade: eliteStub()
+    }));
+    assert.ok(group.result);
+    assert.equal(groupND(group.result.entries), 12);
+    assert.ok(group.time < 250, `composeAnimalCommunityGroup levou ${group.time.toFixed(0)} ms`);
+  }
+});
