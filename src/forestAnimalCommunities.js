@@ -20,7 +20,7 @@ export function getAnimalCommunities(profile, terrainName) {
 export function getCommunityAnimals(catalog, community, terrainTag) {
   return catalog.filter(creature => creature.type === "animal"
     && community.families.includes(creature.ecology?.family)
-    && (creature.ecology?.terrains ?? []).includes(terrainTag));
+    && (creature.ecology?.forestTerrains ?? creature.ecology?.terrains ?? []).includes(terrainTag));
 }
 
 // Mesmo formato de getCreatureComposition em src/encounterResolver.js, replicado aqui

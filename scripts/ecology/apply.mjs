@@ -3,23 +3,37 @@
 
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { readCsv } from "./csv.mjs";
 import { catalogCreatureIds } from "./catalogIds.mjs";
-import { TERRAINS, PLACES, CONDITIONS, GROUPS, RARITIES, normalizeTag, validateEcology } from "../../src/creatureCatalog/ecologyVocabulary.js";
+import { TERRAINS, PLACES, CONDITIONS, NEUTRAL_ECOLOGY, normalizeTag, validateEcology } from "../../src/creatureCatalog/ecologyVocabulary.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const DEFAULT_OUT = join(ROOT, "src", "creatureCatalog", "ecology.js");
-const HEADER = "// Etiquetas de ecologia por id de criatura.\n// Arquivo gerado por scripts/ecology/apply.mjs. Não edite à mão.\n\n";
+const HEADER = "// Etiquetas de ecologia por id de criatura.\n// Arquivo gerado por scripts/ecology/apply.mjs. Não edite à mão.\n";
+const FOREST_REVIEW_HEADER = "// Contém famílias ou terrenos revisados para a floresta.";
 const TRUE_VALUES = new Set(["sim", "x", "true", "s"]);
-const LISTS = [["terrenos", "terrains", TERRAINS], ["lugares", "places", PLACES], ["condicoes", "conditions", CONDITIONS]];
+const LISTS = [
+  ["terrenos", "terrains", TERRAINS], ["terrenos_floresta", "forestTerrains", TERRAINS],
+  ["lugares", "places", PLACES], ["condicoes", "conditions", CONDITIONS]
+];
 
 const clean = (value) => String(value ?? "").trim();
+
+function getLegacyGroups(rows) {
+  // Nas planilhas antigas, familia repetia o nome do agrupamento em cada ficha.
+  return new Set(rows.flatMap(row => {
+    if (clean(row.id) || "agrupamento" in row) return [];
+    const heading = /^== (.+) \(\d+\) ==$/.exec(clean(row.familia));
+    return heading ? [heading[1]] : [];
+  }));
+}
 
 // Devolve { entries, errors }. knownIds (opcional) é um Set de ids válidos do catálogo.
 export function collectEcology(rows, knownIds = null) {
   const entries = {};
   const errors = [];
+  const legacyGroups = getLegacyGroups(rows);
   rows.forEach((row, index) => {
     const id = clean(row.id);
     if (!id) return; // cabeçalho de família ou linha sem id
@@ -27,14 +41,23 @@ export function collectEcology(rows, knownIds = null) {
     const fail = (value, why) => errors.push(`linha ${line}, ${id}, "${value}": ${why}`);
     if (knownIds && !knownIds.has(id)) fail(id, "id não existe no catálogo");
     if (Object.hasOwn(entries, id)) fail(id, "id duplicado");
-    const entry = { terrains: [], places: [], conditions: [], group: null, rarity: "comum", manualOnly: false, reviewed: false };
+    const entry = { ...NEUTRAL_ECOLOGY };
     for (const [column, key, vocabulary] of LISTS) {
+      const value = clean(row[column]);
+      if (key === "forestTerrains" && !value) continue;
+      // Campo vazio herda os terrenos gerais. "nenhum" grava uma lista vazia.
+      const tags = key === "forestTerrains" && value.toLowerCase() === "nenhum" ? "" : value;
       const found = new Set();
-      for (const part of clean(row[column]).split(",").map((p) => p.trim()).filter(Boolean)) {
+      for (const part of tags.split(",").map((p) => p.trim()).filter(Boolean)) {
         const tagId = normalizeTag(key, part);
         if (tagId) found.add(tagId); else fail(part, `etiqueta desconhecida em ${column}`);
       }
       entry[key] = vocabulary.map((v) => v.id).filter((v) => found.has(v));
+    }
+    const family = clean(row.familia);
+    if (family && !legacyGroups.has(family)) {
+      entry.family = normalizeTag("families", family);
+      if (!entry.family) fail(family, "família desconhecida em familia");
     }
     const group = clean(row.grupo);
     if (group) {
@@ -70,15 +93,34 @@ export function renderEcologyModule(entries) {
   const lines = Object.keys(entries).sort().map((id) => {
     const e = entries[id];
     const list = (items) => `[${items.map((i) => JSON.stringify(i)).join(", ")}]`;
-    return `  ${JSON.stringify(id)}: { terrains: ${list(e.terrains)}, places: ${list(e.places)}, conditions: ${list(e.conditions)}, group: ${JSON.stringify(e.group)}, rarity: ${JSON.stringify(e.rarity)}, manualOnly: ${e.manualOnly}, reviewed: ${e.reviewed} },`;
+    const forestTerrains = e.forestTerrains ? `, forestTerrains: ${list(e.forestTerrains)}` : "";
+    const family = e.family ? `, family: ${JSON.stringify(e.family)}` : "";
+    return `  ${JSON.stringify(id)}: { terrains: ${list(e.terrains)}${forestTerrains}, places: ${list(e.places)}, conditions: ${list(e.conditions)}${family}, group: ${JSON.stringify(e.group)}, rarity: ${JSON.stringify(e.rarity)}, manualOnly: ${e.manualOnly}, reviewed: ${e.reviewed} },`;
   });
-  return `${HEADER}export const ecologyByCreatureId = {\n${lines.join("\n")}${lines.length ? "\n" : ""}};\n`;
+  const includesForestReview = Object.values(entries).some(entry => entry.family || entry.forestTerrains);
+  const forestReviewHeader = includesForestReview ? `${FOREST_REVIEW_HEADER}\n` : "";
+  return `${HEADER}${forestReviewHeader}\nexport const ecologyByCreatureId = {\n${lines.join("\n")}${lines.length ? "\n" : ""}};\n`;
+}
+
+function hasForestReview(file) {
+  try {
+    return readFileSync(file, "utf8").split(/\r?\n/, 4).includes(FOREST_REVIEW_HEADER);
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    return false;
+  }
 }
 
 // Valida tudo antes de escrever; com qualquer erro, o arquivo de saída fica intacto.
 export function applyEcologySheet(csvFile, outFile = DEFAULT_OUT) {
   const knownIds = catalogCreatureIds();
-  const entries = buildEcologyFromRows(readCsv(csvFile), knownIds);
+  const rows = readCsv(csvFile);
+  const entries = buildEcologyFromRows(rows, knownIds);
+  const columns = rows[0] ?? {};
+  const supportsForestReview = "familia" in columns && "terrenos_floresta" in columns && !getLegacyGroups(rows).size;
+  if (!supportsForestReview && hasForestReview(outFile)) {
+    throw new Error("A saída já contém dados revisados da floresta. Use as colunas familia e terrenos_floresta da planilha de revisão atual e copie seus valores por id. Mova os títulos dos grupos para a coluna agrupamento.");
+  }
   writeFileSync(outFile, renderEcologyModule(entries), "utf8");
   return entries;
 }

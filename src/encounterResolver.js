@@ -524,22 +524,27 @@ function getNodeAnimalCommunityContext(node, profile) {
   };
 }
 
-// Geração 6: em qualquer combate procedural da floresta, um animal só entra se pertencer
-// a uma comunidade ativa do terreno do nó. As outras criaturas não mudam.
-function filterCommunityAnimals(node, profile, catalog) {
+// O terreno revisto alimenta o filtro obrigatório, o peso e as comunidades somente na v6.
+function filterNodeCreatureCatalog(node, profile, catalog, ecology) {
   const context = getNodeAnimalCommunityContext(node, profile);
-  if (!context) return catalog;
+  if (!context) return filterEncounterCatalog(node, catalog, ecology);
+  const localCatalog = catalog.map(creature => creature.type === "animal" && creature.ecology?.forestTerrains
+    ? { ...creature, ecology: { ...creature.ecology, terrains: creature.ecology.forestTerrains } }
+    : creature);
+  const eligible = filterEncounterCatalog(node, localCatalog, ecology);
   const allowed = new Set(context.communities
     .filter(community => (Number.isFinite(community.weight) ? community.weight : 1) > 0)
-    .flatMap(community => getCommunityAnimals(catalog, community, context.terrainTag))
+    .flatMap(community => getCommunityAnimals(eligible, community, context.terrainTag))
     .map(creature => creature.id));
-  return catalog.filter(creature => creature.type !== "animal" || allowed.has(creature.id));
+  return eligible.filter(creature => creature.type !== "animal" || allowed.has(creature.id));
 }
 
-function getNodeCreatureCatalog(node, profile) {
+function getNodeCreatureCatalog(node, profile, candidates) {
   const ecology = getNodeEcology(node, profile);
-  const catalog = getAllowedCatalog(node.creature.allowedCreatureIds, profile, node.creature.preferAllowedVariants);
-  return { ecology, catalog: filterCommunityAnimals(node, profile, filterEncounterCatalog(node, catalog, ecology)) };
+  const catalog = node.creature
+    ? candidates ?? getAllowedCatalog(node.creature.allowedCreatureIds, profile, node.creature.preferAllowedVariants)
+    : [];
+  return { ecology, catalog: filterNodeCreatureCatalog(node, profile, catalog, ecology) };
 }
 
 /** Na geração 6, diz se o terreno do nó tem comunidade de animais que feche o alvo. */
@@ -699,9 +704,10 @@ export function resolveForestElite(node, profile, {
   const communityContext = getNodeAnimalCommunityContext(node, profile);
   const ecology = getNodeEcology(node, profile);
   const rules = profile.creatureRules;
-  const catalog = filterCommunityAnimals(node, profile, filterEncounterCatalog(node, getAllowedCatalog(
+  const candidates = getAllowedCatalog(
     rules.allowedCreatureIdsByFloor?.[node.level] ?? rules.allowedCreatureIds, profile
-  ), ecology)).map(creature => ({
+  );
+  const catalog = filterNodeCreatureCatalog(node, profile, candidates, ecology).map(creature => ({
     creature,
     order: -Math.log(1 - rng()) / (ecology ? getCreatureEcologyWeight(creature, ecology.context, ecology.rules) : 1)
   })).sort((a, b) => a.order - b.order).map(entry => entry.creature);
@@ -989,11 +995,10 @@ export function rerollNodeCreatures(node, profile, { tacticalLayout } = {}) {
   const challenge = node.challenge?.creatures > 0
     ? getCreatureGroupTarget(node.creature.targetChallenge ?? node.challenge.creatures)
     : calculateCombatND(original);
-  const { type, allowedCreatureIds } = node.creature;
-  const ecology = getNodeEcology(node, profile);
+  const { type } = node.creature;
+  const { catalog: candidates, ecology } = getNodeCreatureCatalog(node, profile);
   // Combate de animais v6 que já saiu para outro tipo: continua sem animais.
-  const catalog = filterCommunityAnimals(node, profile,
-    filterEncounterCatalog(node, getAllowedCatalog(allowedCreatureIds, profile, node.creature.preferAllowedVariants), ecology))
+  const catalog = candidates
     .filter(creature => ecology || !type || creature.type === type)
     .filter(creature => !animalCommunities || type !== "animal" || creature.type !== "animal");
   if (!catalog.length || challenge <= 0) return null;
@@ -1174,10 +1179,8 @@ export function resolveForestAmbush(node, profile, { mapSeed } = {}) {
   if (ambushNode.creature?.type === "animal" && !canComposeNodeAnimals(ambushNode, profile)) {
     assignCreatureProfile(ambushNode, profile, rng, { excludeTypes: ["animal"] });
   }
-  const ecology = getNodeEcology(ambushNode, profile);
+  const { catalog, ecology } = getNodeCreatureCatalog(ambushNode, profile);
   const animalCommunities = getNodeAnimalCommunityContext(ambushNode, profile);
-  const catalog = filterCommunityAnimals(ambushNode, profile,
-    filterEncounterCatalog(ambushNode, getAllowedCatalog(ambushNode.creature?.allowedCreatureIds, profile), ecology));
   const result = {};
   const items = resolveCreatureGroup(ambushNode, rng, catalog, ecology, { profileId: profile.id, seed, animalCommunities, result });
   const groupTarget = getCreatureGroupTarget(target);
@@ -1217,11 +1220,8 @@ export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidate
     items = resolveFixedComposition(node.forestComposition, rng);
     if (node.trap) items.push(getTrapSummary(node.trap));
   } else {
-    const catalog = node.creature
-      ? creatureCandidates ?? getAllowedCatalog(node.creature.allowedCreatureIds, profile, node.creature.preferAllowedVariants)
-      : [];
-    const ecology = getNodeEcology(node, profile);
-    items = resolveCreatureGroup(node, rng, filterCommunityAnimals(node, profile, filterEncounterCatalog(node, catalog, ecology)), ecology, {
+    const { catalog, ecology } = getNodeCreatureCatalog(node, profile, creatureCandidates);
+    items = resolveCreatureGroup(node, rng, catalog, ecology, {
       profileId: profile?.id, seed, tacticalLayout, animalCommunities: getNodeAnimalCommunityContext(node, profile), result
     });
     if (node.trap) items.push(getTrapSummary(node.trap));

@@ -6,7 +6,8 @@ import { fileURLToPath } from "node:url";
 import { dirname, join, relative } from "node:path";
 import { readCsv, writeCsv } from "./csv.mjs";
 import { rawCreatures } from "./catalogIds.mjs";
-import { TERRAINS, PLACES, CONDITIONS, GROUPS, RARITIES } from "../../src/creatureCatalog/ecologyVocabulary.js";
+import { ecologyByCreatureId } from "../../src/creatureCatalog/ecology.js";
+import { TERRAINS, PLACES, CONDITIONS, FAMILIES, GROUPS, RARITIES } from "../../src/creatureCatalog/ecologyVocabulary.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const DIR = join(ROOT, "recursos", "ecologia");
@@ -68,7 +69,7 @@ export function mergeRows(draftRows, verifiedLists) {
   return draftRows.map((r) => verified.get(r.id) ?? r);
 }
 
-export const REVIEW_COLUMNS = ["familia", "nome", "nd", "terrenos", "lugares", "condicoes", "grupo", "raridade", "so_manual", "revisado", "confianca", "citacao", "id", "livro", "pagina_pdf"];
+export const REVIEW_COLUMNS = ["agrupamento", "familia", "nome", "nd", "terrenos", "terrenos_floresta", "lugares", "condicoes", "grupo", "raridade", "so_manual", "revisado", "confianca", "citacao", "id", "livro", "pagina_pdf"];
 
 const TYPE_FAMILIES = { animal: "Animais", construct: "Construtos", spirit: "Espíritos", humanoid: "Humanoides", monster: "Monstros", undead: "Mortos-vivos", event: "Eventos", "???": "Outros" };
 const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
@@ -132,16 +133,30 @@ export function buildReviewRows(sourceRows, catalogById = new Map()) {
   const out = [];
   for (const name of [...byFamily.keys()].sort(byText)) {
     const members = byFamily.get(name).sort((a, b) => ndValue(a.nd) - ndValue(b.nd) || byText(a.nome, b.nome));
-    out.push(Object.fromEntries(REVIEW_COLUMNS.map((c) => [c, c === "familia" ? `== ${name} (${members.length}) ==` : ""])));
-    for (const r of members) out.push(Object.fromEntries(REVIEW_COLUMNS.map((c) => [c, c === "familia" ? name : c === "revisado" ? "" : r[c] ?? ""])));
+    out.push(Object.fromEntries(REVIEW_COLUMNS.map((c) => [c, c === "agrupamento" ? `== ${name} (${members.length}) ==` : ""])));
+    for (const row of members) {
+      const ecology = catalogById.get(row.id)?.ecology;
+      const reviewRow = {
+        ...row,
+        agrupamento: name,
+        familia: ecology?.family ?? "",
+        terrenos_floresta: ecology?.forestTerrains ? ecology.forestTerrains.join(", ") || "nenhum" : "",
+        revisado: ""
+      };
+      out.push(Object.fromEntries(REVIEW_COLUMNS.map(column => [column, reviewRow[column] ?? ""])));
+    }
   }
   return out;
 }
 
 // Palavras válidas de cada coluna, uma coluna por categoria, com os rótulos do vocabulário.
 export function buildVocabularyRows() {
-  const columns = { terrenos: TERRAINS, lugares: PLACES, condicoes: CONDITIONS, grupo: GROUPS, raridade: RARITIES };
+  const columns = {
+    familia: FAMILIES, terrenos: TERRAINS, terrenos_floresta: TERRAINS,
+    lugares: PLACES, condicoes: CONDITIONS, grupo: GROUPS, raridade: RARITIES
+  };
   const values = Object.fromEntries(Object.entries(columns).map(([k, v]) => [k, v.map((e) => e.label)]));
+  values.terrenos_floresta.push("nenhum");
   values.so_manual = ["sim"];
   values.revisado = ["x"];
   const names = Object.keys(values);
@@ -156,7 +171,9 @@ function review(force) {
     return 1;
   }
   const rows = readCsv(MERGED);
-  const sheet = buildReviewRows(rows, rawCreatures());
+  const catalog = rawCreatures();
+  for (const [id, creature] of catalog) catalog.set(id, { ...creature, ecology: ecologyByCreatureId[id] });
+  const sheet = buildReviewRows(rows, catalog);
   writeCsv(sheet, REVIEW, REVIEW_COLUMNS);
   const vocab = buildVocabularyRows();
   writeCsv(vocab.rows, VOCAB, vocab.names);

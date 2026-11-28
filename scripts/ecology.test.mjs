@@ -39,7 +39,8 @@ test("creatures without entry get the neutral ecology", () => {
   assert.deepEqual(getCreatureEcology("nao-existe"), NEUTRAL_ECOLOGY);
   assert.deepEqual(getCreatureEcology("constructor"), NEUTRAL_ECOLOGY);
   const withEntry = creatureCatalog.find((c) => Object.hasOwn(ecologyByCreatureId, c.id));
-  if (withEntry) assert.deepEqual(withEntry.ecology, ecologyByCreatureId[withEntry.id]);
+  if (withEntry) assert.deepEqual(withEntry.ecology, { family: null, ...ecologyByCreatureId[withEntry.id] });
+  assert.equal(getCreatureEcology("glop").family, null);
 });
 
 // ---- Tarefa 2: rascunho automático ----
@@ -179,17 +180,20 @@ test("review sheet has one row per creature plus one header per family, in order
   const sheet = buildReviewRows(rows);
   const headers = sheet.filter((r) => r.id === "");
   assert.equal(sheet.length, rows.length + headers.length);
-  assert.deepEqual(headers.map((r) => r.familia), ["== Animais (1) ==", "== Goblin (3) ==", "== Lobo (1) ==", "== Mortos-vivos (1) ==", "== Outros (1) =="]);
-  assert.ok(headers.every((r) => Object.entries(r).every(([k, v]) => k === "familia" || v === "")));
-  const goblins = sheet.filter((r) => r.familia === "Goblin").map((r) => r.nome);
+  assert.deepEqual(headers.map((r) => r.agrupamento), ["== Animais (1) ==", "== Goblin (3) ==", "== Lobo (1) ==", "== Mortos-vivos (1) ==", "== Outros (1) =="]);
+  assert.ok(headers.every((r) => Object.entries(r).every(([k, v]) => k === "agrupamento" || v === "")));
+  const goblins = sheet.filter((r) => r.agrupamento === "Goblin").map((r) => r.nome);
   assert.deepEqual(goblins, ["Goblin A", "Goblin B", "Goblin X"]);
+  assert.ok(sheet.every((r) => r.familia === ""));
   assert.ok(sheet.every((r) => Object.keys(r).join("|") === REVIEW_COLUMNS.join("|")));
-  assert.deepEqual(REVIEW_COLUMNS, ["familia", "nome", "nd", "terrenos", "lugares", "condicoes", "grupo", "raridade", "so_manual", "revisado", "confianca", "citacao", "id", "livro", "pagina_pdf"]);
+  assert.deepEqual(REVIEW_COLUMNS, ["agrupamento", "familia", "nome", "nd", "terrenos", "terrenos_floresta", "lugares", "condicoes", "grupo", "raridade", "so_manual", "revisado", "confianca", "citacao", "id", "livro", "pagina_pdf"]);
   assert.ok(sheet.every((r) => r.revisado === ""));
 });
 test("vocabulary sheet has one column per category with the vocabulary labels", () => {
   const { names, rows } = buildVocabularyRows();
-  assert.deepEqual(names, ["terrenos", "lugares", "condicoes", "grupo", "raridade", "so_manual", "revisado"]);
+  assert.deepEqual(names, ["familia", "terrenos", "terrenos_floresta", "lugares", "condicoes", "grupo", "raridade", "so_manual", "revisado"]);
+  assert.equal(rows[0].familia, "Abelhas-grifo");
+  assert.ok(rows.some(row => row.terrenos_floresta === "nenhum"));
   assert.equal(rows[0].terrenos, "Aquático");
   assert.equal(rows.map((r) => r.lugares).filter(Boolean).length, 13);
 });
@@ -212,6 +216,79 @@ test("apply accepts labels without accents and extra spaces", () => {
   assert.deepEqual(eco.glop.terrains, ["aquatico", "pantano"]);
   assert.equal(eco.glop.reviewed, true);
   assert.equal(eco.glop.manualOnly, false);
+});
+test("apply reads ecological families and the forest-only habitat", () => {
+  const entries = buildEcologyFromRows([
+    { id: "jiboia", familia: "Serpentes constritoras", terrenos_floresta: "Pântano, Aquático" },
+    { id: "leoa-rainha", familia: "leoes", terrenos: "Montanha", terrenos_floresta: "nenhum" },
+    { id: "lobo", familia: "lobos", terrenos: "Floresta" },
+    { id: "glop" }
+  ]);
+  assert.equal(entries.jiboia.family, "serpentes-constritoras");
+  assert.deepEqual(entries.jiboia.terrains, []);
+  assert.deepEqual(entries.jiboia.forestTerrains, ["aquatico", "pantano"]);
+  assert.deepEqual(entries["leoa-rainha"].forestTerrains, []);
+  assert.deepEqual(entries["leoa-rainha"].terrains, ["montanha"]);
+  assert.equal(entries.lobo.forestTerrains, undefined);
+  assert.equal(entries.glop.family, null);
+  assert.throws(() => buildEcologyFromRows([{ id: "a", familia: "Lava" }]), /linha 2.*a.*Lava.*familia/i);
+  assert.throws(() => buildEcologyFromRows([{ id: "a", terrenos_floresta: "Lava" }]), /linha 2.*a.*Lava.*terrenos_floresta/i);
+  assert.match(validateEcology({ ...NEUTRAL_ECOLOGY, family: "lava" }).join("\n"), /family/);
+  assert.match(validateEcology({ ...NEUTRAL_ECOLOGY, forestTerrains: ["lava"] }).join("\n"), /forestTerrains/);
+});
+test("review separates ecological family from the visual group", () => {
+  const rows = buildReviewRows([{ id: "lobo", nome: "Lobo", familia: "animal" }], new Map([
+    ["lobo", { id: "lobo", name: "Lobo", ecology: { family: "lobos", forestTerrains: ["floresta"] } }]
+  ]));
+  assert.equal(rows[0].agrupamento, "== Animais (1) ==");
+  assert.equal(rows[1].familia, "lobos");
+  assert.equal(rows[1].terrenos_floresta, "floresta");
+  assert.equal(buildEcologyFromRows(rows).lobo.family, "lobos");
+});
+test("apply still accepts the former review sheet's visual grouping", () => {
+  const entries = buildEcologyFromRows([
+    { id: "", familia: "== Goblin (1) ==" },
+    { id: "goblin", familia: "Goblin", terrenos: "Floresta" }
+  ]);
+  assert.equal(entries.goblin.family, null);
+  assert.deepEqual(entries.goblin.terrains, ["floresta"]);
+});
+test("apply preserves a reviewed output when the sheet cannot represent the forest data", () => {
+  const dir = mkdtempSync(join(tmpdir(), "eco-"));
+  try {
+    const csv = join(dir, "s.csv"); const out = join(dir, "ecology.js");
+    writeCsv([{ id: "sucuri", familia: "serpentes-constritoras", terrenos_floresta: "Aquático" }], csv);
+    applyEcologySheet(csv, out);
+    const reviewed = readFileSync(out, "utf8");
+
+    const incompleteSheets = [
+      [{ id: "", familia: "== Animais (1) ==" }, { id: "sucuri", familia: "Animais" }],
+      [{ id: "sucuri", terrenos: "Floresta" }],
+      [{ id: "sucuri", familia: "serpentes-constritoras" }],
+      [{ id: "sucuri", terrenos_floresta: "Aquático" }],
+      [{ id: "", familia: "== Serpentes constritoras (1) ==", terrenos_floresta: "" },
+        { id: "sucuri", familia: "Serpentes constritoras", terrenos_floresta: "Floresta" }]
+    ];
+    for (const rows of incompleteSheets) {
+      writeCsv(rows, csv);
+      assert.throws(() => applyEcologySheet(csv, out), /familia.*terrenos_floresta/);
+      assert.equal(readFileSync(out, "utf8"), reviewed);
+    }
+
+    writeCsv([{ id: "sucuri", familia: "serpentes-constritoras", terrenos_floresta: "Pântano" }], csv);
+    assert.deepEqual(applyEcologySheet(csv, out).sucuri.forestTerrains, ["pantano"]);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+test("apply can still generate an output from a legacy sheet without forest data", () => {
+  const dir = mkdtempSync(join(tmpdir(), "eco-"));
+  try {
+    const csv = join(dir, "s.csv"); const out = join(dir, "ecology.js");
+    writeCsv([{ id: "", familia: "== Animais (1) ==", terrenos: "" },
+      { id: "sucuri", familia: "Animais", terrenos: "Aquático" }], csv);
+    assert.deepEqual(applyEcologySheet(csv, out).sucuri.terrains, ["aquatico"]);
+    writeCsv([{ id: "sucuri", terrenos: "Pântano" }], csv);
+    assert.deepEqual(applyEcologySheet(csv, out).sucuri.terrains, ["pantano"]);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 test("apply defaults, so_manual values, family headers and duplicates", () => {
   const base = { terrenos: "", lugares: "", condicoes: "", grupo: "", raridade: "", revisado: "" };

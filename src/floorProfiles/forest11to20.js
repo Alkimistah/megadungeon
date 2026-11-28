@@ -70,6 +70,41 @@ export const forest11to20Profile = {
     defaultPartySize: 4,
     challengeSource: "creatures",
     bossCreatureId: "quimera",
+    animalCommunities: {
+      "Floresta": [
+        { id: "floresta-alcateia-da-mata", name: "Alcateia da mata", families: ["lobos"], maxSheets: 1, weight: 3 },
+        { id: "floresta-chacais-da-orla", name: "Chacais da orla", families: ["chacais"], maxSheets: 2, weight: 2 },
+        { id: "floresta-gali-gali-na-folhagem", name: "Gali-gali na folhagem", families: ["gali-gali"], maxSheets: 2, weight: 2 },
+        { id: "floresta-clareira-de-herbivoros", name: "Clareira de herbívoros", families: ["suideos", "cervideos", "burafontes", "rinocerontes"], maxSheets: 2, weight: 2 },
+        { id: "floresta-covil-na-raiz", name: "Covil na raiz", families: ["mustelideos"], maxSheets: 1, weight: 1 },
+        { id: "floresta-cacador-solitario", name: "Caça na mata", families: ["felinos-de-mata", "ursideos", "primatas", "gorloggs", "serpentes-constritoras", "deinonicos", "raagorans", "tiranos"], maxSheets: 1, weight: 1 }
+      ],
+      "Pântano": [
+        { id: "pantano-ratos-do-brejo", name: "Ratos do brejo", families: ["ratos"], maxSheets: 1, weight: 2 },
+        { id: "pantano-roedores-da-varzea", name: "Roedores da várzea", families: ["capivaras"], maxSheets: 1, weight: 3 },
+        { id: "pantano-emboscada-no-brejo", name: "Emboscada no brejo", families: ["serpentes-constritoras", "crocodilianos"], maxSheets: 1, weight: 2 },
+        { id: "pantano-banho-de-lama", name: "Banho de lama", families: ["capivaras", "raagorans", "hipopotamos"], maxSheets: 1, weight: 1 }
+      ],
+      "Aquático": [
+        { id: "aquatico-remanso-de-capivaras", name: "Remanso de capivaras", families: ["capivaras"], maxSheets: 1, weight: 3 },
+        { id: "aquatico-espreita-no-remanso", name: "Espreita no remanso", families: ["crocodilianos", "serpentes-constritoras"], maxSheets: 1, weight: 2 },
+        { id: "aquatico-pasto-a-beira-do-lago", name: "Pasto à beira do lago", families: ["cervideos", "capivaras", "hipopotamos"], maxSheets: 3, weight: 1 },
+        { id: "aquatico-aguas-profundas", name: "Águas profundas", families: ["serpentes-constritoras", "platan", "hipo-orcas", "lulas"], maxSheets: 1, weight: 1 }
+      ],
+      "Colinas": [
+        { id: "colinas-cla-das-encostas", name: "Clã das encostas", families: ["hienideos"], maxSheets: 3, weight: 3 },
+        { id: "colinas-chacais-do-descampado", name: "Chacais do descampado", families: ["chacais"], maxSheets: 2, weight: 2 },
+        { id: "colinas-javali-da-encosta", name: "Javali da encosta", families: ["suideos"], maxSheets: 1, weight: 1 }
+      ],
+      "Planície aberta": [
+        { id: "planicie-aberta-cla-da-savana", name: "Clã da savana", families: ["hienideos"], maxSheets: 3, weight: 3 },
+        { id: "planicie-aberta-chacais-do-campo", name: "Chacais do campo", families: ["chacais"], maxSheets: 2, weight: 2 },
+        { id: "planicie-aberta-alcateia-do-campo", name: "Alcateia do campo", families: ["lobos"], maxSheets: 1, weight: 2 },
+        { id: "planicie-aberta-pastagem", name: "Pastagem", families: ["trobos", "proboscideos", "rinocerontes"], maxSheets: 3, weight: 1 },
+        { id: "planicie-aberta-rastro-na-savana", name: "Rastro na savana", families: ["chacais", "leoes", "lagartos-perseguidores"], maxSheets: 1, weight: 1 },
+        { id: "planicie-aberta-trilha-no-campo", name: "Trilha no campo", families: ["suideos", "grandes-sauropodes", "tuntrans"], maxSheets: 1, weight: 1 }
+      ]
+    },
     ecology: {
       defaults: { terrains: ["floresta"], places: [], conditions: [] },
       terrainTagsByName: {

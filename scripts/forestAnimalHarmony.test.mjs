@@ -19,7 +19,7 @@ const originalEcology = new Map();
 for (const [id, family] of Object.entries(TEST_FAMILIES)) {
   const creature = getCreatureById(id);
   originalEcology.set(creature, creature.ecology);
-  creature.ecology = { ...creature.ecology, family };
+  creature.ecology = { ...creature.ecology, family, forestTerrains: undefined };
 }
 // Devolve a ecologia original ao fim do arquivo, para não contaminar outro teste no mesmo processo.
 after(() => {

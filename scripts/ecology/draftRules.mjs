@@ -1,7 +1,7 @@
 // Regras puras do rascunho automático de etiquetas de ecologia (sem I/O).
 // suggestEcology(creature) devolve etiquetas sugeridas, confiança, motivos e se precisa do livro.
 
-import { TERRAINS, PLACES, CONDITIONS, GROUPS } from "../../src/creatureCatalog/ecologyVocabulary.js";
+import { TERRAINS, PLACES, CONDITIONS, GROUPS, NEUTRAL_ECOLOGY } from "../../src/creatureCatalog/ecologyVocabulary.js";
 
 const CONFIDENCE_ORDER = ["baixa", "media", "alta"];
 const ORDER = {
@@ -235,13 +235,13 @@ export function suggestEcology(creature) {
 
   return {
     tags: {
+      ...NEUTRAL_ECOLOGY,
       terrains: ordered("terrains", sets.terrains),
       places: ordered("places", sets.places),
       conditions: ordered("conditions", sets.conditions),
       group,
       rarity,
-      manualOnly: Boolean(manualReason),
-      reviewed: false
+      manualOnly: Boolean(manualReason)
     },
     confidence,
     reasons,
