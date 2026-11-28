@@ -10,6 +10,10 @@
 
 **Spec.** [Abas do encontro](../specs/2026-11-28-abas-do-encontro-design.md). Referência visual: `tmp/previas/abas-encontro/index.html`, forma A.
 
+## Situação
+
+- Plano concluído em 28/11/2026. Tarefas em `d2453d4`, `1b27907` e `4806170`; correções da revisão final em `3d0d332` (trava de progresso de missão na troca da escolta, foco e semântica das abas). Suítes e QA de 11–20, 1–10 e arquipélago passaram.
+
 ## Restrições gerais
 
 - As abas valem para todos os usos de `createEncounterCombatPage`: diálogo do nó, setores do arquipélago, exploração estendida e encontro manual.
@@ -51,7 +55,7 @@
 - Produz: `getEncounterRerollLabel(node, kind) -> string`.
 - Produz: `isTrapNode(node) -> boolean`, igual a `(node.contentType || node.type) === "trap"`.
 
-- [ ] **Passo 1: escrever o teste que falha.** Em `scripts/encounterTabs.test.mjs`, com nós literais:
+- [x] **Passo 1: escrever o teste que falha.** Em `scripts/encounterTabs.test.mjs`, com nós literais:
 
 ```js
 const items = (...kinds) => kinds.map(kind => ({ kind, quantity: 1 }));
@@ -77,11 +81,11 @@ assert.equal(getEncounterRerollLabel({ type: "trap" }, "trap"), "Rerrolar armadi
 assert.equal(getEncounterRerollLabel({ type: "elite" }, "trap"), "Rerrolar armadilha");
 ```
 
-- [ ] **Passo 2: rodar e ver falhar.** `node --test scripts/encounterTabs.test.mjs`. Esperado: falha de importação de `src/encounterTabs.js`.
-- [ ] **Passo 3: implementar** as três funções em `src/encounterTabs.js`, sem dependências de DOM.
-- [ ] **Passo 4: rodar e ver passar.** `node --test scripts/encounterTabs.test.mjs`. Esperado: todos passam.
-- [ ] **Passo 5: incluir o teste em `test:ecology`** no `package.json` (é a suíte de encontros que roda no fluxo) e rodar `npm run test:ecology`.
-- [ ] **Passo 6: commit** `feat: define as abas do encontro`.
+- [x] **Passo 2: rodar e ver falhar.** `node --test scripts/encounterTabs.test.mjs`. Esperado: falha de importação de `src/encounterTabs.js`.
+- [x] **Passo 3: implementar** as três funções em `src/encounterTabs.js`, sem dependências de DOM.
+- [x] **Passo 4: rodar e ver passar.** `node --test scripts/encounterTabs.test.mjs`. Esperado: todos passam.
+- [x] **Passo 5: incluir o teste em `test:ecology`** no `package.json` (é a suíte de encontros que roda no fluxo) e rodar `npm run test:ecology`.
+- [x] **Passo 6: commit** `feat: define as abas do encontro`.
 
 ### Tarefa 2 · Troca da escolta
 
@@ -94,23 +98,23 @@ assert.equal(getEncounterRerollLabel({ type: "elite" }, "trap"), "Rerrolar armad
 - Produz: `canRerollNodeEscort(node) -> boolean`.
 - Produz: `rerollNodeEscort(node, profile, { tacticalLayout = node.tacticalLayout, objectives } = {}) -> resolvedEncounter | null`. O retorno é `{ ...encounter, escortRerolls, items }`, com as criaturas novas seguidas dos itens que não são criatura, na ordem original.
 
-- [ ] **Passo 1: escrever o teste que falha.** Em `scripts/escortReroll.test.mjs`, obter um nó v5 de armadilha com escolta por sementes fixas, reaproveitando a forma como `scripts/forestNodeTraps.test.mjs` monta esses nós. Casos:
+- [x] **Passo 1: escrever o teste que falha.** Em `scripts/escortReroll.test.mjs`, obter um nó v5 de armadilha com escolta por sementes fixas, reaproveitando a forma como `scripts/forestNodeTraps.test.mjs` monta esses nós. Casos:
   - `canRerollNodeEscort(nodeComEscolta) === true` e `canRerollNodeCreatures(nodeComEscolta) === false`.
   - Depois de `rerollNodeEscort`, o item de armadilha é `deepEqual` ao original. A composição das criaturas difere da original, `calculateCombatND(criaturasNovas) === getForestEscortTarget(node.trap.challengeRating)`, esse valor é menor que `node.trap.challengeRating`, todas as criaturas são `type === "humanoid"` e `escortRerolls === 1`.
   - Determinismo: duas chamadas sobre cópias iguais do nó dão o mesmo resultado. Uma segunda troca sobre o resultado usa `escortRerolls === 2`.
   - Ida e volta por `JSON.parse(JSON.stringify(encounter))` preserva `escortRerolls` e os itens.
   - Sem alternativa: com um perfil de teste cujo catálogo humanoide só fecha uma combinação para o alvo, o retorno é `null`.
   - `canRerollNodeEscort` é `false` para: nó de armadilha sem escolta, encontro com reforço (`hasEncounterAdjustments` verdadeiro), `missionBindings` não vazio, `missionObjectives` não vazio, `fixedComposition`, `fixedTacticalMap` e nó normal com criaturas.
-- [ ] **Passo 2: rodar e ver falhar.** `node --test scripts/escortReroll.test.mjs`. Esperado: falha porque `rerollNodeEscort` não é exportado.
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2: rodar e ver falhar.** `node --test scripts/escortReroll.test.mjs`. Esperado: falha porque `rerollNodeEscort` não é exportado.
+- [x] **Passo 3: implementar.**
   - Extrair de `resolveForestTrapNode` o catálogo humanoide filtrado pela ecologia em `getForestEscortCatalog(node, profile) -> { catalog, ecology }`, usado pelas duas funções, sem mudar o comportamento da resolução.
   - Usar a semente `${encounter.seed}:escort-reroll:${escortRerolls}`.
   - Retirar dos grupos o que tiver a mesma `getCreatureComposition` da escolta atual.
   - Sortear com `pickEcologyWeighted` sem repetir grupos.
   - Aceitar o primeiro que passar em `encounterFitsMap` com `[...grupo.items, getTrapSummary(node.trap)]`, `encounter.seed` e `objectives`.
-- [ ] **Passo 4: rodar e ver passar.** `node --test scripts/escortReroll.test.mjs scripts/forestNodeTraps.test.mjs scripts/trapReroll.test.mjs`. Esperado: todos passam, e `forestNodeTraps` mostra que a resolução não mudou.
-- [ ] **Passo 5: incluir o teste em `test:ecology`** e rodar `npm run test:ecology` e `npm run test:floors-11-20`.
-- [ ] **Passo 6: commit** `feat: permite rerrolar a escolta do nó de armadilha`.
+- [x] **Passo 4: rodar e ver passar.** `node --test scripts/escortReroll.test.mjs scripts/forestNodeTraps.test.mjs scripts/trapReroll.test.mjs`. Esperado: todos passam, e `forestNodeTraps` mostra que a resolução não mudou.
+- [x] **Passo 5: incluir o teste em `test:ecology`** e rodar `npm run test:ecology` e `npm run test:floors-11-20`.
+- [x] **Passo 6: commit** `feat: permite rerrolar a escolta do nó de armadilha`.
 
 ### Tarefa 3 · Abas no componente e botão único
 
@@ -126,25 +130,25 @@ assert.equal(getEncounterRerollLabel({ type: "elite" }, "trap"), "Rerrolar armad
 - Produz: a opção `options.reroll` de `createCombatPage` / `createEncounterCombatPage`, no formato `{ creature?: RerollAction, trap?: RerollAction, status?: string }`, com `RerollAction = { run: () => boolean, failure: string }`. O componente desenha o botão da aba ativa com `data-encounter-reroll="<kind>"`, a classe `extended-action is-compact` e o texto de `getEncounterRerollLabel`, dentro de `.encounter-reroll-actions`, no fim do painel da lista. Logo abaixo fica `<p class="node-dialog-meta encounter-reroll-status" role="status">` com `status`. Se `run()` retornar `false`, o componente escreve `failure` no status. Se retornar `true`, quem chamou redesenha e passa a mensagem de sucesso em `status`.
 - Produz: no controlador do diálogo, `canRerollEscort(node)` e `onRerollEscort(node, context) -> boolean`, ao lado de `canRerollCreatures` e `onRerollTrap`.
 
-- [ ] **Passo 1: escrever as asserções de QA que falham** em `scripts/qaForestMvp.mjs`:
+- [x] **Passo 1: escrever as asserções de QA que falham** em `scripts/qaForestMvp.mjs`:
   - **Trocar os rótulos antigos:** `"Rerrolar criaturas"` vira `"Rerrolar inimigos"`. O cenário incidental passa a clicar na aba `Armadilha` antes de `Rerrolar armadilha` e confere que há um só botão em `.encounter-reroll-actions` por aba.
   - **Nó de armadilha com escolta:** a `tablist` tem as abas `Armadilha (1)` e `Escolta (n)` nessa ordem. Clicar em `Escolta` mostra `Rerrolar escolta`; clicar nele mostra o status `Escolta atualizada com o mesmo ND.` No save exportado, `escortRerolls === 1` e o item de armadilha não muda. Após restaurar, a aba `Escolta` continua com `Rerrolar escolta`.
   - **Normal sem armadilha:** não há `role="tablist"` e o título do painel é `Inimigos`.
   - **Armadilha sozinha:** não há `role="tablist"` e o título é `Armadilha`.
   - **Arquipélago:** no script do arquipélago, o encontro do setor mostra `Rerrolar inimigos` na aba de inimigos, e não há mais `Rerrolar criaturas`.
-- [ ] **Passo 2: rodar e ver falhar.** `npm run dev` em segundo plano e depois `QA_APP_URL=http://localhost:5173/megadungeon/ npm run qa:floors-11-20`. Esperado: falha em `Rerrolar inimigos` ou na `tablist`.
-- [ ] **Passo 3: implementar o componente.**
+- [x] **Passo 2: rodar e ver falhar.** `npm run dev` em segundo plano e depois `QA_APP_URL=http://localhost:5173/megadungeon/ npm run qa:floors-11-20`. Esperado: falha em `Rerrolar inimigos` ou na `tablist`.
+- [x] **Passo 3: implementar o componente.**
   - **Aba ativa:** é o `kind` do item selecionado. `getFirstEncounterItemKey` passa a devolver o primeiro item da primeira aba de `getEncounterTabs`.
   - **Barra de abas:** com mais de uma aba, desenhar uma barra com `role="tablist"` e botões `role="tab"` com `aria-selected`, no lugar do título "Combate". Clicar numa aba chama `onSelect` com a chave do primeiro item daquele tipo.
   - **Uma aba só:** o título é o rótulo da aba, sem contagem.
   - **Lista:** a linha de orçamento continua logo depois do título ou da barra. A lista mostra só os itens da aba ativa.
   - **Estilo:** seguir a forma A da prévia, com abas encostadas na borda de baixo, aba de armadilha com o tom alaranjado de `.encounter-list-item.is-trap` e a contagem com opacidade menor.
-- [ ] **Passo 4: ligar o diálogo do nó.**
+- [x] **Passo 4: ligar o diálogo do nó.**
   - **Ações:** `renderCombatPage` passa `options.reroll` em vez de montar os botões. `creature` usa a troca da escolta quando `canRerollEscort(node)` e a troca de inimigos quando `canRerollCreatures(node)`; `trap` usa `canRerollTrap`.
   - **Mensagens:** sucesso `Criaturas atualizadas com o mesmo ND.`, `Escolta atualizada com o mesmo ND.` e `Armadilha atualizada com o mesmo ND.`; falha `Nenhuma outra composição compatível foi encontrada.`, `Nenhuma outra escolta compatível foi encontrada.` e `Nenhuma outra armadilha com o mesmo ND foi encontrada.`
   - **Após a troca:** selecionar o primeiro item do tipo trocado e devolver o foco ao botão.
   - **`main.js`:** acrescentar `canRerollEscort: node => isPendingForestEncounter(node) && canRerollNodeEscort(node)`. `onRerollEscort` chama `rerollNodeEscort(node, activeFloorRange, context)`, grava `node.resolvedEncounter` e chama `refreshExplorationDisplay()`, como `onRerollTrap`. O contexto é `{ tacticalLayout: node.tacticalLayout, objectives: getTacticalObjectives(node) }`.
-- [ ] **Passo 5: ligar o arquipélago.** `createIslandEncounter` passa `options.reroll.creature` (com as mesmas condições `onReroll && canReroll(scene)`) e `status` após a troca, em vez de anexar `.archipelago-reroll-footer`. O botão fica embaixo da lista, como no diálogo do nó, para manter um só visual.
-- [ ] **Passo 6: rodar o QA e ver passar.** `QA_APP_URL=http://localhost:5173/megadungeon/ npm run qa:floors-11-20`, o script de QA do arquipélago e `npm run qa:floors-1-10`, que cobre a exploração estendida. Esperado: todos passam sem erros de JavaScript. Encerrar o servidor.
-- [ ] **Passo 7: rodar as suítes.** `npm run test:ecology`, `npm run test:floors-11-20`, `npm run test:archipelago`, `npm run test:floors-1-10` e `npm run build`. Esperado: todas passam.
-- [ ] **Passo 8: commit** `feat: separa inimigos e armadilhas em abas no encontro`.
+- [x] **Passo 5: ligar o arquipélago.** `createIslandEncounter` passa `options.reroll.creature` (com as mesmas condições `onReroll && canReroll(scene)`) e `status` após a troca, em vez de anexar `.archipelago-reroll-footer`. O botão fica embaixo da lista, como no diálogo do nó, para manter um só visual.
+- [x] **Passo 6: rodar o QA e ver passar.** `QA_APP_URL=http://localhost:5173/megadungeon/ npm run qa:floors-11-20`, o script de QA do arquipélago e `npm run qa:floors-1-10`, que cobre a exploração estendida. Esperado: todos passam sem erros de JavaScript. Encerrar o servidor.
+- [x] **Passo 7: rodar as suítes.** `npm run test:ecology`, `npm run test:floors-11-20`, `npm run test:archipelago`, `npm run test:floors-1-10` e `npm run build`. Esperado: todas passam.
+- [x] **Passo 8: commit** `feat: separa inimigos e armadilhas em abas no encontro`.
