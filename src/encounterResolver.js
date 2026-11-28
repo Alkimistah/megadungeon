@@ -6,7 +6,7 @@ import {
   getEncounterEcologyContext, pickEcologyWeighted
 } from "./encounterEcology.js";
 import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
-import { eliteAuxiliaries, pickEncounterGroupComposition } from "./encounterGroupComposition.js";
+import { eliteAuxiliaries, forestPool, pickEncounterGroupComposition } from "./encounterGroupComposition.js";
 import { applyWeaponVariation } from "./equipment/weaponVariation.js";
 import { getLegacyCandidateWeight, SUPPORT_CREATURE_IDS_BY_TYPE } from "./legacyEncounterPreferences.js";
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
@@ -631,10 +631,17 @@ export function resolveForestElite(node, profile, {
       const principalND = recipe === "eliteSingle" ? rating : rating - 1;
       const auxiliaries = catalog.filter(c => c.challengeRating > 0 && c.challengeRating < principalND)
         .sort((a, b) => b.challengeRating - a.challengeRating);
-      const dead = new Map();
+      // Cada recorte por tipo tem sua própria memória de estados sem saída.
+      const deadByPool = new Map();
       for (const principal of catalog.filter(c => c.challengeRating === principalND)) {
         const leader = { creature: principal, quantity: 1 };
-        const helpers = recipe === "eliteGroup" ? eliteAuxiliaries(auxiliaries, leader, rating, dead) : [[]];
+        let helpers = [[]];
+        if (recipe === "eliteGroup") {
+          const pool = forestPool(auxiliaries, principal.type, rng, { strict: true });
+          const key = [...new Set(pool.map(creature => creature.type))].sort().join(",");
+          if (!deadByPool.has(key)) deadByPool.set(key, new Map());
+          helpers = eliteAuxiliaries(pool, leader, rating, deadByPool.get(key));
+        }
         // Limita as conferências de grade por principal; a próxima principal recomeça.
         let attempts = 0;
         for (const group of helpers) {

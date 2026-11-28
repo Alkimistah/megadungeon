@@ -75,11 +75,14 @@ export function* eliteAuxiliaries(candidates, leader, target, dead = new Map()) 
   yield* search(0, [], [leader.creature.challengeRating]);
 }
 
-function forestPool(catalog, type, rng) {
+// Coesão de tipo dos grupos da floresta: 65% um tipo, 25% humanoides com um tipo
+// companheiro e 10% livre. Com `strict`, o tipo pedido vale mesmo sem candidatos dele,
+// como no elite, em que o tipo é o da principal.
+export function forestPool(catalog, type, rng, { strict = false } = {}) {
   const roll = rng();
   if (roll >= 0.9) return catalog;
   const types = [...new Set(catalog.map(creature => creature.type))];
-  const preferred = types.includes(type) ? type : pick(rng, types);
+  const preferred = strict || types.includes(type) ? type : pick(rng, types);
   if (roll < 0.65) return catalog.filter(creature => creature.type === preferred);
   const otherTypes = types.filter(candidate => candidate !== "humanoid");
   const companion = preferred === "humanoid" ? pick(rng, otherTypes) : preferred;

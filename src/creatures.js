@@ -118,6 +118,13 @@ function getGroupGuidance(node, rules) {
   ];
 }
 
+// Nó de armadilha da floresta usa escolta humanoide; elite exibe o tipo da principal.
+function getForestCompositionType(node) {
+  const { variant, creatures } = node.forestComposition ?? {};
+  if (variant === "trap") return "humanoid";
+  return variant?.startsWith("elite") ? getCreatureById(creatures[0]?.id)?.type ?? null : null;
+}
+
 export function assignCreatureProfile(node, profile, rng) {
   if (!hasCreatureProfile(node)) {
     node.creature = null;
@@ -126,7 +133,7 @@ export function assignCreatureProfile(node, profile, rng) {
 
   const rules = getCreatureRules(profile);
   const specificCreature = getSpecificCreature(node, rules);
-  const prescribedType = specificCreature?.type ?? (node.forestComposition?.variant === "trap" ? "humanoid" : null);
+  const prescribedType = specificCreature?.type ?? getForestCompositionType(node);
   const typeOption = prescribedType ? { type: prescribedType } : pickWeighted(rng, getWeightedCreatureTypes(node, rules));
   const type = CREATURE_TYPES[typeOption.type] || CREATURE_TYPES.monster;
   const targetChallenge = specificCreature?.challengeRating ?? getChallengeSource(node, rules);

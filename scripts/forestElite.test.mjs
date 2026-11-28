@@ -4,7 +4,7 @@ import {
   canRerollNodeCreatures, resolveForestElite, resolveNodeEncounter, rerollNodeCreatures, rerollNodeTrap
 } from "../src/encounterResolver.js";
 import { calculateCombatND } from "../src/challenge.js";
-import { getAutomaticCreatureCatalog } from "../src/creatureCatalog/index.js";
+import { getAutomaticCreatureCatalog, getCreatureById } from "../src/creatureCatalog/index.js";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { generateMapData } from "../src/generator.js";
 import { createRng } from "../src/random.js";
@@ -79,6 +79,25 @@ test("a reroll without an alternative inside the variant keeps the composition",
   assert.equal(rerollNodeCreatures(scene, p), null);
 });
 
+test("elite helpers keep the forest type cohesion around the principal", () => {
+  const p = subset([6, 5], false, c => (c.challengeRating === 6 && c.type === "construct")
+    || (c.challengeRating === 5 && ["animal", "humanoid"].includes(c.type)));
+  const resolve = roll => resolveForestElite(node, p, { seed: "cohesion", rng: () => roll });
+  // 65%: só o tipo da principal. Não há construto ND 5, então o grupo não fecha.
+  assert.notEqual(resolve(0.3).variant, "eliteGroup");
+  // 25%: humanoides acompanham a principal.
+  const escorted = resolve(0.7);
+  assert.equal(escorted.variant, "eliteGroup");
+  assert.deepEqual(escorted.items.map(item => item.type), ["construct", "humanoid"]);
+  // 10%: escolha livre, que admite outro tipo.
+  const free = resolve(0.95);
+  assert.equal(free.variant, "eliteGroup");
+  assert.equal(free.items[0].type, "construct");
+  for (const roll of [0.3, 0.7]) {
+    assert.ok(resolve(roll).items.slice(1).every(item => ["construct", "humanoid"].includes(item.type)));
+  }
+});
+
 test("degrades to the best viable elite above normal, then to the floor normal", () => {
   assert.equal(resolveForestElite(node, subset([6]), { seed: "lower" }).creatureTarget, 6);
   assert.equal(resolveForestElite(node, subset([6]), { seed: "lower" }).variant, "eliteSingle");
@@ -96,7 +115,7 @@ test("every procedural elite keeps one principal and never exceeds its target", 
         assert.equal(result.effectiveType, "elite");
         assertSinglePrincipal(result.items);
         const total = calculateCombatND(result.items) + (result.trap?.challengeRating ?? 0);
-        assert.ok(total <= encounter && total >= encounter - 1, `${name} ${encounter}: ${total}`);
+        assert.equal(total, encounter, `${name} ${encounter}`);
         if (name === "Aquático") assert.ok(result.items.every(item => getAquatic(item.creatureId)));
       }
     }
@@ -113,6 +132,7 @@ test("the generator stores the elite variant and converts unviable elites to nor
     assert.match(elite.forestComposition.variant, /^elite(Group|Trap|Single)$/);
     assert.equal(elite.challenge.creatures + elite.challenge.trap, 7);
     assert.equal(elite.creature.targetChallenge, elite.challenge.creatures);
+    assert.equal(elite.creature.type, getCreatureById(elite.forestComposition.creatures[0].id).type);
     const encounter = resolveNodeEncounter(elite, { profile, mapSeed: seed });
     assertSinglePrincipal(encounter.items.filter(item => item.kind === "creature"));
   }
