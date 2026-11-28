@@ -9,3 +9,11 @@ Thumbs.db
 recursos/
 .playwright-mcp/
 .idea/
+
+# Configurações e documentos de orquestração de IA (apenas locais)
+CLAUDE.md
+AGENTS.md
+.claude/
+.codex/
+docs/superpowers/
+.superpowers/
