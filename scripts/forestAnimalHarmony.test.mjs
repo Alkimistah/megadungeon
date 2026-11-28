@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import test, { after } from "node:test";
 import { calculateCombatND } from "../src/challenge.js";
 import { getAutomaticCreatureCatalog, getCreatureById } from "../src/creatureCatalog/index.js";
 import { assignCreatureProfile } from "../src/creatures.js";
@@ -15,10 +15,16 @@ const TEST_FAMILIES = {
   lobo: "lobo", "lobo-das-cavernas": "lobo", pantera: "felino", tigre: "grande-felino", "urso-pardo": "urso",
   alce: "cervo", giralon: "primata", "rato-gigante": "roedor", raagoran: "raagoran", crocodilo: "crocodiliano"
 };
+const originalEcology = new Map();
 for (const [id, family] of Object.entries(TEST_FAMILIES)) {
   const creature = getCreatureById(id);
+  originalEcology.set(creature, creature.ecology);
   creature.ecology = { ...creature.ecology, family };
 }
+// Devolve a ecologia original ao fim do arquivo, para não contaminar outro teste no mesmo processo.
+after(() => {
+  for (const [creature, ecology] of originalEcology) creature.ecology = ecology;
+});
 
 // Pântano: o brejo nunca fecha (raagoran ND 8 e crocodilo sem a etiqueta), então o
 // gerador cai nos roedores, de uma ficha só.
@@ -112,7 +118,8 @@ test("normal animal combats come from one community of the node terrain", () => 
   for (const { node, mapSeed } of v6Nodes()) {
     if (node.contentType !== "normal" || node.creature?.type !== "animal") continue;
     assert.ok(COMMUNITIES[terrainOf(node)], `animal em ${terrainOf(node)}, terreno sem comunidade`);
-    assert.ok(!JSON.stringify(node).includes("animalCommunityId"), "comunidade gravada antes da descoberta");
+    const { links, ...own } = node; // os vizinhos (links) podem ser elites com a comunidade gravada
+    assert.ok(!JSON.stringify(own).includes("animalCommunityId"), "comunidade gravada antes da descoberta");
     const encounter = resolveNodeEncounter(node, { profile, mapSeed });
     const creatures = creaturesOf(encounter);
     if (!encounter.animalCommunityId) {
@@ -128,6 +135,33 @@ test("normal animal combats come from one community of the node terrain", () => 
   assert.ok(communityCombats >= 10, `poucos combates de animais: ${communityCombats}`);
   assert.ok(hidden > 0, "nenhum desconhecido revelado como combate de animais");
   assert.ok(sheetCounts.size > 1, "só uma quantidade de fichas apareceu");
+});
+
+test("no v6 procedural combat of any type brings an animal outside its terrain communities", () => {
+  let animals = 0;
+  let mixed = 0;
+  for (const { node, mapSeed } of v6Nodes()) {
+    const encounter = resolveNodeEncounter(node, { profile, mapSeed });
+    const creatures = creaturesOf(encounter);
+    const terrain = terrainOf(node);
+    for (const item of creatures) {
+      const base = baseOf(item);
+      if (base.type !== "animal") continue;
+      animals++;
+      if (node.creature?.type !== "animal") mixed++;
+      assert.ok((COMMUNITIES[terrain] ?? []).some(community => community.families.includes(base.ecology.family)
+        && base.ecology.terrains.includes(TAGS[terrain])), `${item.creatureId} fora das comunidades de ${terrain} (nó ${node.creature?.type})`);
+    }
+    const next = node.creature && rerollNodeCreatures(structuredClone(node), profile);
+    for (const item of creaturesOf(next)) {
+      const base = baseOf(item);
+      if (base.type !== "animal") continue;
+      assert.ok((COMMUNITIES[terrain] ?? []).some(community => community.families.includes(base.ecology.family)
+        && base.ecology.terrains.includes(TAGS[terrain])), `rerrolagem trouxe ${item.creatureId} em ${terrain}`);
+    }
+  }
+  assert.ok(animals > 0);
+  assert.ok(mixed > 0, "nenhum animal de comunidade em combate de outro tipo");
 });
 
 test("terrains without a viable community never get the animal type", () => {
