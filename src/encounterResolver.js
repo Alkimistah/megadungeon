@@ -864,6 +864,12 @@ export function rerollNodeCreatures(node, profile, { tacticalLayout } = {}) {
   return null;
 }
 
+export function hasRecordedEncounterProgress(node, missions = []) {
+  const encounterKey = `${node.resolvedEncounter?.seed}:`;
+  return missions.some(mission =>
+    mission.progress?.recordedEncounters?.some(key => key.startsWith(encounterKey)));
+}
+
 export function canRerollNodeEscort(node) {
   return Boolean(node?.trap
     && (node.contentType || node.type) === "trap"

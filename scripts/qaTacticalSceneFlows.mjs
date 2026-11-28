@@ -8,6 +8,7 @@ import { encodeSessionCode } from "../src/sessionCode.js";
 
 const url = process.env.QA_APP_URL || "http://localhost:5173/megadungeon/";
 const browser = await chromium.launch({ executablePath: process.env.QA_CHROME || "/usr/bin/google-chrome", args: ["--no-sandbox"] });
+// Seed "a": the previous seed no longer produced a mission offer for the explored island.
 const seed = "a";
 const state = createArchipelagoState(profile, createRng(seed));
 const worldDraft = { islands: state.getSnapshot().islands };

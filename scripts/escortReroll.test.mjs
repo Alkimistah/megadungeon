@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { calculateCombatND } from "../src/challenge.js";
 import {
-  canRerollNodeCreatures, canRerollNodeEscort, rerollNodeEscort, resolveNodeEncounter
+  canRerollNodeCreatures, canRerollNodeEscort, hasRecordedEncounterProgress, rerollNodeEscort, resolveNodeEncounter
 } from "../src/encounterResolver.js";
 import { forest11to20Profile as profile } from "../src/floorProfiles/forest11to20.js";
 import { generateMapData } from "../src/generator.js";
@@ -54,11 +54,14 @@ test("rerolls the escort and keeps the trap", () => {
 });
 
 test("is deterministic and counts successive rerolls", () => {
-  const node = rerollableNode();
+  const successive = candidate => {
+    const first = reroll(candidate);
+    return first && rerollNodeEscort({ ...clone(candidate), resolvedEncounter: first }, profile);
+  };
+  const node = escortNodes().find(successive);
+  assert.ok(node, "faltou nó com duas rerrolagens seguidas possíveis");
   assert.deepEqual(reroll(node), reroll(node));
-  const first = reroll(node);
-  const second = rerollNodeEscort({ ...clone(node), resolvedEncounter: first }, profile);
-  if (second) assert.equal(second.escortRerolls, 2);
+  assert.equal(successive(node).escortRerolls, 2);
 });
 
 test("survives a JSON round trip", () => {
@@ -102,4 +105,13 @@ test("blocks the reroll when the escort cannot or must not change", () => {
     .flat().find(candidate => candidate.contentType === "normal" && candidate.creature);
   resolveNodeEncounter(normal, { profile, mapSeed: "identity0" });
   assert.equal(canRerollNodeEscort(normal), false);
+});
+
+test("hasRecordedEncounterProgress detects recorded kills for the encounter seed", () => {
+  const node = { resolvedEncounter: { seed: "s1" } };
+  const mission = keys => ({ progress: { recordedEncounters: keys } });
+  assert.equal(hasRecordedEncounterProgress(node, []), false);
+  assert.equal(hasRecordedEncounterProgress(node, [mission(["s2:a:0"])]), false);
+  assert.equal(hasRecordedEncounterProgress(node, [{}, mission([])]), false);
+  assert.equal(hasRecordedEncounterProgress(node, [mission(["s2:a:0"]), mission(["s1:a:0"])]), true);
 });

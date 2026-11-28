@@ -589,7 +589,7 @@ async function escortRerollFlow() {
       return canRerollNodeEscort(candidate);
     });
   }
-  assert.ok(node);
+  assert.ok(node, "faltou nó de armadilha com escolta rerrolável");
   const index = entry.levels.flat().indexOf(node);
   const session = sessionFor(expedition);
   session.state.chosenByLevel = [[node.level, node.id]];
@@ -606,6 +606,19 @@ async function escortRerollFlow() {
     assert.match(await tabs.nth(1).innerText(), /^Escolta \(\d+\)$/);
     await tabs.nth(1).click();
     assert.equal(await tabs.nth(1).getAttribute("aria-selected"), "true");
+    assert.equal(await dialog.locator(".encounter-tabs [data-encounter-tab=creature]").evaluate(el => el === document.activeElement), true, "o foco deve ficar na aba escolhida");
+    assert.equal(await tabs.nth(1).getAttribute("tabindex"), "0");
+    assert.equal(await tabs.nth(0).getAttribute("tabindex"), "-1");
+    await tabs.nth(1).press("ArrowLeft");
+    assert.equal(await tabs.nth(0).getAttribute("aria-selected"), "true");
+    assert.equal(await dialog.locator("[data-encounter-tab=trap]").evaluate(el => el === document.activeElement), true);
+    await tabs.nth(0).press("ArrowRight");
+    assert.equal(await tabs.nth(1).getAttribute("aria-selected"), "true");
+    await tabs.nth(1).evaluate(el => { el.dataset.marker = "same"; });
+    await tabs.nth(1).click();
+    assert.equal(await dialog.locator("[data-encounter-tab=creature]").getAttribute("data-marker"), "same", "clicar na aba ativa não recria nem reseta a seleção");
+    assert.equal(await dialog.locator(".encounter-list").getAttribute("role"), "tabpanel");
+    assert.equal(await dialog.getByRole("tablist").getAttribute("aria-label"), "Combate");
     assert.equal(await dialog.locator(".encounter-reroll-actions button").count(), 1);
     await dialog.getByRole("button", { name: "Rerrolar escolta" }).click();
     await dialog.getByRole("status").getByText("Escolta atualizada com o mesmo ND.").waitFor();

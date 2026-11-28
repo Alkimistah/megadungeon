@@ -442,26 +442,48 @@ export function createEncounterMissionPanel(matches, onAdjustMissionProgress = n
   return panel;
 }
 
+let pendingTabFocus = null;
+
 function createEncounterTabBar(tabs, activeKind, onSelectKind) {
   const bar = document.createElement("div");
+  const buttons = [];
 
   bar.className = "encounter-tabs";
   bar.setAttribute("role", "tablist");
-  tabs.forEach((tab) => {
+  bar.setAttribute("aria-label", "Combate");
+  tabs.forEach((tab, index) => {
     const button = document.createElement("button");
     const count = document.createElement("span");
     const selected = tab.kind === activeKind;
 
     button.type = "button";
+    button.id = `encounter-tab-${tab.kind}`;
     button.className = `encounter-tab is-${tab.kind}${selected ? " is-selected" : ""}`;
+    button.dataset.encounterTab = tab.kind;
     button.setAttribute("role", "tab");
     button.setAttribute("aria-selected", String(selected));
+    button.tabIndex = selected ? 0 : -1;
     button.append(tab.label);
     count.className = "encounter-tab-count";
     count.textContent = `(${tab.count})`;
     button.append(" ", count);
-    button.addEventListener("click", () => onSelectKind(tab.kind));
+    button.addEventListener("click", () => {
+      if (selected) return;
+      pendingTabFocus = tab.kind;
+      onSelectKind(tab.kind);
+    });
+    button.addEventListener("keydown", (event) => {
+      const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+      if (!step) return;
+      event.preventDefault();
+      buttons[(index + step + tabs.length) % tabs.length].click();
+    });
+    buttons.push(button);
     bar.appendChild(button);
+    if (pendingTabFocus === tab.kind) {
+      pendingTabFocus = null;
+      requestAnimationFrame(() => { if (button.isConnected) button.focus(); });
+    }
   });
 
   return bar;
@@ -482,7 +504,7 @@ function createEncounterRerollControls(node, activeKind, reroll, onRerolled) {
   button.textContent = getEncounterRerollLabel(node, activeKind);
   status.className = "node-dialog-meta encounter-reroll-status";
   status.setAttribute("role", "status");
-  status.textContent = reroll.status || "";
+  if (reroll.status) requestAnimationFrame(() => { status.textContent = reroll.status; });
   button.addEventListener("click", () => {
     if (action.run()) onRerolled?.(activeKind);
     else status.textContent = action.failure;
@@ -503,6 +525,10 @@ function createEncounterList(node, selectedKey, onSelect, missions, trapPresenta
 
   panel.className = "encounter-list-panel";
   list.className = "encounter-list";
+  if (tabs.length > 1) {
+    list.setAttribute("role", "tabpanel");
+    list.setAttribute("aria-labelledby", `encounter-tab-${activeKind}`);
+  }
 
   items.forEach((item, index) => {
     if (item.kind !== activeKind) return;

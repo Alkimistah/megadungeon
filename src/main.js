@@ -19,7 +19,7 @@ import { createMissionDialogController } from "./missions/missionDialog.js";
 import { createMissionGenerationContext, generateMissionOffers } from "./missions/missionGenerator.js";
 import { materializeMissionsForCurrentContent } from "./missions/missionProfileAdapters.js";
 import { createMissionState } from "./missions/missionState.js";
-import { canRerollNodeCreatures, canRerollNodeEscort, canRerollNodeTrap, rerollNodeCreatures, rerollNodeEscort, rerollNodeTrap, resolveForestAmbush, resolveNodeEncounter } from "./encounterResolver.js";
+import { canRerollNodeCreatures, canRerollNodeEscort, canRerollNodeTrap, hasRecordedEncounterProgress, rerollNodeCreatures, rerollNodeEscort, rerollNodeTrap, resolveForestAmbush, resolveNodeEncounter } from "./encounterResolver.js";
 import { creatureCatalog } from "./creatureCatalog/index.js";
 import { withCreatureReinforcement } from "./creatureReinforcement.js";
 import { createNodeDialogController } from "./nodeDialog.js";
@@ -137,11 +137,7 @@ function canReinforceCreatures(node) {
 
 function canRerollCreatures(node) {
   if (!isPendingForestEncounter(node) || !canRerollNodeCreatures(node)) return false;
-
-  const encounterKey = `${node.resolvedEncounter.seed}:`;
-  return !missionState.getSelected().some(mission =>
-    mission.progress?.recordedEncounters?.some(key => key.startsWith(encounterKey))
-  );
+  return !hasRecordedEncounterProgress(node, missionState.getSelected());
 }
 
 function openMissionById(missionId, node = null) {
@@ -305,7 +301,8 @@ function advanceNodeMapFloor() {
 const nodeDialogController = createNodeDialogController({
   canReinforceCreatures,
   canRerollCreatures,
-  canRerollEscort: node => isPendingForestEncounter(node) && canRerollNodeEscort(node),
+  canRerollEscort: node => isPendingForestEncounter(node) && canRerollNodeEscort(node) &&
+    !hasRecordedEncounterProgress(node, missionState.getSelected()),
   canRerollTrap: node => isPendingForestEncounter(node) && canRerollNodeTrap(node),
   contentElement: elements.nodeDialogContent,
   dialogElement: elements.nodeDialog,
