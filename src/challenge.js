@@ -148,7 +148,7 @@ function getForestEnvironmentChallenge(challenge) {
 }
 
 export function getForestChallengeParts(node) {
-  if (node.generationVersion !== 5 || !node.challenge) return null;
+  if (!(node.generationVersion >= 5) || !node.challenge) return null;
 
   const { challenge } = node;
   const items = node.resolvedEncounter?.items;
@@ -167,7 +167,7 @@ export function getForestChallengeParts(node) {
 }
 
 export function updateForestChallengeTotal(node, rules) {
-  if (node.generationVersion !== 5 || !node.challenge) return;
+  if (!(node.generationVersion >= 5) || !node.challenge) return;
 
   const { challenge } = node;
   challenge.environment = getForestEnvironmentChallenge(challenge);

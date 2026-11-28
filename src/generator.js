@@ -1,4 +1,4 @@
-import { getEncounterSeed, resolveForestElite, resolveForestTrapNode } from "./encounterResolver.js";
+import { canComposeNodeAnimals, getEncounterSeed, resolveForestElite, resolveForestTrapNode } from "./encounterResolver.js";
 import { assignChallengeRating, formatChallengeRating, updateForestChallengeTotal } from "./challenge.js";
 import { assignCreatureProfile } from "./creatures.js";
 import { assignForestNormalTrap, assignTrapProfile } from "./traps.js";
@@ -106,12 +106,12 @@ function assignChallengeRatings(levels, profile, floor) {
 
 function assignTrapProfiles(levels, profile, rng, mapSeed, visibleTypes, floor) {
   levels.flat().forEach((node) => {
-    if (node.generationVersion === 5 && node.type === "normal") {
+    if (node.generationVersion >= 5 && node.type === "normal") {
       assignForestNormalTrap(node, profile, rng);
-    } else if (node.generationVersion === 5 && ["trap", "elite"].includes(node.type)) {
+    } else if (node.generationVersion >= 5 && ["trap", "elite"].includes(node.type)) {
       const seed = getEncounterSeed(node, mapSeed ?? "map");
       const resolve = node.type === "elite" ? resolveForestElite : resolveForestTrapNode;
-      const { trap, items, creatureTarget, variant = "trap", effectiveType } = resolve(node, profile, { seed });
+      const { trap, items, creatureTarget, variant = "trap", effectiveType, composition, animalCommunityId } = resolve(node, profile, { seed });
       if (effectiveType === "normal") {
         node.type = node.contentType = "normal";
         const room = profile.encounterRules.roomTypes.find(room => room.type === "normal");
@@ -127,7 +127,8 @@ function assignTrapProfiles(levels, profile, rng, mapSeed, visibleTypes, floor) 
       }
       node.trap = trap;
       node.forestComposition = {
-        variant, seed, creatures: items.map(({ creatureId, quantity }) => ({ id: creatureId, quantity }))
+        variant, seed, creatures: composition ?? items.map(({ creatureId, quantity }) => ({ id: creatureId, quantity })),
+        ...(animalCommunityId ? { animalCommunityId } : {})
       };
       node.challenge.trap = trap?.challengeRating ?? 0;
       node.challenge.creatures = creatureTarget;
@@ -138,7 +139,7 @@ function assignTrapProfiles(levels, profile, rng, mapSeed, visibleTypes, floor) 
     } else {
       assignTrapProfile(node, profile, rng);
       // Tesouro e acampamento v5 não têm ficha nem armadilha: zera as parcelas.
-      if (node.generationVersion === 5 && ["treasure", "camp"].includes(node.contentType ?? node.type)) {
+      if (node.generationVersion >= 5 && ["treasure", "camp"].includes(node.contentType ?? node.type)) {
         node.challenge.creatures = 0;
         node.challenge.trap = 0;
         node.challenge.encounterBudgetLabel = "";
@@ -151,6 +152,11 @@ function assignTrapProfiles(levels, profile, rng, mapSeed, visibleTypes, floor) 
 function assignCreatureProfiles(levels, profile, rng) {
   levels.flat().forEach((node) => {
     assignCreatureProfile(node, profile, rng);
+    // Geração 6: combate de animais só onde uma comunidade do terreno fecha o alvo.
+    if (node.generationVersion >= 6 && node.creature?.type === "animal" && !node.forestComposition
+      && !canComposeNodeAnimals(node, profile)) {
+      assignCreatureProfile(node, profile, rng, { excludeTypes: ["animal"] });
+    }
   });
 }
 
@@ -540,7 +546,7 @@ export function generateMapData(depth, baseDC, floorProfile, floor, rng = Math.r
       }
       node.type = node.contentType;
       node.requiresCompletion = true;
-      if (version === 5 && profile.id === "forest-11-20") {
+      if (version >= 5 && profile.id === "forest-11-20") {
         node.generationVersion = version;
         node.encounterSeed = `${floor}:${node.encounterSeed}`;
       }

@@ -562,7 +562,7 @@ export function createNodeTacticalMap(node, objectives = node?.missionObjectives
   const beforeTrap = cells.flat();
   const trapItem = node.resolvedEncounter?.items.find(item => item.kind === "trap");
   const trapLabel = getForestTrapPresentation(profileId, node, trapItem)?.name ?? node.trap?.name ?? trapItem?.name;
-  const trapMarkerId = node.generationVersion === 5 ? trapItem?.trapId : undefined;
+  const trapMarkerId = node.generationVersion >= 5 ? trapItem?.trapId : undefined;
   if (forestLayout?.trapPositions.length) {
     addLayer(markers, "trap", forestLayout.trapPositions.map(([x, y]) => y * WIDTH + x), trapLabel, trapMarkerId);
   } else {

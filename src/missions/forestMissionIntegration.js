@@ -4,7 +4,7 @@ import { createForestMissionObjective, isForestMissionEnvironmentCompatible } fr
 
 // Nos mapas v5 a capacidade vem da parcela de criaturas; mapas legados leem o ND do encontro.
 function getCreatureBudget(node) {
-  return node.generationVersion === 5 ? node.challenge.creatures ?? 0 : node.challenge.encounter;
+  return node.generationVersion >= 5 ? node.challenge.creatures ?? 0 : node.challenge.encounter;
 }
 
 function isEligible(node, mission) {
@@ -96,7 +96,7 @@ function applyCombat(node, mission, quantity, rules) {
     ...node.challenge, encounter: actual, creatures: actual, trap: 0,
     total: Math.min(8, roundToQuarter(actual + node.challenge.climate + node.challenge.terrain))
   };
-  if (node.generationVersion === 5) {
+  if (node.generationVersion >= 5) {
     node.challenge.encounterBudgetLabel = `ND ${formatChallengeRating(actual)} para criaturas`;
     updateForestChallengeTotal(node, rules);
   }

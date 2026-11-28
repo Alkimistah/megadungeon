@@ -8,6 +8,9 @@ import {
 import { hasEncounterAdjustments } from "./encounterCreatureHealth.js";
 import { eliteAuxiliaries, forestPool, pickEncounterGroupComposition } from "./encounterGroupComposition.js";
 import { applyWeaponVariation } from "./equipment/weaponVariation.js";
+import {
+  canComposeAnimalCommunity, composeAnimalCommunityGroup, getAnimalCommunities, getCommunityAnimals
+} from "./forestAnimalCommunities.js";
 import { getLegacyCandidateWeight, SUPPORT_CREATURE_IDS_BY_TYPE } from "./legacyEncounterPreferences.js";
 import { createNodeTacticalMap } from "./nodeTacticalMap.js";
 import { createRng, pickWeighted } from "./random.js";
@@ -181,7 +184,7 @@ function extractAttackName(actionText) {
 
 // Generates a scaled "elite" variant of baseCreature at targetCR using T20 table parameters.
 // Returns null if the required table entries are unavailable.
-function createEliteVariant(baseCreature, targetCR) {
+export function createEliteVariant(baseCreature, targetCR) {
   const snappedTargetCR = snapToValidCRAtOrAbove(targetCR);
   const role = baseCreature.role || "solo";
   let plan, baseParams, targetParams;
@@ -283,6 +286,11 @@ function getCreatureSummary(creature, quantity, rng = null) {
     type: encounterCreature.type,
     typeLabel
   };
+}
+
+// Ficha gerada (versão melhorada) leva os dados junto; ficha do catálogo segue normal.
+function getEncounterCreatureSummary(creature, quantity, rng = null) {
+  return creature.generated ? getEliteCreatureSummary(creature, quantity, rng) : getCreatureSummary(creature, quantity, rng);
 }
 
 function getTrapSummary(trap) {
@@ -505,6 +513,36 @@ function filterEncounterCatalog(node, catalog, ecology) {
   return requiredTag ? catalog.filter(creature => creature.ecology?.terrains?.includes(requiredTag)) : catalog;
 }
 
+// Geração 6 da floresta: comunidades de animais do terreno do nó e a etiqueta desse
+// terreno. Fora da regra (outra versão, outro perfil ou encontro manual) devolve null.
+function getNodeAnimalCommunityContext(node, profile) {
+  if (!(node.generationVersion >= 6) || profile?.id !== "forest-11-20" || node.creature?.challengeSource === "manual") return null;
+  const terrainName = getTerrainName(node);
+  return {
+    communities: getAnimalCommunities(profile, terrainName),
+    terrainTag: profile.creatureRules?.ecology?.terrainTagsByName?.[terrainName]?.[0] ?? null
+  };
+}
+
+function getNodeCreatureCatalog(node, profile) {
+  const ecology = getNodeEcology(node, profile);
+  const catalog = getAllowedCatalog(node.creature.allowedCreatureIds, profile, node.creature.preferAllowedVariants);
+  return { ecology, catalog: filterEncounterCatalog(node, catalog, ecology) };
+}
+
+/** Na geração 6, diz se o terreno do nó tem comunidade de animais que feche o alvo. */
+export function canComposeNodeAnimals(node, profile) {
+  const context = getNodeAnimalCommunityContext(node, profile);
+  if (!context || !node.creature) return true;
+  return canComposeAnimalCommunity({
+    catalog: getNodeCreatureCatalog(node, profile).catalog,
+    target: getCreatureGroupTarget(node.creature.targetChallenge ?? node.challenge.creatures),
+    terrainTag: context.terrainTag,
+    communities: context.communities,
+    upgrade: createEliteVariant
+  });
+}
+
 function getMixedChallengePairs(catalog, targetChallenge, type, ecology) {
   const candidates = catalog.filter(creature => typeof creature.challengeRating === "number"
     && creature.challengeRating < targetChallenge
@@ -525,7 +563,7 @@ function getMixedChallengePairs(catalog, targetChallenge, type, ecology) {
 }
 
 function groupFitsTacticalMap(node, layout, profileId, seed, entries, count) {
-  const items = entries.map(({ creature, quantity }) => getCreatureSummary(creature, quantity));
+  const items = entries.map(({ creature, quantity }) => getEncounterCreatureSummary(creature, quantity));
   if (node.trap) items.push(getTrapSummary(node.trap));
   return encounterFitsMap(node, layout, profileId, seed, items, count);
 }
@@ -536,7 +574,7 @@ function encounterFitsMap(node, layout, profileId, seed, items, count, objective
   }, objectives, { profileId });
   const enemies = map.scene.pieces.filter(piece => piece.side === "enemy");
   const trapItem = items.find(item => item.kind === "trap");
-  if (node.generationVersion === 5 && trapItem) {
+  if (node.generationVersion >= 5 && trapItem) {
     const trapTiles = new Set(map.scene.markers.filter(marker => marker.id === trapItem.trapId)
       .flatMap(marker => marker.indices ?? []));
     if (!trapTiles.size) return false;
@@ -620,9 +658,33 @@ export function resolveForestTrapNode(node, profile, { seed, tacticalLayout = no
 
 const ELITE_FIT_ATTEMPTS = 8;
 
+// Comunidade do elite v6: a gravada (rerrolagem) ou uma sorteada pelo peso entre as que
+// têm animal no catálogo do nó.
+function pickEliteCommunity(context, catalog, rng, animalCommunityId) {
+  if (!context) return null;
+  if (animalCommunityId) return context.communities.find(community => community.id === animalCommunityId) ?? null;
+  const options = context.communities
+    .filter(community => (Number.isFinite(community.weight) ? community.weight : 1) > 0)
+    .filter(community => getCommunityAnimals(catalog, community, context.terrainTag).length)
+    .map(community => ({ community, weight: Number.isFinite(community.weight) ? community.weight : 1 }));
+  return options.length ? pickEcologyWeighted(rng, options).community : null;
+}
+
+function* withinSheets(groups, maxHelperSheets) {
+  if (maxHelperSheets < 1) return;
+  for (const group of groups) if (group.length <= maxHelperSheets) yield group;
+}
+
+export function getForestCompositionCreatures(items) {
+  return items.map(item => item.generated
+    ? { id: item.creatureData.baseCreatureId, quantity: item.quantity, eliteChallenge: item.challengeRating }
+    : { id: item.creatureId, quantity: item.quantity });
+}
+
 export function resolveForestElite(node, profile, {
-  seed, tacticalLayout = node.tacticalLayout, rng = createRng(seed), variant, originalComposition
+  seed, tacticalLayout = node.tacticalLayout, rng = createRng(seed), variant, originalComposition, animalCommunityId
 }) {
+  const communityContext = getNodeAnimalCommunityContext(node, profile);
   const ecology = getNodeEcology(node, profile);
   const rules = profile.creatureRules;
   const catalog = filterEncounterCatalog(node, getAllowedCatalog(
@@ -631,6 +693,31 @@ export function resolveForestElite(node, profile, {
     creature,
     order: -Math.log(1 - rng()) / (ecology ? getCreatureEcologyWeight(creature, ecology.context, ecology.rules) : 1)
   })).sort((a, b) => a.order - b.order).map(entry => entry.creature);
+  // Geração 6: a principal animal e os auxiliares dela saem de uma só comunidade; a
+  // principal pode ser a versão melhorada de um animal da comunidade.
+  const community = pickEliteCommunity(communityContext, catalog, rng, animalCommunityId);
+  const communityAnimals = community ? getCommunityAnimals(catalog, community, communityContext.terrainTag) : [];
+  const inCommunity = new Set(communityAnimals.map(creature => creature.id));
+  const upgrades = new Map();
+  const upgradeOf = (creature, rating) => {
+    const key = `${creature.id}:${rating}`;
+    if (!upgrades.has(key)) {
+      const upgraded = createEliteVariant(creature, rating);
+      upgrades.set(key, upgraded?.challengeRating === rating ? upgraded : null);
+    }
+    return upgrades.get(key);
+  };
+  // Cada animal da comunidade concorre na posição sorteada da própria ficha: com o ND
+  // da principal entra como está; abaixo dele, pela versão melhorada.
+  const principalsFor = principalND => {
+    if (!communityContext) return catalog.filter(c => c.challengeRating === principalND);
+    return catalog.flatMap(c => {
+      if (c.type !== "animal") return c.challengeRating === principalND ? [c] : [];
+      if (!inCommunity.has(c.id) || !(c.challengeRating > 0)) return [];
+      if (c.challengeRating === principalND) return [c];
+      return c.challengeRating < principalND ? [upgradeOf(c, principalND)].filter(Boolean) : [];
+    });
+  };
   const variants = variant ? [variant] : rng() < 0.1
     ? ["eliteTrap", "eliteGroup", "eliteSingle"] : ["eliteGroup", "eliteTrap", "eliteSingle"];
   const traps = variant ? [node.trap].filter(Boolean) : getEligibleForestTraps(profile, { maximumChallenge: 1, mode: "standalone" })
@@ -644,10 +731,16 @@ export function resolveForestElite(node, profile, {
         .sort((a, b) => b.challengeRating - a.challengeRating);
       // Cada recorte por tipo tem sua própria memória de estados sem saída.
       const deadByPool = new Map();
-      for (const principal of catalog.filter(c => c.challengeRating === principalND)) {
+      for (const principal of principalsFor(principalND)) {
         const leader = { creature: principal, quantity: 1 };
+        const fromCommunity = communityContext && principal.type === "animal";
         let helpers = [[]];
-        if (recipe === "eliteGroup") {
+        if (recipe === "eliteGroup" && fromCommunity) {
+          const baseId = principal.baseCreatureId ?? principal.id;
+          const pool = communityAnimals.filter(c => c.id !== baseId && c.challengeRating > 0 && c.challengeRating < principalND)
+            .sort((a, b) => b.challengeRating - a.challengeRating);
+          helpers = withinSheets(eliteAuxiliaries(pool, leader, rating), community.maxSheets - 1);
+        } else if (recipe === "eliteGroup") {
           const pool = forestPool(auxiliaries, principal.type, rng, { strict: true });
           const key = [...new Set(pool.map(creature => creature.type))].sort().join(",");
           if (!deadByPool.has(key)) deadByPool.set(key, new Map());
@@ -657,7 +750,7 @@ export function resolveForestElite(node, profile, {
         let attempts = 0;
         for (const group of helpers) {
           if (attempts >= ELITE_FIT_ATTEMPTS) break;
-          const items = [leader, ...group].map(({ creature, quantity }) => getCreatureSummary(creature, quantity));
+          const items = [leader, ...group].map(({ creature, quantity }) => getEncounterCreatureSummary(creature, quantity));
           if (originalComposition && getCreatureComposition(items) === originalComposition) continue;
           attempts++;
           for (const trap of recipe === "eliteTrap" ? traps : [null]) {
@@ -665,8 +758,12 @@ export function resolveForestElite(node, profile, {
             const count = items.reduce((sum, item) => sum + item.quantity, 0);
             if (encounterFitsMap({ ...node, trap }, tacticalLayout, profile.id, seed, all, count)) {
               // A variação de armas vale para a rerrolagem; a geração grava só as fichas.
-              const varied = [leader, ...group].map(({ creature, quantity }) => getCreatureSummary(creature, quantity, rng));
-              return { items: varied, trap, creatureTarget: calculateCombatND(items), effectiveType: "elite", variant: recipe };
+              const varied = [leader, ...group].map(({ creature, quantity }) => getEncounterCreatureSummary(creature, quantity, rng));
+              return {
+                items: varied, trap, creatureTarget: calculateCombatND(items), effectiveType: "elite", variant: recipe,
+                composition: getForestCompositionCreatures(varied),
+                ...(fromCommunity ? { animalCommunityId: community.id } : {})
+              };
             }
           }
         }
@@ -677,7 +774,11 @@ export function resolveForestElite(node, profile, {
   return { items: [], trap: null, creatureTarget: 0, effectiveType: "normal", variant: "normal" };
 }
 
-function resolveCreatureGroup(node, rng, catalog, ecology, { profileId, seed, compositionSeed = seed, tacticalLayout } = {}) {
+// `animalCommunities` (geração 6) monta o combate de animais por comunidade e grava a
+// comunidade em `result.animalCommunityId`; sem grupo, segue sem animais no catálogo.
+function resolveCreatureGroup(node, rng, catalog, ecology, {
+  profileId, seed, compositionSeed = seed, tacticalLayout, animalCommunities = null, excludeComposition = null, result = null
+} = {}) {
   if (!node.creature || !node.challenge || node.challenge.creatures <= 0) return [];
 
   const specificCreatureItems = resolveSpecificCreature(node, rng);
@@ -686,6 +787,20 @@ function resolveCreatureGroup(node, rng, catalog, ecology, { profileId, seed, co
   const targetChallenge = getCreatureGroupTarget(node.creature.targetChallenge ?? node.challenge.creatures);
   const terrainName = getTerrainName(node);
   const type = node.creature.type ?? null;
+  if (animalCommunities && type === "animal") {
+    const layout = tacticalLayout ?? node.tacticalLayout;
+    const group = composeAnimalCommunityGroup({
+      catalog, target: targetChallenge, terrainTag: animalCommunities.terrainTag,
+      communities: animalCommunities.communities, rng: createRng(`${compositionSeed}:animal-community`),
+      accepts: (entries, count) => groupFitsTacticalMap(node, layout, profileId, seed, entries, count),
+      upgrade: createEliteVariant, excludeComposition
+    });
+    if (group) {
+      if (result) result.animalCommunityId = group.communityId;
+      return group.entries.map(({ creature, quantity }) => getEncounterCreatureSummary(creature, quantity, rng));
+    }
+    catalog = catalog.filter(creature => creature.type !== "animal");
+  }
   if (["dungeon-1-10", "forest-11-20", "archipelago-21-30"].includes(profileId) &&
       node.creature.challengeSource !== "manual") {
     const compositionRng = createRng(`${compositionSeed}:group-composition`);
@@ -787,7 +902,7 @@ function resolveCreatureGroup(node, rng, catalog, ecology, { profileId, seed, co
 }
 
 export function getEncounterSeed(node, mapSeed) {
-  if (node.generationVersion === 5 && node.forestComposition?.seed) return node.forestComposition.seed;
+  if (node.generationVersion >= 5 && node.forestComposition?.seed) return node.forestComposition.seed;
   return `${mapSeed || "map"}:${node.encounterSeed || node.id}:encounter-v${ENCOUNTER_RESOLUTION_VERSION}`;
 }
 
@@ -819,15 +934,42 @@ export function rerollNodeCreatures(node, profile, { tacticalLayout } = {}) {
   const original = encounter.items.filter(item => item.kind === "creature");
   const originalComposition = getCreatureComposition(original);
   const variant = node.forestComposition?.variant;
-  if (node.generationVersion === 5 && variant?.startsWith("elite")) {
+  if (node.generationVersion >= 5 && variant?.startsWith("elite")) {
     const reroll = (encounter.creatureRerolls || 0) + 1;
     const result = resolveForestElite(node, profile, {
       seed: encounter.seed, tacticalLayout, variant, originalComposition,
+      animalCommunityId: node.forestComposition.animalCommunityId,
       rng: createRng(`${encounter.seed}:creature-reroll:${reroll}`)
     });
     if (result.variant !== variant) return null;
     return { ...encounter, creatureRerolls: reroll,
       items: [...result.items, ...encounter.items.filter(item => item.kind !== "creature")] };
+  }
+  const animalCommunities = getNodeAnimalCommunityContext(node, profile);
+  if (animalCommunities && encounter.animalCommunityId) {
+    // Geração 6: a mesma comunidade, sem repetir a composição; sem alternativa, null.
+    const community = animalCommunities.communities.find(candidate => candidate.id === encounter.animalCommunityId);
+    if (!community) return null;
+    const reroll = (encounter.creatureRerolls || 0) + 1;
+    const layout = tacticalLayout ?? node.tacticalLayout;
+    const group = composeAnimalCommunityGroup({
+      catalog: getNodeCreatureCatalog(node, profile).catalog,
+      target: getCreatureGroupTarget(node.creature.targetChallenge ?? node.challenge.creatures),
+      terrainTag: animalCommunities.terrainTag, communities: [community],
+      rng: createRng(`${encounter.seed}:creature-reroll:${reroll}`),
+      accepts: (entries, count) => groupFitsTacticalMap(node, layout, profile.id, encounter.seed, entries, count),
+      upgrade: createEliteVariant, excludeComposition: originalComposition
+    });
+    if (!group) return null;
+    const weaponRng = createRng(`${encounter.seed}:creature-reroll:${reroll}:weapons`);
+    return {
+      ...encounter,
+      creatureRerolls: reroll,
+      items: [
+        ...group.entries.map(({ creature, quantity }) => getEncounterCreatureSummary(creature, quantity, weaponRng)),
+        ...encounter.items.filter(item => item.kind !== "creature")
+      ]
+    };
   }
   // Com orçamento de criaturas, mira o mesmo alvo de resolveCreatureGroup: um grupo
   // gravado antes do ND de grupo do livro pode valer outro ND. Sem orçamento, mira
@@ -837,8 +979,10 @@ export function rerollNodeCreatures(node, profile, { tacticalLayout } = {}) {
     : calculateCombatND(original);
   const { type, allowedCreatureIds } = node.creature;
   const ecology = getNodeEcology(node, profile);
+  // Combate de animais v6 que já saiu para outro tipo: continua sem animais.
   const catalog = filterEncounterCatalog(node, getAllowedCatalog(allowedCreatureIds, profile, node.creature.preferAllowedVariants), ecology)
-    .filter(creature => ecology || !type || creature.type === type);
+    .filter(creature => ecology || !type || creature.type === type)
+    .filter(creature => !animalCommunities || type !== "animal" || creature.type !== "animal");
   if (!catalog.length || challenge <= 0) return null;
 
   // O orçamento e a identidade da cena continuam sendo os do encontro original.
@@ -873,7 +1017,7 @@ export function hasRecordedEncounterProgress(node, missions = []) {
 export function canRerollNodeEscort(node) {
   return Boolean(node?.trap
     && (node.contentType || node.type) === "trap"
-    && node.generationVersion === 5
+    && node.generationVersion >= 5
     && getForestEscortTarget(node.trap.challengeRating) > 0
     && !node.missionBindings?.length
     && !node.missionObjectives?.length
@@ -924,7 +1068,7 @@ export function rerollNodeTrap(node, profile, { tacticalLayout = node?.tacticalL
   const current = node.resolvedEncounter;
   const trapRerolls = (current.trapRerolls || 0) + 1;
   const rng = createRng(`${current.seed}:trap-reroll:${trapRerolls}`);
-  if (node.generationVersion === 5 && profile.id === "forest-11-20") {
+  if (node.generationVersion >= 5 && profile.id === "forest-11-20") {
     const count = current.items.filter(item => item.kind === "creature").reduce((sum, item) => sum + item.quantity, 0);
     const mode = count && node.forestComposition?.variant !== "eliteTrap" ? undefined : "standalone";
     const candidates = getEligibleForestTraps(profile, { maximumChallenge: node.trap.challengeRating, mode })
@@ -954,9 +1098,11 @@ export function rerollNodeTrap(node, profile, { tacticalLayout = node?.tacticalL
 function resolveFixedComposition(fixedComposition, rng) {
   const weaponRng = fixedComposition.useWeaponVariation === false ? null : rng;
   const creatureItems = (fixedComposition.creatures || [])
-    .map(({ id, quantity }) => {
-      const creature = getCreatureById(id);
-      return creature ? getCreatureSummary(creature, quantity || 1, weaponRng) : null;
+    .map(({ id, quantity, eliteChallenge }) => {
+      const base = getCreatureById(id);
+      // Versão melhorada (elite v6 da floresta): refeita a partir da ficha original.
+      const creature = base && eliteChallenge ? createEliteVariant(base, eliteChallenge) : base;
+      return creature ? getEncounterCreatureSummary(creature, quantity || 1, weaponRng) : null;
     })
     .filter(Boolean);
   const trapQuantities = (fixedComposition.traps || []).reduce((quantities, trapId) => {
@@ -1012,18 +1158,30 @@ export function resolveForestAmbush(node, profile, { mapSeed } = {}) {
     challenge: { ...node.challenge, creatures: target }
   };
   assignCreatureProfile(ambushNode, profile, rng);
+  if (ambushNode.creature?.type === "animal" && !canComposeNodeAnimals(ambushNode, profile)) {
+    assignCreatureProfile(ambushNode, profile, rng, { excludeTypes: ["animal"] });
+  }
   const ecology = getNodeEcology(ambushNode, profile);
+  const animalCommunities = getNodeAnimalCommunityContext(ambushNode, profile);
   const catalog = filterEncounterCatalog(ambushNode, getAllowedCatalog(ambushNode.creature?.allowedCreatureIds, profile), ecology);
-  const items = resolveCreatureGroup(ambushNode, rng, catalog, ecology, { profileId: profile.id, seed });
+  const result = {};
+  const items = resolveCreatureGroup(ambushNode, rng, catalog, ecology, { profileId: profile.id, seed, animalCommunities, result });
   const groupTarget = getCreatureGroupTarget(target);
-  if (items.length && calculateCombatND(items) === groupTarget) return createResolvedEncounter(ambushNode, items, seed);
+  if (items.length && calculateCombatND(items) === groupTarget) {
+    const encounter = createResolvedEncounter(ambushNode, items, seed);
+    if (result.animalCommunityId) encounter.animalCommunityId = result.animalCommunityId;
+    return encounter;
+  }
 
+  // Na geração 6, a última saída do combate de animais não traz animal fora de comunidade.
+  const fallbackCatalog = animalCommunities && ambushNode.creature.type === "animal"
+    ? catalog.filter(creature => creature.type !== "animal") : catalog;
   const creature = pickExactCreatureForChallenge({
     type: ambushNode.creature.type,
     targetChallenge: groupTarget,
     terrainName: getTerrainName(node),
     rng,
-    catalog,
+    catalog: fallbackCatalog,
     ecology
   });
   return creature ? createResolvedEncounter(ambushNode, [getCreatureSummary(creature, 1, rng)], seed) : null;
@@ -1037,10 +1195,11 @@ export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidate
 
   const seed = getEncounterSeed(node, mapSeed);
   const rng = createRng(seed);
+  const result = {};
   let items;
   if (node.fixedComposition) {
     items = resolveFixedComposition(node.fixedComposition, rng);
-  } else if (node.generationVersion === 5 && node.forestComposition && node.creature?.challengeSource !== "manual") {
+  } else if (node.generationVersion >= 5 && node.forestComposition && node.creature?.challengeSource !== "manual") {
     items = resolveFixedComposition(node.forestComposition, rng);
     if (node.trap) items.push(getTrapSummary(node.trap));
   } else {
@@ -1049,12 +1208,13 @@ export function resolveNodeEncounter(node, { mapSeed, profile, creatureCandidate
       : [];
     const ecology = getNodeEcology(node, profile);
     items = resolveCreatureGroup(node, rng, filterEncounterCatalog(node, catalog, ecology), ecology, {
-      profileId: profile?.id, seed, tacticalLayout
+      profileId: profile?.id, seed, tacticalLayout, animalCommunities: getNodeAnimalCommunityContext(node, profile), result
     });
     if (node.trap) items.push(getTrapSummary(node.trap));
   }
   if (items.length === 0) return null;
 
   node.resolvedEncounter = createResolvedEncounter(node, items, seed);
+  if (result.animalCommunityId) node.resolvedEncounter.animalCommunityId = result.animalCommunityId;
   return node.resolvedEncounter;
 }

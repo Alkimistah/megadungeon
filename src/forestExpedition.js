@@ -25,7 +25,7 @@ export function prepareForestExpedition({ seed, profile, missions, startFloor = 
       const mapSeed = `${seed}:forest:${floor}:${attempt}`;
       const levels = generateMapData(floorDepth, floorDc, profile, floor, createRng(mapSeed), { version: GENERATION_VERSION, mapSeed });
       for (const node of levels.flat()) {
-        if (node.generationVersion !== 5) node.encounterSeed = `${floor}:${node.encounterSeed}`;
+        if (!(node.generationVersion >= 5)) node.encounterSeed = `${floor}:${node.encounterSeed}`;
       }
       try {
         const nextMissions = materializeForestFloorMissions({ floor, levels, missions: preparedMissions, profile });

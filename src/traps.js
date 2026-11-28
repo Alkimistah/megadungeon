@@ -746,7 +746,7 @@ export function syncRerolledTrapProfile(node) {
   const trapEntry = item && getTrapById(item.trapId);
   if (trapEntry) {
     node.trap = withTrapRole(trapEntry, item.role, node.trap?.targetChallenge ?? item.challengeRating);
-    if (node.generationVersion === 5 && item.role === "incidental" && (node.contentType ?? node.type) === "normal") {
+    if (node.generationVersion >= 5 && item.role === "incidental" && (node.contentType ?? node.type) === "normal") {
       node.trap.roleDescription = forestIncidentalDescription;
     }
   }

@@ -48,7 +48,7 @@ const NON_CREATURE_ROOM_TYPES = new Set(["camp", "trap", "treasure"]);
 const NON_CREATURE_UNKNOWN_LABELS = new Set(["Acampamento", "Armadilha", "Tesouro"]);
 
 function hasCreatureProfile(node) {
-  if (node.generationVersion === 5 && node.forestComposition?.variant === "trap") return node.challenge.creatures > 0;
+  if (node.generationVersion >= 5 && node.forestComposition?.variant === "trap") return node.challenge.creatures > 0;
   if (NON_CREATURE_ROOM_TYPES.has(node.type)) return false;
   if (node.type === "unknown" && NON_CREATURE_UNKNOWN_LABELS.has(node.revealedLabel)) return false;
   if (node.challenge?.creatures === 0) return false;
@@ -125,7 +125,9 @@ function getForestCompositionType(node) {
   return variant?.startsWith("elite") ? getCreatureById(creatures[0]?.id)?.type ?? null : null;
 }
 
-export function assignCreatureProfile(node, profile, rng) {
+// `excludeTypes` tira tipos do sorteio (a geração 6 da floresta exclui "animal" quando
+// o terreno não tem comunidade que feche o alvo). Um tipo prescrito não é afetado.
+export function assignCreatureProfile(node, profile, rng, { excludeTypes = [] } = {}) {
   if (!hasCreatureProfile(node)) {
     node.creature = null;
     return;
@@ -134,7 +136,11 @@ export function assignCreatureProfile(node, profile, rng) {
   const rules = getCreatureRules(profile);
   const specificCreature = getSpecificCreature(node, rules);
   const prescribedType = specificCreature?.type ?? getForestCompositionType(node);
-  const typeOption = prescribedType ? { type: prescribedType } : pickWeighted(rng, getWeightedCreatureTypes(node, rules));
+  const weights = getWeightedCreatureTypes(node, rules);
+  const allowedWeights = weights.filter(option => !excludeTypes.includes(option.type));
+  const typeOption = prescribedType
+    ? { type: prescribedType }
+    : pickWeighted(rng, allowedWeights.length ? allowedWeights : weights);
   const type = CREATURE_TYPES[typeOption.type] || CREATURE_TYPES.monster;
   const targetChallenge = specificCreature?.challengeRating ?? getChallengeSource(node, rules);
   const allowedCreatureIds = getAllowedCreatureIds(node, rules);

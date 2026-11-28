@@ -82,12 +82,13 @@ test("uses the full floor ND for visible and hidden normal combats in a forest v
   }
 });
 
-test("uses the v5 marker only when that version is requested for a forest", () => {
+test("uses the v5+ marker only when that version is requested for a forest", () => {
   const generate = (floorProfile, floor, options) =>
     generateMapData(5, 20, floorProfile, floor, createRng("forest-version"), options).flat();
-  for (const version of [undefined, 1, 2, 3, 4, 6]) {
+  for (const version of [undefined, 1, 2, 3, 4]) {
     assert.ok(generate(profile, 11, { version }).every(node => node.generationVersion === undefined));
   }
+  assert.ok(generate(profile, 11, { version: 6 }).every(node => node.generationVersion === 6));
   const otherProfile = { ...profile, id: "other-profile" };
   assert.ok(generate(otherProfile, 11, { version: 5 }).every(node => node.generationVersion === undefined));
 });
